@@ -1,4 +1,4 @@
-﻿# GAM55X Game Project
+﻿# Team Laurel Game Project
 
 ## Directory Layout
 
@@ -72,3 +72,4 @@ GAM55X-Aspen/
 - Committing build artifacts or `.vs/` folders
 - Using inconsistent naming conventions across folders
 - Confusing organizations
+
