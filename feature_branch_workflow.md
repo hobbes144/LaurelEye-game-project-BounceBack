@@ -1,4 +1,4 @@
-# Mastering the Feature Branch Workflow in GitHub for C++ Projects
+﻿# Mastering the Feature Branch Workflow in GitHub for C++ Projects
 
 As graduate computer science students, you're likely managing complex C++ projects, whether for coursework, research, or open-source contributions. The **Feature Branch Workflow** is a streamlined GitHub strategy that isolates development tasks, enabling clean collaboration and robust version control. This guide walks you through the workflow with a C++ project example, ensuring your team can develop, test, and merge features like matrix operations or algorithm optimizations without breaking the main codebase.
 

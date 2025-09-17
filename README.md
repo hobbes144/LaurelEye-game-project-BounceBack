@@ -14,12 +14,12 @@ You get to determine the folder layout in GAM550, but the instructor will mark d
    - organizes the build output making diagnosing problems easier
    - allows you to perform a very fast "clean" by deleting the `/build` directory
 - Replace all instances of `Laurel` (as in `LaurelGameEngine`) with your team codename (e.g., `BirchGameEngine`). This applies to folder names, project files, etc.
-- prefer `lowercase` directy names except where inappropriate.  
+- prefer `lowercase` directly names except where inappropriate.  
 - Regarding coding conventions: I've included
 ```
 
-GAM55X-Laurel/
-├── GAM550.sln                        # Global solution file containing all the projects
+gam55X-laurel/
+├── CMakeLists.txt                    # Global CMake project linking to all the sub-projects
 ├── coding_conventions.md             # An example coding convention file for the team
 ├── external/                         # Third-party libraries (headers + binaries)
 │   ├── glfw/                         # Window/input management
@@ -30,7 +30,7 @@ GAM55X-Laurel/
 │   ├── imgui/                        # Immediate-mode GUI
 │   └── ...etc...
 ├── include/                          # Public headers for your lib/dll projects
-│   └── LaurelGameEngine/              # Your game engine's public headers
+│   └── LaurelEyeEngine/              # Your game engine's public headers
 │       ├── core/                     # Application, window, input
 │       ├── graphics/                 # Shader, texture, mesh, camera
 │       ├── audio/                    # FMOD wrappers
@@ -39,19 +39,19 @@ GAM55X-Laurel/
 │       └── ...etc...
 ├── source/                           # C++ implementation projects
 │   ├── LaurelGameEngine/              # Game engine (.lib or .exe if script-based)
-│   │   ├── LaurelGameEngine.vcxproj   # Project file
+│   │   ├── CMakeLists.txt   # Project file
 │   │   ├── core/                     # Internal hierarchy
 │   │   └── ...etc...                 
 │   ├── LaurelGame/                    # Game executable project (optional)
-│   │   ├── LaurelGame.vcxproj         
+│   │   ├── CMakeLists.txt         
 │   │   └── ...etc...                 
 │   └── ...etc...                     # Other projects (examples, prototypes, etc.)
 ├── tests/                            # Test code
 │   ├── LaurelGameEngineUnitTests/
-│   │   ├── LaurelGameEngineUnitTests.vcxproj
+│   │   ├── CMakeLists.txt
 │   │   └── ...etc...
 │   └── LaurelGameEngineStressTests/
-│       ├── LaurelGameEngineStressTests.vcxproj
+│       ├── CMakeLists.txt
 │       └── ...etc...
 ├── assets/                           # Assets folder
 │   ├── shaders/

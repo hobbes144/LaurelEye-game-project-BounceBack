@@ -43,7 +43,7 @@ These suggestions below were designed for C++23, aligning with modern C++ practi
 
 | Category                | Style                    | Examples                           | Notes                                                                 |
 |-------------------------|--------------------------|------------------------------------|----------------------------------------------------------------------|
-| Namespaces              | `snake_case`             | `aspen`, `strings`                | Prefer single-word names.                                            |
+| Namespaces              | `UpperCamelCase`             | `Aspen`, `Strings`                | Prefer single-word names.                                            |
 | Modules                 | `snake_case`             | `aspen.strings`, `aspen.utils`   | Nouns; match namespace names.                                        |
 | Classes                 | `UpperCamelCase`         | `Logger`, `TransformString`        | Nouns; verbs for function objects.                                   |
 | Methods                 | `lowerCamelCase`         | `getValue`, `parseInput`           | Verbs describing actions.                                            |
@@ -60,10 +60,10 @@ These suggestions below were designed for C++23, aligning with modern C++ practi
 ### Details
 
 ##### Namespaces
-- **Style:** `snake_case`
-- **Examples:** `aspen`, `strings`
+- **Style:** `UpperCamelCase`
+- **Examples:** `Aspen`, `Strings`
 - **Part of Speech:** Nouns and Noun Phrases
-- **Notes:** Prefer single-word names over `multiple_words`.
+- **Notes:** Prefer single-word names over `MultipleWords`.
 
 ##### Modules (*future*)
 - **NOTE:** C++ Modules are new and most students don't use them yet. Moreover, there's limited support in the MS VC toolset. ***Recommended*:** If you don't already know how to use modules, don't try to use them in GAM55X.
