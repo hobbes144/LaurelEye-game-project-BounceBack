@@ -1,22 +1,18 @@
-/*!****************************************************************************
- * \file   Matrix4.h
- * \author Anish Murthy (anish.murthy.dev@gmail.com)
- * \par    **DigiPen Email**
- *    anish.murthy@digipen.edu
- * \author Mariojulio Osmin Zaldivar Alvarez (ex-Adjunct Professor)
- *   (zaldivaralvarez@gmail.com) (Advising and Base Code)
- * \par    **Course**
- *    CS529
- * \date   10-05-2024
- * \brief  File conatining the custom Matrix4 implementation for use with
- * OpenGL functions and other game logic.
- *
- * Copyright � 2025 DIGIPEN Institute of Technology. All rights reserved.
- *
- *****************************************************************************/
-#ifndef MATRIX4_H
-#define MATRIX4_H
-
+﻿///
+/// @file   Matrix4.h
+/// @author Anish Murthy (anish.murthy.dev@gmail.com)
+/// @par    **DigiPen Email**
+///     anish.murthy@digipen.edu
+/// @author Mariojulio Osmin Zaldivar Alvarez (ex-Adjunct Professor)
+///     (zaldivaralvarez@gmail.com) (Advising and Base Code)
+/// @par    **Course**
+///     CS529
+/// @date   10-05-2024
+/// @brief  File conatining the custom Matrix4 implementation for use with
+///     OpenGL functions and other game logic.
+///
+/// Copyright © 2025 DIGIPEN Institute of Technology. All rights reserved.
+///
 #pragma once
 
 #include <array>
@@ -24,17 +20,15 @@
 #include <iostream>
 #include <stdexcept>
 
+#include "LaurelEyeEngine/core/Quaternion.h"
 #include "LaurelEyeEngine/core/Vector3.h"
 #include "LaurelEyeEngine/core/VectorTemplated.h"
 #include "LaurelEyeEngine/core/Quaternion.h"
 
 namespace LaurelEye {
 
-/*!****************************************************************************
- * \brief Class that implements a custom 4x4 Matrix for use with OpenGL
- * functions and game logic.
- *
- *****************************************************************************/
+    /// @brief Class that implements a custom 4x4 Matrix for use with OpenGL
+    ///     functions and game logic.
 class Matrix4 {
     /*
       We will store matrix in column major:
@@ -47,7 +41,7 @@ class Matrix4 {
       Note that this is transposed form of a regular matrix.
     */
 private:
-    /** Data of the Matrix4 object */
+        /// Data of the Matrix4 object
     float data[4][4];
 
 public:
@@ -137,6 +131,4 @@ public:
 
 std::ostream& operator<<(std::ostream& os, const Matrix4& m);
 
-}
-
-#endif // MATRIX4_H
+} // namespace LaurelEye

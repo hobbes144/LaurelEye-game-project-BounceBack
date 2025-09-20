@@ -1,4 +1,4 @@
-/*!****************************************************************************
+ï»¿/*!****************************************************************************
  * \file   Vector3.h
  * \author Anish Murthy (anish.murthy.dev@gmail.com)
  * \par    **DigiPen Email**
@@ -11,7 +11,7 @@
  * \brief  File conatining the custom Vector3 implementation for use with
  * OpenGL functions and other game logic.
  *
- * Copyright © 2025 DIGIPEN Institute of Technology. All rights reserved.
+ * Copyright ï¿½ 2025 DIGIPEN Institute of Technology. All rights reserved.
  *
  *****************************************************************************/
 #ifndef VECTOR3_H
@@ -19,14 +19,14 @@
 
 #pragma once
 
-#include <cmath>
 #include <array>
-#include <vector>
+#include <cmath>
 #include <stdexcept>
+#include <vector>
 
 namespace LaurelEye {
 
-constexpr float PI{ 3.14159265f };
+    constexpr float PI{3.14159265f};
 
 class Vector3 {
 public:
@@ -80,11 +80,11 @@ public:
 
     int getMaxIndex() const;
 
-    std::vector<float> getData() const { return { x, y, z }; }
+        std::vector<float> getData() const { return {x, y, z}; }
 
     friend std::ostream& operator<<(std::ostream& os, const Vector3& v);
 };
 
-}
+} // namespace LaurelEye
 
 #endif // VECTOR3_H

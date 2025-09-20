@@ -1,4 +1,4 @@
-/*!****************************************************************************
+ï»¿/*!****************************************************************************
  * \file   VectorTemplated.h
  * \author Anish Murthy (anish.murthy.dev@gmail.com)
  * \par    **DigiPen Email**
@@ -12,7 +12,7 @@
  *
  * Currently not in use. To be updated when ready to use.
  *
- * Copyright © 2025 DIGIPEN Institute of Technology. All rights reserved.
+ * Copyright ï¿½ 2025 DIGIPEN Institute of Technology. All rights reserved.
  *
  *****************************************************************************/
 #ifndef VECTOR_TEMPLATED_H
@@ -66,7 +66,7 @@ public:
     }
 
     bool operator!=(const VectorTemplated& other) const {
-        return ( !( *this == other ) );
+            return (!(*this == other));
     }
 
     // Formula: [v1 + u1, v2 + u2, ..., vn + un]
@@ -136,7 +136,7 @@ public:
     T magnitude() const {
         T result = 0;
         for ( int i = 0; i < N; i++ ) {
-            result += static_cast<T>( pow(data[i], 2) );
+                result += static_cast<T>(pow(data[i], 2));
         }
         return sqrt(result);
     }
@@ -161,12 +161,12 @@ public:
     // Specific to 3D vectors
     // Formula: [v2*u3 - v3*u2, v3*u1 - v1*u3, v1*u2 - v2*u1]
     VectorTemplated cross(const VectorTemplated& other) const {
-        return VectorTemplated(( data[1] * other.data[2] - data[2] * other.data[1] ), ( data[2] * other.data[0] - data[0] * other.data[2] ), ( data[0] * other.data[1] - data[1] * other.data[0] ));
+            return VectorTemplated((data[1] * other.data[2] - data[2] * other.data[1]), (data[2] * other.data[0] - data[0] * other.data[2]), (data[0] * other.data[1] - data[1] * other.data[0]));
     }
 };
 
 using Vector4 = VectorTemplated<float, 4>;
 
-}
+} // namespace LaurelEye
 
 #endif // VECTOR_TEMPLATED_H

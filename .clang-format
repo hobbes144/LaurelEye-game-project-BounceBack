@@ -1,0 +1,47 @@
+﻿BasedOnStyle: Microsoft
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ColumnLimit: 0
+# DeriveLineEnding: False
+LineEnding: CRLF
+InsertNewlineAtEOF: true
+NamespaceIndentation: All
+AlignArrayOfStructures: Right
+AlignOperands: AlignAfterOperator
+AlignTrailingComments: Always
+AllowAllArgumentsOnNextLine: true
+AllowShortBlocksOnASingleLine: Always
+AllowShortEnumsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: AllIfsAndElse
+AllowShortLambdasOnASingleLine: All
+AllowShortLoopsOnASingleLine: true
+IncludeBlocks: Preserve
+IndentAccessModifiers: false
+AccessModifierOffset: -4
+IndentWrappedFunctionNames: true
+# BreakFunctionDefinitionParameters: true
+# IndentCaseLabels: False
+# IndentCaseBlocks: False
+PointerAlignment: Left
+QualifierAlignment: Left
+ReferenceAlignment: Left
+SortIncludes: CaseInsensitive
+# SpaceBeforeParens: ControlStatements
+SpacesInConditionalStatement: true
+# SpacesInParentheses: True
+# SpaceInEmptyParentheses: False
+# SpacesInSquareBrackets: False
+# SpaceBeforeSquareBrackets: False
+# SpacesInCStyleCastParentheses: False
+# SpaceAfterCStyleCast: False
+# SpaceBeforeCpp11BracedList: False
+# Cpp11BracedListStyle: False
+BraceWrapping:
+  AfterNamespace: false
+  AfterClass: false
+  AfterStruct: false
+  AfterEnum: false
+  AfterFunction: false
+  AfterControlStatement: false

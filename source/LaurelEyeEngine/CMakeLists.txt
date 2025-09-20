@@ -1,11 +1,14 @@
-# Engine library
+﻿# Engine library
 # project (LaurelEyeEngine VERSION 0.0.1 DESCRIPTION "Team Laurel GAM55x Engine")
 
 file(GLOB_RECURSE ENGINE_SOURCES CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/precompiled.cpp
     #${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/core/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/physics/*.cpp
 )
+
+find_package(Bullet CONFIG REQUIRED)
 
 add_library(LaurelEyeEngine SHARED ${ENGINE_SOURCES})
 
@@ -37,3 +40,10 @@ if (CMAKE_VERSION VERSION_GREATER 3.20)
 endif()
 
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
+
+target_link_libraries(LaurelEyeEngine
+    PUBLIC
+        LinearMath
+        BulletCollision
+        BulletDynamics
+)

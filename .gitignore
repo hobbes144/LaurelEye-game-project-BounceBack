@@ -68,5 +68,8 @@ _deps
 CMakeUserPresets.json
 .cache
 
+# Doxygen output Files
+doc/html/
+
 # Temporarily added until I track down why cmake is still creating this
 out/

@@ -1,11 +1,11 @@
-// IWYU pragma: keep
+ï»¿// IWYU pragma: keep
 /*!****************************************************************************
  * \file   precompiled.h
  * \author Erik Fleegal (Adjunct Senior Lecturer)
  *   (eric.fleegal@digipen.edu)
  * \brief  Precompiled headers
  *
- * Copyright © 2025 DIGIPEN Institute of Technology. All rights reserved.
+ * Copyright ï¿½ 2025 DIGIPEN Institute of Technology. All rights reserved.
  *
  *****************************************************************************/
 #pragma once
@@ -18,7 +18,7 @@
 // #undef far
 
 // microsoft headers
-//#include <math.h>
+// #include <math.h>
 
 // std library headers
 #include <algorithm>

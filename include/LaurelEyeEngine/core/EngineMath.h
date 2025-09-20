@@ -26,8 +26,8 @@ namespace LaurelEye {
             float boundedFloat(float min, float max);
         }
 
-    }
+    } // namespace EngineMath
 
-}
+} // namespace LaurelEye
 
 #endif // !ENGINE_MATH_H
