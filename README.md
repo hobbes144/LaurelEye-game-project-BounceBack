@@ -2,9 +2,6 @@
 
 ## Directory Layout
 
-You get to determine the folder layout in GAM550, but the instructor will mark down if unorganized, sloppy, or just looks like copy-paste from other projects.  Your approach must be intentional.
-
-- Below is a suggested layout
 - Separate the "public" header files of your engine and other libraries from their private files.
    - This allows consuming projects to add just the `include` directory to the C++ `include` path
    - consuming projects then `#include <LaurelGameEngine/core/SomeHeader.h>` making it very explicit what's being included
@@ -14,7 +11,7 @@ You get to determine the folder layout in GAM550, but the instructor will mark d
    - organizes the build output making diagnosing problems easier
    - allows you to perform a very fast "clean" by deleting the `/build` directory
 - Replace all instances of `Laurel` (as in `LaurelGameEngine`) with your team codename (e.g., `BirchGameEngine`). This applies to folder names, project files, etc.
-- prefer `lowercase` directly names except where inappropriate.  
+- prefer `lowercase` directly names except where inappropriate.
 - Regarding coding conventions: I've included
 ```
 
@@ -41,10 +38,10 @@ gam55X-laurel/
 │   ├── LaurelGameEngine/              # Game engine (.lib or .exe if script-based)
 │   │   ├── CMakeLists.txt   # Project file
 │   │   ├── core/                     # Internal hierarchy
-│   │   └── ...etc...                 
+│   │   └── ...etc...
 │   ├── LaurelGame/                    # Game executable project (optional)
-│   │   ├── CMakeLists.txt         
-│   │   └── ...etc...                 
+│   │   ├── CMakeLists.txt
+│   │   └── ...etc...
 │   └── ...etc...                     # Other projects (examples, prototypes, etc.)
 ├── tests/                            # Test code
 │   ├── LaurelGameEngineUnitTests/

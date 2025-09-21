@@ -6,9 +6,11 @@ file(GLOB_RECURSE ENGINE_SOURCES CONFIGURE_DEPENDS
     #${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/core/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/physics/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/graphics/*.cpp
 )
 
 find_package(Bullet CONFIG REQUIRED)
+find_package(glfw3 CONFIG REQUIRED)
 
 add_library(LaurelEyeEngine SHARED ${ENGINE_SOURCES})
 
@@ -46,4 +48,5 @@ target_link_libraries(LaurelEyeEngine
         LinearMath
         BulletCollision
         BulletDynamics
+        glfw
 )

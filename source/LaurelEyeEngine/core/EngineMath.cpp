@@ -12,6 +12,8 @@
  *****************************************************************************/
 #include "LaurelEyeEngine/core/EngineMath.h"
 
+#include <random>
+
 namespace LaurelEye {
 
     namespace EngineMath {
