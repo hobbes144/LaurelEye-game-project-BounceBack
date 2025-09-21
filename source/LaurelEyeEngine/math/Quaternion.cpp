@@ -1,23 +1,19 @@
-﻿/*!****************************************************************************
- * \file   Quaternion.cpp
- * \author Anish Murthy (anish.murthy.dev@gmail.com)
- * \par    **DigiPen Email**
- *    anish.murthy@digipen.edu
- * \par    **Course**
- *    GAM541
- * \date   04-18-2025
- *
- * Copyright � 2025 DIGIPEN Institute of Technology. All rights reserved.
- *
- *****************************************************************************/
-#include "LaurelEyeEngine/core/Quaternion.h"
+﻿/// @file   Quaternion.cpp
+/// @author Anish Murthy (anish.murthy.dev@gmail.com)
+/// @par    **DigiPen Email**
+///     anish.murthy@digipen.edu
+/// @par    **Course**
+///     GAM541
+/// @date   04-18-2025
+///
+/// Copyright © 2025 DIGIPEN Institute of Technology. All rights reserved.
+#include "LaurelEyeEngine/math/Quaternion.h"
 
 namespace LaurelEye {
 
     void Quaternion::setDirty() {
         isNormalized = false;
         isEulerVector = false;
-        // isRotationMatrix = false;
     }
 
     Vector3 Quaternion::forward() {

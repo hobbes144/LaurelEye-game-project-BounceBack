@@ -9,7 +9,7 @@
 /// @date   10-05-2024
 ///
 /// Copyright © 2025 DIGIPEN Institute of Technology. All rights reserved.
-#include "LaurelEyeEngine/core/Matrix4.h"
+#include "LaurelEyeEngine/math/Matrix4.h"
 
 namespace LaurelEye {
 

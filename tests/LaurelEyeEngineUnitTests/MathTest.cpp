@@ -1,6 +1,6 @@
-﻿#include "LaurelEyeEngine/core/Matrix4.h"
-#include "LaurelEyeEngine/core/Vector3.h"
-#include "LaurelEyeEngine/core/VectorTemplated.h"
+﻿#include "LaurelEyeEngine/math/Matrix4.h"
+#include "LaurelEyeEngine/math/Vector3.h"
+#include "LaurelEyeEngine/math/VectorTemplated.h"
 #include <btBulletDynamicsCommon.h>
 
 int main() {

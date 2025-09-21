@@ -4,7 +4,7 @@
 file(GLOB_RECURSE ENGINE_SOURCES CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/precompiled.cpp
     #${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/core/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/math/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/physics/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/graphics/*.cpp
 )
