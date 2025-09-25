@@ -1,5 +1,12 @@
 ﻿# Team Laurel Game Project
 
+## Steps to Clone and Run
+1. From git bash call 'git clone --recursive'. Do not use GitHub Desktop, and recommended not to use other GUI based implementations due to the use of submodules.
+2. From git bash call 'git submodule init vcpkg' from the root of the directory to initialize the vcpkg submodule in your local .git folder.
+3. From git bash call 'git submodule update vcpkg' from the root of the directory to fetch updates to vcpkg and the packages we currently utilize.
+4. Navigate to the repo on your local desktop. Open the vcpkg folder and run the 'bootstrap-vcpkg' .bat file in order to connect vcpkg to your local submodule.
+5. Open the repo in your IDE of choice and begin coding.
+
 ## Directory Layout
 
 - Separate the "public" header files of your engine and other libraries from their private files.
@@ -69,5 +76,6 @@ gam55X-laurel/
 - Committing build artifacts or `.vs/` folders
 - Using inconsistent naming conventions across folders
 - Confusing organizations
+
 
 
