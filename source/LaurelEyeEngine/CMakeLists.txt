@@ -7,6 +7,7 @@ file(GLOB_RECURSE ENGINE_SOURCES CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/math/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/physics/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/graphics/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/input/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ecs/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/scene/*.cpp
 )
