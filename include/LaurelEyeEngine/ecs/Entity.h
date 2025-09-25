@@ -141,6 +141,6 @@ namespace LaurelEye {
             return worldTransform;
         }
     };
-    #include "entity.inl"
+    #include "LaurelEyeEngine/ecs/Entity.inl"
 } // namespace LaurelEye
 

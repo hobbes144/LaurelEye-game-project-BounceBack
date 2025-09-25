@@ -2,8 +2,6 @@
 
 namespace LaurelEyeEngine {
     void GLFWInput::update() {
-        //TODO remove later
-        glfwPollEvents();
         updateMousePosition();
         for ( auto& [key, state] : keyStates ) {
             if ( glfwGetKey(pWindow, key) == GLFW_PRESS ) {

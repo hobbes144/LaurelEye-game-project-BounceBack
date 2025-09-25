@@ -1,24 +1,24 @@
 ﻿#include "LaurelEyeEngine/input/InputSystem.h"
+#include "LaurelEyeEngine/platforms/glfw/GlfwPlatform.h"
+#include "LaurelEyeEngine/window/IWindow.h"
+#include "LaurelEyeEngine/window/WindowManager.h"
 
 
 int Test() {
-    if ( !glfwInit() ) {
-        std::cerr << "Failed to initialize GLFW\n";
-        return -1;
-    }
 
-    GLFWwindow* window = glfwCreateWindow(640, 480, "Input Test", nullptr, nullptr);
-    if ( !window ) {
-        std::cerr << "Failed to create GLFW window\n";
-        glfwTerminate();
-        return -1;
-    }
+    LaurelEye::GlfwPlatform glfwP = LaurelEye::GlfwPlatform();
+    glfwP.initialize();
 
-    LaurelEyeEngine::InputSystem inputSystem(window);
+    LaurelEye::WindowManager wm = LaurelEye::WindowManager();
+    auto window = wm.createWindow(LaurelEye::WindowDescription());
+
+    LaurelEyeEngine::InputSystem inputSystem((GLFWwindow*)window->getNativeHandle());
 
     std::cout << "Press W, A, S, D, or Escape to test input. Escape will exit.\n";
 
-    while (!inputSystem.isKeyPressed(LaurelEyeEngine::Key::Escape)) {
+    while ( !inputSystem.isKeyPressed(LaurelEyeEngine::Key::Escape) ) {
+
+        glfwP.update();
         inputSystem.update();
 
         if ( inputSystem.isKeyPressed(LaurelEyeEngine::Key::W) )
@@ -67,7 +67,7 @@ int Test() {
         glfwWaitEventsTimeout(0.05);
     }
 
-    glfwDestroyWindow(window);
-    glfwTerminate();
+    wm.shutdown();
+    glfwP.shutdown();
     return 0;
 };

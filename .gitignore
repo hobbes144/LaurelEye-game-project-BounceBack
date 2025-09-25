@@ -70,6 +70,9 @@ CMakeUserPresets.json
 
 # Doxygen output Files
 doc/html/
+CMakeDoxyfile.in
+CMakeDoxygenDefaults.cmake
+doc/Doxyfile.doc
 
 # Temporarily added until I track down why cmake is still creating this
 out/

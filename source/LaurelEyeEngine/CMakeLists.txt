@@ -6,16 +6,26 @@ file(GLOB_RECURSE ENGINE_SOURCES CONFIGURE_DEPENDS
     #${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/math/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/physics/*.cpp
+<<<<<<< HEAD
+=======
     ${CMAKE_CURRENT_SOURCE_DIR}/graphics/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/input/*.cpp
+>>>>>>> origin/main
     ${CMAKE_CURRENT_SOURCE_DIR}/ecs/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/scene/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/platforms/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/window/*.cpp
+)
+
+file(GLOB_RECURSE PLATFORM_SOURCES CONFIGURE_DEPENDS
+    ${CMAKE_CURRENT_SOURCE_DIR}/platforms/glfw/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/window/glfw/*.cpp
 )
 
 find_package(Bullet CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 
-add_library(LaurelEyeEngine SHARED ${ENGINE_SOURCES})
+add_library(LaurelEyeEngine SHARED ${ENGINE_SOURCES} ${PLATFORM_SOURCES})
 
 # add_library (LaurelEyeEngine
 #   SHARED
@@ -39,6 +49,8 @@ target_include_directories(LaurelEyeEngine
 )
 
 set_target_properties(LaurelEyeEngine PROPERTIES PUBLIC_HEADER include/LaurelEyeEngine/LaurelEyeEngine.h)
+
+target_compile_definitions(LaurelEyeEngine PUBLIC PLATFORM_GLFW)
 
 if (CMAKE_VERSION VERSION_GREATER 3.20)
     set_property(TARGET LaurelEyeEngine PROPERTY CXX_STANDARD 23)
