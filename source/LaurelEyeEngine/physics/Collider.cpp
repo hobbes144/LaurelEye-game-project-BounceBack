@@ -6,7 +6,7 @@
  * \par    **Course**
  *    GAM541
  * \date   09-17-2025
- * \brief  
+ * \brief  OBSOLETE?
  * 
  *****************************************************************************/
 #include "LaurelEyeEngine/physics/Collider.h"
