@@ -2,7 +2,7 @@
 
 #include <unordered_map>
 #include "InputCodes.h" 
-namespace LaurelEyeEngine {
+namespace LaurelEye {
 
     struct KeyState {
         bool isPressed = false;

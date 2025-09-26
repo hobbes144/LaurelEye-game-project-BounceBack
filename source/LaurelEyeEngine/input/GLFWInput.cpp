@@ -1,6 +1,6 @@
 ﻿#include "LaurelEyeEngine/input/GLFWInput.h"
 
-namespace LaurelEyeEngine {
+namespace LaurelEye {
     void GLFWInput::update() {
         updateMousePosition();
         for ( auto& [key, state] : keyStates ) {

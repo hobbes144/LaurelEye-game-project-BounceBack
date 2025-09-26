@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include "Input.h"
 
-namespace LaurelEyeEngine {
+namespace LaurelEye {
     class GLFWInput : public Input {
     public:
         GLFWInput(GLFWwindow* window)

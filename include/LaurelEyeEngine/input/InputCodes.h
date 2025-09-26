@@ -1,5 +1,5 @@
 ﻿
-namespace LaurelEyeEngine {
+namespace LaurelEye {
     enum class Key {
         W,
         A,

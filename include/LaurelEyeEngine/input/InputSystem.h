@@ -2,7 +2,7 @@
 
 #include "GLFWInput.h"
 
-namespace LaurelEyeEngine {
+namespace LaurelEye {
     class InputSystem {
     public:
         InputSystem(GLFWwindow* window)

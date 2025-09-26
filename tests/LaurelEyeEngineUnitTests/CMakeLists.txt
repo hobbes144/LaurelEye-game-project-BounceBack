@@ -2,8 +2,11 @@
 # project specific logic here.
 #
 
-# Add source to this project's executable.
-add_executable (LaurelEyeEngineTest "MathTest.cpp")
+file(GLOB TEST_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
+
+add_executable(LaurelEyeEngineTest
+    ${TEST_SOURCES}
+)
 
 target_link_libraries(LaurelEyeEngineTest
     PRIVATE

@@ -3,58 +3,59 @@
 #include "LaurelEyeEngine/physics/PhysicsSystem.h"
 #include <btBulletDynamicsCommon.h>
 
-void PhysicsTest() {
-    
-    std::cout << "------- Physics Test -------" << std::endl;
+namespace LaurelEye {
+    void physicsTest() {
 
-    LaurelEye::Physics::PhysicsSystem physicsSystem;
-    physicsSystem.initialize();
+        std::cout << "------- Physics Test -------" << std::endl;
 
-    // Shape descriptions
-    LaurelEye::Physics::CollisionShapePhys groundDesc{
-        LaurelEye::Physics::CollisionShapePhys::ShapeType::Box, {50, 1, 50}
-    };
-    LaurelEye::Physics::CollisionShapePhys cubeDesc{
-        LaurelEye::Physics::CollisionShapePhys::ShapeType::Box, {1, 1, 1}
-    };
+        LaurelEye::Physics::PhysicsSystem physicsSystem;
+        physicsSystem.initialize();
 
-    // Transforms
-    LaurelEye::Physics::TransPhys groundTransform{
-        {0, -1, 0},
-        {1, 0, 0, 0}
-    }; // at y = -1
+        // Shape descriptions
+        LaurelEye::Physics::CollisionShapePhys groundDesc{
+            LaurelEye::Physics::CollisionShapePhys::ShapeType::Box, {50, 1, 50}
+        };
+        LaurelEye::Physics::CollisionShapePhys cubeDesc{
+            LaurelEye::Physics::CollisionShapePhys::ShapeType::Box, {1, 1, 1}
+        };
 
-    LaurelEye::Physics::TransPhys cubeTransform{
-        {0, 10, 0},
-        {1, 0, 0, 0}
-    }; // start 10 units up
+        // Transforms
+        LaurelEye::Physics::TransPhys groundTransform{
+            {0, -1, 0},
+            {1, 0, 0, 0}
+        }; // at y = -1
 
-    // Directly create bodies (no need for CreateShape)
-    auto ground = physicsSystem.CreateBody(
-        LaurelEye::Physics::BodyType::Static,
-        groundDesc,
-        groundTransform);
+        LaurelEye::Physics::TransPhys cubeTransform{
+            {0, 10, 0},
+            {1, 0, 0, 0}
+        }; // start 10 units up
 
-    auto cube = physicsSystem.CreateBody(
-        LaurelEye::Physics::BodyType::Dynamic,
-        cubeDesc,
-        cubeTransform);
+        // Directly create bodies (no need for CreateShape)
+        auto ground = physicsSystem.CreateBody(
+            LaurelEye::Physics::BodyType::Static,
+            groundDesc,
+            groundTransform);
 
-    // Simulation loop
-    float dt = 1.0f / 60.0f; // 60 Hz
-    for ( int i = 0; i < 300; i++ ) {
-        physicsSystem.update(dt);
+        auto cube = physicsSystem.CreateBody(
+            LaurelEye::Physics::BodyType::Dynamic,
+            cubeDesc,
+            cubeTransform);
 
-        auto t = cube->GetTransform();
-        std::cout << "Step " << i
-                  << " | Cube position: ("
-                  << t.position.x << ", "
-                  << t.position.y << ", "
-                  << t.position.z << ")\n";
+        // Simulation loop
+        float dt = 1.0f / 60.0f; // 60 Hz
+        for ( int i = 0; i < 300; i++ ) {
+            physicsSystem.update(dt);
+
+            auto t = cube->GetTransform();
+            std::cout << "Step " << i
+                      << " | Cube position: ("
+                      << t.position.x << ", "
+                      << t.position.y << ", "
+                      << t.position.z << ")\n";
+        }
+
+        physicsSystem.shutdown();
+
+        std::cout << "------- Physics End -------" << std::endl;
     }
-
-    physicsSystem.shutdown();
-
-    std::cout << "------- Physics End -------" << std::endl;
-
 }

@@ -1,6 +1,6 @@
 ﻿#include "LaurelEyeEngine/input/InputSystem.h"
 
-namespace LaurelEyeEngine {
+namespace LaurelEye {
     void InputSystem::update() {
         inputBackend->update();
     }

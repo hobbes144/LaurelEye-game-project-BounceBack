@@ -35,4 +35,4 @@ set(
 # Include sub-projects.
 add_subdirectory("source/LaurelEyeEngine")
 add_subdirectory("tests/LaurelEyeEngineUnitTests")
-add_subdirectory("doc")
+#add_subdirectory("doc")
