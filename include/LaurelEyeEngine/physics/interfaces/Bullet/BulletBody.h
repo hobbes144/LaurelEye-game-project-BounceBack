@@ -1,9 +1,10 @@
 ﻿#pragma once
 
-#include <btBulletDynamicsCommon.h>
-
 #include "LaurelEyeEngine/physics/interfaces/IBody.h"
 #include "LaurelEyeEngine/physics/interfaces/Bullet/BulletShape.h"
+
+#include <btBulletDynamicsCommon.h>
+#include <memory>
 
 namespace LaurelEye::Physics {
     class BulletBody : public IBody {

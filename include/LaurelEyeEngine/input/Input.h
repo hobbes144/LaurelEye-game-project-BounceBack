@@ -1,7 +1,7 @@
 ﻿#pragma once
 
+#include "InputCodes.h"
 #include <unordered_map>
-#include "InputCodes.h" 
 namespace LaurelEye {
 
     struct KeyState {
@@ -12,6 +12,7 @@ namespace LaurelEye {
 
     class Input {
     public:
+        virtual ~Input() = default;
         virtual void update() = 0;
 
         /*Virtual functions for checking states for the keyboard*/
@@ -31,4 +32,4 @@ namespace LaurelEye {
         virtual bool isButtonHeld(GamepadButton button) = 0;
         virtual bool isButtonReleased(GamepadButton button) = 0;
     };
-}
+} // namespace LaurelEye

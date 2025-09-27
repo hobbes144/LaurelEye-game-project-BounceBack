@@ -11,8 +11,8 @@ namespace LaurelEye::Physics {
         virtual void SetTransform(const TransPhys& t) = 0;
         virtual TransPhys GetTransform() const = 0;
 
-        virtual void ApplyForce(const Vector3& const f) = 0;
-        virtual void ApplyImpulse(const Vector3& const f) = 0;
+        virtual void ApplyForce(const Vector3& f) = 0;
+        virtual void ApplyImpulse(const Vector3& f) = 0;
 
         virtual void SetVelocity(const Vector3& v) = 0;
         virtual Vector3 GetVelocity() const = 0;
@@ -21,4 +21,4 @@ namespace LaurelEye::Physics {
         virtual float GetMass() const = 0;
     };
 
-}
+} // namespace LaurelEye::Physics

@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "GLFWInput.h"
+#include <memory>
 
 namespace LaurelEye {
     class InputSystem {
@@ -24,8 +25,8 @@ namespace LaurelEye {
         bool isButtonPressed(GamepadButton button);
         bool isButtonHeld(GamepadButton button);
         bool isButtonReleased(GamepadButton button);
+
     private:
         std::unique_ptr<Input> inputBackend;
     };
-}
-
+} // namespace LaurelEyeEngine
