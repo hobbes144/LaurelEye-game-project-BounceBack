@@ -5,7 +5,10 @@
 #include "LaurelEyeEngine/ecs/Entity.h"
 #include "LaurelEyeEngine/ecs/IComponent.h"
 #include "LaurelEyeEngine/scene/Scene.h"
+#include "LaurelEyeEngine/math/Vector3.h"
+#include "LaurelEyeEngine/math/Matrix4.h"
 #include <iostream>
+#include <cassert>
 #ifdef _WIN32
 #include <windows.h>
 #else

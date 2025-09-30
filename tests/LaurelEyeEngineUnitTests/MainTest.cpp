@@ -53,85 +53,85 @@ int main() {
     std::cout << "Tests are finished, moving to gameplay demo" << std::endl;
 
     // gameplay test
-    struct GameplayScene : public LaurelEye::Scene {
-        explicit GameplayScene(const std::string& name)
-            : Scene(name) {}
+    //struct GameplayScene : public LaurelEye::Scene {
+    //    explicit GameplayScene(const std::string& name)
+    //        : Scene(name) {}
 
-    protected:
-        void OnEnter() override {
-            std::cout << "Entering scene: " << getName() << std::endl;
-        }
+    //protected:
+    //    void OnEnter() override {
+    //        std::cout << "Entering scene: " << getName() << std::endl;
+    //    }
 
-        void OnExit() override {
-            std::cout << "Exiting scene: " << getName() << std::endl;
-        }
+    //    void OnExit() override {
+    //        std::cout << "Exiting scene: " << getName() << std::endl;
+    //    }
 
-        void OnResume() override {
-            std::cout << "Resuming scene: " << getName() << std::endl;
-        }
+    //    void OnResume() override {
+    //        std::cout << "Resuming scene: " << getName() << std::endl;
+    //    }
 
-        void OnPause() override {
-            std::cout << "Pausing scene: " << getName() << std::endl;
-        }
-    };
+    //    void OnPause() override {
+    //        std::cout << "Pausing scene: " << getName() << std::endl;
+    //    }
+    //};
 
-    std::unique_ptr<GameplayScene> gameplayScene = std::make_unique<GameplayScene>("GameplayScene");
-    std::unique_ptr<LaurelEye::Entity> player = std::make_unique<LaurelEye::Entity>("Player");
-    player->addTag("Player");
-    gameplayScene->addEntity({std::move(player), nullptr});
+    //std::unique_ptr<GameplayScene> gameplayScene = std::make_unique<GameplayScene>("GameplayScene");
+    //std::unique_ptr<LaurelEye::Entity> player = std::make_unique<LaurelEye::Entity>("Player");
+    //player->addTag("Player");
+    //gameplayScene->addEntity({std::move(player), nullptr});
 
-    while ( !inputSystem.isKeyPressed(LaurelEye::Key::Escape) ) {
-        glfwP.update();
-        inputSystem.update();
-        float deltaTime = 0.016f; // ~60 FPS
-        gameplayScene->update(deltaTime);
+    //while ( !inputSystem.isKeyPressed(LaurelEye::Key::Escape) ) {
+    //    glfwP.update();
+    //    inputSystem.update();
+    //    float deltaTime = 0.016f; // ~60 FPS
+    //    gameplayScene->update(deltaTime);
 
-        // For now just know when keys are pressed
-        if ( inputSystem.isKeyPressed(LaurelEye::Key::W) )
-            std::cout << "W key pressed!" << std::endl;
-        if ( inputSystem.isKeyPressed(LaurelEye::Key::A) )
-            std::cout << "A key pressed!" << std::endl;
-        if ( inputSystem.isKeyPressed(LaurelEye::Key::S) )
-            std::cout << "A key pressed!" << std::endl;
-        if ( inputSystem.isKeyPressed(LaurelEye::Key::D) )
-            std::cout << "A key pressed!" << std::endl;
+    //    // For now just know when keys are pressed
+    //    if ( inputSystem.isKeyPressed(LaurelEye::Key::W) )
+    //        std::cout << "W key pressed!" << std::endl;
+    //    if ( inputSystem.isKeyPressed(LaurelEye::Key::A) )
+    //        std::cout << "A key pressed!" << std::endl;
+    //    if ( inputSystem.isKeyPressed(LaurelEye::Key::S) )
+    //        std::cout << "A key pressed!" << std::endl;
+    //    if ( inputSystem.isKeyPressed(LaurelEye::Key::D) )
+    //        std::cout << "A key pressed!" << std::endl;
 
-        if ( inputSystem.isKeyHeld(LaurelEye::Key::W) )
-            std::cout << "W key Held!" << std::endl;
-        if ( inputSystem.isKeyHeld(LaurelEye::Key::A) )
-            std::cout << "A key Held!" << std::endl;
-        if ( inputSystem.isKeyHeld(LaurelEye::Key::S) )
-            std::cout << "A key Held!" << std::endl;
-        if ( inputSystem.isKeyHeld(LaurelEye::Key::D) )
-            std::cout << "A key Held!" << std::endl;
+    //    if ( inputSystem.isKeyHeld(LaurelEye::Key::W) )
+    //        std::cout << "W key Held!" << std::endl;
+    //    if ( inputSystem.isKeyHeld(LaurelEye::Key::A) )
+    //        std::cout << "A key Held!" << std::endl;
+    //    if ( inputSystem.isKeyHeld(LaurelEye::Key::S) )
+    //        std::cout << "A key Held!" << std::endl;
+    //    if ( inputSystem.isKeyHeld(LaurelEye::Key::D) )
+    //        std::cout << "A key Held!" << std::endl;
 
-        if ( inputSystem.isKeyReleased(LaurelEye::Key::W) )
-            std::cout << "W key Released!" << std::endl;
-        if ( inputSystem.isKeyReleased(LaurelEye::Key::A) )
-            std::cout << "A key Released!" << std::endl;
-        if ( inputSystem.isKeyReleased(LaurelEye::Key::S) )
-            std::cout << "A key Released!" << std::endl;
-        if ( inputSystem.isKeyReleased(LaurelEye::Key::D) )
-            std::cout << "A key Released!" << std::endl;
+    //    if ( inputSystem.isKeyReleased(LaurelEye::Key::W) )
+    //        std::cout << "W key Released!" << std::endl;
+    //    if ( inputSystem.isKeyReleased(LaurelEye::Key::A) )
+    //        std::cout << "A key Released!" << std::endl;
+    //    if ( inputSystem.isKeyReleased(LaurelEye::Key::S) )
+    //        std::cout << "A key Released!" << std::endl;
+    //    if ( inputSystem.isKeyReleased(LaurelEye::Key::D) )
+    //        std::cout << "A key Released!" << std::endl;
 
-        if ( inputSystem.isMouseButtonPressed(LaurelEye::MouseButton::Left) )
-            std::cout << "Left Click pressed!" << std::endl;
-        if ( inputSystem.isMouseButtonPressed(LaurelEye::MouseButton::Right) )
-            std::cout << "Right Click pressed!" << std::endl;
+    //    if ( inputSystem.isMouseButtonPressed(LaurelEye::MouseButton::Left) )
+    //        std::cout << "Left Click pressed!" << std::endl;
+    //    if ( inputSystem.isMouseButtonPressed(LaurelEye::MouseButton::Right) )
+    //        std::cout << "Right Click pressed!" << std::endl;
 
-        if ( inputSystem.isMouseButtonHeld(LaurelEye::MouseButton::Left) )
-            std::cout << "Left Click Held!" << std::endl;
-        if ( inputSystem.isMouseButtonHeld(LaurelEye::MouseButton::Right) )
-            std::cout << "Right Click Held!" << std::endl;
+    //    if ( inputSystem.isMouseButtonHeld(LaurelEye::MouseButton::Left) )
+    //        std::cout << "Left Click Held!" << std::endl;
+    //    if ( inputSystem.isMouseButtonHeld(LaurelEye::MouseButton::Right) )
+    //        std::cout << "Right Click Held!" << std::endl;
 
-        if ( inputSystem.isMouseButtonReleased(LaurelEye::MouseButton::Left) )
-            std::cout << "Left Click Released!" << std::endl;
-        if ( inputSystem.isMouseButtonReleased(LaurelEye::MouseButton::Right) )
-            std::cout << "Right Click Released!" << std::endl;
+    //    if ( inputSystem.isMouseButtonReleased(LaurelEye::MouseButton::Left) )
+    //        std::cout << "Left Click Released!" << std::endl;
+    //    if ( inputSystem.isMouseButtonReleased(LaurelEye::MouseButton::Right) )
+    //        std::cout << "Right Click Released!" << std::endl;
 
-        // Sleep or wait a bit to avoid spamming the console
-        glfwWaitEventsTimeout(0.05);
-    }
+    //    // Sleep or wait a bit to avoid spamming the console
+    //    glfwWaitEventsTimeout(0.05);
+    //}
     wm.shutdown();
     glfwP.shutdown();
     return 0;

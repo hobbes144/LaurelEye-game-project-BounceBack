@@ -29,15 +29,16 @@
 /// 
 /// @return \b std::shared_ptr<ComponentType> Component created
 template <typename ComponentType>
-std::shared_ptr<ComponentType> LaurelEye::Entity::addComponent() {
+ComponentType* LaurelEye::Entity::addComponent() {
     static_assert(std::is_base_of<IComponent, ComponentType>::value,
-                    "Component must be derived from IComponent class");
+                  "Component must be derived from IComponent");
 
-    auto component = std::make_shared<ComponentType>();
+    auto component = std::make_unique<ComponentType>();
     component->setOwner(this);
-    components.push_back(component);
 
-    return component;
+    ComponentType* raw = component.get();
+    components.push_back(std::move(component));
+    return raw;
 }
 
 /// @brief Add a component by input, specialized for Renderable
@@ -59,13 +60,14 @@ std::shared_ptr<ComponentType> LaurelEye::Entity::addComponent() {
 /// @param _component Component to be added to the GameObject
 /// @return \b std::shared_ptr<ComponentType> Component added
 template <typename ComponentType>
-std::shared_ptr<ComponentType> LaurelEye::Entity::addComponent(std::shared_ptr<ComponentType> _component) {
+ComponentType* LaurelEye::Entity::addComponent(std::unique_ptr<ComponentType> component) {
     static_assert(std::is_base_of<IComponent, ComponentType>::value,
-                    "Component must derive from Component");
+                  "Component must derive from IComponent");
 
-    _component->setOwner(this);
-    ComponentType* raw = _component.get();
-    components.push_back(_component);
+    component->setOwner(this);
+
+    ComponentType* raw = component.get();
+    components.push_back(std::move(component));
     return raw;
 }
 
@@ -83,12 +85,11 @@ void LaurelEye::Entity::removeComponent() {
     auto it = std::remove_if(
         components.begin(),
         components.end(),
-        [](const std::shared_ptr<IComponent>& c) {
+        [](const std::unique_ptr<IComponent>& c) {
             return dynamic_cast<ComponentType*>(c.get()) != nullptr;
         });
 
     if ( it != components.end() ) {
-        (*it)->shutdown();
         components.erase(it, components.end());
     }
 }
@@ -101,52 +102,11 @@ void LaurelEye::Entity::removeComponent() {
 ///
 /// @return \b <Component derived class>* Component being searched for.
 template <typename ComponentType>
-std::shared_ptr<ComponentType> LaurelEye::Entity::findComponent() {
+ComponentType* LaurelEye::Entity::findComponent() {
     for ( auto& c : components ) {
-        if ( auto casted = std::dynamic_pointer_cast<ComponentType>(c) ) {
-            return casted; // returns a shared_ptr<ComponentType>
+        if ( auto* casted = dynamic_cast<ComponentType*>(c.get()) ) {
+            return casted;
         }
     }
     return nullptr;
-}
-
-/// @brief Find all components of given type
-/// @tparam ComponentType Component type to search for
-/// @return The components as a vector of references
-template <typename ComponentType>
-std::vector<std::shared_ptr<ComponentType>> LaurelEye::Entity::findComponents() {
-    std::vector<ComponentType*> results;
-    for ( auto& c : components ) {
-        if(auto casted = std::dynamic_pointer_cast<ComponentType>(c)) {
-            results.push_back(casted);
-        }
-    }
-    return results;
-}
-
-/// @brief Find a component from one of the entity's children and return a pointer to it
-///
-/// ## Usage:
-///
-/// This can be used to get a specific component added to the Entity's child.
-///
-/// @return \b <Component derived class>* Component being searched for.
-template <class ComponentType>
-std::shared_ptr<ComponentType> LaurelEye::Entity::findComponentInChild() {
-    std::vector<ComponentType*> results;
-
-    // check this entity
-    for ( auto& c : components ) {
-        if ( auto* casted = dynamic_cast<ComponentType*>(c.get()) ) {
-            results.push_back(casted);
-        }
-    }
-
-    // recurse into children
-    for ( auto& child : children ) {
-        auto childResults = child->findComponents<ComponentType>();
-        results.insert(results.end(), childResults.begin(), childResults.end());
-    }
-
-    return results;
 }

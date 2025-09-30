@@ -4,7 +4,7 @@ namespace LaurelEye::Physics {
 
     PhysicsBodyComponent::PhysicsBodyComponent() {}
 
-    void PhysicsBodyComponent::initialize() {
+    /*void PhysicsBodyComponent::initialize() {
 
     }
 
@@ -14,6 +14,6 @@ namespace LaurelEye::Physics {
 
     void PhysicsBodyComponent::shutdown() {
 
-    }
+    }*/
 
 }

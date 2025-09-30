@@ -3,42 +3,35 @@
 
 namespace LaurelEye {
 
-    Scene::Scene(const std::string& name) : name(name), initialized(false), paused(false)
-    {
-        rootEntity = std::make_unique<Entity>("root");
-    }
+    Scene::Scene(const std::string& name) : name(name), initialized(false), paused(false) {}
 
     void Scene::initialize() {
         std::cout << "Initializing scene: " << name << std::endl;
-        if ( rootEntity ) {
-            rootEntity->initialize();
-        }
+        initialized = true;
     }
 
     void Scene::update(float deltaTime) {
         std::cout << "Updating scene: " << name << std::endl;
-        // Handle any pending add/remove first
+        // Handle any pending add/remove
         spawnPendingEntities();
         cleanupDestroyedEntities();
-
-        if ( rootEntity && rootEntity->isActiveInHierarchy() ) {
-            rootEntity->update(deltaTime);
-        }
     }
 
     void Scene::shutdown() {
         std::cout << "Shutting down scene: " << name << std::endl;
-        if ( rootEntity ) {
-            rootEntity->shutdown();
-            rootEntity.reset();
-        }
-
+        entities.clear();
         pendingAdditions.clear();
         pendingRemovals.clear();
+        initialized = false;
     }
 
-    void Scene::addEntity(PendingEntity entityToAdd) {
-        pendingAdditions.push_back(std::move(entityToAdd));
+    Entity* Scene::addEntity(std::unique_ptr<Entity> entityToAdd) {
+        if ( entityToAdd ) {
+            Entity* entityToReturn = entityToAdd.get();
+            pendingAdditions.push_back(std::move(entityToAdd));
+            return entityToReturn;
+        }
+        return nullptr;
     }
 
     void Scene::removeEntity(Entity* entityToRemove) {
@@ -48,45 +41,55 @@ namespace LaurelEye {
     }
 
     void Scene::removeEntity(const std::string& entityName) {
-        Entity* entityToRemove = rootEntity->findChildByName(entityName);
-        if ( entityToRemove ) {
-            pendingRemovals.push_back(entityToRemove);
+        auto it = std::find_if(
+            entities.begin(), entities.end(),
+            [&entityName](const std::unique_ptr<Entity>& e) {
+                return e->getName() == entityName;
+            });
+        if ( it != entities.end() ) pendingRemovals.push_back(it->get());
+    }
+
+    Entity* Scene::findEntityByName(const std::string& name) const {
+        for ( auto& e : entities ) {
+            if ( e->getName() == name ) return e.get();
         }
+        return nullptr;
+    }
+
+    Entity* Scene::findEntityById(unsigned int id) const {
+        for ( auto& e : entities ) {
+            if ( e->getId() == id ) return e.get();
+        }
+        return nullptr;
+    }
+
+    std::vector<Entity*> Scene::findEntitiesWithTag(const std::string& tag) const {
+        std::vector<Entity*> results;
+        for ( auto& e : entities ) {
+            if ( e->compareTag(tag) ) results.push_back(e.get());
+        }
+        return results;
     }
 
     void Scene::spawnPendingEntities() {
-        for ( auto& pending : pendingAdditions ) {
-            if ( pending.entity ) {
-                if ( pending.parent ) {
-                    // Child entity
-                    pending.parent->addChild(std::move(pending.entity));
-                }
-                else if ( rootEntity ) {
-                    // Default to scene root
-                    rootEntity->addChild(std::move(pending.entity));
-                }
-                else {
-                    // If no root yet, set as root
-                    rootEntity = std::move(pending.entity);
-                }
-            }
+        if ( !pendingAdditions.empty() ) {
+            entities.insert(
+                entities.end(),
+                std::make_move_iterator(pendingAdditions.begin()),
+                std::make_move_iterator(pendingAdditions.end()));
+            pendingAdditions.clear();
         }
-        pendingAdditions.clear();
     }
 
     void Scene::cleanupDestroyedEntities() {
-        for ( auto* entity : pendingRemovals ) {
-            if ( !entity ) continue;
-
-            if ( entity == rootEntity.get() ) {
-                // If root entity itself is removed, shut everything down
-                entity->shutdown();
-                rootEntity.reset();
+        if ( !pendingRemovals.empty() ) {
+            for ( Entity* entity : pendingRemovals ) {
+                auto it = std::remove_if(
+                    entities.begin(), entities.end(),
+                    [entity](const std::unique_ptr<Entity>& e) { return e.get() == entity; });
+                entities.erase(it, entities.end());
             }
-            else if ( entity->getParent() ) {
-                entity->getParent()->removeChild(entity);
-            }
+            pendingRemovals.clear();
         }
-        pendingRemovals.clear();
     }
 } // namespace LaurelEye

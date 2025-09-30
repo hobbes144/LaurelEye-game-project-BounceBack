@@ -17,49 +17,38 @@
 
 namespace LaurelEye {
     class Entity;
-     /**
-     * @brief Pending entity that will be added to the scene between frames.
-     * If parent is null, the entity is added under the scene root.
-     */
-    struct PendingEntity {
-        std::unique_ptr<Entity> entity;
-        Entity* parent;
-    };
-
     class Scene {
     public:
         explicit Scene(const std::string& name);
         virtual ~Scene() = default;
 
         /* Core scene lifecycle */
-        virtual void initialize();
-        virtual void update(float deltaTime);
-        virtual void shutdown();
+        void initialize();
+        void update(float deltaTime);
+        void shutdown();
 
         /* Scene monitoring */
         const std::string& getName() const { return name; }
-        Entity* getRootEntity() const { return rootEntity.get(); }
         bool gsInitialize() const { return initialized; }
         bool isPaused() const { return paused; }
 
         // --- Entity management (deferred) ---
-        void addEntity(PendingEntity entityToAdd);
+        Entity* addEntity(std::unique_ptr<Entity> entityToAdd);
         void removeEntity(Entity* entity);
         void removeEntity(const std::string& entityName);
+        Entity* findEntityByName(const std::string& name) const;
+        Entity* findEntityById(unsigned int id) const;
+        std::vector<Entity*> findEntitiesWithTag(const std::string& tag) const; // Note - this is unoptimal for now - use with caution
+        const std::vector<std::unique_ptr<Entity>>& getEntities() const { return entities; }
 
-    protected:
+    private:
         void spawnPendingEntities();
         void cleanupDestroyedEntities();
 
-        virtual void OnEnter() = 0;
-        virtual void OnExit() = 0;
-        virtual void OnResume() = 0;
-        virtual void OnPause() = 0;
-
         std::string name;
-        std::unique_ptr<Entity> rootEntity;
 
-        std::vector<PendingEntity> pendingAdditions;
+        std::vector<std::unique_ptr<Entity>> entities; // Flat list of entities for the scene
+        std::vector<std::unique_ptr<Entity>> pendingAdditions;
         std::vector<Entity*> pendingRemovals;
 
         bool initialized;

@@ -10,11 +10,15 @@
 #pragma once
 
 #include <string>
+#include <vector>
+#include <algorithm>
+#include <memory>
+
 namespace LaurelEye {
     template <typename ComponentType>
     class ISystem {
     public:
-        using ComponentPtr = std::shared_ptr<ComponentType>;
+        using ComponentPtr = ComponentType*;
 
         virtual ~ISystem() = default;
 
@@ -22,22 +26,13 @@ namespace LaurelEye {
         virtual void update(float deltaTime) = 0;
         virtual void shutdown() = 0;
         
-        void addComponent(const ComponentPtr& component) {
+        void registerComponent(const ComponentPtr component) {
             components.push_back(component);
         }
 
-        void removeComponent(const ComponentPtr& component) {
+        void deregisterComponent(ComponentPtr component) {
             components.erase(
                 std::remove(components.begin(), components.end(), component),
-                components.end());
-        }
-
-        void removeComponent(ComponentType* component) {
-            components.erase(
-                std::remove_if(
-                    components.begin(),
-                    components.end(),
-                    [component](const ComponentPtr& c) { return c.get() == component; }),
                 components.end());
         }
 

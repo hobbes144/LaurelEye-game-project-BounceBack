@@ -12,9 +12,9 @@ namespace LaurelEye::Physics {
         public:
         PhysicsBodyComponent();
 
-        void initialize() override;
-        void update(float dt) override;
-        void shutdown() override;
+        //void initialize() override;
+        //void update(float dt) override;
+        //void shutdown() override;
 
         private:
         std::shared_ptr<IBody> body;

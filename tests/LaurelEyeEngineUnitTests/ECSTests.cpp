@@ -2,99 +2,102 @@
 
 namespace LaurelEye {
     void entityTest() {
-        // Create some entities
-        std::unique_ptr<LaurelEye::Entity> root = std::make_unique<LaurelEye::Entity>("RootEntity");
-        std::unique_ptr<LaurelEye::Entity> child1 = std::make_unique<LaurelEye::Entity>("Child1");
-        std::unique_ptr<LaurelEye::Entity> child2 = std::make_unique<LaurelEye::Entity>("Child2");
-
-        // Add children
-        root->addChild(std::move(child1));
-        root->addChild(std::move(child2));
-
-        // Test hierarchy
-        auto found = root->findChildByName("Child1");
-        std::cout << (found ? "Child1 Found" : "Child1 Not Found") << std::endl;
-
-        // Test tags
-        root->addTag("Player");
-        std::cout << (root->compareTag("Player") ? "Tag Passed" : "Tag Failed") << std::endl;
-
-        // Test components using dummy component
-        struct DummyComponent : public LaurelEye::IComponent {
-            void initialize() override { std::cout << "Initializing Dummy Component." << std::endl; }
-            void update(float) override { std::cout << "Updating Dummy Component." << std::endl; }
-            void shutdown() override { std::cout << "Shutting down Dummy Component." << std::endl; }
-            void configure(const std::unordered_map<std::string, std::any>&) override {}
+        // Dummy component for testing
+        struct DummyComponent : public IComponent {
+            int value{42};
         };
 
-        auto comp = root->addComponent<DummyComponent>();
-        std::cout << ((comp != nullptr) ? "Component Added" : "Component Failed") << std::endl;
+        // Create entity
+        auto root = std::make_unique<Entity>("RootEntity");
+        assert(root != nullptr);
+        assert(root->getName() == "RootEntity");
 
-        auto foundComp = root->findComponent<DummyComponent>();
-        std::cout << ((foundComp != nullptr) ? "Component Found" : "Component Missing") << std::endl;
+        // Check unique ID generation
+        unsigned int rootId = root->getId();
+        auto another = std::make_unique<Entity>("AnotherEntity");
+        assert(another->getId() != rootId);
 
-        root->initialize();
+        // Tag tests
+        root->addTag("Player");
+        assert(root->compareTag("Player"));
+        assert(!root->compareTag("Enemy"));
+        std::cout << "Tag tests passed\n";
 
-        for ( int frame = 0; frame < 100; ++frame ) {
-            float deltaTime = 0.016f; // ~60 FPS
-            std::cout << "--- Frame " << frame << " ---" << std::endl;
-            root->update(deltaTime);
-        }
+        // Component tests
+        DummyComponent* comp = root->addComponent<DummyComponent>();
+        assert(comp != nullptr);
+        assert(comp->value == 42);
+
+        DummyComponent* foundComp = root->findComponent<DummyComponent>();
+        assert(foundComp != nullptr);
+        assert(foundComp == comp);
+        std::cout << "Component add/find passed\n";
+
+        // Remove component and verify
+        root->removeComponent<DummyComponent>();
+        DummyComponent* removedComp = root->findComponent<DummyComponent>();
+        assert(removedComp == nullptr);
+        std::cout << "Component removal passed\n";
     }
 
     void sceneTest() {
-        // Create some entities
-        std::unique_ptr<LaurelEye::Entity> player = std::make_unique<LaurelEye::Entity>("Player");
-        std::unique_ptr<LaurelEye::Entity> child1 = std::make_unique<LaurelEye::Entity>("Child1");
-        std::unique_ptr<LaurelEye::Entity> child2 = std::make_unique<LaurelEye::Entity>("Child2");
-
-        // Add children
-        player->addChild(std::move(child1));
-        player->addChild(std::move(child2));
-
-        // Test tags
-        player->addTag("Player");
-
-        // Test components using dummy component
-        struct ShootyComponent : public LaurelEye::IComponent {
-            void initialize() override { std::cout << "Initializing ShootyComponent." << std::endl; }
-            void update(float) override { std::cout << "Shooting the ShootyComponent" << std::endl; }
-            void shutdown() override { std::cout << "Shutting down ShootyComponent." << std::endl; }
-            void configure(const std::unordered_map<std::string, std::any>&) override {}
+        // Dummy component for testing
+        struct ShootyComponent : public IComponent {
+            int bullets{50};
         };
 
-        // Generate a test scene that does nothing but iterate
-        struct TestScene : public LaurelEye::Scene {
+        // Create test scene
+        struct TestScene : public Scene {
             explicit TestScene(const std::string& name)
                 : Scene(name) {}
-
-        protected:
-            void OnEnter() override {
-                std::cout << "Entering scene: " << getName() << std::endl;
-            }
-
-            void OnExit() override {
-                std::cout << "Exiting scene: " << getName() << std::endl;
-            }
-
-            void OnResume() override {
-                std::cout << "Resuming scene: " << getName() << std::endl;
-            }
-
-            void OnPause() override {
-                std::cout << "Pausing scene: " << getName() << std::endl;
-            }
         };
 
+        auto testScene = std::make_unique<TestScene>("TestScene");
+        assert(testScene->getName() == "TestScene");
+        assert(!testScene->gsInitialize());
+
+        // Create and tag entities
+        auto player = std::make_unique<Entity>("Player");
+        auto child1 = std::make_unique<Entity>("Child1");
+        auto child2 = std::make_unique<Entity>("Child2");
+
+        player->addTag("Player");
+        child1->addTag("Ally");
+        child2->addTag("Enemy");
+
+        // Add component to player
         auto comp = player->addComponent<ShootyComponent>();
+        assert(comp != nullptr);
+        assert(comp->bullets == 50);
 
-        std::unique_ptr<TestScene> testScene = std::make_unique<TestScene>("TestScene");
-        testScene->addEntity({std::move(player), nullptr});
+        // Add entities to scene
+        testScene->addEntity(std::move(player));
+        testScene->addEntity(std::move(child1));
+        testScene->addEntity(std::move(child2));
 
-        for ( int frame = 0; frame < 100; ++frame ) {
-            float deltaTime = 0.016f; // ~60 FPS
-            std::cout << "--- Frame " << frame << " ---" << std::endl;
-            testScene->update(deltaTime);
+        // Before update: entities not yet spawned
+        auto preUpdatePlayers = testScene->findEntitiesWithTag("Player");
+        assert(preUpdatePlayers.empty());
+        std::cout << "Pre-update: No Player Found\n";
+
+        // Run updates to trigger entity spawn
+        for ( int frame = 0; frame < 10; ++frame ) {
+            testScene->update(0.016f); // ~60 FPS
         }
+
+        // After update: entities should be active
+        auto postUpdatePlayers = testScene->findEntitiesWithTag("Player");
+        assert(!postUpdatePlayers.empty());
+        std::cout << "Post-update: Player Found\n";
+
+        // Additional checks
+        auto foundPlayer = testScene->findEntityByName("Player");
+        assert(foundPlayer != nullptr);
+        assert(foundPlayer->compareTag("Player"));
+
+        auto allies = testScene->findEntitiesWithTag("Ally");
+        auto enemies = testScene->findEntitiesWithTag("Enemy");
+        assert(allies.size() == 1);
+        assert(enemies.size() == 1);
     }
-}
+} // namespace LaurelEye
