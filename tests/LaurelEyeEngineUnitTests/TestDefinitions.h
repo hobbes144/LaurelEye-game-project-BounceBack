@@ -7,7 +7,10 @@
 #include "LaurelEyeEngine/scene/Scene.h"
 #include "LaurelEyeEngine/math/Vector3.h"
 #include "LaurelEyeEngine/math/Matrix4.h"
+#include "LaurelEyeEngine/transform/TransformComponent.h"
+#include "LaurelEyeEngine/transform/TransformSystem.h"
 #include <iostream>
+#include <cassert>
 #include <cassert>
 #ifdef _WIN32
 #include <windows.h>
@@ -21,4 +24,7 @@ namespace LaurelEye {
     void entityTest();
     void sceneTest();
     void physicsTest();
+    void transformTest();
+    void transformSystemTest();
+    void transformHierarchyTest();
 }
