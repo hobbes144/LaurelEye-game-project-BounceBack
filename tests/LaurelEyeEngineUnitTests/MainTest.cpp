@@ -14,7 +14,7 @@ int main() {
     LaurelEye::WindowManager wm = LaurelEye::WindowManager();
     auto window = wm.createWindow(LaurelEye::WindowDescription());
 
-    LaurelEye::InputSystem inputSystem((GLFWwindow*)window->getNativeHandle());
+    LaurelEye::InputManager inputManager(*window);
 
     typedef void (*test)();
     struct NamedTest {
@@ -43,12 +43,13 @@ int main() {
         bool waiting = true;
         while ( waiting ) {
             glfwP.update();
-            inputSystem.update();
+            inputManager.update();
 
-            if ( inputSystem.isKeyPressed(LaurelEye::Key::Space) ) {
+            if ( inputManager.isKeyPressed(LaurelEye::Key::Space) ) {
                 waiting = false; // leave the inner loop, go to next test
             }
-            if ( inputSystem.isKeyPressed(LaurelEye::Key::Escape) ) {
+
+            if ( inputManager.isKeyPressed(LaurelEye::Key::Escape) ) {
                 return 0; // bail out of program early
             }
         }

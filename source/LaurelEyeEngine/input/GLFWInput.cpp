@@ -55,8 +55,46 @@ namespace LaurelEye {
                 }
             }
         }
-        //TODO: Implement updating gamepad inputs
         
+        if ( glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1) ) {
+            GLFWgamepadstate* state = new GLFWgamepadstate;
+            if ( glfwGetGamepadState(GLFW_JOYSTICK_1, state) ) {
+                for ( int i = 0; i < 15; i++ ) {
+                    if ( gamepadStates.find(i) == gamepadStates.end() ) {
+                        gamepadStates[i] = KeyState();
+                    }
+                    else {
+                        if ( state->buttons[i] == GLFW_PRESS ) {
+                            if ( !gamepadStates[i].isHeld ) {
+                                gamepadStates[i].isPressed = true;
+                                gamepadStates[i].isHeld = true;
+                                gamepadStates[i].isReleased = false;
+                            }
+                            else {
+                                gamepadStates[i].isPressed = false;
+                                gamepadStates[i].isHeld = true;
+                                gamepadStates[i].isReleased = false;
+                            }
+                        }
+                        else {
+                            if ( gamepadStates[i].isHeld ) {
+                                gamepadStates[i].isPressed = false;
+                                gamepadStates[i].isHeld = false;
+                                gamepadStates[i].isReleased = true;
+                            }
+                            else {
+                                gamepadStates[i].isPressed = false;
+                                gamepadStates[i].isHeld = false;
+                                gamepadStates[i].isReleased = false;
+                            }
+                        }
+                    }
+                }
+                for ( int j = 0; j < 6; j++ ) {
+                    axisStates[j] = state->axes[j];
+                }
+            }
+        }
     }
 
     bool GLFWInput::isKeyPressed(Key key) {
@@ -100,22 +138,30 @@ namespace LaurelEye {
         if ( !glfwJoystickPresent(GLFW_JOYSTICK_1) ) {
             return false;
         }
-        int glfwButton = toGLFWGamepad(button);
+        int glfwButton = toGLFWGamepadButton(button);
         return gamepadStates[static_cast<int>(glfwButton)].isPressed;
     }
     bool GLFWInput::isButtonHeld(GamepadButton button) {
         if ( !glfwJoystickPresent(GLFW_JOYSTICK_1) ) {
             return false;
         }
-        int glfwButton = toGLFWGamepad(button);
+        int glfwButton = toGLFWGamepadButton(button);
         return gamepadStates[static_cast<int>(glfwButton)].isHeld;
     }
     bool GLFWInput::isButtonReleased(GamepadButton button) {
         if ( !glfwJoystickPresent(GLFW_JOYSTICK_1) ) {
             return false;
         }
-        int glfwButton = toGLFWGamepad(button);
+        int glfwButton = toGLFWGamepadButton(button);
         return gamepadStates[static_cast<int>(glfwButton)].isReleased;
+    }
+
+    float GLFWInput::getGamepadAxis(GamepadAxes axis) {
+        if ( !glfwJoystickPresent(GLFW_JOYSTICK_1) ) {
+            return false;
+        }
+        int glfwAxis = toGLFWGamepadAxis(axis);
+        return axisStates[static_cast<int>(glfwAxis)];
     }
 
     int GLFWInput::toGLFWKey(Key key) {
@@ -160,7 +206,7 @@ namespace LaurelEye {
         }
     }
 
-    int GLFWInput::toGLFWGamepad(GamepadButton button) {
+    int GLFWInput::toGLFWGamepadButton(GamepadButton button) {
         switch ( button ) {
         case GamepadButton::gamepadA:
             return GLFW_GAMEPAD_BUTTON_A;
@@ -189,4 +235,22 @@ namespace LaurelEye {
         }
     }
 
+    int GLFWInput::toGLFWGamepadAxis(GamepadAxes axis) {
+        switch (axis){
+        case GamepadAxes::gamepadLStickX:
+            return GLFW_GAMEPAD_AXIS_LEFT_X;
+        case GamepadAxes::gamepadLStickY:
+            return GLFW_GAMEPAD_AXIS_LEFT_Y;
+        case GamepadAxes::gamepadRStickX:
+            return GLFW_GAMEPAD_AXIS_RIGHT_X;
+        case GamepadAxes::gamepadRStickY:
+            return GLFW_GAMEPAD_AXIS_RIGHT_Y;
+        case GamepadAxes::gamepadLT:
+            return GLFW_GAMEPAD_AXIS_LEFT_TRIGGER;
+        case GamepadAxes::gamepadRT:
+            return GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER;
+        default:
+            return -1;
+        }
+    }
 }

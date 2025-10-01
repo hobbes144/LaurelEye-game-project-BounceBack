@@ -32,6 +32,15 @@ namespace LaurelEye {
         gamepadDown,
         gamepadRight,
         gamepadLeft,
-        gamepadStart
+        gamepadStart,
+    };
+
+    enum class GamepadAxes {
+        gamepadLStickX,
+        gamepadLStickY,
+        gamepadRStickX,
+        gamepadRStickY,
+        gamepadLT,
+        gamepadRT
     };
 }

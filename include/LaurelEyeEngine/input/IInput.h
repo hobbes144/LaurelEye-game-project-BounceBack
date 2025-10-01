@@ -1,4 +1,12 @@
-﻿#pragma once
+﻿/// @file    IInput.h
+/// @author  Jacob Wilburn (jacoblinwilburn@gmail.com)
+/// @par     **Digipen Email**
+///    jacob.wilburn@digipen.edu
+/// @date    9-22-25
+/// @brief   File containing the core input implementation for the LaurelEyeEngine
+/// Abstracted input interface, holding virtual functions for all input functions needed
+
+#pragma once
 
 #include "InputCodes.h"
 #include <unordered_map>
@@ -10,9 +18,9 @@ namespace LaurelEye {
         bool isReleased = false;
     };
 
-    class Input {
+    class IInput {
     public:
-        virtual ~Input() = default;
+        virtual ~IInput() = default;
         virtual void update() = 0;
 
         /*Virtual functions for checking states for the keyboard*/
@@ -31,5 +39,6 @@ namespace LaurelEye {
         virtual bool isButtonPressed(GamepadButton button) = 0;
         virtual bool isButtonHeld(GamepadButton button) = 0;
         virtual bool isButtonReleased(GamepadButton button) = 0;
+        virtual float getGamepadAxis(GamepadAxes axis) = 0;
     };
 } // namespace LaurelEye

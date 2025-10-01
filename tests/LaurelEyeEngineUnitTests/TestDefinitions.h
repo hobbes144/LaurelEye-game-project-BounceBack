@@ -1,10 +1,11 @@
-﻿#include "LaurelEyeEngine/input/InputSystem.h"
+﻿#include "LaurelEyeEngine/input/InputManager.h"
 #include "LaurelEyeEngine/platforms/glfw/GlfwPlatform.h"
 #include "LaurelEyeEngine/window/IWindow.h"
 #include "LaurelEyeEngine/window/WindowManager.h"
 #include "LaurelEyeEngine/ecs/Entity.h"
 #include "LaurelEyeEngine/ecs/IComponent.h"
 #include "LaurelEyeEngine/scene/Scene.h"
+#include "LaurelEyeEngine//input/IInput.h"
 #include "LaurelEyeEngine/math/Vector3.h"
 #include "LaurelEyeEngine/math/Matrix4.h"
 #include "LaurelEyeEngine/transform/TransformComponent.h"
@@ -24,6 +25,7 @@ namespace LaurelEye {
     void entityTest();
     void sceneTest();
     void physicsTest();
+    void inputTest();
     void transformTest();
     void transformSystemTest();
     void transformHierarchyTest();
