@@ -41,6 +41,9 @@ namespace LaurelEye {
         template <typename ComponentType>
         ComponentType* addComponent();
 
+        template <typename ComponentType, typename... Args>
+        ComponentType* addComponent(Args&&... args);
+
         template <typename ComponentType>
         ComponentType* addComponent(std::unique_ptr<ComponentType> component);
 

@@ -8,7 +8,7 @@ namespace LaurelEye::Physics {
         delete shape;
     }
 
-    CollisionShapePhys BulletShape::GetDiscription() const {
+    CollisionShapePhys BulletShape::GetDescription() const {
         return collisionShapePhys;
     }
 }

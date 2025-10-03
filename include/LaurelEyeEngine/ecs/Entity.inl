@@ -41,6 +41,38 @@ ComponentType* LaurelEye::Entity::addComponent() {
     return raw;
 }
 
+/// @brief Add a component by creating using Constructor
+///  ## Usage:
+///
+/// Game behaviour and properties are handled through components. This function
+/// adds components to the GameObject by creating them. Pass the Componets constructor arguements in
+/// as arguments.
+///
+/// ## Explanation:
+///
+/// Components that can be added include Render components (requiring Mesh and
+/// Material components) and PhysicsBody components.
+/// 
+/// ## Note:
+///
+/// Adding duplicates of a Component type leads to undefined behaviour.
+/// 
+/// @param ...args The Arguements to be passed to the constructor
+/// @return \b std::shared_ptr<ComponentType> Component created
+template <typename ComponentType, typename... Args>
+ComponentType* LaurelEye::Entity::addComponent(Args&&... args) {
+    // Prevent conflict if someone tries to pass a unique_ptr here
+    static_assert(!std::is_same_v<std::decay_t<Args>..., std::unique_ptr<ComponentType>>,
+                  "Use addComponent(std::unique_ptr<T>) for unique_ptrs!");
+
+    auto component = std::make_unique<ComponentType>(std::forward<Args>(args)...);
+    component->setOwner(this);
+
+    ComponentType* raw = component.get();
+    components.push_back(std::move(component));
+    return raw;
+}
+
 /// @brief Add a component by input, specialized for Renderable
 ///
 /// ## Usage:

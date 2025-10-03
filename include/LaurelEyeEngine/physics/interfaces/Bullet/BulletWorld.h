@@ -1,4 +1,13 @@
-﻿#pragma once
+﻿/// @file   BulletWorld.h
+/// @author Nicholas Shaw (nick_shaw@me.com)
+/// @par    **DigiPen Email**
+///     nick.shaw@digipen.edu
+/// @date   10/02/2025
+/// @brief Bullet-based implementation of IPhysicsWorld.
+/// Manages Bullet world setup, simulation stepping,
+/// and creation of bodies and collision shapes.
+
+#pragma once
 
 #include <memory>
 #include <btBulletDynamicsCommon.h>
@@ -15,10 +24,7 @@ namespace LaurelEye::Physics {
 
         void StepSimulation(float dt) override;
 
-        std::shared_ptr<IBody> CreateBody(
-            BodyType type,
-            const CollisionShapePhys& shapeDesc,
-            const TransPhys& start) override;
+        std::shared_ptr<IBody> CreateBody(const PhysicsBodyData& data) override;
 
         std::shared_ptr<ICollisionShape> CreateShape(
             const CollisionShapePhys& csPhys) override;

@@ -28,7 +28,7 @@ int main() {
         {"PhysicsTest", LaurelEye::physicsTest},
         {"TransformTest", LaurelEye::transformTest},
         {"TransformSystemTest", LaurelEye::transformSystemTest},
-        {"TransformHierarchyTest", LaurelEye::transformHierarchyTest}
+        {"TransformHierarchyTest", LaurelEye::transformHierarchyTest},
     };
 
     for ( NamedTest testFunc : tests ) {

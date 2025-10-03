@@ -1,4 +1,5 @@
 ﻿#include "LaurelEyeEngine/physics/interfaces/Bullet/BulletBody.h"
+#include "LaurelEyeEngine/transform/TransformComponent.h"
 
 namespace LaurelEye::Physics {
 
@@ -30,14 +31,12 @@ namespace LaurelEye::Physics {
         btRB->applyCentralImpulse(ToBt(i));
     }
 
-    void BulletBody::SetTransform(const TransPhys& t) {
-        btTransform trans(ToBt(t.rotation), ToBt(t.position));
+    void BulletBody::BindTransform(LaurelEye::TransformComponent* t) {
+        boundTransform = t;
     }
 
-    TransPhys BulletBody::GetTransform() const {
-        btTransform trans;
-        btRB->getMotionState()->getWorldTransform(trans);
-        return { FromBt(trans.getOrigin()), FromBt(trans.getRotation()) };
+    LaurelEye::TransformComponent* BulletBody::GetBoundTransform() const {
+        return boundTransform;
     }
 
     void BulletBody::SetVelocity(const Vector3& v) {
@@ -56,6 +55,26 @@ namespace LaurelEye::Physics {
 
     float BulletBody::GetMass() const {
         return 1.0f / btRB->getInvMass();
+    }
+
+    void BulletBody::pushTransformToPhysics() {
+        if ( !btRB || !boundTransform ) return;
+        const auto& pos = boundTransform->getWorldTransform().getPosition();
+        const auto& rot = boundTransform->getWorldTransform().getRotation();
+        btTransform btTrans(btQuaternion(rot.x(), rot.y(), rot.z(), rot.w()),
+                            btVector3(pos.x, pos.y, pos.z));
+        btRB->setWorldTransform(btTrans);
+        btRB->getMotionState()->setWorldTransform(btTrans);
+    }
+
+    void BulletBody::updateTransformFromPhysics() {
+        if ( !btRB || !boundTransform ) return;
+        btTransform btTrans = btRB->getWorldTransform();
+        btVector3 pos = btTrans.getOrigin();
+        btQuaternion rot = btTrans.getRotation();
+        float temp = pos.y();
+        boundTransform->setLocalPosition(Vector3(pos.x(), pos.y(), pos.z()));
+        boundTransform->setLocalRotation(Quaternion(rot.x(), rot.y(), rot.z(), rot.w()));
     }
 
 }

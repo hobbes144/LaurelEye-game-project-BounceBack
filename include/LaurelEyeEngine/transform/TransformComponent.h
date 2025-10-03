@@ -41,6 +41,44 @@ namespace LaurelEye {
             markDirty(); // Setting a transform requires recomputation
         }
 
+        // --- Local Position / Rotation / Scale ---
+        Vector3 getLocalPosition() const { return localTransform.getPosition(); }
+        void setLocalPosition(const Vector3& pos) {
+            localTransform.setPosition(pos);
+            markDirty();
+        }
+
+        Quaternion getLocalRotation() const { return localTransform.getRotation(); }
+        void setLocalRotation(const Quaternion& rot) {
+            localTransform.setRotation(rot);
+            markDirty();
+        }
+
+        Vector3 getLocalScale() const { return localTransform.getScaling(); }
+        void setLocalScale(const Vector3& scale) {
+            localTransform.setScaling(scale);
+            markDirty();
+        }
+
+        // --- World Position / Rotation / Scale ---
+        Vector3 getWorldPosition() const { return worldTransform.getPosition(); }
+        void setWorldPosition(const Vector3& pos) {
+            worldTransform.setPosition(pos);
+            markDirty();
+        }
+
+        Quaternion getWorldRotation() const { return worldTransform.getRotation(); }
+        void setWorldRotation(const Quaternion& rot) {
+            worldTransform.setRotation(rot);
+            markDirty();
+        }
+
+        Vector3 getWorldScale() const { return worldTransform.getScaling(); }
+        void setWorldScale(const Vector3& scale) {
+            worldTransform.setScaling(scale);
+            markDirty();
+        }
+
         void setParent(TransformComponent* parent) { parentTransform = parent; }
         void addChild(TransformComponent* child) { childTransforms.push_back(child); }
 

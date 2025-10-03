@@ -1,4 +1,12 @@
-﻿#pragma once
+﻿/// @file   BulletShape.h
+/// @author Nicholas Shaw (nick_shaw@me.com)
+/// @par    **DigiPen Email**
+///     nick.shaw@digipen.edu
+/// @date   10/02/2025
+/// @brief Bullet implementation of ICollisionShape.
+/// Wraps a btCollisionShape and stores its description.
+
+#pragma once
 
 #include <btBulletDynamicsCommon.h>
 
@@ -11,7 +19,7 @@ namespace LaurelEye::Physics {
         BulletShape(const CollisionShapePhys& csPhys, btCollisionShape* shape);
         ~BulletShape();
 
-        CollisionShapePhys GetDiscription() const override;
+        CollisionShapePhys GetDescription() const override;
         btCollisionShape* GetInternal() { return shape; }
 
     private:

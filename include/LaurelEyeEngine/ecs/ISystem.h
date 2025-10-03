@@ -26,11 +26,11 @@ namespace LaurelEye {
         virtual void update(float deltaTime) = 0;
         virtual void shutdown() = 0;
         
-        void registerComponent(const ComponentPtr component) {
+        virtual void registerComponent(const ComponentPtr component) {
             components.push_back(component);
         }
 
-        void deregisterComponent(ComponentPtr component) {
+        virtual void deregisterComponent(ComponentPtr component) {
             components.erase(
                 std::remove(components.begin(), components.end(), component),
                 components.end());

@@ -15,8 +15,8 @@ namespace LaurelEye::Physics {
         void ApplyForce(const Vector3& f) override;
         void ApplyImpulse(const Vector3& i) override;
 
-        void SetTransform(const TransPhys& t) override;
-        TransPhys GetTransform() const override;
+        void BindTransform(LaurelEye::TransformComponent* t) override;
+        LaurelEye::TransformComponent* GetBoundTransform() const override;
 
         void SetVelocity(const Vector3& v) override;
         Vector3 GetVelocity() const override;
@@ -27,8 +27,12 @@ namespace LaurelEye::Physics {
         std::shared_ptr<btRigidBody> GetInternal() { return btRB; }
         std::shared_ptr<BulletShape> GetShape() { return shape; }
 
+        void pushTransformToPhysics() override;
+        void updateTransformFromPhysics() override;
+
     private:
         std::shared_ptr<btRigidBody> btRB;
+        TransformComponent* boundTransform = nullptr;
         std::shared_ptr<BulletShape> shape;
         std::shared_ptr<btDefaultMotionState> motionState;
     };

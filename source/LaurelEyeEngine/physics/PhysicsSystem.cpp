@@ -16,18 +16,38 @@ namespace LaurelEye::Physics {
     }
 
     void PhysicsSystem::update(float dt) {
+        // Sync Transforms to Physics Simulation
+        for ( auto* comp : components ) {
+            comp->GetBodyRef()->pushTransformToPhysics();
+        }
+
         if ( world ) world->StepSimulation(dt);
+
+        //Sync Physics to Transforms
+        for ( auto* comp : components ) {
+            comp->GetBodyRef()->updateTransformFromPhysics();
+        }
+
     }
 
     void PhysicsSystem::shutdown() {
 
     }
 
-    std::shared_ptr<IBody> PhysicsSystem::CreateBody(
-        BodyType type,
-        const CollisionShapePhys& shapeDesc,
-        const TransPhys& transform) {
-        return world ? world->CreateBody(type, shapeDesc, transform) : nullptr;
+    void PhysicsSystem::registerComponent(const ComponentPtr component) {
+        // Call base
+        LaurelEye::ISystem<PhysicsBodyComponent>::registerComponent(component);
+
+        // Create Physics Body
+        auto newBody = CreateBody(component->GetBodyData());
+
+        // Bind the Body to its Component
+        component->SetBodyRef(newBody);
+        newBody->BindTransform(component->GetBodyData().transformRef);
+    }
+
+    std::shared_ptr<IBody> PhysicsSystem::CreateBody(const PhysicsBodyData& data) {
+        return world ? world->CreateBody(data) : nullptr;
     }
 
     std::shared_ptr<ICollisionShape> PhysicsSystem::CreateShape(const CollisionShapePhys& desc) {

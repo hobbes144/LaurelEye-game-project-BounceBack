@@ -10,9 +10,13 @@
 #include "LaurelEyeEngine/math/Matrix4.h"
 #include "LaurelEyeEngine/transform/TransformComponent.h"
 #include "LaurelEyeEngine/transform/TransformSystem.h"
+#include "LaurelEyeEngine/physics/PhysicsSystem.h"
+#include "LaurelEyeEngine/physics/interfaces/IBody.h"
+#include "LaurelEyeEngine/physics/interfaces/Bullet/BulletBody.h"
+#include "LaurelEyeEngine/physics/PhysicsBodyComponent.h"
 #include <iostream>
 #include <cassert>
-#include <cassert>
+#include <btBulletDynamicsCommon.h>
 #ifdef _WIN32
 #include <windows.h>
 #else
@@ -29,4 +33,5 @@ namespace LaurelEye {
     void transformTest();
     void transformSystemTest();
     void transformHierarchyTest();
+    void physicsComponentTest();
 }

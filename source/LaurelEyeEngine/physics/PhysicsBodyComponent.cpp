@@ -1,19 +1,42 @@
 ﻿#include "LaurelEyeEngine/physics/PhysicsBodyComponent.h"
+#include "LaurelEyeEngine/ecs/Entity.h"
+#include "LaurelEyeEngine/math/Transform.h"
 
 namespace LaurelEye::Physics {
 
-    PhysicsBodyComponent::PhysicsBodyComponent() {}
+    PhysicsBodyComponent::PhysicsBodyComponent()
+        : data{} {}
 
-    /*void PhysicsBodyComponent::initialize() {
+    PhysicsBodyComponent::PhysicsBodyComponent(const PhysicsBodyData& initData)
+        : data(initData) {}
 
+    std::shared_ptr<IBody> PhysicsBodyComponent::GetBodyRef() {
+        return body;
     }
 
-    void PhysicsBodyComponent::update(float dt) {
-
+    void PhysicsBodyComponent::SetBodyRef(std::shared_ptr<IBody> b) {
+        body = b;
     }
 
-    void PhysicsBodyComponent::shutdown() {
+    PhysicsBodyData& PhysicsBodyComponent::GetBodyData() {
+        return data;
+    }
 
-    }*/
+    void PhysicsBodyComponent::SetBodyData(const PhysicsBodyData& d) {
+        data = d;
+    }
+
+    void PhysicsBodyComponent::setOwner(Entity* entity) {
+        //Call base 
+        IComponent::setOwner(entity);
+
+        if ( entity ) {
+            auto* transform = entity->findComponent<LaurelEye::TransformComponent>();
+            if ( transform ) {
+                data.transformRef = transform;
+            }
+        }
+    }
+
 
 }
