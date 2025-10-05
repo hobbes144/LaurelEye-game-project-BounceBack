@@ -18,6 +18,10 @@ target_include_directories(LaurelEyeEngineTest
         ${PROJECT_SOURCE_DIR}/include
 )
 
+target_compile_definitions(LaurelEyeEngineTest
+    PRIVATE TEST_MEDIA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/TestMedia"
+)
+
 if (CMAKE_VERSION VERSION_GREATER 3.20)
     set_property(TARGET LaurelEyeEngineTest PROPERTY CXX_STANDARD 23)
 endif()

@@ -37,5 +37,6 @@
 #include <typeindex>
 #include <unordered_map>
 #include <vector>
+#include <sstream>
 
 // external library headers go here

@@ -29,6 +29,9 @@ int main() {
         {"TransformTest", LaurelEye::transformTest},
         {"TransformSystemTest", LaurelEye::transformSystemTest},
         {"TransformHierarchyTest", LaurelEye::transformHierarchyTest},
+        {"AssetMeshTest", LaurelEye::assetMeshTest},
+        {"AssetImageTest", LaurelEye::assetImageTest},
+        {"AssetCacheTest", LaurelEye::assetCacheTest}
     };
 
     for ( NamedTest testFunc : tests ) {

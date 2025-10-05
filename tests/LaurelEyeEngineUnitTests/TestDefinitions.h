@@ -16,6 +16,8 @@
 #include "LaurelEyeEngine/physics/PhysicsBodyComponent.h"
 #include <iostream>
 #include <cassert>
+#include "LaurelEyeEngine/io/AssetManager.h"
+#include "LaurelEyeEngine/io/Assets.h"
 #include <btBulletDynamicsCommon.h>
 #ifdef _WIN32
 #include <windows.h>
@@ -33,5 +35,8 @@ namespace LaurelEye {
     void transformTest();
     void transformSystemTest();
     void transformHierarchyTest();
+    void assetMeshTest();
+    void assetImageTest();
+    void assetCacheTest();
     void physicsComponentTest();
 }

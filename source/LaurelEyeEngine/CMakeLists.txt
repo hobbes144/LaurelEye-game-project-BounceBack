@@ -14,6 +14,8 @@ file(GLOB_RECURSE ENGINE_SOURCES CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/platforms/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/window/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/transform/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/io/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/io/importers/*.cpp
 )
 
 file(GLOB_RECURSE PLATFORM_SOURCES CONFIGURE_DEPENDS
@@ -23,6 +25,9 @@ file(GLOB_RECURSE PLATFORM_SOURCES CONFIGURE_DEPENDS
 
 find_package(Bullet CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
+find_package(assimp CONFIG REQUIRED)
+find_package(Stb REQUIRED)
+find_package(RapidJSON CONFIG REQUIRED) 
 
 add_library(LaurelEyeEngine SHARED ${ENGINE_SOURCES} ${PLATFORM_SOURCES})
 
@@ -63,4 +68,11 @@ target_link_libraries(LaurelEyeEngine
         BulletCollision
         BulletDynamics
         glfw
+        assimp::assimp
+)
+
+target_include_directories(LaurelEyeEngine
+    PUBLIC
+        ${Stb_INCLUDE_DIR}            # provided by vcpkg
+        ${RAPIDJSON_INCLUDE_DIRS}     # provided by vcpkg
 )

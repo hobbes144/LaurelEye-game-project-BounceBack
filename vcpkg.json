@@ -3,6 +3,9 @@
     "version-string": "0.0.1",
     "dependencies": [
         { "name": "bullet3" },
-        { "name": "glfw3" }
+        { "name": "glfw3" },
+        { "name": "assimp" },
+        { "name": "stb" },
+        { "name": "rapidjson" }
     ]
 }
