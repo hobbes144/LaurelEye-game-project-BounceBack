@@ -10,6 +10,7 @@
 #include "LaurelEyeEngine/math/Matrix4.h"
 #include "LaurelEyeEngine/transform/TransformComponent.h"
 #include "LaurelEyeEngine/transform/TransformSystem.h"
+#include "LaurelEyeEngine/memory/MemoryManager.h"
 #include "LaurelEyeEngine/physics/PhysicsSystem.h"
 #include "LaurelEyeEngine/physics/interfaces/IBody.h"
 #include "LaurelEyeEngine/physics/interfaces/Bullet/BulletBody.h"
@@ -35,6 +36,7 @@ namespace LaurelEye {
     void transformTest();
     void transformSystemTest();
     void transformHierarchyTest();
+    void memoryTest();
     void assetMeshTest();
     void assetImageTest();
     void assetCacheTest();

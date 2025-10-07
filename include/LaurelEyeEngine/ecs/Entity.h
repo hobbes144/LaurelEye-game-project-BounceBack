@@ -28,6 +28,12 @@ namespace LaurelEye {
               name(name),
               active(true) {}
 
+        //Empty constructor, used in memory manager allocation
+        Entity()
+            : name("unnamed"),
+              id(generateId()),
+              active(false) {}
+
         ~Entity() = default;
 
         // disallow copy
@@ -66,6 +72,11 @@ namespace LaurelEye {
 
         bool compareTag(std::string tagToCompare) {
             return tags.find(tagToCompare) != tags.end();
+        }
+
+        // Clear the entity data, used in memory manager
+        void reset() {
+            *this = Entity();
         }
 
     private:

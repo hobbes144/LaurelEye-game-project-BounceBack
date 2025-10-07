@@ -4,7 +4,7 @@
 #include "LaurelEyeEngine/window/WindowManager.h"
 
 namespace LaurelEye {
-    int inputTest() {
+    void inputTest() {
 
         LaurelEye::GlfwPlatform glfwP = LaurelEye::GlfwPlatform();
         glfwP.initialize();
@@ -131,7 +131,6 @@ namespace LaurelEye {
 
         wm.shutdown();
         glfwP.shutdown();
-        return 0;
     };
 
 }
