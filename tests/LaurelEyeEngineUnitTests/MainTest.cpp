@@ -28,7 +28,7 @@ int main() {
         {"TransformTest", LaurelEye::transformTest},
         {"TransformSystemTest", LaurelEye::transformSystemTest},
         {"TransformHierarchyTest", LaurelEye::transformHierarchyTest},
-        {"MemoryManagerTest", LaurelEye::memoryTest}
+        {"MemoryManagerTest", LaurelEye::memoryTest},
         {"AssetMeshTest", LaurelEye::assetMeshTest},
         {"AssetImageTest", LaurelEye::assetImageTest},
         {"AssetCacheTest", LaurelEye::assetCacheTest}
