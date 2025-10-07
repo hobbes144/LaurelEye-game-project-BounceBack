@@ -24,10 +24,12 @@ namespace LaurelEye::Physics {
     }
 
     void BulletBody::ApplyForce(const Vector3& f) {
+        btRB->activate(true);
         btRB->applyCentralForce(ToBt(f));
     }
 
     void BulletBody::ApplyImpulse(const Vector3& i) {
+        btRB->activate(true);
         btRB->applyCentralImpulse(ToBt(i));
     }
 

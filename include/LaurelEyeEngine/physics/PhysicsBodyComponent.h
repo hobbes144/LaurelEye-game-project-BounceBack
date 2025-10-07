@@ -30,6 +30,9 @@ namespace LaurelEye::Physics {
 
         void setOwner(Entity* entity) override;
 
+        void ApplyForce(Vector3 f);
+        void ApplyImpulse(Vector3 i);
+
     private:
         std::shared_ptr<IBody> body;
         PhysicsBodyData data;

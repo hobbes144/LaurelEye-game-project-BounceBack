@@ -38,5 +38,12 @@ namespace LaurelEye::Physics {
         }
     }
 
+    void PhysicsBodyComponent::ApplyForce(Vector3 f) {
+        body->ApplyForce(f);
+    }
+
+    void PhysicsBodyComponent::ApplyImpulse(Vector3 i) {
+        body->ApplyImpulse(i);
+    }
 
 }

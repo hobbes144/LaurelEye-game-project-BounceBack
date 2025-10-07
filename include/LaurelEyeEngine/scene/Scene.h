@@ -11,6 +11,8 @@
 ///
 /// Copyright © 2025 DIGIPEN Institute of Technology. All rights reserved.
 
+#pragma once
+
 #include <memory>
 #include <string>
 #include <vector>

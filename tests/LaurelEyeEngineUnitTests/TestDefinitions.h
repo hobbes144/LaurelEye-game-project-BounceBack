@@ -39,4 +39,5 @@ namespace LaurelEye {
     void assetImageTest();
     void assetCacheTest();
     void physicsComponentTest();
+    void inputPhysTest(LaurelEye::GlfwPlatform& glfwP, LaurelEye::InputManager& inputManager);
 }

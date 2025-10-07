@@ -72,6 +72,9 @@ namespace LaurelEye::Physics {
             d.shapeDefinition.type = CollisionShapePhys::ShapeType::Box;
             d.shapeDefinition.size = halfExtents;
             d.mass = mass;
+            d.useCCD = true;
+            d.ccdMotionThreshold = 0.01f;
+            d.ccdSweptSphereRadius = std::max(std::max(halfExtents.x, halfExtents.y), halfExtents.z);
             return d;
         }
 
