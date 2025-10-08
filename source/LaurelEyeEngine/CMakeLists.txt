@@ -13,6 +13,7 @@ file(GLOB_RECURSE ENGINE_SOURCES CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/scene/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/platforms/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/window/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/audio/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/transform/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/memory/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/io/*.cpp
@@ -32,6 +33,15 @@ find_package(RapidJSON CONFIG REQUIRED)
 
 add_library(LaurelEyeEngine SHARED ${ENGINE_SOURCES} ${PLATFORM_SOURCES})
 
+add_library(fmod SHARED IMPORTED GLOBAL)
+
+set(FMOD_DIR "${PROJECT_SOURCE_DIR}/external/fmod")
+
+target_include_directories(LaurelEyeEngine PRIVATE ${FMOD_DIR})
+
+set_target_properties(fmod PROPERTIES IMPORTED_IMPLIB "${FMOD_DIR}/fmodlibs/fmod.lib")
+set_target_properties(fmod PROPERTIES IMPORTED_IMPLIB "${FMOD_DIR}/fmodlibs/fmod_vc.lib")
+
 # add_library (LaurelEyeEngine
 #   SHARED
 #   "LaurelEyeEngine.cpp"
@@ -49,6 +59,7 @@ target_precompile_headers(LaurelEyeEngine
 target_include_directories(LaurelEyeEngine
     PUBLIC
         ${PROJECT_SOURCE_DIR}/include
+        ${PROJECT_SOURCE_DIR}/external
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
@@ -69,6 +80,7 @@ target_link_libraries(LaurelEyeEngine
         BulletCollision
         BulletDynamics
         glfw
+        fmod
         assimp::assimp
 )
 
@@ -77,3 +89,28 @@ target_include_directories(LaurelEyeEngine
         ${Stb_INCLUDE_DIR}            # provided by vcpkg
         ${RAPIDJSON_INCLUDE_DIRS}     # provided by vcpkg
 )
+
+add_custom_command(TARGET LaurelEyeEngine POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${FMOD_DIR}/fmoddlls/fmod.dll"
+        $<TARGET_FILE_DIR:LaurelEyeEngine>)
+
+add_custom_command(TARGET LaurelEyeEngine POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${FMOD_DIR}/fmoddlls/fmodL.dll"
+        $<TARGET_FILE_DIR:LaurelEyeEngine>)
+
+add_custom_command(TARGET LaurelEyeEngine POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${FMOD_DIR}/fmoddlls/fmodstudio.dll"
+        $<TARGET_FILE_DIR:LaurelEyeEngine>)
+
+add_custom_command(TARGET LaurelEyeEngine POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${FMOD_DIR}/fmoddlls/fmodstudioL.dll"
+        $<TARGET_FILE_DIR:LaurelEyeEngine>)
+
+add_custom_command(TARGET LaurelEyeEngine POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${PROJECT_SOURCE_DIR}/media"
+        $<TARGET_FILE_DIR:LaurelEyeEngine>/media)

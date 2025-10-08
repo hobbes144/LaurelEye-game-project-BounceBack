@@ -10,6 +10,8 @@
 #include "LaurelEyeEngine/math/Matrix4.h"
 #include "LaurelEyeEngine/transform/TransformComponent.h"
 #include "LaurelEyeEngine/transform/TransformSystem.h"
+#include "LaurelEyeEngine/audio/FModAudioManager.h"
+#include "LaurelEyeEngine/audio/SpeakerComponent.h"
 #include "LaurelEyeEngine/memory/MemoryManager.h"
 #include "LaurelEyeEngine/physics/PhysicsSystem.h"
 #include "LaurelEyeEngine/physics/interfaces/IBody.h"
@@ -36,6 +38,13 @@ namespace LaurelEye {
     void transformTest();
     void transformSystemTest();
     void transformHierarchyTest();
+    void audioPlayTest();
+    void audioStopTest();
+    void audioPauseTest();
+    void audioResumeTest();
+    void speakerTest();
+    void speakerTest2();
+    void speakerTest3();
     void memoryTest();
     void assetMeshTest();
     void assetImageTest();

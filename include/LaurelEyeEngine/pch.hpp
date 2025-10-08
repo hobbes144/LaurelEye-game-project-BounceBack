@@ -40,3 +40,4 @@
 #include <sstream>
 
 // external library headers go here
+#include "fmod/fmod.hpp"
