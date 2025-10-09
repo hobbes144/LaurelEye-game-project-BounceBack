@@ -17,9 +17,11 @@ namespace LaurelEye {
         auto groundT = ground->addComponent<LaurelEye::TransformComponent>();
         LaurelEye::Transform groundLocal;
         groundLocal.setPosition(0.0f, -1.0f, 0.0f);
+        groundLocal.setScaling(10.0f, 1.0f, 10.0f);
         groundT->setLocalTransform(groundLocal);
+        groundT->setWorldTransform(groundLocal);
         auto groundPB = ground->addComponent<LaurelEye::Physics::PhysicsBodyComponent>(
-            LaurelEye::Physics::PhysicsBodyData::StaticBox({50.0f, 1.0f, 50.0f}));
+            LaurelEye::Physics::PhysicsBodyData::StaticBox({1.0f, 1.0f, 1.0f}));
 
         transformSystem.registerComponent(groundT);
         physicsSystem.registerComponent(groundPB);
@@ -30,19 +32,20 @@ namespace LaurelEye {
         LaurelEye::Transform cubeLocal;
         cubeLocal.setPosition(0.0f, 10.0f, 0.0f);
         cubeT->setLocalTransform(cubeLocal);
+        cubeT->setWorldTransform(cubeLocal);
         auto cubePB = cube->addComponent<LaurelEye::Physics::PhysicsBodyComponent>(
             LaurelEye::Physics::PhysicsBodyData::DynamicBox({1.0f, 1.0f, 1.0f}, 1.0f));
 
         transformSystem.registerComponent(cubeT);
         physicsSystem.registerComponent(cubePB);
 
-        transformSystem.update(0.016);
+        //transformSystem.update(0.016);
 
         // === Simulation ===
         float dt = 1.0f / 60.0f; // 60Hz
         while ( !inputManager.isKeyPressed(LaurelEye::Key::Escape) ) {
-            physicsSystem.update(dt);
             transformSystem.update(dt);
+            physicsSystem.update(dt);
             glfwP.update();
             inputManager.update();
 

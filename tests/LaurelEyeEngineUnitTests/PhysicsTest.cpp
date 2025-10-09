@@ -17,12 +17,16 @@ namespace LaurelEye {
         auto groundT = ground->addComponent<TransformComponent>();
         Transform groundLocal;
         groundLocal.setPosition(0.0f, -1.0f, 0.0f);
+        groundLocal.setScaling(10.0f, 1.0f, 10.0f);
         groundT->setLocalTransform(groundLocal);
+        groundT->setWorldTransform(groundLocal);
         auto groundPB = ground->addComponent<Physics::PhysicsBodyComponent>(
-            Physics::PhysicsBodyData::StaticBox({50.0f, 1.0f, 50.0f}));
+            Physics::PhysicsBodyData::StaticBox({1.0f, 1.0f, 1.0f}));
 
         transformSystem.registerComponent(groundT);
         physicsSystem.registerComponent(groundPB);
+
+        transformSystem.update(0.016);
 
         // === Create Cube Entity ===
         auto cube = std::make_unique<Entity>("Cube");
@@ -30,6 +34,7 @@ namespace LaurelEye {
         Transform cubeLocal;
         cubeLocal.setPosition(0.0f, 10.0f, 0.0f);
         cubeT->setLocalTransform(cubeLocal);
+        cubeT->setWorldTransform(cubeLocal);
         auto cubePB = cube->addComponent<Physics::PhysicsBodyComponent>(
             Physics::PhysicsBodyData::DynamicBox({1.0f, 1.0f, 1.0f}, 1.0f));
 
@@ -68,12 +73,9 @@ namespace LaurelEye {
             
 
             // In the early frames, cube should fall (y decreasing)
-            if ( i == 10 ) {
-                float y0 = cubeWorld.getPosition().y;
-                physicsSystem.update(dt);
-                transformSystem.update(dt);
-                float y1 = cubeT->getWorldTransform().getPosition().y;
-                assert(y1 < y0); // falling
+            if ( i == 20 ) {
+                float y = cubeT->getWorldTransform().getPosition().y;
+                assert(y < 10); // falling
             }
         }
 

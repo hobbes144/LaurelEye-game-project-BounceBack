@@ -43,6 +43,14 @@ namespace LaurelEye::Physics {
         auto bulletShape = std::dynamic_pointer_cast<BulletShape>(CreateShape(data.shapeDefinition));
         if ( !bulletShape ) throw std::runtime_error("Failed to create BulletShape");
 
+        // Apply local scaling from transform
+        if ( data.transformRef ) {
+            Vector3 scale = data.transformRef->getWorldScale();
+            bulletShape->GetInternal()->setLocalScaling(btVector3(scale.x, scale.y, scale.z));
+        }
+
+        auto t = bulletShape->GetInternal();
+
         //Start Transform
         btTransform btStart;
         btStart.setOrigin(btVector3(

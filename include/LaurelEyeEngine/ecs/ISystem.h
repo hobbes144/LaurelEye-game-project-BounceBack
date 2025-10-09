@@ -28,6 +28,8 @@ namespace LaurelEye {
         
         virtual void registerComponent(const ComponentPtr component) {
             components.push_back(component);
+
+            //Build the Bodies
         }
 
         virtual void deregisterComponent(ComponentPtr component) {
