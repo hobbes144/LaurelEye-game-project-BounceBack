@@ -46,10 +46,9 @@ namespace LaurelEye::Physics {
         // Apply local scaling from transform
         if ( data.transformRef ) {
             Vector3 scale = data.transformRef->getWorldScale();
-            bulletShape->GetInternal()->setLocalScaling(btVector3(scale.x, scale.y, scale.z));
+            btVector3 dim = bulletShape->GetInternal()->getLocalScaling();
+            bulletShape->GetInternal()->setLocalScaling(btVector3(scale.x * dim.x(), scale.y * dim.y(), scale.z)*dim.z());
         }
-
-        auto t = bulletShape->GetInternal();
 
         //Start Transform
         btTransform btStart;
