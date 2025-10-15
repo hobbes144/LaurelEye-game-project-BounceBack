@@ -17,6 +17,9 @@
 #include "LaurelEyeEngine/physics/interfaces/IBody.h"
 #include "LaurelEyeEngine/physics/interfaces/Bullet/BulletBody.h"
 #include "LaurelEyeEngine/physics/PhysicsBodyComponent.h"
+#include "LaurelEyeEngine/events/CollisionEvent.h"
+#include "LaurelEyeEngine/events/EventManager.h"
+#include "LaurelEyeEngine/events/IEvent.h"
 #include <iostream>
 #include <cassert>
 #include "LaurelEyeEngine/io/AssetManager.h"
@@ -50,5 +53,6 @@ namespace LaurelEye {
     void assetImageTest();
     void assetCacheTest();
     void physicsComponentTest();
+    void eventTest();
     void inputPhysTest(LaurelEye::GlfwPlatform& glfwP, LaurelEye::InputManager& inputManager);
 }
