@@ -1,4 +1,6 @@
-﻿#include "LaurelEyeEngine/input/InputManager.h"
+﻿#include "LaurelEyeEngine/graphics/Graphics.h"
+#include "LaurelEyeEngine/graphics/RenderSystem.h"
+#include "LaurelEyeEngine/input/InputManager.h"
 #include "LaurelEyeEngine/platforms/glfw/GlfwPlatform.h"
 #include "LaurelEyeEngine/window/IWindow.h"
 #include "LaurelEyeEngine/window/WindowManager.h"
@@ -53,6 +55,7 @@ namespace LaurelEye {
     void assetImageTest();
     void assetCacheTest();
     void physicsComponentTest();
+    void renderTestExtended(IWindow* window, GlfwPlatform* glfwP, InputManager* inputManager);
     void eventTest();
     void inputPhysTest(LaurelEye::GlfwPlatform& glfwP, LaurelEye::InputManager& inputManager);
 }

@@ -1,37 +1,51 @@
-﻿#include "LaurelEyeEngine/window/WindowManager.h"
+﻿/// @file   WindowManager.cpp
+/// @author Anish Murthy (anish.murthy.dev@gmail.com)
+/// @par    **DigiPen Email**
+///     anish.murthy@digipen.edu
+/// @date    10-14-2025
+/// @brief Implementation of WindowManager
+
+#include "LaurelEyeEngine/window/WindowManager.h"
 #include "LaurelEyeEngine/window/IWindow.h"
 
-#ifdef PLATFORM_GLFW
 #include "LaurelEyeEngine/window/glfw/LGlfwWindow.h"
-#else
-#error "No window backend selected (define PLATFORM_GLFW or PLATFORM_SDL)"
-#endif
 
 #include <memory>
 #include <vector>
 
 namespace LaurelEye {
 
-    void WindowManager::initialize() {}
-
-    void WindowManager::update(float deltaTime) {
-        // std::vector<std::unique_ptr<IWindow>> pendingCloseWindows;
-        // managedWindows.erase(
-        //     std::remove_if(
-        //         managedWindows.begin(),
-        //         managedWindows.end(),
-        //         [&](std::unique_ptr<IWindow>& window) { return window->shouldClose(); }),
-        //     managedWindows.end());
+    WindowManager::WindowManager(WindowBackend type) {
+        systemType = type;
     }
+
+
+    // void WindowManager::update(float deltaTime) {
+    //     // std::vector<std::unique_ptr<IWindow>> pendingCloseWindows;
+    //     // managedWindows.erase(
+    //     //     std::remove_if(
+    //     //         managedWindows.begin(),
+    //     //         managedWindows.end(),
+    //     //         [&](std::unique_ptr<IWindow>& window) { return window->shouldClose(); }),
+    //     //     managedWindows.end());
+    // }
 
     void WindowManager::shutdown() {
         managedWindows.clear();
     }
 
     IWindow* WindowManager::createWindow(const WindowDescription& wDesc) {
-#ifdef PLATFORM_GLFW
-        auto pWindow = std::make_unique<LaurelEye::LGlfwWindow>(wDesc);
-#endif
+        std::unique_ptr<IWindow> pWindow;
+        switch ( systemType ) {
+        case WindowBackend::GLFW:
+            pWindow = std::make_unique<LaurelEye::LGlfwWindow>(wDesc);
+
+            if (mainWindowId == -1) {
+                glfwMakeContextCurrent((GLFWwindow*)pWindow->getNativeHandle());
+                mainWindowId = 0;
+            }
+            break;
+        }
         IWindow* rawPWindow = pWindow.get();
         managedWindows.emplace_back(std::move(pWindow));
         return rawPWindow;

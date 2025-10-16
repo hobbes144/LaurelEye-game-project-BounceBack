@@ -13,6 +13,7 @@
 #pragma once
 
 #include <memory>
+#include <algorithm>
 #include <vector>
 #include <unordered_set>
 #include <string>

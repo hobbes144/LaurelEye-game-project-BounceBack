@@ -1,6 +1,6 @@
 ﻿// IWYU pragma: keep
 /*!****************************************************************************
- * \file   precompiled.h
+ * \file   pch.hpp
  * \author Erik Fleegal (Adjunct Senior Lecturer)
  *   (eric.fleegal@digipen.edu)
  * \brief  Precompiled headers

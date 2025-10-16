@@ -149,14 +149,13 @@ namespace LaurelEye {
             result.normalize();
             return result;
         }
-
-        // Specific to 3D vectors
-        // Formula: [v2*u3 - v3*u2, v3*u1 - v1*u3, v1*u2 - v2*u1]
-        VectorTemplated cross(const VectorTemplated& other) const {
-            return VectorTemplated((data[1] * other.data[2] - data[2] * other.data[1]), (data[2] * other.data[0] - data[0] * other.data[2]), (data[0] * other.data[1] - data[1] * other.data[0]));
-        }
     };
 
+    using Vector2 = VectorTemplated<float, 2>;
+    using FVector2 = VectorTemplated<float, 2>;
     using Vector4 = VectorTemplated<float, 4>;
-
+    using FVector4 = VectorTemplated<float, 4>;
+    using IVector2 = VectorTemplated<int, 2>;
+    using IVector3 = VectorTemplated<int, 3>;
+    using IVector4 = VectorTemplated<int, 4>;
 } // namespace LaurelEye

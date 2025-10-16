@@ -4,6 +4,7 @@
     "dependencies": [
         { "name": "bullet3" },
         { "name": "glfw3" },
+        { "name": "glad" },
         { "name": "assimp" },
         { "name": "stb" },
         { "name": "rapidjson" }

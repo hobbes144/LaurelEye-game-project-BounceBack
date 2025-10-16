@@ -8,6 +8,9 @@ file(GLOB_RECURSE ENGINE_SOURCES CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/physics/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/physics/interfaces/Bullet/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/graphics/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/graphics/resources/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/graphics/mesh/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/graphics/device/glfw/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/input/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ecs/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/scene/*.cpp
@@ -15,6 +18,8 @@ file(GLOB_RECURSE ENGINE_SOURCES CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/window/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/audio/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/transform/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/graphics/graphics_components/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/graphics/material/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/memory/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/io/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/io/importers/*.cpp
@@ -27,9 +32,10 @@ file(GLOB_RECURSE PLATFORM_SOURCES CONFIGURE_DEPENDS
 
 find_package(Bullet CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
+find_package(glad CONFIG REQUIRED)
 find_package(assimp CONFIG REQUIRED)
 find_package(Stb REQUIRED)
-find_package(RapidJSON CONFIG REQUIRED) 
+find_package(RapidJSON CONFIG REQUIRED)
 
 add_library(LaurelEyeEngine SHARED ${ENGINE_SOURCES} ${PLATFORM_SOURCES})
 
@@ -80,6 +86,7 @@ target_link_libraries(LaurelEyeEngine
         BulletCollision
         BulletDynamics
         glfw
+        glad::glad
         fmod
         assimp::assimp
 )

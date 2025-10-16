@@ -31,7 +31,7 @@ namespace LaurelEye {
         assetManager.registerImporter("jpg", std::make_unique<IO::ImageImporter>());
 
         try {
-           
+
             auto asset = assetManager.load(std::string(TEST_MEDIA_DIR) + "/variation-a.png");
             auto image = std::dynamic_pointer_cast<IO::ImageAsset>(asset);
             assert(image && "Image import failed: not an ImageAsset");

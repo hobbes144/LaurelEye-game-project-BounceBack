@@ -8,7 +8,7 @@
 ///     (alex.humphries@digipen.edu) (Additional code)
 /// @date   9-21-2025
 /// @brief  Implementation of templated Entity code. Adapted from GameObject.inl
-/// 
+///
 /// Copyright © 2025 DIGIPEN Institute of Technology. All rights reserved.
 
 /// @brief Add a component by creating
@@ -22,11 +22,11 @@
 ///
 /// Components that can be added include Render components (requiring Mesh and
 /// Material components) and PhysicsBody components.
-/// 
+///
 /// ## Note:
 ///
 /// Adding duplicates of a Component type leads to undefined behaviour.
-/// 
+///
 /// @return \b std::shared_ptr<ComponentType> Component created
 template <typename ComponentType>
 ComponentType* LaurelEye::Entity::addComponent() {
@@ -52,11 +52,11 @@ ComponentType* LaurelEye::Entity::addComponent() {
 ///
 /// Components that can be added include Render components (requiring Mesh and
 /// Material components) and PhysicsBody components.
-/// 
+///
 /// ## Note:
 ///
 /// Adding duplicates of a Component type leads to undefined behaviour.
-/// 
+///
 /// @param ...args The Arguements to be passed to the constructor
 /// @return \b std::shared_ptr<ComponentType> Component created
 template <typename ComponentType, typename... Args>

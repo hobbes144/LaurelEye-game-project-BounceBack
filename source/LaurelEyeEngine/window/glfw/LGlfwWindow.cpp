@@ -1,15 +1,20 @@
-﻿#include "LaurelEyeEngine/window/glfw/LGlfwWindow.h"
+﻿/// @file   LGlfwWindow.cpp
+/// @author Anish Murthy (anish.murthy.dev@gmail.com)
+/// @par    **DigiPen Email**
+///     anish.murthy@digipen.edu
+/// @date    10-14-2025
+/// @brief Implementation of GLFW Window
+
+#include "LaurelEyeEngine/window/glfw/LGlfwWindow.h"
+#include "LaurelEyeEngine/graphics/Graphics.h"
 #include "LaurelEyeEngine/window/IWindow.h"
+
 #include <GLFW/glfw3.h>
 
 namespace LaurelEye {
 
     LGlfwWindow::LGlfwWindow(const WindowDescription& wDesc) : IWindow() {
-        this->attributes.title = wDesc.title;
-        this->attributes.width = wDesc.width;
-        this->attributes.height = wDesc.height;
-        this->attributes.mode = wDesc.mode;
-        this->attributes.width = wDesc.width;
+        this->attributes = wDesc;
 
         GLFWmonitor* monitor = nullptr;
 
@@ -22,6 +27,16 @@ namespace LaurelEye {
         else {
             this->attributes.width = this->attributes.windowedWidth;
             this->attributes.height = this->attributes.windowedHeight;
+        }
+
+        if ( this->attributes.setupOpenGLContext ) {
+            // TODO: The window config needs to specify the GraphicsBackend.
+            // Also a lot of window params are rendering specific.
+            glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+            glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+            glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+            glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
+            glfwWindowHint(GLFW_DEPTH_BITS, 24);
         }
 
         nativeHandle = glfwCreateWindow(
@@ -55,7 +70,7 @@ namespace LaurelEye {
         return false;
     }
 
-    PlatformWindow* LGlfwWindow::getNativeHandle() {
+    NativeWindowHandle LGlfwWindow::getNativeHandle() {
         return nativeHandle;
     }
 

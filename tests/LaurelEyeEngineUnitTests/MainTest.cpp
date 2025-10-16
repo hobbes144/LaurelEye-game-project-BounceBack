@@ -28,12 +28,22 @@ int main() {
         {"TransformTest", LaurelEye::transformTest},
         {"TransformSystemTest", LaurelEye::transformSystemTest},
         {"TransformHierarchyTest", LaurelEye::transformHierarchyTest},
+        // {"RenderTest", LaurelEye::renderTest}
+        {"AudioTest1", LaurelEye::audioPlayTest},
+        {"AudioTest2", LaurelEye::audioPauseTest},
+        {"AudioTest3", LaurelEye::audioResumeTest},
+        {"AudioTest4", LaurelEye::audioStopTest},
+        {"AudioTest4", LaurelEye::speakerTest},
+        {"AudioTest4", LaurelEye::speakerTest2},
+        {"AudioTest4", LaurelEye::speakerTest3},
         {"EventTest", LaurelEye::eventTest},
         {"MemoryManagerTest", LaurelEye::memoryTest},
         {"AssetMeshTest", LaurelEye::assetMeshTest},
         {"AssetImageTest", LaurelEye::assetImageTest},
         {"AssetCacheTest", LaurelEye::assetCacheTest}
     };
+
+    renderTestExtended(window, &glfwP, &inputManager);
 
     for ( NamedTest testFunc : tests ) {
         std::cout << "Running test: " << testFunc.name << std::endl;
@@ -63,6 +73,7 @@ int main() {
     LaurelEye::inputPhysTest(glfwP, inputManager);
 
     std::cout << "Tests are finished, moving to gameplay demo" << std::endl;
+
 
     wm.shutdown();
     glfwP.shutdown();
