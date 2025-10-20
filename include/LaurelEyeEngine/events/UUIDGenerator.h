@@ -7,7 +7,8 @@
 /// Used for the event system to generate IDs for listeners
 
 #pragma once
-#include "LaurelEyeEngine/pch.hpp"
+
+#include <atomic>
 
 class UUIDGenerator {
 public:

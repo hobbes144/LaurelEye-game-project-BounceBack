@@ -11,7 +11,6 @@
  *****************************************************************************/
 
 #include "LaurelEyeEngine/audio/FModAudioManager.h"
-#include "LaurelEyeEngine/pch.hpp"
 
 namespace LaurelEye::Audio {
     /*!****************************************************************************

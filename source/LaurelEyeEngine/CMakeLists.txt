@@ -30,6 +30,10 @@ file(GLOB_RECURSE PLATFORM_SOURCES CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/window/glfw/*.cpp
 )
 
+# Top-level CMakeLists.txt
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+include(FMODVendor)
+
 find_package(Bullet CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 find_package(glad CONFIG REQUIRED)
@@ -39,14 +43,26 @@ find_package(RapidJSON CONFIG REQUIRED)
 
 add_library(LaurelEyeEngine SHARED ${ENGINE_SOURCES} ${PLATFORM_SOURCES})
 
-add_library(fmod SHARED IMPORTED GLOBAL)
+le_add_fmod(LaurelEyeEngine USE_STUDIO)
 
-set(FMOD_DIR "${PROJECT_SOURCE_DIR}/external/fmod")
+# add_library(fmod SHARED IMPORTED GLOBAL)
+# target_include_directories(LaurelEyeEngine PRIVATE ${FMOD_DIR})
 
-target_include_directories(LaurelEyeEngine PRIVATE ${FMOD_DIR})
+# set(FMOD_DIR "${PROJECT_SOURCE_DIR}/external/fmod")
 
-set_target_properties(fmod PROPERTIES IMPORTED_IMPLIB "${FMOD_DIR}/fmodlibs/fmod.lib")
-set_target_properties(fmod PROPERTIES IMPORTED_IMPLIB "${FMOD_DIR}/fmodlibs/fmod_vc.lib")
+# if (WIN32)
+#     # set_property(TARGET fmod PROPERTY
+#     #              IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/win/core/lib/x64/fmod.dll")
+#     # set_property(TARGET fmod PROPERTY
+#     #              IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/win/core/lib/x64/fmod_vc.lib")
+#     # set_property(TARGET fmod PROPERTY
+#     #              INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/win/core/inc")
+#
+#     set_target_properties(fmod PROPERTIES IMPORTED_IMPLIB "${FMOD_DIR}/fmodlibs/fmod.lib")
+#     set_target_properties(fmod PROPERTIES IMPORTED_IMPLIB "${FMOD_DIR}/fmodlibs/fmod_vc.lib")
+# endif()
+
+
 
 # add_library (LaurelEyeEngine
 #   SHARED
@@ -87,7 +103,7 @@ target_link_libraries(LaurelEyeEngine
         BulletDynamics
         glfw
         glad::glad
-        fmod
+        # fmod
         assimp::assimp
 )
 
@@ -98,26 +114,28 @@ target_include_directories(LaurelEyeEngine
 )
 
 add_custom_command(TARGET LaurelEyeEngine POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${FMOD_DIR}/fmoddlls/fmod.dll"
-        $<TARGET_FILE_DIR:LaurelEyeEngine>)
-
-add_custom_command(TARGET LaurelEyeEngine POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${FMOD_DIR}/fmoddlls/fmodL.dll"
-        $<TARGET_FILE_DIR:LaurelEyeEngine>)
-
-add_custom_command(TARGET LaurelEyeEngine POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${FMOD_DIR}/fmoddlls/fmodstudio.dll"
-        $<TARGET_FILE_DIR:LaurelEyeEngine>)
-
-add_custom_command(TARGET LaurelEyeEngine POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${FMOD_DIR}/fmoddlls/fmodstudioL.dll"
-        $<TARGET_FILE_DIR:LaurelEyeEngine>)
-
-add_custom_command(TARGET LaurelEyeEngine POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${PROJECT_SOURCE_DIR}/media"
-        $<TARGET_FILE_DIR:LaurelEyeEngine>/media)
+        "${PROJECT_SOURCE_DIR}/assets"
+        $<TARGET_FILE_DIR:LaurelEyeEngine>/assets)
+
+# if (WIN32)
+#     add_custom_command(TARGET LaurelEyeEngine POST_BUILD
+#     COMMAND ${CMAKE_COMMAND} -E copy_if_different
+#         "${FMOD_DIR}/fmoddlls/fmod.dll"
+#         $<TARGET_FILE_DIR:LaurelEyeEngine>)
+#
+#     add_custom_command(TARGET LaurelEyeEngine POST_BUILD
+#     COMMAND ${CMAKE_COMMAND} -E copy_if_different
+#         "${FMOD_DIR}/fmoddlls/fmodL.dll"
+#         $<TARGET_FILE_DIR:LaurelEyeEngine>)
+#
+#     add_custom_command(TARGET LaurelEyeEngine POST_BUILD
+#     COMMAND ${CMAKE_COMMAND} -E copy_if_different
+#         "${FMOD_DIR}/fmoddlls/fmodstudio.dll"
+#         $<TARGET_FILE_DIR:LaurelEyeEngine>)
+#
+#     add_custom_command(TARGET LaurelEyeEngine POST_BUILD
+#     COMMAND ${CMAKE_COMMAND} -E copy_if_different
+#         "${FMOD_DIR}/fmoddlls/fmodstudioL.dll"
+#         $<TARGET_FILE_DIR:LaurelEyeEngine>)
+# endif()

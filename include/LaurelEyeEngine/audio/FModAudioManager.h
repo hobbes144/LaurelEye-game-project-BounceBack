@@ -14,7 +14,7 @@
 #ifndef FMODAUDIOMANAGER_H
 #define FMODAUDIOMANAGER_H
 
-#include "fmod/fmod.hpp"
+#include <fmod.hpp>
 #include "LaurelEyeEngine/audio/interfaces/IAudioManager.h"
 
 namespace LaurelEye::Audio {

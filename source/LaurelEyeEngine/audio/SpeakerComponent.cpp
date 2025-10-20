@@ -7,11 +7,10 @@
  *    GAM541
  * \date   10-01-2025
  * \brief  Speaker component implementation.
- * 
+ *
  *****************************************************************************/
 
 #include "LaurelEyeEngine/audio/SpeakerComponent.h"
-#include "LaurelEyeEngine/pch.hpp"
 #include "LaurelEyeEngine/transform/TransformComponent.h"
 
 namespace LaurelEye::Audio {

@@ -10,6 +10,7 @@
 
 #include "LaurelEyeEngine/events/UUIDGenerator.h"
 #include "LaurelEyeEngine/events/IEvent.h"
+#include <typeindex>
 #include <functional>
 
 namespace LaurelEye {

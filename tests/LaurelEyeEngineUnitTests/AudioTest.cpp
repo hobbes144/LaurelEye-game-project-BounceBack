@@ -1,17 +1,19 @@
-﻿#include "TestDefinitions.h"
+﻿#include "LaurelEyeEngine/audio/interfaces/IAudioManager.h"
+#include "TestDefinitions.h"
 #include <chrono>
 #include <cmath>
+#include <memory>
 #include <thread>
 
 namespace LaurelEye {
-    Audio::FModAudioManager* am;
+    std::unique_ptr<Audio::FModAudioManager> am;
 
     void audioPlayTest() {
         /* Audio System Initalization */
-        am = new Audio::FModAudioManager();
+        am = std::make_unique<Audio::FModAudioManager>();
 
         am->update();
-        am->loadSound("music", "media/audio/testAudio.mp3", false, true);
+        am->loadSound("music", std::string(TEST_MEDIA_DIR) + "/audio/testAudio.mp3", false, true);
         am->playSound("music", Vector3(0.0f, 0.0f, 0.0f), 0.15f);
         am->update();
     }
@@ -35,7 +37,7 @@ namespace LaurelEye {
     }
 
     void speakerTest() {
-        am->loadSound("slide", "media/audio/slide.mp3", true, true);
+        am->loadSound("slide", std::string(TEST_MEDIA_DIR) + "/audio/slide.mp3", true, true);
 
         // Create entity
         auto root = std::make_unique<Entity>("RootEntity");
@@ -48,7 +50,7 @@ namespace LaurelEye {
 
         Audio::SpeakerComponent* sp = root->addComponent<Audio::SpeakerComponent>();
         sp->setVolume(0.5f);
-        sp->setAudioManager(am);
+        sp->setAudioManager((Audio::IAudioManager*) am.get());
         assert(sp != nullptr);
 
         // Simple transforms for testing
@@ -80,7 +82,7 @@ namespace LaurelEye {
 
         Audio::SpeakerComponent* sp = root->addComponent<Audio::SpeakerComponent>();
         sp->setVolume(0.5f);
-        sp->setAudioManager(am);
+        sp->setAudioManager((Audio::IAudioManager*) am.get());
         assert(sp != nullptr);
 
         // Simple transforms for testing
@@ -101,7 +103,7 @@ namespace LaurelEye {
     void speakerTest3() {
         am->stopSound("slide");
 
-        am->loadSound("slide2", "media/audio/slide.mp3", true, false);
+        am->loadSound("slide2", std::string(TEST_MEDIA_DIR) + "/audio/slide.mp3", true, false);
 
         // Create entity
         auto root = std::make_unique<Entity>("RootEntity");
@@ -115,7 +117,7 @@ namespace LaurelEye {
         Audio::SpeakerComponent* sp = root->addComponent<Audio::SpeakerComponent>();
         assert(sp != nullptr);
         sp->setVolume(1.0f);
-        sp->setAudioManager(am);
+        sp->setAudioManager((Audio::IAudioManager*) am.get());
 
         float x = -10.0f, y = 0.0f, z = 0.0f;
 
