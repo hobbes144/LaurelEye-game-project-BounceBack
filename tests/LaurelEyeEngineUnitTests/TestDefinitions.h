@@ -24,9 +24,13 @@
 #include "LaurelEyeEngine/events/IEvent.h"
 #include <iostream>
 #include <cassert>
+#include <thread>
+#include <chrono>
 #include "LaurelEyeEngine/io/AssetManager.h"
 #include "LaurelEyeEngine/io/Assets.h"
 #include <btBulletDynamicsCommon.h>
+#include "LaurelEyeEngine/core/Engine.h"
+#include "LaurelEyeEngine/core/EngineContext.h"
 #ifdef _WIN32
 #include <windows.h>
 #else
@@ -58,4 +62,8 @@ namespace LaurelEye {
     void renderTestExtended(IWindow* window, GlfwPlatform* glfwP, InputManager* inputManager);
     void eventTest();
     void inputPhysTest(LaurelEye::GlfwPlatform& glfwP, LaurelEye::InputManager& inputManager);
+    void engineLifecycleTest();
+    void engineContextServiceTest();
+    void engineSystemCoordinatorWiringTest();
+    void engineContextOverwriteTest();
 }

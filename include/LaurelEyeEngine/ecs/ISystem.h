@@ -13,6 +13,7 @@
 #include <vector>
 #include <algorithm>
 #include <memory>
+#include "LaurelEyeEngine/core/EngineContext.h"
 
 namespace LaurelEye {
     template <typename ComponentType>
@@ -38,7 +39,12 @@ namespace LaurelEye {
                 components.end());
         }
 
+        void setEngineContext(EngineContext& newContext) {
+            context = &newContext;
+        }
+
     protected:
+        EngineContext* context = nullptr;
         std::vector<ComponentPtr> components;
     };
 } // namespace LaurelEye

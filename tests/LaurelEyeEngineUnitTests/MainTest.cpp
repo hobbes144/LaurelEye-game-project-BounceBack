@@ -40,7 +40,11 @@ int main() {
         {"MemoryManagerTest", LaurelEye::memoryTest},
         {"AssetMeshTest", LaurelEye::assetMeshTest},
         {"AssetImageTest", LaurelEye::assetImageTest},
-        {"AssetCacheTest", LaurelEye::assetCacheTest}
+        {"AssetCacheTest", LaurelEye::assetCacheTest},
+        {"EngineLifecycleTest", LaurelEye::engineLifecycleTest},
+        {"EngineContextServiceTest", LaurelEye::engineContextServiceTest},
+        {"EngineSystemCoordinatorWiringTest", LaurelEye::engineSystemCoordinatorWiringTest},
+        {"EngineContextOverwriteTest",        LaurelEye::engineContextOverwriteTest}
     };
 
     renderTestExtended(window, &glfwP, &inputManager);

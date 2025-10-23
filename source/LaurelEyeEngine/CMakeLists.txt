@@ -18,6 +18,7 @@ file(GLOB_RECURSE ENGINE_SOURCES CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/window/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/audio/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/transform/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/core/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/graphics/graphics_components/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/graphics/material/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/memory/*.cpp

@@ -52,7 +52,7 @@ namespace LaurelEye {
     }
 
     IWindow* WindowManager::getWindow(int id) {
-        if ( id < managedWindows.size() - 1 ) return managedWindows[id].get();
+        if ( id < managedWindows.size() ) return managedWindows[id].get();
         else return nullptr;
     }
 

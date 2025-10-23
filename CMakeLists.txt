@@ -35,6 +35,7 @@ set(
 # Include sub-projects.
 add_subdirectory("source/LaurelEyeEngine")
 add_subdirectory("tests/LaurelEyeEngineUnitTests")
+add_subdirectory("games")
 
 option(BUILD_DOCS "Build API documentation" OFF)
 add_subdirectory("doc")
