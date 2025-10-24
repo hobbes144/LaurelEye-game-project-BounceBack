@@ -70,7 +70,7 @@ namespace LaurelEye {
             std::cout << "Step " << i
                       << " Cube Y: " << cubeT->getWorldTransform().getPosition().y
                       << std::endl;
-            
+
 
             // In the early frames, cube should fall (y decreasing)
             if ( i == 20 ) {

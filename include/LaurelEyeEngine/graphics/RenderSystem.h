@@ -18,8 +18,15 @@
 
 #include "LaurelEyeEngine/graphics/Graphics.h"
 
-// temp
+
+// Temp
 #include "LaurelEyeEngine/graphics/renderpass/SinglePass.h"
+#include "LaurelEyeEngine/graphics/graphics_components/AmbientLightComponent.h"
+#include "LaurelEyeEngine/graphics/graphics_components/CameraComponent.h"
+#include "LaurelEyeEngine/graphics/graphics_components/DirectionalLightComponent.h"
+#include "LaurelEyeEngine/graphics/graphics_components/PointLightComponent.h"
+#include "LaurelEyeEngine/graphics/graphics_components/LightComponent.h"
+#include "LaurelEyeEngine/graphics/resources/Lights.h"
 
 #include <memory>
 #include <unordered_map>
@@ -132,5 +139,17 @@ namespace LaurelEye::Graphics {
         std::unique_ptr<RenderResources> tempRenderResources;
         /// @brief A single-pass rendering pipeline used for simple frame rendering.
         std::shared_ptr<SinglePass> sp;
+
+        // Temp pointers to support lights and camera updates
+        PointLightComponent* pointLight = nullptr;
+        CameraComponent* camera = nullptr;
+        DirectionalLightComponent* dirLight = nullptr;
+        AmbientLightComponent* ambLight = nullptr;
+
+        // Lighting pass lights
+        DataBufferHandle lightingPassLightsBufferHandle;
+        // TODO: Update this to correctly handle global and local lights.
+        LocalLights lightingPassLights;
+        bool lightingPassLightsInitStatus = false;
     };
 } // namespace LaurelEye::Graphics

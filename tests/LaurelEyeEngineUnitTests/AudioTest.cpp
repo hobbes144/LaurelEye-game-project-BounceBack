@@ -37,7 +37,7 @@ namespace LaurelEye {
     }
 
     void speakerTest() {
-        am->loadSound("slide", std::string(TEST_MEDIA_DIR) + "/audio/slide.mp3", true, true);
+        am->loadSound("slide", std::string(TEST_MEDIA_DIR) + "/audio/slide.mp3", true, true);
 
         // Create entity
         auto root = std::make_unique<Entity>("RootEntity");
@@ -103,7 +103,7 @@ namespace LaurelEye {
     void speakerTest3() {
         am->stopSound("slide");
 
-        am->loadSound("slide2", std::string(TEST_MEDIA_DIR) + "/audio/slide.mp3", true, false);
+        am->loadSound("slide2", std::string(TEST_MEDIA_DIR) + "/audio/slide.mp3", true, false);
 
         // Create entity
         auto root = std::make_unique<Entity>("RootEntity");

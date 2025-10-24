@@ -8,14 +8,16 @@
 
 #pragma once
 
-#include "LaurelEyeEngine/events/UUIDGenerator.h"
 #include "LaurelEyeEngine/events/IEvent.h"
-#include <typeindex>
+#include "LaurelEyeEngine/events/UUIDGenerator.h"
+
+#include <cstdint>
 #include <functional>
+#include <typeindex>
 
 namespace LaurelEye {
     struct CallbackWrapper {
-        uint32_t entityId;                          // Object identifier
+        uint32_t entityId;                           // Object identifier
         std::function<void(const IEvent&)> callback; // Actual callback function
     };
 
@@ -42,5 +44,6 @@ namespace LaurelEye {
         std::unordered_map<std::type_index, std::vector<CallbackWrapper>> listeners;
     };
 
-    #include "EventManager.inl"
-}
+} // namespace LaurelEye
+
+#include "EventManager.inl"

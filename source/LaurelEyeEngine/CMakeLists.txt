@@ -9,7 +9,6 @@ file(GLOB_RECURSE ENGINE_SOURCES CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/physics/interfaces/Bullet/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/graphics/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/graphics/resources/*.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/graphics/mesh/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/graphics/device/glfw/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/input/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ecs/*.cpp
@@ -20,7 +19,6 @@ file(GLOB_RECURSE ENGINE_SOURCES CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/transform/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/core/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/graphics/graphics_components/*.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/graphics/material/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/memory/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/io/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/io/importers/*.cpp
