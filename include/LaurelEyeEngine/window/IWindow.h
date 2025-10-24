@@ -8,6 +8,7 @@
 #pragma once
 
 #include <string>
+#include <functional>
 
 namespace LaurelEye {
 
@@ -122,7 +123,7 @@ namespace LaurelEye {
         // RenderGraphBuilder, WSP will read it during beginFrame.
         // resizeCallback -> IWindowSurfaceProvider.resizeSurface ->
         //                   SizeRegistry.updateSwapchainSize
-
+        std::function<void(NativeWindowHandle, int, int)> surfaceResizeCallback;
     protected:
         /// Window attributes for this window
         WindowDescription attributes;

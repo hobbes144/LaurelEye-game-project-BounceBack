@@ -67,6 +67,8 @@ namespace LaurelEye::Graphics {
     void RenderSystem::update(float deltaTime) {
         // TODO: All the draw logic should run here.
 
+        windowSurfaces[0]->resizeSurfaceCallback();
+
         // Camera update
         for ( size_t i = 0; i < GetCameraComponents().size(); i++ ) {
             GetCameraComponents()[i]->updateViewMatrix();

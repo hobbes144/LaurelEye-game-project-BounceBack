@@ -67,11 +67,15 @@ namespace LaurelEye::Graphics {
         /// This function should be called at the end of each frame.
         virtual void endFrame() = 0;
 
+       virtual void resizeSurfaceCallback() = 0;
+       virtual void resizeSurface(int w, int h) = 0;
+
     protected:
         /// @brief Handle to the native window associated with this surface.
         NativeWindowHandle nativeWindow;
 
         // We would have SizeRegistry object here to manage viewport size.
+        
     };
 }
 

@@ -36,10 +36,12 @@ namespace LaurelEye {
         /// \copydoc IWindow::setFullscreen
         void setFullscreen(bool flag) override;
 
+        static void onResizeCallback(GLFWwindow* window, int width, int height);
     private:
         GLFWwindow* nativeHandle = nullptr;
 
         // TODO: Implement all the window callbacks here
         // Consider adding a single event callback setter?
+
     };
 } // namespace LaurelEye

@@ -44,6 +44,7 @@ namespace LaurelEye::Graphics {
         /// This function should be called at the end of each render frame.
         void endFrame() override;
 
+        
     private:
         /// @brief Width of the window surface.
         /// @note Consider swapping this to a SizeRegistry in the future.
@@ -51,5 +52,12 @@ namespace LaurelEye::Graphics {
         /// @brief Height of the window surface.
         /// @note Consider swapping this to a SizeRegistry in the future.
         int height;
+
+        void resizeSurface(int w, int h) override;
+
+        void resizeSurfaceCallback() override;
+        int pendingWidth = 0;
+        int pendingHeight = 0;
+        bool resizePending = false;
     };
 }

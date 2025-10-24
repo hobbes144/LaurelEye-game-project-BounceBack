@@ -58,7 +58,7 @@ namespace LaurelEye {
 
         // TODO: Below need to be implemented:
         // glfwSetWindowMaximizeCallback(nativeHandle, maximizedCallback);
-        // glfwSetFramebufferSizeCallback(nativeHandle, resizeCallback); // Maybe this should be in the renderer?
+        glfwSetFramebufferSizeCallback(nativeHandle, onResizeCallback); // Maybe this should be in the renderer?
         // glfwSetWindowFocusCallback(nativeHandle, focusCallback);
     }
 
@@ -78,13 +78,29 @@ namespace LaurelEye {
         // To be implemented here
     }
     void LGlfwWindow::setWidth(int _width) {
+        attributes.width = _width;
     }
     void LGlfwWindow::setHeight(int _height) {
+        attributes.height = _height;
     }
     void LGlfwWindow::setVsync(bool flag) {
         if ( this->attributes.vsync != flag )
             glfwSwapInterval(int(flag));
     }
     void LGlfwWindow::setFullscreen(bool flag) {
+    }
+    void LGlfwWindow::onResizeCallback(GLFWwindow* window, int width, int height) {
+        auto* pWindow = static_cast<LGlfwWindow*>(glfwGetWindowUserPointer(window));
+        if ( pWindow ) {
+            // update logical attributes (these are pixels from framebuffer callback)
+            pWindow->setWidth(width);
+            pWindow->setHeight(height);
+
+            // call engine-provided resize callback if set
+            if ( pWindow->surfaceResizeCallback ) {
+                pWindow->surfaceResizeCallback(pWindow->getNativeHandle(), width, height);
+            }
+            std::cout << "Window size: (" << width << ", " << height << ")" << std::endl;
+        }
     }
 } // namespace LaurelEye
