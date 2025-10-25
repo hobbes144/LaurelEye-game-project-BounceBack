@@ -20,6 +20,7 @@
 
 
 // Temp
+#include "LaurelEyeEngine/graphics/renderpass/SingleBufferedDataPass.h"
 #include "LaurelEyeEngine/graphics/renderpass/SinglePass.h"
 #include "LaurelEyeEngine/graphics/graphics_components/AmbientLightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/CameraComponent.h"
@@ -125,6 +126,7 @@ namespace LaurelEye::Graphics {
         std::vector<std::unique_ptr<IWindowSurfaceProvider>> windowSurfaces;
 
         // TODO: potential optimization, merge into 1 because theye all have unique ID's
+
         /// @brief Mapping of unique light component IDs to their instances.
         std::unordered_map<unsigned int, LightComponent*> lightProperties;
         /// @brief Mapping of unique camera component IDs to their instances.
@@ -138,7 +140,8 @@ namespace LaurelEye::Graphics {
         /// @brief Temporary rendering resource storage used during frame execution.
         std::unique_ptr<RenderResources> tempRenderResources;
         /// @brief A single-pass rendering pipeline used for simple frame rendering.
-        std::shared_ptr<SinglePass> sp;
+        // std::shared_ptr<SinglePass> sp;
+        std::shared_ptr<SingleBufferedDataPass> sp;
 
         // Temp pointers to support lights and camera updates
         PointLightComponent* pointLight = nullptr;
@@ -147,9 +150,20 @@ namespace LaurelEye::Graphics {
         AmbientLightComponent* ambLight = nullptr;
 
         // Lighting pass lights
-        DataBufferHandle lightingPassLightsBufferHandle;
+        DataBufferHandle globalLightsBufferHandle = InvalidDataBuffer;
         // TODO: Update this to correctly handle global and local lights.
-        LocalLights lightingPassLights;
-        bool lightingPassLightsInitStatus = false;
+        GlobalLights globalLights;
+        bool globalLightsInitStatus = false;
+
+        // Camera interactions
+        void initCameraBuffer(CameraComponent* camera);
+        void updateCameraBuffer(CameraComponent* camera);
+
+        // Light interactions
+        void registerLight(LightComponent* light);
+        void initGlobalLightsBuffer();
+        void updateGlobalLights() const;
+        void updateLocalLight(LightComponent* light) const;
+        void updateLocalLights() const;
     };
 } // namespace LaurelEye::Graphics

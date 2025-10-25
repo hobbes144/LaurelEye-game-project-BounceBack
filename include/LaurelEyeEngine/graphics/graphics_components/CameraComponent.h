@@ -13,6 +13,7 @@
 #pragma once
 
 #include "LaurelEyeEngine/graphics/graphics_components/IRenderPropertyComponent.h"
+#include "LaurelEyeEngine/graphics/resources/Camera.h"
 #include "LaurelEyeEngine/graphics/resources/DataBuffer.h"
 #include "LaurelEyeEngine/math/Matrix4.h"
 #include "LaurelEyeEngine/math/Quaternion.h"
@@ -50,6 +51,12 @@ namespace LaurelEye::Graphics {
         // };
 
         /* Component functions */
+
+        void setPositionRotation( const Vector3& _position, const Quaternion& _rotation);
+        void setPosition(const Vector3& _position);
+        void setRotation(const Quaternion& _rotation);
+
+        const Camera* getCameraDataPtr() const;
 
         /// @brief Update Camera's View matrix using the current camera
         /// position and rotation.
@@ -105,11 +112,11 @@ namespace LaurelEye::Graphics {
         /// NOTE: Currently non functional.
         ///
         /// @return Exposure of the camera.
-        const float& getExposure() { return exposure; }
+        const float& getExposure() { return cameraData.exposure; }
         /// @brief Set the camera exposure.
         ///
         /// @param _exposure Camera exposure.
-        void setExposure(float _exposure) { exposure = _exposure; }
+        void setExposure(float _exposure) { cameraData.exposure = _exposure; }
 
         /* Utility functions */
         /// @brief Set Camera Projection matrix to a perspective projection.
@@ -141,15 +148,12 @@ namespace LaurelEye::Graphics {
 
     private:
         std::string name;
-        Matrix4 viewMatrix;
-        Matrix4 projectionMatrix;
-        Matrix4 inverseViewMatrix;
+
+        Camera cameraData;
         Vector3 position = Vector3();
         Quaternion rotation = Quaternion();
 
         DataBufferHandle cameraBufferHandle;
-
-        float exposure;
 
         Vector3 forward;
         Vector3 right;

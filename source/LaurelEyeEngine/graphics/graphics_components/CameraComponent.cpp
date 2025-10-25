@@ -6,25 +6,46 @@
 /// @brief  Camera component implementation file.
 
 #include "LaurelEyeEngine/graphics/graphics_components/CameraComponent.h"
+#include "LaurelEyeEngine/graphics/resources/Camera.h"
 
 namespace LaurelEye::Graphics {
 
     CameraComponent::CameraComponent()
-        : IRenderPropertyComponent(RenderComponentType::PropertyCamera), name("Camera"), position(Vector3()),
+        : IRenderPropertyComponent(RenderComponentType::PropertyCamera),
+          name("Camera"),
+          position(Vector3()),
           rotation(Quaternion(0.0f, 0.0f, 1.0f, 0.0f)),
-          exposure(1.0f) {
+          cameraData() {};
 
-          };
+    void CameraComponent::setPositionRotation(const Vector3& _position, const Quaternion& _rotation) {
+        position = _position;
+        rotation = _rotation;
+        updateViewMatrix();
+    }
+
+    void CameraComponent::setPosition(const Vector3& _position) {
+        position = _position;
+        updateViewMatrix();
+    }
+
+    void CameraComponent::setRotation(const Quaternion& _rotation) {
+        rotation = _rotation;
+        updateViewMatrix();
+    }
+
+    const Camera* CameraComponent::getCameraDataPtr() const {
+        return &cameraData;
+    }
 
     void CameraComponent::updateViewMatrix() {
         // Extract basis vectors (Right, Up, Forward)
         forward = rotation.forward();
         up = rotation.up();
-        right = rotation.right();
+        // right = rotation.right();
 
         // Compute view matrix using LookAt
-        viewMatrix = Matrix4::lookAt(position, position + forward, up);
-        inverseViewMatrix = Matrix4::inverse(viewMatrix);
+        cameraData.viewMatrix = Matrix4::lookAt(position, position - forward, up);
+        cameraData.inverseViewMatrix = Matrix4::inverse(cameraData.viewMatrix);
     }
 
     void CameraComponent::setPerspectiveProjection(
@@ -32,7 +53,7 @@ namespace LaurelEye::Graphics {
         const float aspectRatio,
         const float near,
         const float far) {
-        projectionMatrix = Matrix4::perspective(fov, aspectRatio, near, far);
+        cameraData.projectionMatrix = Matrix4::perspective(fov, aspectRatio, near, far);
 
         return;
     }
@@ -44,22 +65,22 @@ namespace LaurelEye::Graphics {
         const float top,
         const float near,
         const float far) {
-        projectionMatrix = Matrix4::orthographic(
+        cameraData.projectionMatrix = Matrix4::orthographic(
             left, right, bottom, top, near, far);
 
         return;
     }
 
     const Matrix4& CameraComponent::getViewMatrix() {
-        return viewMatrix;
+        return cameraData.viewMatrix;
     }
 
     const Matrix4& CameraComponent::getInverseViewMatrix() {
-        return inverseViewMatrix;
+        return cameraData.inverseViewMatrix;
     }
 
     const Matrix4& CameraComponent::getProjectionMatrix() {
-        return projectionMatrix;
+        return cameraData.projectionMatrix;
     }
 
 } // namespace LaurelEye::Graphics

@@ -8,22 +8,23 @@
 #include "LaurelEyeEngine/ecs/ISystem.h"
 #include "LaurelEyeEngine/graphics/Graphics.h"
 
+#include "LaurelEyeEngine/graphics/resources/DataBuffer.h"
+#include "LaurelEyeEngine/graphics/resources/Lights.h"
 #include "LaurelEyeEngine/graphics/surface/glfw/LGlfwOpenGLWindowSurface.h"
-#include "LaurelEyeEngine/window/IWindow.h"
 
 #include "LaurelEyeEngine/graphics/device/glfw/LGLRenderDevice.h"
 
 #include "LaurelEyeEngine/graphics/graphics_components/CameraComponent.h"
-#include "LaurelEyeEngine/graphics/graphics_components/IRenderableComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/LightComponent.h"
 #include "LaurelEyeEngine/graphics/renderpass/SinglePass.h"
+#include "LaurelEyeEngine/graphics/renderpass/SingleBufferedDataPass.h"
 #include "LaurelEyeEngine/graphics/RenderSystem.h"
 #include "LaurelEyeEngine/graphics/resources/FrameContext.h"
-#include "LaurelEyeEngine/graphics/resources/Mesh.h"
 #include "LaurelEyeEngine/graphics/resources/RenderResources.h"
 #include "LaurelEyeEngine/graphics/ShaderManager.h"
 
 #include <memory>
+#include <stdexcept>
 
 namespace LaurelEye::Graphics {
 
@@ -60,8 +61,11 @@ namespace LaurelEye::Graphics {
 
         // Temp code starts here:
         tempRenderResources = std::make_unique<RenderResources>(*device.get());
-        sp = std::make_shared<SinglePass>();
+        // sp = std::make_shared<SinglePass>();
+        sp = std::make_shared<SingleBufferedDataPass>();
         sp->setup(*tempRenderResources.get());
+
+        initGlobalLightsBuffer();
     }
 
     void RenderSystem::update(float deltaTime) {
@@ -70,77 +74,52 @@ namespace LaurelEye::Graphics {
         windowSurfaces[0]->resizeSurfaceCallback();
 
         // Camera update
-        for ( size_t i = 0; i < GetCameraComponents().size(); i++ ) {
-            GetCameraComponents()[i]->updateViewMatrix();
-            if ( GetCameraComponents()[i]->getInitStatus() == false ) {
-                GetCameraComponents()[i]->setCameraBufferHandle(device->createDataBuffer(DataBufferDesc{
-                    DataBufferType::UBO, DataBufferUpdateMode::Dynamic,
-                    (sizeof(Matrix4) * 3) + sizeof(float),
-                    0}));
-
-                GetCameraComponents()[i]->setInitStatus(true);
-            }
-            else {
-                device->updateDataBufferSubData(GetCameraComponents()[i]->getCameraBufferHandle(), 0, sizeof(Matrix4), GetCameraComponents()[i]->getProjectionMatrix().getData());
-                device->updateDataBufferSubData(GetCameraComponents()[i]->getCameraBufferHandle(), sizeof(Matrix4), sizeof(Matrix4), GetCameraComponents()[i]->getViewMatrix().getData());
-                device->updateDataBufferSubData(GetCameraComponents()[i]->getCameraBufferHandle(), sizeof(Matrix4) * 2, sizeof(Matrix4), GetCameraComponents()[i]->getInverseViewMatrix().getData());
-                device->updateDataBufferSubData(GetCameraComponents()[i]->getCameraBufferHandle(), sizeof(Matrix4) * 3, sizeof(float), &(GetCameraComponents()[i]->getExposure()));
-            }
-        }
+        updateCameraBuffer(camera);
+        // for ( size_t i = 0; i < GetCameraComponents().size(); i++ ) {
+        //     GetCameraComponents()[i]->updateViewMatrix();
+        //     if ( GetCameraComponents()[i]->getInitStatus() == false ) {
+        //         initCameraBuffer(GetCameraComponents()[i]);
+        //     }
+        //     else {
+        //         updateCameraBuffer(GetCameraComponents()[i]);
+        //     }
+        // }
 
         // Light update
-        for ( size_t i = 0; i < GetLightComponents().size(); i++ ) {
-            if ( GetLightComponents()[i]->getInitStatus() == false && GetLightComponents()[i]->getType() == LightType::Point ) {
-                pointLight = dynamic_cast<PointLightComponent*>(GetLightComponents()[i]);
-                pointLight->setHandle(device->createDataBuffer(DataBufferDesc{DataBufferType::SSBO, DataBufferUpdateMode::Dynamic, sizeof(PointLight), 2}));
+        // TODO: Eventually remove this command from here. Ideally we don't
+        // need to keep calling this. We just call it when there's a change.
+        updateGlobalLights();
 
-                pointLight->setInitStatus(true);
-            }
-            else {
-                if ( GetLightComponents()[i]->getType() == LightType::Point ) {
-                    pointLight = dynamic_cast<PointLightComponent*>(GetLightComponents()[i]);
-                    pointLight->getLightData();
-                    device->bindDataBufferBase(pointLight->getHandle());
-                    device->updateDataBufferSubData(
-                        pointLight->getHandle(),
-                        0,
-                        sizeof(PointLight),
-                        &(pointLight->getLightData()));
-                }
-                else if ( GetLightComponents()[i]->getType() == LightType::Directional ) {
-                    dirLight = dynamic_cast<DirectionalLightComponent*>(GetLightComponents()[i]);
-                    lightingPassLights.sunLight = dirLight->getLightData();
-                }
-                else if ( GetLightComponents()[i]->getType() == LightType::Ambient ) {
-                    ambLight = dynamic_cast<AmbientLightComponent*>(GetLightComponents()[i]);
-                    lightingPassLights.ambientLight = ambLight->getLightData();
-                }
-            }
-        }
+        // TODO: Code for point lights: eventually move to local lights
+        // interaction functions.
+        //
+        // for ( size_t i = 0; i < GetLightComponents().size(); i++ ) {
+        //     if ( GetLightComponents()[i]->getInitStatus() == false && GetLightComponents()[i]->getType() == LightType::Point ) {
+        //         pointLight = dynamic_cast<PointLightComponent*>(GetLightComponents()[i]);
+        //         pointLight->setHandle(device->createDataBuffer(DataBufferDesc{DataBufferType::SSBO, DataBufferUpdateMode::Dynamic, sizeof(PointLight), 2}));
+        //
+        //         pointLight->setInitStatus(true);
+        //     }
+        //     else {
+        //         if ( GetLightComponents()[i]->getType() == LightType::Point ) {
+        //             pointLight = dynamic_cast<PointLightComponent*>(GetLightComponents()[i]);
+        //             pointLight->getLightData();
+        //             device->bindDataBufferBase(pointLight->getHandle());
+        //             device->updateDataBufferSubData(
+        //                 pointLight->getHandle(),
+        //                 0,
+        //                 sizeof(PointLight),
+        //                 &(pointLight->getLightData()));
+        //         }
+        //     }
+        // }
 
-        if ( !lightingPassLightsInitStatus ) {
-            lightingPassLightsBufferHandle = device->createDataBuffer(DataBufferDesc{DataBufferType::UBO, DataBufferUpdateMode::Dynamic, sizeof(LocalLights), 1}, &lightingPassLights);
-            lightingPassLightsInitStatus = true;
-        }
-        else {
-            device->bindDataBufferBase(lightingPassLightsBufferHandle);
-            device->updateDataBufferSubData(lightingPassLightsBufferHandle, 0, sizeof(LocalLights), &lightingPassLights);
-        }
-
-        device->updateDataBufferSubData(lightingPassLightsBufferHandle, 0, sizeof(LocalLights), &lightingPassLights);
+        // Bind camera and global lights buffer for use in shaders
+        device->bindDataBufferBase(camera->getCameraBufferHandle());
+        device->bindDataBufferBase(globalLightsBufferHandle);
 
         // In future, this needs to be swapped to per window, but this is more than good enough for now.
         windowSurfaces[0]->beginFrame();
-
-        // tempShader->use();
-        // tempShader->setUInt("height", config.windows[0]->getHeight());
-        // tempShader->setUInt("width", config.windows[0]->getWidth());
-
-        // Draw calls here.
-        // for ( const auto& transform : tempTransforms ) {
-        // tempShader->setMat4("ModelMatrix", transform.getLocalMatrix());
-        // tempMesh->draw(GL_TRIANGLES);
-        // }
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -173,19 +152,22 @@ namespace LaurelEye::Graphics {
             ISystem::registerComponent(component);
             break;
         case RenderComponentType::PropertyCamera: {
-            auto* camera = dynamic_cast<CameraComponent*>(component);
-            if ( camera )
-                cameraProperties[camera->GetRenderID()] = camera;
-            else
-                std::cerr << "Error: component is not a CameraComponent!\n";
+            assert(dynamic_cast<CameraComponent*>(component) && "ERROR::GRAPHICS::RENDERSYSTEM::INVALID_LIGHT");
+            // TODO: This is currently updating camera to the new component
+            // each time. This should be changed when we handle multiple
+            // cameras.
+            camera = static_cast<CameraComponent*>(component);
+            assert(camera && "ERROR::GRAPHICS::RENDERSYSTEM::INVALID_CAMERA");
+            cameraProperties[camera->GetRenderID()] = camera;
+            initCameraBuffer(camera);
+            updateCameraBuffer(camera);
             break;
         }
         case RenderComponentType::PropertyLight: {
-            auto* light = dynamic_cast<LightComponent*>(component);
-            if ( light )
-                lightProperties[light->GetRenderID()] = light;
-            else
-                std::cerr << "Error: component is not a LightComponent!\n";
+            assert(dynamic_cast<LightComponent*>(component) && "ERROR::GRAPHICS::RENDERSYSTEM::INVALID_LIGHT");
+            auto* light = static_cast<LightComponent*>(component);
+            lightProperties[light->GetRenderID()] = light;
+            registerLight(light);
             break;
         }
         default:
@@ -286,6 +268,60 @@ namespace LaurelEye::Graphics {
         for ( const auto& pair : cameraProperties )
             values.push_back(pair.second);
         return values;
+    }
+
+    // Camera interactons
+    void RenderSystem::initCameraBuffer(CameraComponent* camera) {
+        // TODO: Update code to handle multiple cameras.
+        camera->setCameraBufferHandle(device->createDataBuffer(DataBufferDesc{
+            DataBufferType::UBO, DataBufferUpdateMode::Dynamic,
+            sizeof(Camera),
+            0}));
+        camera->setInitStatus(true);
+    }
+
+    void RenderSystem::updateCameraBuffer(CameraComponent* camera) {
+        device->updateDataBufferSubData(camera->getCameraBufferHandle(), 0, sizeof(Camera), camera->getCameraDataPtr());
+    }
+
+    // Light interactions
+    void RenderSystem::registerLight(LightComponent* light) {
+        switch ( light->getType() ) {
+        case LightType::Ambient:
+            globalLights.ambientLight = static_cast<AmbientLightComponent*>(light)->getLightData();
+            updateGlobalLights();
+            break;
+        case LightType::Directional:
+            globalLights.sunLight = static_cast<DirectionalLightComponent*>(light)->getLightData();
+            updateGlobalLights();
+            break;
+        case LightType::Point:
+            // registerLocalLight(light);
+            break;
+        case LightType::Default:
+        default:
+            throw std::logic_error("ERROR::GRAPHICS::RENDERSYSTEM::INVALID_LIGHT_TYPE");
+            break;
+        }
+
+        light->setHandle(globalLightsBufferHandle);
+    }
+
+    void RenderSystem::initGlobalLightsBuffer() {
+        globalLightsBufferHandle = device->createDataBuffer(
+            DataBufferDesc{
+                DataBufferType::UBO,
+                DataBufferUpdateMode::Dynamic,
+                sizeof(GlobalLights),
+                1},
+            &globalLights);
+    }
+
+    void RenderSystem::updateGlobalLights() const {
+        assert(isValid(globalLightsBufferHandle) && "ERROR::GRAPHICS::RENDERSYSTEM::GLOBALLIGHTS_UNINITIALIZED");
+        device->updateDataBufferSubData(
+            globalLightsBufferHandle, 0,
+            sizeof(GlobalLights), &globalLights);
     }
 
 } // namespace LaurelEye::Graphics

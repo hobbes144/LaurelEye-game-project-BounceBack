@@ -1,10 +1,11 @@
-﻿#include "LaurelEyeEngine/graphics/graphics_components/Renderable3DComponent.h"
+﻿#include "LaurelEyeEngine/graphics/graphics_components/AmbientLightComponent.h"
+#include "LaurelEyeEngine/graphics/graphics_components/DirectionalLightComponent.h"
+#include "LaurelEyeEngine/graphics/graphics_components/PointLightComponent.h"
+#include "LaurelEyeEngine/graphics/graphics_components/Renderable3DComponent.h"
 #include "LaurelEyeEngine/graphics/RenderSystem.h"
 #include "LaurelEyeEngine/graphics/resources/Material.h"
 #include "LaurelEyeEngine/graphics/resources/Mesh.h"
-#include "LaurelEyeEngine/graphics/graphics_components/AmbientLightComponent.h"
-#include "LaurelEyeEngine/graphics/graphics_components/DirectionalLightComponent.h"
-#include "LaurelEyeEngine/graphics/graphics_components/PointLightComponent.h"
+#include "LaurelEyeEngine/math/Quaternion.h"
 #include "TestDefinitions.h"
 #include <memory>
 
@@ -68,8 +69,8 @@ namespace LaurelEye {
         renderSystem.registerComponent(cubeRC);
 
         auto DLightData = Graphics::DirectionalLight{
-            Vector3(-0.2f, -1.0f, -0.3f), // direction
-            1000.0f,                      // intensity
+            Vector3(0.75f, -1.0f, 0.75f).normalized(), // direction
+            4.0f,                      // intensity
             Vector3(1.0f, 1.0f, 1.0f)     // color (white)
         };
 
@@ -80,39 +81,49 @@ namespace LaurelEye {
         renderSystem.registerComponent(DLightLC);
 
         auto ALight = std::make_unique<Entity>("ALight");
+
+        auto ALightData = Graphics::AmbientLight{
+            Vector3(1.0f, 1.0f, 1.0f), // color (white)
+            0.3f                      // intensity
+        };
+
         auto ALightT = ALight->addComponent<TransformComponent>();
-        auto ALightLC = ALight->addComponent<Graphics::AmbientLightComponent>();
+        auto ALightLC = ALight->addComponent<Graphics::AmbientLightComponent>(ALightData);
 
         renderSystem.registerComponent(ALightLC);
 
-        auto PLightData = Graphics::PointLight{
-            Vector3(0.0f, 0.0f, 0.0f), // position
-            50.0f,                     // intensity
-            Vector3(1.0f, 0.0f, 0.0f), // color (red)
-            20.0f                      // range
-        };
-
-        auto PLight = std::make_unique<Entity>("PLight");
-        auto PLightT = PLight->addComponent<TransformComponent>();
-        auto PLightLC = PLight->addComponent<Graphics::PointLightComponent>(PLightData);
-
-        Transform PLightLocal;
-        PLightLocal.setPosition(0.0f, 15.0f, 0.0f);
-        PLightLocal.setScaling(1.0f, 1.0f, 1.0f);
-        PLightT->setLocalTransform(PLightLocal);
-
-        renderSystem.registerComponent(PLightLC);
+        // auto PLightData = Graphics::PointLight{
+        //     Vector3(0.0f, 0.0f, 0.0f), // position
+        //     50.0f,                     // intensity
+        //     Vector3(1.0f, 0.0f, 0.0f), // color (red)
+        //     20.0f                      // range
+        // };
+        //
+        // auto PLight = std::make_unique<Entity>("PLight");
+        // auto PLightT = PLight->addComponent<TransformComponent>();
+        // auto PLightLC = PLight->addComponent<Graphics::PointLightComponent>(PLightData);
+        //
+        // Transform PLightLocal;
+        // PLightLocal.setPosition(0.0f, 15.0f, 0.0f);
+        // PLightLocal.setScaling(1.0f, 1.0f, 1.0f);
+        // PLightT->setLocalTransform(PLightLocal);
+        //
+        // renderSystem.registerComponent(PLightLC);
 
         auto Camera = std::make_unique<Entity>("Camera");
         auto CameraT = Camera->addComponent<TransformComponent>();
         Transform cameraLocal;
-        cameraLocal.setPosition(0.0f, 0.0f, 0.0f);
+        cameraLocal.setPosition(-50.f, 15.f, 0.0f);
         cameraLocal.setScaling(1.0f, 1.0f, 1.0f);
         CameraT->setLocalTransform(cameraLocal);
 
         std::cout << CameraT->getWorldPosition() << std::endl;
 
         auto CameraComponent = Camera->addComponent<Graphics::CameraComponent>();
+        CameraComponent->setPositionRotation(
+            Vector3(-50.f, 15.f, 0.f),
+            Matrix4::lookAt(Vector3(-50.f, 15.f, 0.f), Vector3(0.f)).toQuaternion());
+        CameraComponent->setPerspectiveProjection(45.0f * 3.14159f / 180.0f, 1280.f / 720.f, 0.1f, 1000.0f);
 
         renderSystem.registerComponent(CameraComponent);
 
