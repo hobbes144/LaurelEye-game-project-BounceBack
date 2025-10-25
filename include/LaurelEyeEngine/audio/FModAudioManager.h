@@ -17,6 +17,8 @@
 #include <fmod.hpp>
 #include "LaurelEyeEngine/audio/interfaces/IAudioManager.h"
 
+#include <unordered_map>
+
 namespace LaurelEye::Audio {
     /*!****************************************************************************
      * \brief Audio Manager

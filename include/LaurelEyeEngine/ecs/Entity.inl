@@ -11,6 +11,10 @@
 ///
 /// Copyright © 2025 DIGIPEN Institute of Technology. All rights reserved.
 
+#pragma once
+
+#include "LaurelEyeEngine/ecs/Entity.h"
+
 /// @brief Add a component by creating
 ///
 /// ## Usage:

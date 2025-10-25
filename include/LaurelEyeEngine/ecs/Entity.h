@@ -98,6 +98,6 @@ namespace LaurelEye {
         unsigned int layer;                   // identifies the layer the entity is assigned to
 
     };
-    #include "LaurelEyeEngine/ecs/Entity.inl"
 } // namespace LaurelEye
 
+#include "LaurelEyeEngine/ecs/Entity.inl"

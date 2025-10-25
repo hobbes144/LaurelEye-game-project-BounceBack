@@ -10,6 +10,7 @@
 
 #pragma once
 #include <rapidjson/document.h>
+#include <unordered_map>
 #include <vector>
 #include <memory>
 #include "LaurelEyeEngine/io/IAsset.h"
