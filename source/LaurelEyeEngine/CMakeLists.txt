@@ -23,6 +23,8 @@ file(GLOB_RECURSE ENGINE_SOURCES CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/memory/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/io/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/io/importers/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/scripting/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/scripting/engines/sol2/*.cpp
 )
 
 file(GLOB_RECURSE PLATFORM_SOURCES CONFIGURE_DEPENDS
@@ -40,6 +42,8 @@ find_package(glad CONFIG REQUIRED)
 find_package(assimp CONFIG REQUIRED)
 find_package(Stb REQUIRED)
 find_package(RapidJSON CONFIG REQUIRED)
+find_package(lua CONFIG REQUIRED)
+find_package(sol2 CONFIG REQUIRED)
 
 add_library(LaurelEyeEngine SHARED ${ENGINE_SOURCES} ${PLATFORM_SOURCES})
 
@@ -105,6 +109,8 @@ target_link_libraries(LaurelEyeEngine
         glad::glad
         # fmod
         assimp::assimp
+        lua
+        sol2::sol2
 )
 
 target_include_directories(LaurelEyeEngine

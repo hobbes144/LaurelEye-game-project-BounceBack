@@ -7,6 +7,8 @@
         { "name": "glad" },
         { "name": "assimp" },
         { "name": "stb" },
-        { "name": "rapidjson" }
+        { "name": "rapidjson" },
+        { "name": "lua"},
+        { "name": "sol2"}
     ]
 }

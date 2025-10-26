@@ -29,6 +29,10 @@
 #include "LaurelEyeEngine/io/AssetManager.h"
 #include "LaurelEyeEngine/io/Assets.h"
 #include <btBulletDynamicsCommon.h>
+#include "LaurelEyeEngine/scripting/ScriptSystem.h"
+#include "LaurelEyeEngine/scripting/ScriptComponent.h"
+#include "LaurelEyeEngine/scripting/sol2/Sol2State.h"
+#include "LaurelEyeEngine/scripting/sol2/Sol2ScriptInstance.h"
 #include "LaurelEyeEngine/core/Engine.h"
 #include "LaurelEyeEngine/core/EngineContext.h"
 #ifdef _WIN32
@@ -62,6 +66,9 @@ namespace LaurelEye {
     void renderTestExtended(IWindow* window, GlfwPlatform* glfwP, InputManager* inputManager);
     void eventTest();
     void inputPhysTest(LaurelEye::GlfwPlatform& glfwP, LaurelEye::InputManager& inputManager);
+    void scriptingBasicTest();
+    void scriptingMultipleTest();
+    void scriptingMathTest();
     void engineLifecycleTest();
     void engineContextServiceTest();
     void engineSystemCoordinatorWiringTest();
