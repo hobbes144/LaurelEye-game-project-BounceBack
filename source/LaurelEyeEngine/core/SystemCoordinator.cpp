@@ -40,11 +40,15 @@ namespace LaurelEye {
         physicsSystem->initialize();
     }
     void SystemCoordinator::update(float deltaTime) {
+        //std::cout << "SysCord Update\n";
         transformSystem->update(deltaTime);
-        physicsSystem->update(deltaTime);
         renderSystem->update(deltaTime);
         audioSystem->update();
     }
+    void SystemCoordinator::updateFixed(float deltaTimeFixed) {
+        physicsSystem->update(deltaTimeFixed);
+    }
+
     void SystemCoordinator::shutdown() {
         std::cout << "Systems Shutting Down" << std::endl;
         transformSystem->shutdown();

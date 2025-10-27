@@ -1,4 +1,5 @@
 ﻿#include "LaurelEyeEngine/core/Engine.h"
+#include "LaurelEyeEngine/framerate/FramerateController.h"
 #include <iostream>
 
 namespace LaurelEye {
@@ -16,11 +17,31 @@ namespace LaurelEye {
         isRunning = true;
         initialize();
 
+        auto* frameController = FFramerateController::getController();
+        frameController->setTargetFramerate(engineConfig.render.targetFramerate);
+        frameController->setPhysicsTimestep(engineConfig.physics.fixedDeltaTime);
+
         while ( isRunning ) {
-            // TODO - Determine deltaTime here using FrameRateController
-            float deltaTime = 0.016;
+            frameController->startFrame();
+
+            // --- Fixed timestep physics loop ---
+            while ( frameController->shouldUpdatePhysics() ) {
+                float physicsDelta = frameController->getPhysicsTimestep();
+                //std::cout << "|Fixed\n";
+                systemCoordinator->updateFixed(physicsDelta);
+                frameController->consumePhysicsTime();
+            }
+
+
+            // --- Variable timestep updates (optional) ---
+            float deltaTime = frameController->getFrameTime();
+            //std::cout << "-Update\n";
             systemCoordinator->update(deltaTime);
             resourceCoordinator->update(deltaTime);
+
+            // --- End frame and regulate FPS ---
+            frameController->endFrame();
+
         }
 
         shutdown();

@@ -75,7 +75,9 @@ namespace LaurelEye {
         ///
         /// @return GLFWwindow pointer.
         virtual NativeWindowHandle getNativeHandle() = 0;
-
+        /// @brief Get the Time
+        /// @return Time as provided by the window 
+        virtual double getTime() = 0;
         // Other functions:
         // - show()
         // - hide()

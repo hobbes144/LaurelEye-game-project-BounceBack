@@ -24,6 +24,8 @@ namespace LaurelEye {
         bool shouldClose() const override;
         /// \copydoc IWindow::getNativeHandle
         NativeWindowHandle getNativeHandle() override;
+        ///  \copydoc IWindow::getTime
+        double getTime() override;
 
         /// \copydoc IWindow::setTitle
         void setTitle(std::string _title) override;

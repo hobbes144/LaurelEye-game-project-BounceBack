@@ -22,6 +22,7 @@ namespace LaurelEye {
     public:
         void initialize(EngineContext& ctx, const EngineConfig& engineConfig);
         void update(float deltaTime);
+        void updateFixed(float deltaTimeFixed);
         void shutdown();
 
     private:

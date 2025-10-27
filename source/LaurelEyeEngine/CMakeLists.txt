@@ -7,6 +7,7 @@ file(GLOB_RECURSE ENGINE_SOURCES CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/math/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/physics/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/physics/interfaces/Bullet/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/framerate/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/graphics/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/graphics/resources/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/graphics/device/glfw/*.cpp

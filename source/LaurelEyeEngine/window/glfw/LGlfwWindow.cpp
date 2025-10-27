@@ -74,6 +74,10 @@ namespace LaurelEye {
         return nativeHandle;
     }
 
+    double LGlfwWindow::getTime() {
+        return glfwGetTime();
+    }
+
     void LGlfwWindow::setTitle(std::string _title) {
         // To be implemented here
     }
