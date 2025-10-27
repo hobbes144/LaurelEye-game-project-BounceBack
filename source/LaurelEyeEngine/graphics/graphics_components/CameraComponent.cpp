@@ -8,6 +8,28 @@
 #include "LaurelEyeEngine/graphics/graphics_components/CameraComponent.h"
 #include "LaurelEyeEngine/graphics/resources/Camera.h"
 
+#include <source_location>
+
+inline void warn_impl(std::string_view expr,
+                      std::string_view msg = {},
+                      std::source_location loc = std::source_location::current()) {
+    std::cerr << "[warn] " << loc.file_name() << ':' << loc.line()
+              << " in " << loc.function_name()
+              << " — condition '" << expr << "' failed"
+              << (msg.empty() ? "" : ": ") << msg << '\n';
+}
+
+#define WARN_IF(cond, ...)                                              \
+    do {                                                                \
+        if ( (cond) ) warn_impl(#cond, std::string_view{__VA_ARGS__}); \
+    } while ( 0 )
+
+#ifndef NDEBUG
+#define DEBUG_WARN_IF(cond, ...) WARN_IF(cond, __VA_ARGS__)
+#else
+#define DEBUG_WARN_IF(cond, ...) ((void)0)
+#endif
+
 namespace LaurelEye::Graphics {
 
     CameraComponent::CameraComponent()
@@ -16,6 +38,8 @@ namespace LaurelEye::Graphics {
           position(Vector3()),
           rotation(Quaternion(0.0f, 0.0f, 1.0f, 0.0f)),
           cameraData() {};
+
+    CameraComponent::~CameraComponent() = default;
 
     void CameraComponent::setPositionRotation(const Vector3& _position, const Quaternion& _rotation) {
         position = _position;

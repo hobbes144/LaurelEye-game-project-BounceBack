@@ -29,6 +29,7 @@ namespace LaurelEye::Graphics {
 
     public:
         CameraComponent();
+        ~CameraComponent();
 
         /// @brief Get camera name
         ///

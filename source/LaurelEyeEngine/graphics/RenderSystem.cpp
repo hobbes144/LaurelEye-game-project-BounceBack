@@ -5,6 +5,7 @@
 /// @date    10-14-2025
 /// @brief Implementation of RenderSystem
 
+#include "LaurelEyeEngine/ecs/Entity.h"
 #include "LaurelEyeEngine/ecs/ISystem.h"
 #include "LaurelEyeEngine/graphics/Graphics.h"
 
@@ -16,8 +17,8 @@
 
 #include "LaurelEyeEngine/graphics/graphics_components/CameraComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/LightComponent.h"
-#include "LaurelEyeEngine/graphics/renderpass/SinglePass.h"
 #include "LaurelEyeEngine/graphics/renderpass/SingleBufferedDataPass.h"
+#include "LaurelEyeEngine/graphics/renderpass/SinglePass.h"
 #include "LaurelEyeEngine/graphics/RenderSystem.h"
 #include "LaurelEyeEngine/graphics/resources/FrameContext.h"
 #include "LaurelEyeEngine/graphics/resources/RenderResources.h"
@@ -65,6 +66,7 @@ namespace LaurelEye::Graphics {
         sp = std::make_shared<SingleBufferedDataPass>();
         sp->setup(*tempRenderResources.get());
 
+        initDefaultCamera();
         initGlobalLightsBuffer();
     }
 
@@ -156,6 +158,9 @@ namespace LaurelEye::Graphics {
             // TODO: This is currently updating camera to the new component
             // each time. This should be changed when we handle multiple
             // cameras.
+            if (defaultCamera) {
+                defaultCamera = nullptr;
+            }
             camera = static_cast<CameraComponent*>(component);
             assert(camera && "ERROR::GRAPHICS::RENDERSYSTEM::INVALID_CAMERA");
             cameraProperties[camera->GetRenderID()] = camera;
@@ -175,6 +180,7 @@ namespace LaurelEye::Graphics {
         }
 
         component->BindTransform();
+        component->rs = this;
     }
 
     void RenderSystem::deregisterComponent(const ComponentPtr component) {
@@ -188,6 +194,8 @@ namespace LaurelEye::Graphics {
         case RenderComponentType::PropertyCamera: {
             auto it = cameraProperties.find(component->GetRenderID());
             if ( it != cameraProperties.end() ) {
+                if (it->second->getInitStatus())
+                    destroyCameraBuffer(it->second);
                 cameraProperties.erase(it);
             }
             break;
@@ -271,6 +279,22 @@ namespace LaurelEye::Graphics {
     }
 
     // Camera interactons
+
+    // TODO: Delete this when the full scenegraph is up, we don't want to do this.
+    void RenderSystem::initDefaultCamera() {
+        defaultCamera = std::make_unique<Entity>("Default Camera");
+        auto defaultCameraT = defaultCamera->addComponent<TransformComponent>();
+        auto defaultCameraComponent = defaultCamera->addComponent<CameraComponent>();
+        defaultCameraComponent->setPerspectiveProjection(45.0f * 3.14159f / 180.0f, 1280.f / 720.f, 0.1f, 1000.0f);
+        camera = defaultCameraComponent;
+        cameraProperties[defaultCameraComponent->GetRenderID()] = defaultCameraComponent;
+        initCameraBuffer(defaultCameraComponent);
+        updateCameraBuffer(defaultCameraComponent);
+
+        defaultCameraComponent->BindTransform();
+        defaultCameraComponent->rs = this;
+    }
+
     void RenderSystem::initCameraBuffer(CameraComponent* camera) {
         // TODO: Update code to handle multiple cameras.
         camera->setCameraBufferHandle(device->createDataBuffer(DataBufferDesc{
@@ -281,7 +305,13 @@ namespace LaurelEye::Graphics {
     }
 
     void RenderSystem::updateCameraBuffer(CameraComponent* camera) {
+        assert(camera && "ERROR::GRAPHICS::RENDERSYSTEM::CAMERA_UNINITIALIZED");
         device->updateDataBufferSubData(camera->getCameraBufferHandle(), 0, sizeof(Camera), camera->getCameraDataPtr());
+    }
+
+    void RenderSystem::destroyCameraBuffer(CameraComponent* camera) {
+        device->destroyDataBuffer(camera->getCameraBufferHandle());
+        camera->setInitStatus(false);
     }
 
     // Light interactions

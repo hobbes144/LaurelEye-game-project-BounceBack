@@ -21,6 +21,8 @@
 
 namespace LaurelEye::Graphics {
 
+    class RenderSystem;
+
     /// @enum RenderComponentType
     /// @brief Enumerates the different types of render components.
     ///
@@ -49,7 +51,7 @@ namespace LaurelEye::Graphics {
         /// @param type The render component classification (e.g., `Renderable3D`).
         explicit IRenderComponent(RenderComponentType type) : rcType(type), renderID(++nextID) {}
         /// @brief Virtual destructor.
-        virtual ~IRenderComponent() = default;
+        virtual ~IRenderComponent();
 
         /// @brief Gets the unique render ID assigned to this component.
         /// @return The component's render ID.
@@ -65,7 +67,7 @@ namespace LaurelEye::Graphics {
         /// and stores a pointer for later use in rendering.
         void BindTransform() {
             transComp = owner->findComponent<TransformComponent>();
-        } 
+        }
 
         /// @brief Gets the type classification of this render component.
         /// @return The `RenderComponentType` value for this component.
@@ -95,6 +97,10 @@ namespace LaurelEye::Graphics {
         unsigned int renderID;
         /// @brief Static counter to assign unique render IDs.
         static inline unsigned int nextID = 0;
+
+        RenderSystem* rs = nullptr;
+
+        friend RenderSystem;
 
     };
 

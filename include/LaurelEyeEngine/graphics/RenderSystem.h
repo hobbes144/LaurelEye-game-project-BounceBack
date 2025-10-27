@@ -1,4 +1,4 @@
-﻿/// @file   RenderSystem.h
+/// @file   RenderSystem.h
 /// @author Anish Murthy
 /// @par    **DigiPen Email**
 ///     anish.murthy@digipen.edu
@@ -144,6 +144,7 @@ namespace LaurelEye::Graphics {
         std::shared_ptr<SingleBufferedDataPass> sp;
 
         // Temp pointers to support lights and camera updates
+        std::unique_ptr<Entity> defaultCamera = nullptr;
         PointLightComponent* pointLight = nullptr;
         CameraComponent* camera = nullptr;
         DirectionalLightComponent* dirLight = nullptr;
@@ -156,8 +157,10 @@ namespace LaurelEye::Graphics {
         bool globalLightsInitStatus = false;
 
         // Camera interactions
+        void initDefaultCamera();
         void initCameraBuffer(CameraComponent* camera);
         void updateCameraBuffer(CameraComponent* camera);
+        void destroyCameraBuffer(CameraComponent* camera);
 
         // Light interactions
         void registerLight(LightComponent* light);
