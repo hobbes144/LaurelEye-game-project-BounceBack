@@ -20,6 +20,7 @@
 #include "LaurelEyeEngine/window/WindowManager.h"
 #include "LaurelEyeEngine/memory/MemoryManager.h"
 #include "LaurelEyeEngine/io/AssetManager.h"
+#include "LaurelEyeEngine/events/EventManager.h"
 
 namespace LaurelEye {
     class ResourceCoordinator {
@@ -36,5 +37,6 @@ namespace LaurelEye {
         std::unique_ptr<WindowManager> windowManager;
         std::unique_ptr<MemoryManager> memoryManager;
         std::unique_ptr<IO::AssetManager> assetManager;
+        std::unique_ptr<EventManager> eventManager;
     };
 } // namespace LaurelEye

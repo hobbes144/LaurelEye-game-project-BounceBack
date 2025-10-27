@@ -15,7 +15,7 @@
 #include "LaurelEyeEngine/physics/interfaces/IBody.h"
 
 namespace LaurelEye::Physics {
-
+    class IBody;
     class PhysicsBodyComponent : public IComponent {
 
     public:

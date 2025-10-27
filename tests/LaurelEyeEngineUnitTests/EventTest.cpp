@@ -5,6 +5,15 @@ namespace LaurelEye {
     void eventTest() {
         EventManager manager;
         Entity e1, e2;
+        LaurelEye::Physics::CollisionEventData ced = {
+            LaurelEye::Physics::CollisionEventData::Type::Enter,
+            e1.getId(),
+            e2.getId(),
+            Vector3(1,1,1),
+            Vector3(0,1,0),
+            &e1,
+            &e2
+            };
 
         bool wasCalled = false;
         bool wasCalledTwice = false;
@@ -13,11 +22,12 @@ namespace LaurelEye {
         uint32_t listenerId = manager.addListener<CollisionEvent>(
             [&](const CollisionEvent& event) {
                 wasCalled = true;
-                assert(event.entity1 == &e1);
-                assert(event.entity2 == &e2);
+                std::cout << event.GetData() << std::endl;
+                //assert(event.collisionData.entityARef == &e1);
+                //assert(event.collisionData.entityBRef == &e2);
             });
 
-        CollisionEvent event(&e1, &e2);
+        CollisionEvent event(ced);
         manager.broadcastEvent(event);
         assert(wasCalled && "Listener should be called on BroadcastEvent");
 

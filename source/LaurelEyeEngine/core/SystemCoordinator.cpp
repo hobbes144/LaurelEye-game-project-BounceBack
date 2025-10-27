@@ -27,6 +27,7 @@ namespace LaurelEye {
         renderSystem->setConfig(renderConfig);
         
         physicsSystem = std::make_unique<Physics::PhysicsSystem>();
+        physicsSystem->setEngineContext(ctx);
         // Calls its own initialize and shutdown methods - in future will get reworked
         audioSystem = std::make_unique<Audio::FModAudioManager>();
 

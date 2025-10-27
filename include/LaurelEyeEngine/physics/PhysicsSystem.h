@@ -13,6 +13,7 @@
 #include <memory>
 
 #include "LaurelEyeEngine/physics/interfaces/IPhysicsWorld.h"
+#include "LaurelEyeEngine/physics/CollisionManager.h"
 #include "LaurelEyeEngine/physics/PhysicsBodyComponent.h"
 #include "LaurelEyeEngine/ecs/ISystem.h"
 
@@ -57,12 +58,19 @@ namespace LaurelEye::Physics {
         /// @brief Get a pointer to the active physics world
         /// @return A raw pointer to the IPhysicsWorld (owned internally)
         IPhysicsWorld* GetWorld();
+   
+        CollisionManager& GetCollisionManager() {
+            return collisionManager;
+        }
 
     private:
         /// @brief Selected physics backend
         PhysicsSystemType systemType;
         /// @brief Unique pointer to world instance
         std::unique_ptr<IPhysicsWorld> world;
+        CollisionManager collisionManager;
+
+        void dispatchCollisionEvents();
 
     };
 

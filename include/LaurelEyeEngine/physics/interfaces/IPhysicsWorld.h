@@ -12,8 +12,8 @@
 #include <memory>
 
 #include "LaurelEyeEngine/physics/interfaces/PhysicsTypes.h"
-
 #include "LaurelEyeEngine/physics/interfaces/IBody.h"
+#include "LaurelEyeEngine/physics/CollisionManager.h"
 
 namespace LaurelEye::Physics {
     class IBody;
@@ -45,7 +45,7 @@ namespace LaurelEye::Physics {
         virtual std::shared_ptr<ICollisionShape> CreateShape(
             const CollisionShapePhys& csPhys) = 0;
 
-        
+        virtual void GatherCollisions(CollisionManager& cm) = 0;
 
     protected:
         //TODO: Track Physics Bodies in a more efficient manner

@@ -10,16 +10,21 @@
 
 #include "LaurelEyeEngine/physics/interfaces/PhysicsTypes.h"
 #include "LaurelEyeEngine/transform/TransformComponent.h"
+#include "LaurelEyeEngine/physics/PhysicsBodyComponent.h"
 
 #include <any>
+#include <atomic>
 
 namespace LaurelEye::Physics {
 
     /// @brief Interface for physics bodies managed by a physics world.
     /// An IBody represents a single object in the physics simulation, which may be static, 
     /// dynamic, or kinematic depending on its configuration
+    class PhysicsBodyComponent;
     class IBody {
     public:
+        IBody()
+            : bodyId(GenerateUniqueID()){}
         /// @brief Virtual destructor for safe cleanup of derived classes.
         virtual ~IBody() = default;
 
@@ -29,6 +34,10 @@ namespace LaurelEye::Physics {
         /// @brief Get the current transform of this body.
         /// @return The current position and orientation.
         virtual LaurelEye::TransformComponent* GetBoundTransform() const = 0;
+        /// @brief Binds the pointer to the PhysicsBodyComponent to the internal physics
+        /// body such that the simulation has a reference to Components
+        /// @param pbc A pointer to the 
+        virtual void BindPhysicsBodyComponent(PhysicsBodyComponent* pbc) = 0;
 
         /// @brief Apply a continuous force to this body.
         /// @param f The force vector to apply.
@@ -55,6 +64,17 @@ namespace LaurelEye::Physics {
         virtual void updateTransformFromPhysics() = 0;
 
         //virtual std::any GetInternal() = 0; Potential Optimization, Ignore for now
+
+        unsigned int GetBodyID() const { return bodyId; }
+
+    protected:
+        static unsigned int GenerateUniqueID() {
+            static std::atomic<unsigned int> nextID{1};
+            return nextID++;
+        }
+
+    private:
+        unsigned int bodyId;
 
     };
 

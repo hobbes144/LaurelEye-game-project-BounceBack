@@ -15,11 +15,13 @@ namespace LaurelEye {
         inputManager = std::make_unique<InputManager>(*window);
         memoryManager = std::make_unique<MemoryManager>();
         assetManager = std::make_unique<IO::AssetManager>();
+        eventManager = std::make_unique<EventManager>();
        
         ctx.registerService<InputManager>(inputManager.get());
         ctx.registerService<WindowManager>(windowManager.get());
         ctx.registerService<MemoryManager>(memoryManager.get());
         ctx.registerService<IO::AssetManager>(assetManager.get());
+        ctx.registerService<EventManager>(eventManager.get());
     }
 
     void ResourceCoordinator::update(float deltaTime) {

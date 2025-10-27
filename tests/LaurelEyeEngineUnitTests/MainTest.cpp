@@ -47,7 +47,8 @@ int main() {
         {"EngineLifecycleTest", LaurelEye::engineLifecycleTest},
         {"EngineContextServiceTest", LaurelEye::engineContextServiceTest},
         {"EngineSystemCoordinatorWiringTest", LaurelEye::engineSystemCoordinatorWiringTest},
-        {"EngineContextOverwriteTest",        LaurelEye::engineContextOverwriteTest}
+        {"EngineContextOverwriteTest",        LaurelEye::engineContextOverwriteTest},
+        {"CollisionEventTest", LaurelEye::collisionEventTest}
     };
 
     renderTestExtended(window, &glfwP, &inputManager);

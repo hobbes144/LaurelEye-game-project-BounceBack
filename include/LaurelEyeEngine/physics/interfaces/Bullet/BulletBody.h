@@ -18,6 +18,8 @@ namespace LaurelEye::Physics {
         void BindTransform(LaurelEye::TransformComponent* t) override;
         LaurelEye::TransformComponent* GetBoundTransform() const override;
 
+        void BindPhysicsBodyComponent(PhysicsBodyComponent* pbc) override;
+
         void SetVelocity(const Vector3& v) override;
         Vector3 GetVelocity() const override;
 

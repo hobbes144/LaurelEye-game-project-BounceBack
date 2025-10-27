@@ -19,9 +19,7 @@ namespace LaurelEye::Physics {
     BulletBody::BulletBody(std::shared_ptr<btRigidBody> body, std::shared_ptr<BulletShape> s, std::shared_ptr<btDefaultMotionState> motion)
         : btRB(std::move(body)), shape(std::move(s)), motionState(std::move(motion)){}
 
-    BulletBody::~BulletBody() {
-
-    }
+    BulletBody::~BulletBody() {}
 
     void BulletBody::ApplyForce(const Vector3& f) {
         btRB->activate(true);
@@ -39,6 +37,10 @@ namespace LaurelEye::Physics {
 
     LaurelEye::TransformComponent* BulletBody::GetBoundTransform() const {
         return boundTransform;
+    }
+
+    void BulletBody::BindPhysicsBodyComponent(PhysicsBodyComponent* pbc) {
+        btRB->setUserPointer(pbc);
     }
 
     void BulletBody::SetVelocity(const Vector3& v) {

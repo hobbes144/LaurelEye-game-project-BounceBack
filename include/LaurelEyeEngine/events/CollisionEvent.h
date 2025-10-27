@@ -13,11 +13,30 @@
 namespace LaurelEye {
     class CollisionEvent : public IEvent {
     public:
-        CollisionEvent(Entity* e1, Entity* e2)
-            : entity1(e1), entity2(e2) {}
+        explicit CollisionEvent(const LaurelEye::Physics::CollisionEventData& cd)
+            : collisionData(cd) {}
 
-        
-        Entity* entity1;
-        Entity* entity2;
+        virtual ~CollisionEvent() = default;
+
+        LaurelEye::Physics::CollisionEventData GetData() const { return collisionData; }
+
+    private:
+        LaurelEye::Physics::CollisionEventData collisionData;
     };
+
+    class CollisionEnterEvent : public CollisionEvent {
+    public:
+        using CollisionEvent::CollisionEvent; // Inherit constructor
+    };
+
+    class CollisionStayEvent : public CollisionEvent {
+    public:
+        using CollisionEvent::CollisionEvent;
+    };
+
+    class CollisionExitEvent : public CollisionEvent {
+    public:
+        using CollisionEvent::CollisionEvent;
+    };
+
 } // namespace LaurelEye

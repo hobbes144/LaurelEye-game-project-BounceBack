@@ -131,5 +131,37 @@ namespace LaurelEye::Physics {
         return shape;
     }
 
+    void BulletWorld::GatherCollisions(CollisionManager& cm) {
+        int numManifolds = dispatcher->getNumManifolds();
+        for ( int i = 0; i < numManifolds; i++ ) {
+            btPersistentManifold* manifold = dispatcher->getManifoldByIndexInternal(i);
+            const btCollisionObject* obj0 = manifold->getBody0();
+            const btCollisionObject* obj1 = manifold->getBody1();
+
+            auto body0 = static_cast<PhysicsBodyComponent*>(obj0->getUserPointer());
+            auto body1 = static_cast<PhysicsBodyComponent*>(obj1->getUserPointer());
+            if ( !body0 || !body1 ) continue;
+
+            int numContacts = manifold->getNumContacts();
+            for ( int j = 0; j < numContacts; ++j ) {
+                btManifoldPoint& pt = manifold->getContactPoint(0);
+                Vector3 contactPoint(pt.getPositionWorldOnB().x(),
+                                     pt.getPositionWorldOnB().y(),
+                                     pt.getPositionWorldOnB().z());
+                Vector3 normal(pt.m_normalWorldOnB.x(),
+                               pt.m_normalWorldOnB.y(),
+                               pt.m_normalWorldOnB.z());
+
+                cm.registerContact(
+                    body0->GetBodyRef()->GetBodyID(),
+                    body1->GetBodyRef()->GetBodyID(),
+                    contactPoint,
+                    normal,
+                    body0->getOwner(),
+                    body1->getOwner()
+                );
+            }
+        }
+    }
 
 }

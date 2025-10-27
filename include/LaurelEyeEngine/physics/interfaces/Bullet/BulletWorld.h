@@ -29,6 +29,8 @@ namespace LaurelEye::Physics {
         std::shared_ptr<ICollisionShape> CreateShape(
             const CollisionShapePhys& csPhys) override;
 
+        void GatherCollisions(CollisionManager& cm) override;
+
     private:
         std::vector<std::shared_ptr<btDefaultMotionState>> motions;
 
