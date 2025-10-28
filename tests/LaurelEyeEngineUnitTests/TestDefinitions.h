@@ -69,7 +69,6 @@ namespace LaurelEye {
     void scriptingBasicTest();
     void scriptingMultipleTest();
     void scriptingMathTest();
-    void engineLifecycleTest();
     void engineContextServiceTest();
     void engineSystemCoordinatorWiringTest();
     void engineContextOverwriteTest();

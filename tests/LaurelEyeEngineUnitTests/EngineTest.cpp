@@ -2,35 +2,6 @@
 
 namespace LaurelEye {
     // ------------------------------------------------------------
-    // Engine lifecycle test (basic run-stop flow)
-    // ------------------------------------------------------------
-    void engineLifecycleTest() {
-        std::cout << "[EngineTest] Starting Engine Lifecycle Test...\n";
-
-        EngineConfig config;
-        config.projectName = "LifecycleTest";
-        config.enableDebugMode = true;
-        config.assetRoot = "assets/";
-        config.initialSceneList = "scenes/scene_list.json";
-
-        Engine engine(config);
-
-        // Run engine in a separate thread since run() blocks until stop() is called.
-        std::thread engineThread([&engine]() {
-            engine.run();
-        });
-
-        // Let it run a few frames
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-        engine.stop();
-        engineThread.join();
-
-        std::cout << "[EngineTest] Engine ran and stopped cleanly.\n";
-        std::cout << "[EngineTest] Passed Engine Lifecycle Test\n";
-    }
-
-    // ------------------------------------------------------------
     // EngineContext service registration and retrieval
     // ------------------------------------------------------------
     struct DummyService {

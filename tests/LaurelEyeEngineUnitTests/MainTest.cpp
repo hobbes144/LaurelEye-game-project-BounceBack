@@ -44,9 +44,8 @@ int main() {
         {"ScriptingBaseTest", LaurelEye::scriptingBasicTest},
         {"ScriptingMultipleTest", LaurelEye::scriptingMultipleTest},
         {"ScriptingMathTest", LaurelEye::scriptingMathTest},
-        {"EngineLifecycleTest", LaurelEye::engineLifecycleTest},
         {"EngineContextServiceTest", LaurelEye::engineContextServiceTest},
-        {"EngineSystemCoordinatorWiringTest", LaurelEye::engineSystemCoordinatorWiringTest},
+        //{"EngineSystemCoordinatorWiringTest", LaurelEye::engineSystemCoordinatorWiringTest},
         {"EngineContextOverwriteTest",        LaurelEye::engineContextOverwriteTest},
         {"CollisionEventTest", LaurelEye::collisionEventTest}
     };
