@@ -70,8 +70,8 @@ namespace LaurelEye {
 
         auto DLightData = Graphics::DirectionalLight{
             Vector3(0.75f, -1.0f, 0.75f).normalized(), // direction
-            4.0f,                      // intensity
-            Vector3(1.0f, 1.0f, 1.0f)     // color (white)
+            4.0f,                                      // intensity
+            Vector3(1.0f, 1.0f, 1.0f)                  // color (white)
         };
 
         auto DLight = std::make_unique<Entity>("DLight");
@@ -84,7 +84,7 @@ namespace LaurelEye {
 
         auto ALightData = Graphics::AmbientLight{
             Vector3(1.0f, 1.0f, 1.0f), // color (white)
-            0.3f                      // intensity
+            0.3f                       // intensity
         };
 
         auto ALightT = ALight->addComponent<TransformComponent>();
@@ -131,7 +131,8 @@ namespace LaurelEye {
 
         // Simulation loop
         float dt = 1.0f / 60.0f; // 60 Hz
-        for ( int i = 0; i < 300.f * 60.0f; i++ ) {
+        bool paused = false;
+        while ( true ) {
             glfwP->update();
             pInputManager->update();
 
@@ -147,10 +148,20 @@ namespace LaurelEye {
                 renderSystem.shutdown();
                 return; // bail out of program early
             }
+            else if ( pInputManager->isKeyPressed(LaurelEye::Key::Tab) ) {
+                paused = !paused;
+            }
+            else if ( paused && pInputManager->isKeyPressed(LaurelEye::Key::arrowRight) ) {
+                physicsSystem.update(dt);
+                transformSystem.update(dt);
+                renderSystem.update(dt);
+            }
 
-            physicsSystem.update(dt);
-            transformSystem.update(dt);
-            renderSystem.update(dt);
+            if ( !paused ) {
+                physicsSystem.update(dt);
+                transformSystem.update(dt);
+                renderSystem.update(dt);
+            }
 #ifdef _WIN32
             Sleep(dt * 1000.f);
 #else
