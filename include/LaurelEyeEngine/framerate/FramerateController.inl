@@ -1,5 +1,6 @@
-﻿#ifndef FRAMERATECONTROLLER_INL
-#define FRAMERATECONTROLLER_INL
+﻿#pragma once
+
+#include "FramerateController.h"
 
 #include <chrono>
 #include <thread>
@@ -170,5 +171,3 @@ T FramerateController<T>::getAccumulatorAlpha(const unsigned int id) const {
     return accumulatorTimes[id] / accumulatorTimesteps[id];
 }
 #endif
-
-#endif // FRAMERATECONTROLLER_INL

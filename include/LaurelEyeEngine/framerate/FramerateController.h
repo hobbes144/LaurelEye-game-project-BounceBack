@@ -6,18 +6,14 @@
 /// - Mariojulio Osmin Zaldivar Alvarez (ex-Adjunct Professor)
 ///   - (zaldivaralvarez@gmail.com) — Advising and Base Code
 ///
-/// **Course:** CS529  
-/// **Date:** 10-25-2024  
+/// **Course:** CS529
+/// **Date:** 10-25-2024
 ///
 /// **Brief:** Framerate Controller
 ///
 /// © 2025 DIGIPEN Institute of Technology. All rights reserved.
-#ifndef FRAMERATE_CONTROLLER_H
-#define FRAMERATE_CONTROLLER_H
-
 #pragma once
 
-#include <chrono>
 #include <vector>
 
 /// \class FramerateController
@@ -104,5 +100,3 @@ using FFramerateController = FramerateController<float>;
 
 // Include template implementation
 #include "FramerateController.inl"
-
-#endif FRAMERATE_CONTROLLER_H
