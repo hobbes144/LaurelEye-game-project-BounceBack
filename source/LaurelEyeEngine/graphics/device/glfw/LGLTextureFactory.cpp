@@ -44,11 +44,13 @@ namespace LaurelEye::Graphics {
         if ( std::any_of(rgbFormats.begin(), rgbFormats.end(), [&](TextureFormat e) { return e == f; }) ) {
             baseFormat = GL_RGB;
         }
-        else if ( std::any_of(rgbFormats.begin(), rgbFormats.end(), [&](TextureFormat e) { return e == f; }) ) {
+        else if ( std::any_of(rgbaFormats.begin(), rgbaFormats.end(), [&](TextureFormat e) { return e == f; }) ) {
             baseFormat = GL_RGBA;
         }
         else {
             // TODO: Add code to handle 1D texture R8 here
+            //
+            // TODO: Change this to warning logging.
             std::cout << "WARNING::RENDERSYSTEM::TEXTUREFACTORY::CREATE::INVALIDFORMAT"
                       << "::Defaulting to RGBA" << std::endl;
             baseFormat = GL_RGBA;

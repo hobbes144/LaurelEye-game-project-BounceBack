@@ -6,6 +6,7 @@
 /// @brief Implementation of RenderResources
 
 #include "LaurelEyeEngine/graphics/resources/RenderResources.h"
+#include "LaurelEyeEngine/graphics/resources/Texture.h"
 
 namespace LaurelEye::Graphics {
 
@@ -36,6 +37,7 @@ namespace LaurelEye::Graphics {
     }
 
     TextureHandle RenderResources::texture(const std::string& name) {
+        if (!textures.contains(name)) return InvalidTexture;
         return textures[name].handle;
     }
 

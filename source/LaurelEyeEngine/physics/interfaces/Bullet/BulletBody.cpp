@@ -78,7 +78,7 @@ namespace LaurelEye::Physics {
         btQuaternion rot = btTrans.getRotation();
         float temp = pos.y();
         boundTransform->setLocalPosition(Vector3(pos.x(), pos.y(), pos.z()));
-        boundTransform->setLocalRotation(Quaternion(rot.x(), rot.y(), rot.z(), rot.w()));
+        boundTransform->setLocalRotation(Quaternion(rot.w(), rot.x(), rot.y(), rot.z()));
     }
 
 }

@@ -5,6 +5,7 @@
 #include "LaurelEyeEngine/graphics/resources/RenderResources.h"
 #include "LaurelEyeEngine/graphics/resources/Texture.h"
 #include "LaurelEyeEngine/io/Assets.h"
+#include <filesystem>
 
 namespace LaurelEye::IO {
     std::shared_ptr<IAsset> ImageImporter::import(const std::string& path) {
@@ -24,30 +25,35 @@ namespace LaurelEye::IO {
         else {
             return loadSDRFile(path);
         }
-
-        stbi_image_free(data);
-        return asset;
     }
 
     std::shared_ptr<IAsset> ImageImporter::loadHDRFile(const std::string& path) {
         /*TextureParameters textureParameters = TextureParameters(10,
                                                                 TEXTURE_NEAREST, TEXTURE_LINEAR_MIPMAP_LINEAR,
                                                                 TEXTURE_REPEAT, TEXTURE_REPEAT);*/
-        Graphics::TextureDesc desc = Graphics::TextureDesc();
-
         stbi_set_flip_vertically_on_load(true);
-        int channels;
-        int w = static_cast<int>(desc.width);
-        int h = static_cast<int>(desc.height);
+        int channels = 0;
+        int w = 0, h = 0;
+        // Request 4 components (RGBA float)
         float* data = stbi_loadf(path.c_str(), &w, &h, &channels, 4);
+        assert(("ERROR::TEXTURE::LOADHDR::LOADFAILED::" + path).c_str() && data);
 
-        assert(("ERROR::TEXTURE::LOADTEXTURE::LOADFAILED::" + path).c_str() && data);
-
+        Graphics::TextureDesc desc = Graphics::TextureDesc();
+        desc.width = static_cast<uint32_t>(w);
+        desc.height = static_cast<uint32_t>(h);
         desc.format = Graphics::TextureFormat::RGBA32F;
 
-        Graphics::TextureHandle id = rs->createTexture("NamePlaceholder", desc, "TagPlaceholder", data);
+        Graphics::TextureHandle id = rs->createTexture(path, desc, "ImageImporter", data);
+
         auto asset = std::make_shared<ImageAsset>(path);
+        asset->width = w;
+        asset->height = h;
+        asset->channels = 4;
+        asset->format = ImageAsset::HDR_FLOAT;
+
         stbi_image_free(data);
+
+        (void)id;
 
         return asset;
     }
@@ -56,24 +62,34 @@ namespace LaurelEye::IO {
         /*TextureParameters textureParameters = TextureParameters(10,
                                                                 TEXTURE_NEAREST, TEXTURE_LINEAR_MIPMAP_LINEAR,
                                                                 TEXTURE_REPEAT, TEXTURE_REPEAT);*/
-        Graphics::TextureDesc desc = Graphics::TextureDesc();
-
         stbi_set_flip_vertically_on_load(true);
-        int channels;
-        int w = static_cast<int>(desc.width);
-        int h = static_cast<int>(desc.height);
+        int channels = 0;
+        int w = 0, h = 0;
         unsigned char* data = stbi_load(path.c_str(), &w, &h, &channels, 0);
+        assert(("ERROR::TEXTURE::LOADSDR::LOADFAILED::" + path).c_str() && data);
 
-        assert(("ERROR::TEXTURE::LOADTEXTURE::LOADFAILED::" + path).c_str() && data);
+        Graphics::TextureDesc desc = Graphics::TextureDesc();
+        desc.width = static_cast<uint32_t>(w);
+        desc.height = static_cast<uint32_t>(h);
 
         if ( channels == 3 )
             desc.format = Graphics::TextureFormat::RGB8;
         else if ( channels == 4 )
             desc.format = Graphics::TextureFormat::RGBA8;
 
-        Graphics::TextureHandle id = rs->createTexture("NamePlaceholder", desc, "TagPlaceholder", data);
         auto asset = std::make_shared<ImageAsset>(path);
+        asset->width = w;
+        asset->height = h;
+        asset->channels = channels;
+        asset->format = (channels == 3) ? ImageAsset::RGB8 : ImageAsset::RGBA8;
+        Graphics::TextureHandle id = rs->createTexture(asset->getName(), desc, "ImageImporter", data);
+
+        // store raw pixels in case other systems need them
+        asset->pixelData.assign(data, data + (w * h * channels));
+
         stbi_image_free(data);
+
+        (void)id; // created GPU texture handle is intentionally not stored on ImageAsset for now
 
         return asset;
     }

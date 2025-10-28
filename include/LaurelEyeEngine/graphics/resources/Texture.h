@@ -57,6 +57,10 @@ namespace LaurelEye::Graphics {
     // @typedef TextureHandle
     /// @brief Numeric handle used to reference a texture.
     using TextureHandle = uint32_t;
+    static constexpr TextureHandle InvalidTexture = UINT32_MAX;
+    inline bool isValidTexture(TextureHandle h) noexcept {
+        return h != InvalidTexture;
+    }
 
     /// @struct TextureDesc
     /// @brief Describes the properties required to create a texture.

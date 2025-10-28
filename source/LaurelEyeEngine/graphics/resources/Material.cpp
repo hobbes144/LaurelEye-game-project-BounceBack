@@ -7,6 +7,7 @@
 
 #include "LaurelEyeEngine/graphics/resources/Material.h"
 #include "LaurelEyeEngine/graphics/resources/Shader.h"
+#include "LaurelEyeEngine/graphics/resources/Texture.h"
 #include "LaurelEyeEngine/math/Vector3.h"
 #include "LaurelEyeEngine/math/Matrix4.h"
 
@@ -14,7 +15,30 @@ namespace LaurelEye::Graphics {
 
     std::unordered_map<std::string, std::shared_ptr<Material>> Material::basicMaterials;
 
+    void Material::setTexture(const std::string& name, TextureHandle handle) {
+        if ( !isValidTexture(handle) ) {
+            textureBindings.erase(name);
+        }
+        else {
+            textureBindings[name] = handle;
+        }
+    }
+
+    TextureHandle Material::getTexture(const std::string& name) const {
+        auto it = textureBindings.find(name);
+        if ( it == textureBindings.end() ) return InvalidTexture;
+        return it->second;
+    }
+
+    void Material::removeTexture(const std::string& name) {
+        textureBindings.erase(name);
+    }
+
     void Material::apply(std::shared_ptr<Shader> shader) const {
+        if ( !shader ) return;
+
+        // Ensure the shader program is active so glUniform calls take effect.
+        shader->use();
 
         /* Todo: this is VERY inefficient. We don't need to be using variant
          * and doing TWO loops over the same variant data is really bad for
@@ -47,6 +71,7 @@ namespace LaurelEye::Graphics {
             }
         }
 
+        // Upload temporary properties
         for ( const auto& [name, value] : tempProperties ) {
             if ( auto item = std::get_if<unsigned int>(&value) ) {
                 shader->setUInt(name, *item);
@@ -68,13 +93,30 @@ namespace LaurelEye::Graphics {
             }
         }
 
-        unsigned int textureUnit = 10;
-        
-        for ( const auto& [name, textureID] : texturesToBind ) {
-            shader->bindTexture(textureUnit, name, textureID);
-            ++textureUnit;
+        // Ensure shader has deterministic texture-related uniforms set even if the
+             // property map doesn't contain them. This prevents uniform carry-over between
+             // draws when the same shader program is used for multiple objects.
+        // shader->setInt("useTexture", useTexture ? 1 : 0);
+        // shader->setVec2("mainTextureScale", mainTextureScale[0], mainTextureScale[1]);
+         // Bind textures previously set via setTexture(...)
+          // Start from texture unit 0 and increment for each bound texture.
+        unsigned int textureUnit = 0;
+        // GLint maxUnits = 0;
+        // glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxUnits);
+        for ( const auto& [name, textureID] : textureBindings ) {
+            if ( textureID != 0 ) {
+                // if ( static_cast<GLint>(textureUnit) >= maxUnits ) {
+                //     std::cout << "Peepee poopoo" << std::endl;
+                //     continue;
+                //
+                // }
+                shader->bindTexture(textureUnit, name, textureID);
+                 ++textureUnit;
+
+            }
+
         }
-        
+
     }
 
 } // namespace LaurelEye::Graphics

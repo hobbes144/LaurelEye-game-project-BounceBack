@@ -262,6 +262,7 @@ namespace LaurelEye::Graphics {
         unsigned int uniformBlockIndex =
             glGetUniformBlockIndex(programID, name.c_str());
         glUniformBlockBinding(programID, uniformBlockIndex, blockBinding);
+        // TODO: Change this to warning logs
         std::cout << "UBO initialized at: " << uniformBlockIndex << std::endl;
     }
 
@@ -355,10 +356,20 @@ namespace LaurelEye::Graphics {
        const std::string& name,
        TextureHandle texHandle) const
      {
-       glActiveTexture(GL_TEXTURE0 + textureUnit);
-       glBindTexture(static_cast<GLenum>(TextureType::Texture2D), texHandle);
-    
-       setInt(name, textureUnit);
+
+       // Validate texture unit against device limits to avoid GL_INVALID_ENUM.
+       GLint maxUnits = 0;
+       glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxUnits);
+       if ( static_cast<GLint>(textureUnit) >= maxUnits ) {
+           std::cout << "Poopoo Peepee" << std::endl;
+           return;
+
+       }
+        glActiveTexture(GL_TEXTURE0 + textureUnit);
+        // always 2D textures for now
+           glBindTexture(GL_TEXTURE_2D, texHandle);
+        // set the sampler uniform to the texture unit index
+           setInt(name, static_cast<int>(textureUnit));
      }
 
      void Shader::unbindTexture(unsigned int textureUnit) const
@@ -366,7 +377,7 @@ namespace LaurelEye::Graphics {
        glActiveTexture(GL_TEXTURE0 + textureUnit);
          glBindTexture(static_cast<GLenum>(TextureType::Texture2D), 0);
      }
-    
+
      //void Shader::bindImageTexture(
      //  unsigned int bindingUnit,
      //  TextureHandle texHandle,

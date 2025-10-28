@@ -6,16 +6,20 @@
 #include "LaurelEyeEngine/graphics/resources/Material.h"
 #include "LaurelEyeEngine/graphics/resources/Mesh.h"
 #include "LaurelEyeEngine/math/Quaternion.h"
+#include "LaurelEyeEngine/io/importers/ImageImporter.h"
 #include "TestDefinitions.h"
 #include <memory>
+#include <filesystem>
 
 namespace LaurelEye {
     void renderTestExtended(IWindow* window, GlfwPlatform* glfwP, InputManager* pInputManager) {
+        EngineContext context;
         LaurelEye::Graphics::RenderSystem renderSystem = LaurelEye::Graphics::RenderSystem();
         LaurelEye::Graphics::RenderSystemConfig renderConfig;
         renderConfig.windows.push_back(window);
         renderSystem.setConfig(renderConfig);
         renderSystem.initialize();
+        context.registerService<LaurelEye::Graphics::RenderSystem>(&renderSystem);
 
         std::cout << "Created window" << std::endl;
 
@@ -38,6 +42,25 @@ namespace LaurelEye {
         auto groundRC = ground->addComponent<Graphics::Renderable3DComponent>();
         groundRC->SetMesh(Graphics::Mesh::getShapeMesh(Graphics::Mesh::Cube));
         groundRC->SetMaterial(std::make_shared<Graphics::Material>());
+
+        //Texture Addition for testing
+        LaurelEye::IO::AssetManager assetManager(context);
+        assetManager.initialize();
+
+        const std::string importPath = "tests/LaurelEyeEngineUnitTests/TestMedia/textures/test.png";
+        auto groundTextureAsset = assetManager.load(importPath);
+
+        // retrieve the GPU handle (importer/register stores texture under the full path)
+        auto handle = renderSystem.getRenderResources()->texture(groundTextureAsset->getName());
+        // Set shader flags / scale via PropertyMap (uniforms)
+        groundRC->GetMaterial()->setProperty<int>("useTexture", 1);
+        groundRC->GetMaterial()->setProperty<Vector2>("mainTextureScale", Vector2(1.0f));
+
+        // Bind the texture by name (generic). Name must match the sampler name in the shader.
+        // In your fragment shader the sampler is `mainTexture`, so use that name here.
+        groundRC->GetMaterial()->setTexture("mainTexture", handle);
+        // End Texture Addition
+
         groundRC->GetMaterial()->setProperty<int>("objectId", 3);
         groundRC->GetMaterial()->setProperty<Vector3>("diffuse", Vector3(62.0 / 255.0, 102.0 / 255.0, 38.0 / 255.0));
         groundRC->GetMaterial()->setProperty<Vector3>("specular", Vector3(0.f));
@@ -59,6 +82,8 @@ namespace LaurelEye {
         auto cubeRC = cube->addComponent<Graphics::Renderable3DComponent>();
         cubeRC->SetMesh(Graphics::Mesh::getShapeMesh(Graphics::Mesh::Cube));
         cubeRC->SetMaterial(std::make_shared<Graphics::Material>());
+        cubeRC->GetMaterial()->setProperty<int>("useTexture", 0);
+
         cubeRC->GetMaterial()->setProperty<int>("objectId", 9);
         cubeRC->GetMaterial()->setProperty<Vector3>("diffuse", Vector3(0.5f, 0.5f, 0.1f));
         cubeRC->GetMaterial()->setProperty<Vector3>("specular", Vector3(0.009f));

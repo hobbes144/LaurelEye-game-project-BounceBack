@@ -14,7 +14,7 @@
 #include "LaurelEyeEngine/math/Matrix4.h"
 #include "LaurelEyeEngine/math/Vector3.h"
 #include "LaurelEyeEngine/math/VectorTemplated.h"
-
+#include "LaurelEyeEngine/graphics/resources/Texture.h"
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -96,11 +96,54 @@ namespace LaurelEye::Graphics {
         static std::shared_ptr<T> getMaterial(
             const std::string& name);
 
+        /// @brief Bind a named texture to this material (generic).
+        ///
+        /// Example: setTexture("mainTexture", handle) or setTexture("normalMap", handle).
+        void setTexture(const std::string& name, TextureHandle handle);
+
+        /// @brief Get a bound texture by name. Returns 0 if not found.
+        TextureHandle getTexture(const std::string& name) const;
+
+        /// @brief Remove a texture binding by name.
+        void removeTexture(const std::string& name);
+
+        // Backwards-compatible helpers (convenience)
+        bool isUsingTexture() const { return useTexture; }
+        TextureHandle getMainTexture() const { return mainTexture; }
+        VectorTemplated<float, 2> getTextureScale() const { return mainTextureScale; }
+
+        // Legacy helpers retained for existing call sites: they now propagate to the generic API.
+        void useTextureFlag() {
+            useTexture = true;
+            // Also expose as a uniform property so shaders that rely on "useTexture" get set.
+            setProperty<int>("useTexture", 1);
+        }
+        void setMainTexture(TextureHandle texture) {
+            mainTexture = texture;
+            setTexture("mainTexture", texture);
+        }
+        void setTextureScale(const VectorTemplated<float, 2>& scale) {
+            mainTextureScale = scale;
+            // Ensure shader uniform property gets set by property loop in apply.
+            setProperty<VectorTemplated<float, 2>>("mainTextureScale", scale);
+        }
+
     protected:
         /// @brief Persistent material properties (remain until changed).
         PropertyMap properties;
         /// @brief Temporary material properties (cleared frequently).
         PropertyMap tempProperties;
+
+        // Texture bindings stored separately from PropertyMap so textures are always bound
+        // by name (and won't be confused with numeric properties).
+        std::unordered_map<std::string, TextureHandle> textureBindings;
+
+        // Legacy / convenience members (kept for compatibility)
+        bool useTexture = false;
+        TextureHandle mainTexture = 0;
+        VectorTemplated<float, 2> mainTextureScale = VectorTemplated<float, 2>({1.0f, 1.0f});
+        
+        
     };
 
 } // namespace LaurelEye::Graphics
