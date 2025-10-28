@@ -77,8 +77,8 @@ namespace LaurelEye::Graphics {
         /// @return Handle to the created DataBuffer resource.
         DataBufferHandle createDataBuffer(const std::string& name, const DataBufferDesc& d,
                 const std::string& tag);
-        // TextureHandle createTexture(const std::string& name, const TextureDesc& d,
-        //         const std::string& tag);
+        TextureHandle createTexture(const std::string& name, const TextureDesc& d,
+                 const std::string& tag, const void* init = nullptr);
         // FrameBufferHandle createFrameBuffer(const std::string& name, const FrameBufferDesc& d,
         //         const std::string& tag);
 
@@ -89,7 +89,7 @@ namespace LaurelEye::Graphics {
         /// @param name Name of the buffer to retrieve.
         /// @return Handle to the DataBuffer resource, or an invalid handle if not found.
         DataBufferHandle dataBuffer(const std::string& name);
-        // TextureHandle texture(const std::string& name);
+        TextureHandle texture(const std::string& name);
         // FrameBufferHandle frameBuffer(const std::string& name);
 
         // void rebuildFrameBuffer(const std::string& name, const FrameBufferDesc& d);
@@ -98,6 +98,7 @@ namespace LaurelEye::Graphics {
         ///
         /// @param name Name of the buffer to destroy.
         void destroyDataBuffer(const std::string& name);
+        void destroyTexture(const std::string& name);
 
         // void destroy(const std::string& name);
         // void destroyTag(const std::string& tag);
@@ -110,5 +111,7 @@ namespace LaurelEye::Graphics {
         std::unordered_map<std::string, DataBufferResource> databuffers;
         /// @brief Map of framebuffer names to their corresponding handles.
         std::unordered_map<std::string, FrameBufferHandle> framebuffers;
+        /// @brief Map of texture names to their corresponding resource metadata.
+        std::unordered_map<std::string, TextureResource> textures;
     };
 }

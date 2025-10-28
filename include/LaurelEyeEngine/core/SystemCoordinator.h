@@ -16,6 +16,8 @@
 #include "LaurelEyeEngine/graphics/RenderSystem.h"
 #include "LaurelEyeEngine/physics/PhysicsSystem.h"
 #include "LaurelEyeEngine/audio/FModAudioManager.h"
+#include "LaurelEyeEngine/io/AssetManager.h"
+#include "LaurelEyeEngine/io/importers/ImageImporter.h"
 
 namespace LaurelEye {
     class SystemCoordinator {

@@ -350,30 +350,32 @@ namespace LaurelEye::Graphics {
         glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, value.getData());
     }
 
-    // void Shader::bindTexture(
-    //   unsigned int textureUnit,
-    //   const std::string& name,
-    //   TextureManager::TextureID textureID) const
-    // {
-    //   glActiveTexture(GL_TEXTURE0 + textureUnit);
-    //   glBindTexture(TEXTURE_2D, textureID.id);
-    //
-    //   setInt(name, textureUnit);
-    // }
+     void Shader::bindTexture(
+       unsigned int textureUnit,
+       const std::string& name,
+       TextureHandle texHandle) const
+     {
+       glActiveTexture(GL_TEXTURE0 + textureUnit);
+       glBindTexture(static_cast<GLenum>(TextureType::Texture2D), texHandle);
+    
+       setInt(name, textureUnit);
+     }
 
-    // void Shader::unbindTexture(unsigned int textureUnit) const
-    // {
-    //   glActiveTexture(GL_TEXTURE0 + textureUnit);
-    //   glBindTexture(TEXTURE_2D, 0);
-    // }
-    //
-    // void Shader::bindImageTexture(
-    //   unsigned int bindingUnit,
-    //   TextureManager::TextureID textureID,
-    //   GLenum access) const
-    // {
-    //   glBindImageTexture(
-    //     bindingUnit, textureID, 0, GL_FALSE, 0, access, TextureManager::getInstance().getTextureInfo(textureID).format);
-    // }
+     void Shader::unbindTexture(unsigned int textureUnit) const
+     {
+       glActiveTexture(GL_TEXTURE0 + textureUnit);
+         glBindTexture(static_cast<GLenum>(TextureType::Texture2D), 0);
+     }
+    
+     //void Shader::bindImageTexture(
+     //  unsigned int bindingUnit,
+     //  TextureHandle texHandle,
+     //  GLenum access) const
+     //{
+
+     //  //Find a way to get the format from the texHandle for the last argument
+     //  glBindImageTexture(
+     //    bindingUnit, texHandle, 0, GL_FALSE, 0, access, );
+     //}
 
 } // namespace LaurelEye::Graphics

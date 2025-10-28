@@ -116,6 +116,11 @@ namespace LaurelEye::Graphics {
         /// @return A vector containing pointers to all camera components.
         std::vector<CameraComponent*> GetCameraComponents() const;
 
+        RenderResources* getRenderResources() {
+            return tempRenderResources.get();
+        }
+
+
     private:
         /// @brief Configuration data used to initialize the render system.
         RenderSystemConfig config;

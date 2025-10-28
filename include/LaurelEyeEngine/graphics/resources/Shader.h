@@ -15,6 +15,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "LaurelEyeEngine/graphics/resources/Texture.h"
+
 namespace LaurelEye {
     class Vector3;
     class Matrix4;
@@ -98,7 +100,7 @@ namespace LaurelEye::Graphics {
         //     Vector3,
         //     Vector4,
         //     Matrix4>;
-        //     // TextureManager::TextureID>;
+        //     // TextureHandle>;
         //
         // using PropertyMap = std::unordered_map<std::string, Property>;
 
@@ -106,18 +108,18 @@ namespace LaurelEye::Graphics {
         // void setProperty(const std::string& name, Property property) const;
         // void setProperties(const PropertyMap&) const;
 
-        // void bindTexture(
-        //     unsigned int textureUnit,
-        //     const std::string& name,
-        //     TextureManager::TextureID textureID) const;
-        // void unbindTexture(
-        //     unsigned int textureUnit) const;
+        void bindTexture(
+             unsigned int textureUnit,
+             const std::string& name,
+             TextureHandle textureID) const;
+        void unbindTexture(
+             unsigned int textureUnit) const;
 
-        // Image Textures
-        // void bindImageTexture(
-        //     unsigned int bindingUnit,
-        //     TextureManager::TextureID textureID,
-        //     GLenum access) const;
+        //Image Textures
+        /*void bindImageTexture(
+             unsigned int bindingUnit,
+             TextureHandle textureID,
+             GLenum access) const;*/
 
         /// @brief Retrieves the OpenGL program ID.
         /// @return Unsigned integer ID of the shader program.

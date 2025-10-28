@@ -38,6 +38,20 @@ namespace LaurelEye {
 
         transformSystem->initialize();
         renderSystem->initialize();
+
+        auto assetManager = ctx.getService <IO::AssetManager>();
+        if ( assetManager ) {
+            auto imgImporter = std::make_shared<IO::ImageImporter>();
+            imgImporter->registerRenderResources(renderSystem->getRenderResources());
+            assetManager->registerImporter("png", imgImporter);
+            assetManager->registerImporter("jpg", imgImporter);
+            assetManager->registerImporter("jpeg", imgImporter);
+            // add other extensions you need, e.g. "hdr"
+        }
+        else {
+            std::cerr << "AssetManager service not found - image importer not registered\n";
+        }
+
         physicsSystem->initialize();
     }
     void SystemCoordinator::update(float deltaTime) {

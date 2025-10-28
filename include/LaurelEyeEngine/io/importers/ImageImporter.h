@@ -9,10 +9,11 @@
 /// Copyright © 2025 DIGIPEN Institute of Technology. All rights reserved.
 #pragma once
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "LaurelEyeEngine/io/Assets.h"
 #include "LaurelEyeEngine/io/IAssetImporter.h"
-#include <stb_image.h>
+
+namespace LaurelEye::Graphics {
+    class RenderResources;
+}
 
 namespace LaurelEye::IO {
     class ImageImporter : public IAssetImporter {
@@ -21,5 +22,16 @@ namespace LaurelEye::IO {
         /// @param path - Path to the image file
         /// @return an ImageAsset loaded with the raw image data
         std::shared_ptr<IAsset> import(const std::string& path) override;
+
+        void registerRenderResources(LaurelEye::Graphics::RenderResources* _rs) {
+            rs = _rs;
+        }
+
+    private:
+        std::shared_ptr<IAsset> loadHDRFile(const std::string& path);
+        std::shared_ptr<IAsset> loadSDRFile(const std::string& path);
+
+        LaurelEye::Graphics::RenderResources* rs = nullptr;
     };
+
 } // namespace LaurelEye::IO

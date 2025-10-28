@@ -24,7 +24,7 @@ namespace LaurelEye::Graphics {
          * took half an hour to realise.
          */
 
-        //std::vector<std::pair<std::string, TextureManager::TextureID>> texturesToBind;
+        std::vector<std::pair<std::string, TextureHandle>> texturesToBind;
 
         for ( const auto& [name, value] : properties ) {
             if ( auto item = std::get_if<unsigned int>(&value) ) {
@@ -69,12 +69,12 @@ namespace LaurelEye::Graphics {
         }
 
         unsigned int textureUnit = 10;
-        /*
+        
         for ( const auto& [name, textureID] : texturesToBind ) {
             shader->bindTexture(textureUnit, name, textureID);
             ++textureUnit;
         }
-        */
+        
     }
 
 } // namespace LaurelEye::Graphics
