@@ -9,10 +9,8 @@
 /// Copyright © 2025 DIGIPEN Institute of Technology. All rights reserved.
 #pragma once
 
-#include <string>
 #include <vector>
 #include <algorithm>
-#include <memory>
 #include "LaurelEyeEngine/core/EngineContext.h"
 
 namespace LaurelEye {
@@ -21,12 +19,16 @@ namespace LaurelEye {
     public:
         using ComponentPtr = ComponentType*;
 
-        virtual ~ISystem() = default;
+        virtual ~ISystem() {
+            for (auto component : components) {
+                deregisterComponent(component);
+            }
+        }
 
         virtual void initialize() = 0;
         virtual void update(float deltaTime) = 0;
         virtual void shutdown() = 0;
-        
+
         virtual void registerComponent(const ComponentPtr component) {
             components.push_back(component);
 
