@@ -61,11 +61,11 @@ namespace LaurelEye {
 
         EngineContext context;
         EngineConfig config;
-        ResourceCoordinator resourceCoord;
-        SystemCoordinator sysCoord;
+        ResourceCoordinator resourceCoord(context, config);
+        SystemCoordinator sysCoord(context, config);
 
-        resourceCoord.initialize(context, config);
-        sysCoord.initialize(context, config);
+        resourceCoord.initialize();
+        sysCoord.initialize();
         
         auto transformSys = context.getService<TransformSystem>();
         assert(transformSys && "TransformSystem should be registered in EngineContext after initialization");

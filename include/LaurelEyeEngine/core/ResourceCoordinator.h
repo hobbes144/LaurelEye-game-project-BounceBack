@@ -20,12 +20,15 @@
 #include "LaurelEyeEngine/window/WindowManager.h"
 #include "LaurelEyeEngine/memory/MemoryManager.h"
 #include "LaurelEyeEngine/io/AssetManager.h"
+#include "LaurelEyeEngine/scene/SceneManager.h"
 #include "LaurelEyeEngine/events/EventManager.h"
+#include "LaurelEyeEngine/platforms/IPlatform.h"
 
 namespace LaurelEye {
     class ResourceCoordinator {
     public:
-        void initialize(EngineContext& ctx, const EngineConfig& config);
+        ResourceCoordinator(EngineContext& ctx, const EngineConfig& config);
+        void initialize();
         // TODO - I'm putting this for input. If input needs update, it should be a system plz
         void update(float deltaTime);
         void shutdown();
@@ -37,6 +40,8 @@ namespace LaurelEye {
         std::unique_ptr<WindowManager> windowManager;
         std::unique_ptr<MemoryManager> memoryManager;
         std::unique_ptr<IO::AssetManager> assetManager;
+        std::unique_ptr<SceneManager> sceneManager;
         std::unique_ptr<EventManager> eventManager;
+        std::unique_ptr<IPlatform> platformManager;
     };
 } // namespace LaurelEye

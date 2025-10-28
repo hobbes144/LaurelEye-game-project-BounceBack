@@ -4,7 +4,8 @@
 
 namespace LaurelEye {
     void assetMeshTest() {
-        IO::AssetManager assetManager;
+        EngineContext context;
+        IO::AssetManager assetManager(context);
         assetManager.registerImporter("obj", std::make_unique<IO::MeshImporter>());
         assetManager.registerImporter("fbx", std::make_unique<IO::MeshImporter>());
 
@@ -26,7 +27,8 @@ namespace LaurelEye {
     }
 
     void assetImageTest() {
-        IO::AssetManager assetManager;
+        EngineContext context;
+        IO::AssetManager assetManager(context);
         assetManager.registerImporter("png", std::make_unique<IO::ImageImporter>());
         assetManager.registerImporter("jpg", std::make_unique<IO::ImageImporter>());
 
@@ -48,7 +50,8 @@ namespace LaurelEye {
     }
 
     void assetCacheTest() {
-        IO::AssetManager assetManager;
+        EngineContext context;
+        IO::AssetManager assetManager(context);
         assetManager.registerImporter("png", std::make_unique<IO::ImageImporter>());
 
         try {

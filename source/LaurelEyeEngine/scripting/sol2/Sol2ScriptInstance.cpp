@@ -1,5 +1,6 @@
 ﻿#include "LaurelEyeEngine/scripting/sol2/Sol2ScriptInstance.h"
 #include "LaurelEyeEngine/scripting/sol2/Sol2API.h"
+#include "LaurelEyeEngine/io/FileSystem.h"
 
 namespace LaurelEye::Scripting {
 
@@ -7,9 +8,10 @@ namespace LaurelEye::Scripting {
         : lua(luaState), env(luaState, sol::create, luaState.globals()), owner(owner_) {
 
         Sol2API::registerEnvironment(env, owner);
-
+        // TODO - somehow let AssetManager do this?
+        auto fullPath = IO::resolve(scriptPath);
         try {
-            lua.script_file(scriptPath, env);
+            lua.script_file(fullPath.string(), env);
         }
         catch ( const sol::error& e ) {
             std::cerr << "[Lua] script_file error: " << e.what() << std::endl;

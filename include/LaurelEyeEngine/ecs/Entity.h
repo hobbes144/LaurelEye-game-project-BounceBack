@@ -80,6 +80,8 @@ namespace LaurelEye {
             *this = Entity();
         }
 
+        const std::vector<std::unique_ptr<IComponent>>& getComponents() const { return components; }
+
     private:
         std::string name;
         unsigned int id;

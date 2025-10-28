@@ -1,8 +1,33 @@
 ﻿#include "LaurelEyeEngine/io/AssetManager.h"
 #include "LaurelEyeEngine/io/Assets.h"
-#include <stb_image.h>
+#include "LaurelEyeEngine/io/FileSystem.h"
+#include "LaurelEyeEngine/io/importers/MeshImporter.h"
+#include "LaurelEyeEngine/io/importers/ImageImporter.h"
+#include "LaurelEyeEngine/io/importers/JsonImporter.h"
+
+#include "LaurelEyeEngine/graphics/RenderSystem.h"
 
 namespace LaurelEye::IO {
+    void AssetManager::initialize() {
+        // 3D models
+        registerImporter("obj", std::make_unique<IO::MeshImporter>());
+        registerImporter("fbx", std::make_unique<IO::MeshImporter>());
+
+        assert(context && "AssetManager: No EngineContext provided. Cannot locate RenderSystem for texture importing.");
+
+        Graphics::RenderSystem* renderSystem = context->getService<Graphics::RenderSystem>();
+        if ( renderSystem ) {
+            auto imgImporter = std::make_shared<IO::ImageImporter>();
+            imgImporter->registerRenderResources(renderSystem->getRenderResources());
+            registerImporter("png", imgImporter);
+            registerImporter("jpg", imgImporter);
+            registerImporter("jpeg", imgImporter);
+        }
+
+        // Json
+        registerImporter("json", std::make_unique<IO::JsonImporter>());
+    }
+
     void AssetManager::registerImporter(const std::string& extension, std::shared_ptr<IAssetImporter> importer) {
         std::string lowerExt = normalizeExtension(extension);
         importers[lowerExt] = importer;
@@ -13,16 +38,17 @@ namespace LaurelEye::IO {
         if ( auto cached = assetCache.find(path); cached != assetCache.end() ) {
             return cached->second;
         }
-
+       
         // If it hasn't been used before, look for the importer to import it by its extension
         std::string ext = extractExtension(path);
         auto it = importers.find(ext);
         if ( it == importers.end() ) {
             throw std::runtime_error("No importer registered for extension: " + ext);
         }
-
+        // Use this to always find the correct path to load (source based loading)
+        auto fullPath = resolve(path);
         // Call the importer's import method
-        auto asset = it->second->import(path);
+        auto asset = it->second->import(fullPath.string());
         if ( asset ) {
             assetCache[path] = asset;
         }

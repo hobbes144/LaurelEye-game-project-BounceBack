@@ -125,6 +125,10 @@ add_custom_command(TARGET LaurelEyeEngine POST_BUILD
         "${PROJECT_SOURCE_DIR}/assets"
         $<TARGET_FILE_DIR:LaurelEyeEngine>/assets)
 
+target_compile_definitions(LaurelEyeEngine
+    PUBLIC PROJECT_ROOT_DIR="${PROJECT_SOURCE_DIR}"
+)
+
 # if (WIN32)
 #     add_custom_command(TARGET LaurelEyeEngine POST_BUILD
 #     COMMAND ${CMAKE_COMMAND} -E copy_if_different

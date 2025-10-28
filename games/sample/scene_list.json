@@ -1,0 +1,13 @@
+﻿{
+    "initialScene": "SampleScene1",
+    "scenes": [
+        {
+            "name": "SampleScene1",
+            "path": "scenes/sample_scene_one.scene.json"
+        },
+        {
+            "name": "SampleScene2",
+            "path": "scenes/sample_scene_two.scene.json"
+        }
+    ]
+}

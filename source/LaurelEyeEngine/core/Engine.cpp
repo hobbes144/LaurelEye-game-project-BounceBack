@@ -55,11 +55,11 @@ namespace LaurelEye {
         
         ctx = std::make_unique<EngineContext>();
 
-        resourceCoordinator = std::make_unique<ResourceCoordinator>();
-        systemCoordinator = std::make_unique<SystemCoordinator>();
+        resourceCoordinator = std::make_unique<ResourceCoordinator>(*ctx, engineConfig);
+        systemCoordinator = std::make_unique<SystemCoordinator>(*ctx, engineConfig);
 
-        resourceCoordinator->initialize(*ctx, engineConfig);
-        systemCoordinator->initialize(*ctx, engineConfig);
+        resourceCoordinator->initialize();
+        systemCoordinator->initialize();
     }
 
     void Engine::shutdown() {

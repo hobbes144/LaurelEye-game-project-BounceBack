@@ -11,7 +11,10 @@
 #pragma once
 #include <fstream>
 #include <sstream>
+#include <rapidjson/document.h>
+#include <rapidjson/istreamwrapper.h>
 #include "LaurelEyeEngine/io/Assets.h"
+#include <rapidjson/error/en.h>
 #include "LaurelEyeEngine/io/IAssetImporter.h"
 
 namespace LaurelEye::IO {

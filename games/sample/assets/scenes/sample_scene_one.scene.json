@@ -1,0 +1,148 @@
+﻿{
+    "settings": {
+        "resetOnLoad": true
+    },
+    "entities": [
+        {
+            "name": "Ground",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, -1.0, 0.0 ],
+                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "scale": [ 50.0, 1.0, 50.0 ]
+                },
+                "Render3D": {
+                    "meshes": [
+                        {
+                            "name": "squareMesh",
+                            "file": "meshes/square.obj"
+                        }
+                    ],
+                    "materials": [
+                        {
+                            "name": "testMat",
+                            "properties": {
+                                "testString": "def",
+                                "testVec2": [ 1, 2 ],
+                                "testInt": 1
+                            }
+                        }
+                    ]
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 50.0,
+                            "y": 1.0,
+                            "z": 50.0
+                        }
+                    },
+                    "mass": 0.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.5,
+                    "restitution": 0.0,
+                    "collisionGroup": 1,
+                    "collisionMask": 4294967295,
+                    "gravityScale": 0.0
+                }
+            }
+        },
+        {
+            "name": "Camera",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, -1.0, 0.0 ],
+                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "scale": [ 50.0, 1.0, 50.0 ]
+                },
+                "Camera": {
+
+                }
+            }
+        },
+        {
+            "name": "DirectionalLight",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, -1.0, 0.0 ],
+                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Light": {
+                    "type": "Directional",
+                    "direction": [ 0.75, -1.0, 0.75 ],
+                    "intensity": 4.0,
+                    "color": [ 1.0, 1.0, 1.0 ]
+                }
+            }
+        },
+        {
+            "name": "AmbientLight",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 0.0, 0.0 ],
+                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Light": {
+                    "type": "Ambient",
+                    "intensity": 0.3,
+                    "color": [ 1.0, 1.0, 1.0 ]
+                }
+            }
+        },
+        {
+            "name": "Player",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 10.0, 0.0 ],
+                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Render3D": {
+
+                },
+                "Physics": {
+                    "type": "Dynamic",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        },
+                        "radius": 0.5,
+                        "height": 1.0
+                    },
+                    "mass": 1.0,
+                    "inertia": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "centerOfMass": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "linearDamping": 0.05,
+                    "angularDamping": 0.1,
+                    "friction": 0.5,
+                    "restitution": 0.1,
+                    "collisionGroup": 1,
+                    "collisionMask": 4294967295,
+                    "useCCD": true,
+                    "ccdMotionThreshold": 0.01,
+                    "ccdSweptSphereRadius": 1.0,
+                    "gravityScale": 1.0
+                },
+                "Script": {
+                    "path": "scripts/player_script.lua"
+                }
+            }
+        }
+    ]
+}

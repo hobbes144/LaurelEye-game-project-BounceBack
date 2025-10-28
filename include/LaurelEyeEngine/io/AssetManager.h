@@ -18,11 +18,16 @@
 #include <unordered_map>
 #include "LaurelEyeEngine/io/IAsset.h"
 #include "LaurelEyeEngine/io/IAssetImporter.h"
+#include "LaurelEyeEngine/core/EngineContext.h"
 
 namespace LaurelEye::IO {
 
     class AssetManager {
     public:
+        AssetManager(EngineContext& ctx)
+            : context(&ctx) {}
+
+        void initialize();
         /// @brief Given an extension for a file type, and an asset importer, update our importers map
         /// @param extension The actual extension type of the data files to be imported. I.e.; ".obj"
         /// @param importer The importer class we use to import. I.e., a MeshImporter can interpret a .obj correctly.
@@ -36,6 +41,8 @@ namespace LaurelEye::IO {
         /// @param path The path used to load the asset
         void unload(const std::string& path); 
     private:
+        // Context for other engine services
+        EngineContext* context = nullptr;
         // Cached assets, easy lookup if they've been encountered before. Maps filepath to the actual IAsset child
         std::unordered_map<std::string, std::shared_ptr<IAsset>> assetCache;
         // Registered importers. Specific for extension type. Maps extension string to the correlating importer

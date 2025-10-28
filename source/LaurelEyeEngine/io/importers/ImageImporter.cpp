@@ -1,8 +1,7 @@
-﻿#include "LaurelEyeEngine/io/importers/ImageImporter.h"
+﻿#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
-
+#include "LaurelEyeEngine/io/importers/ImageImporter.h"
 #include "LaurelEyeEngine/graphics/resources/RenderResources.h"
 #include "LaurelEyeEngine/graphics/resources/Texture.h"
 #include "LaurelEyeEngine/io/Assets.h"

@@ -16,13 +16,13 @@
 #include "LaurelEyeEngine/graphics/RenderSystem.h"
 #include "LaurelEyeEngine/physics/PhysicsSystem.h"
 #include "LaurelEyeEngine/audio/FModAudioManager.h"
-#include "LaurelEyeEngine/io/AssetManager.h"
-#include "LaurelEyeEngine/io/importers/ImageImporter.h"
+#include "LaurelEyeEngine/scripting/ScriptSystem.h"
 
 namespace LaurelEye {
     class SystemCoordinator {
     public:
-        void initialize(EngineContext& ctx, const EngineConfig& engineConfig);
+        SystemCoordinator(EngineContext& ctx, const EngineConfig& engineConfig);
+        void initialize();
         void update(float deltaTime);
         void updateFixed(float deltaTimeFixed);
         void shutdown();
@@ -34,5 +34,6 @@ namespace LaurelEye {
         std::unique_ptr<Graphics::RenderSystem> renderSystem;
         std::unique_ptr<Physics::PhysicsSystem> physicsSystem;
         std::unique_ptr<Audio::FModAudioManager> audioSystem;
+        std::unique_ptr<Scripting::ScriptSystem> scriptSystem;
     };
 } // namespace LaurelEye
