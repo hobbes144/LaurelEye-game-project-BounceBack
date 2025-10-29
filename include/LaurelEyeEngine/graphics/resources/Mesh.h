@@ -12,17 +12,17 @@
 
 #pragma once
 
-#include "LaurelEyeEngine/math/Transform.h"
 #include "LaurelEyeEngine/graphics/resources/GeometryBuffer.h"
+#include "LaurelEyeEngine/math/Transform.h"
 
 // TODO: Move GL operations to the Device
 #include <glad/glad.h>
 
+#include "assimp/mesh.h"
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
-
 
 namespace LaurelEye::Graphics {
     /// @class Mesh
@@ -172,6 +172,8 @@ namespace LaurelEye::Graphics {
         // static void processMesh(aiMesh* mesh, Attributes& newMeshData, std::vector<unsigned int>& indices);
         /// @brief Cache of loaded meshes for reuse and deduplication.
         static std::unordered_map<std::string, std::shared_ptr<Mesh>> loadedMeshes;
+
+        static void processMesh(aiMesh* mesh, Attributes& newMeshData, std::vector<unsigned int>& indices);
 
         /// @brief Cached built-in primitive meshes (Square, Cube, Sphere).
         static std::unordered_map<Type, std::shared_ptr<Mesh>> shapeMeshes;

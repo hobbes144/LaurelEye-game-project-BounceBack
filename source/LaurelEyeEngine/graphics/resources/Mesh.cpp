@@ -22,6 +22,10 @@
 
 #include "LaurelEyeEngine/graphics/resources/Mesh.h"
 
+#include "assimp/Importer.hpp"
+#include "assimp/postprocess.h"
+#include "assimp/scene.h"
+
 namespace LaurelEye::Graphics {
 
     std::unordered_map<Mesh::Type, std::shared_ptr<Mesh>> Mesh::shapeMeshes;
@@ -174,45 +178,6 @@ namespace LaurelEye::Graphics {
         return newMesh;
     }
 
-    // std::shared_ptr<Mesh> Mesh::createSquareMesh(const std::string& name)
-    //{
-    //   // Generate vertex data for a rectangle
-    //   // We'll use a unit rectangle centered at the origin
-    //   std::vector<float> vertices = {
-    //     // Position (x, y, z)
-    //     -0.5f, -0.5f, 0.0f,      0.0f, 0.0f,  // Bottom-left
-    //      0.5f, -0.5f, 0.0f,      1.0f, 0.0f,  // Bottom-right
-    //      0.5f,  0.5f, 0.0f,      1.0f, 1.0f,  // Top-right
-    //     -0.5f,  0.5f, 0.0f,      0.0f, 1.0f   // Top-left
-    //   };
-    //
-    //
-    //   // Generate indices for two triangles
-    //   std::vector<unsigned int> indices = {
-    //       0, 1, 2,  // First triangle
-    //       2, 3, 0   // Second triangle
-    //   };
-    //
-    //   Mesh::Attributes newMeshData;
-    //
-    //   newMeshData[GeometryBuffer::AttributeType::Position] = {
-    //     vertices,
-    //     3
-    //   };
-    //
-    //   newMeshData[GeometryBuffer::AttributeType::TexCoord] = {
-    //     vertices,
-    //     2
-    //   };
-    //
-    //   std::shared_ptr<Mesh> newMesh = std::make_shared<Mesh>(
-    //     name + "_Mesh",
-    //     newMeshData,
-    //     indices,
-    //     static_cast<GLsizei>(5 * sizeof(float)));
-    //   return newMesh;
-    // }
-
     Mesh::Attributes Mesh::combineAttributes(const std::vector<Attributes>& attributesList) {
         Attributes combinedAttributes;
         bool isFirst = true;
@@ -242,6 +207,109 @@ namespace LaurelEye::Graphics {
     }
 
     std::unordered_map<std::string, std::shared_ptr<Mesh>> Mesh::loadedMeshes;
+
+    std::shared_ptr<Mesh> Mesh::loadMesh(const std::string& filename) {
+        // if already have this file, return the cached mesh.
+        if ( loadedMeshes.find(filename) != loadedMeshes.end() )
+            return loadedMeshes[filename];
+
+        Assimp::Importer importer;
+        const aiScene* scene = importer.ReadFile(filename,
+                                                 aiProcess_Triangulate |
+                                                     aiProcess_FlipUVs |
+                                                     aiProcess_GenNormals |
+                                                     aiProcess_CalcTangentSpace);
+
+        if ( !scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode ) {
+            std::cerr << "Assimp error loading " << filename << ": "
+                      << importer.GetErrorString() << std::endl;
+            return nullptr;
+        }
+
+        std::vector<Attributes> meshesAttributes;
+        std::vector<unsigned int> combinedIndices;
+        unsigned int vertexOffset = 0;
+
+        for ( unsigned int i = 0; i < scene->mNumMeshes; i++ ) {
+            aiMesh* aMesh = scene->mMeshes[i];
+            Attributes tempAttributes;
+            tempAttributes[GeometryBuffer::AttributeType::Position] = std::make_pair(std::vector<float>(), 3);
+            tempAttributes[GeometryBuffer::AttributeType::Normal] = std::make_pair(std::vector<float>(), 3);
+            tempAttributes[GeometryBuffer::AttributeType::TexCoord] = std::make_pair(std::vector<float>(), 2);
+            tempAttributes[GeometryBuffer::AttributeType::Tangent] = std::make_pair(std::vector<float>(), 3);
+
+            std::vector<unsigned int> meshIndices;
+            // process the individual mesh.
+            processMesh(aMesh, tempAttributes, meshIndices);
+
+            // adjust the indices from this mesh by the current vertex offset.
+            combineIndices(vertexOffset, combinedIndices, meshIndices);
+
+            // Update vertexOffset
+            size_t numVertices = tempAttributes[GeometryBuffer::AttributeType::Position].first.size() / 3;
+            vertexOffset += static_cast<unsigned int>(numVertices);
+
+            meshesAttributes.push_back(tempAttributes);
+        }
+
+        // combine the per‑mesh attribute data into one Attributes object.
+        Attributes combinedAttributes = combineAttributes(meshesAttributes);
+
+        // create the new mesh instance using the combined attributes and indices.
+        std::shared_ptr<Mesh> newMesh = std::make_shared<Mesh>(filename + "_Mesh", combinedAttributes, combinedIndices, 0);
+
+        // cache the loaded mesh.
+        loadedMeshes[filename] = newMesh;
+        return newMesh;
+    }
+
+    void Mesh::processMesh(aiMesh* mesh, Attributes& newMeshData, std::vector<unsigned int>& indices) {
+        // Reserve space based on the number of vertices.
+        newMeshData[GeometryBuffer::AttributeType::Position].first.reserve(mesh->mNumVertices * 3);
+        newMeshData[GeometryBuffer::AttributeType::Normal].first.reserve(mesh->mNumVertices * 3);
+        newMeshData[GeometryBuffer::AttributeType::TexCoord].first.reserve(mesh->mNumVertices * 2);
+        newMeshData[GeometryBuffer::AttributeType::Tangent].first.reserve(mesh->mNumVertices * 3);
+
+        // Process vertices.
+        for ( unsigned int i = 0; i < mesh->mNumVertices; i++ ) {
+            // Position.
+            newMeshData[GeometryBuffer::AttributeType::Position].first.push_back(mesh->mVertices[i].x);
+            newMeshData[GeometryBuffer::AttributeType::Position].first.push_back(mesh->mVertices[i].y);
+            newMeshData[GeometryBuffer::AttributeType::Position].first.push_back(mesh->mVertices[i].z);
+
+            // Normal.
+            if ( mesh->HasNormals() ) {
+                newMeshData[GeometryBuffer::AttributeType::Normal].first.push_back(mesh->mNormals[i].x);
+                newMeshData[GeometryBuffer::AttributeType::Normal].first.push_back(mesh->mNormals[i].y);
+                newMeshData[GeometryBuffer::AttributeType::Normal].first.push_back(mesh->mNormals[i].z);
+            }
+
+            // Texture Coordinates (first set only).
+            if ( mesh->HasTextureCoords(0) ) {
+                newMeshData[GeometryBuffer::AttributeType::TexCoord].first.push_back(mesh->mTextureCoords[0][i].x);
+                newMeshData[GeometryBuffer::AttributeType::TexCoord].first.push_back(mesh->mTextureCoords[0][i].y);
+            }
+            else {
+                newMeshData[GeometryBuffer::AttributeType::TexCoord].first.push_back(0.0f);
+                newMeshData[GeometryBuffer::AttributeType::TexCoord].first.push_back(0.0f);
+            }
+
+            // Tangent.
+            if ( mesh->HasTangentsAndBitangents() ) {
+                newMeshData[GeometryBuffer::AttributeType::Tangent].first.push_back(mesh->mTangents[i].x);
+                newMeshData[GeometryBuffer::AttributeType::Tangent].first.push_back(mesh->mTangents[i].y);
+                newMeshData[GeometryBuffer::AttributeType::Tangent].first.push_back(mesh->mTangents[i].z);
+            }
+        }
+
+        // Process indices.
+        for ( unsigned int i = 0; i < mesh->mNumFaces; i++ ) {
+            aiFace face = mesh->mFaces[i];
+            for ( unsigned int j = 0; j < face.mNumIndices; j++ ) {
+                indices.push_back(face.mIndices[j]);
+            }
+        }
+    }
 
     void Mesh::pushquad(std::vector<unsigned int>& Tri, int i, int j, int k, int l) {
         Tri.push_back(i);
@@ -400,71 +468,6 @@ namespace LaurelEye::Graphics {
             static_cast<GLsizei>(0));
         return newMesh;
     }
-
-    // std::shared_ptr<Mesh> Mesh::createCubeMesh(const std::string& name)
-    //{
-    //   // Generate vertex data for a rectangle
-    //   // We'll use a unit rectangle centered at the origin
-    //   std::vector<float> vertices = {
-    //     // Box corners in normalized coordinates (-0.5 to 0.5)
-    //     -0.5f, -0.5f, -0.5f,   1.0f, 0.0f,  // Bottom-left-Back    //  0 A
-    //      0.5f, -0.5f, -0.5f,   0.0f, 0.0f,  // Bottom-right-Back   //  1 B
-    //      0.5f,  0.5f, -0.5f,   0.0f, 1.0f,  // Top-right-Back      //  2 C
-    //     -0.5f,  0.5f, -0.5f,   1.0f, 1.0f,  // Top-left-Back       //  3 D
-    //     -0.5f, -0.5f, 0.5f,   0.0f, 0.0f,  // Bottom-left-Front      //  4 E
-    //      0.5f, -0.5f, 0.5f,   1.0f, 0.0f,  // Bottom-right-Front     //  5 F
-    //      0.5f,  0.5f, 0.5f,   1.0f, 1.0f,  // Top-right-Front        //  6 G
-    //     -0.5f,  0.5f, 0.5f,   0.0f, 1.0f,  // Top-left-Front         //  7 H
-    //     -0.5f, -0.5f, -0.5f,   0.0f, 0.0f,  // Bottom-left-Back    //  8 A
-    //      0.5f, -0.5f, -0.5f,   1.0f, 0.0f,  // Bottom-right-Back   //  9 B
-    //      0.5f,  0.5f, -0.5f,   1.0f, 1.0f,  // Top-right-Back      // 10 C
-    //     -0.5f,  0.5f, -0.5f,   0.0f, 1.0f,  // Top-left-Back       // 11 D
-    //     -0.5f, -0.5f, 0.5f,   0.0f, 1.0f,  // Bottom-left-Front      // 12 E
-    //      0.5f, -0.5f, 0.5f,   1.0f, 1.0f,  // Bottom-right-Front     // 13 F
-    //      0.5f,  0.5f, 0.5f,   1.0f, 0.0f,  // Top-right-Front        // 14 G
-    //     -0.5f,  0.5f, 0.5f,   0.0f, 0.0f,  // Top-left-Front         // 15 H
-    //     -0.5f, -0.5f, 0.5f,   1.0f, 0.0f,  // Bottom-left-Front      // 16 E
-    //      0.5f, -0.5f, 0.5f,   0.0f, 0.0f,  // Bottom-right-Front     // 17 F
-    //      0.5f,  0.5f, 0.5f,   0.0f, 1.0f,  // Top-right-Front        // 18 G
-    //     -0.5f,  0.5f, 0.5f,   1.0f, 1.0f,  // Top-left-Front         // 19 H
-    //   };
-    //
-    //
-    //   // Generate indices for two triangles
-    //   std::vector<unsigned int> indices = {
-    //     0, 1, 2,  // Bottom Right Back triangle     // 0
-    //     2, 3, 0,  // Top left Back triangle          // 3
-    //     4, 5, 6,  // Bottom Right Front triangle          // 6
-    //     6, 7, 4,  // Top Left Front triangle           // 9
-    //     8, 9, 13,  // Bottom Right Bottom triangle     // 12
-    //     13, 12, 8,  // Top left Bottom triangle          // 15
-    //     15, 14, 10,  // Bottom Right Top triangle          // 18
-    //     10, 11, 15,  // Top Left Top triangle           // 21
-    //     16, 8, 11,  // Bottom Right Left triangle     // 24
-    //     11, 19, 16,  // Top left Left triangle          // 27
-    //     10, 9, 17,  // Bottom Right Right triangle          // 30
-    //     17, 18, 10,  // Top Left Right triangle           // 33
-    //   };
-    //
-    //   Mesh::Attributes newMeshData;
-    //
-    //   newMeshData[GeometryBuffer::AttributeType::Position] = {
-    //     vertices,
-    //     3
-    //   };
-    //
-    //   newMeshData[GeometryBuffer::AttributeType::TexCoord] = {
-    //     vertices,
-    //     2
-    //   };
-    //
-    //   std::shared_ptr<Mesh> newMesh = std::make_shared<Mesh>(
-    //     name + "_Mesh",
-    //     newMeshData,
-    //     indices,
-    //     static_cast<GLsizei>(5 * sizeof(float)));
-    //   return newMesh;
-    // }
 
     std::shared_ptr<Mesh> Mesh::createMesh(const std::string& name, Type type) {
         switch ( type ) {

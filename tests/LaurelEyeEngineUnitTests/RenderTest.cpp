@@ -30,6 +30,10 @@ namespace LaurelEye {
         Physics::PhysicsSystem physicsSystem;
         physicsSystem.initialize();
 
+        // // === Load player mesh ===
+        // auto asset = assetManager.load(std::string(TEST_MEDIA_DIR) + "/item-box.fbx");
+        // auto mesh = std::dynamic_pointer_cast<IO::MeshAsset>(asset);
+
         // === Create Ground Entity ===
         auto ground = std::make_unique<Entity>("Ground");
         auto groundT = ground->addComponent<TransformComponent>();
@@ -71,18 +75,34 @@ namespace LaurelEye {
         renderSystem.registerComponent(groundRC);
 
         // === Create Cube Entity ===
-        auto cube = std::make_unique<Entity>("Cube");
+        auto cube = std::make_unique<Entity>("Player");
         auto cubeT = cube->addComponent<TransformComponent>();
         Transform cubeLocal;
         cubeLocal.setPosition(0.0f, 10.0f, 0.0f);
-        cubeLocal.setScaling(1.0f, 1.0f, 1.0f);
+        cubeLocal.setScaling(0.05f, 0.05f, 0.05f);
         cubeT->setLocalTransform(cubeLocal);
         auto cubePB = cube->addComponent<Physics::PhysicsBodyComponent>(
             Physics::PhysicsBodyData::DynamicBox({1.0f, 1.0f, 1.0f}, 1.0f));
         auto cubeRC = cube->addComponent<Graphics::Renderable3DComponent>();
-        cubeRC->SetMesh(Graphics::Mesh::getShapeMesh(Graphics::Mesh::Cube));
+        // cubeRC->SetMesh(Graphics::Mesh::loadMesh(std::string(TEST_MEDIA_DIR) + "/models/viking_C.fbx"));
+        cubeRC->SetMesh(Graphics::Mesh::loadMesh(std::string(TEST_MEDIA_DIR) + "/models/roman_D.fbx"));
         cubeRC->SetMaterial(std::make_shared<Graphics::Material>());
-        cubeRC->GetMaterial()->setProperty<int>("useTexture", 0);
+        cubeRC->GetMaterial()->setProperty<int>("useTexture", 1);
+
+        // retrieve the GPU handle (importer/register stores texture under the full path)
+        // const std::string vikingTexPath = std::string(TEST_MEDIA_DIR) + "/textures/viking_blue_C_texture.jpg";
+        // auto vikingTex = assetManager.load(vikingTexPath);
+        // auto vikingTexHandle = renderSystem.getRenderResources()->texture(vikingTex->getName());
+        // cubeRC->GetMaterial()->setTexture("mainTexture", vikingTexHandle);
+        const std::string romanTexPath = std::string(TEST_MEDIA_DIR) + "/textures/roman_blue_D_texture.jpg";
+        auto romanTex = assetManager.load(romanTexPath);
+        auto romanTexHandle = renderSystem.getRenderResources()->texture(romanTex->getName());
+
+        cubeRC->GetMaterial()->setTexture("mainTexture", romanTexHandle);
+        // Set shader flags / scale via PropertyMap (uniforms)
+        cubeRC->GetMaterial()->setProperty<int>("useTexture", 1);
+        cubeRC->GetMaterial()->setProperty<Vector2>("mainTextureScale", Vector2(1.0f));
+
 
         cubeRC->GetMaterial()->setProperty<int>("objectId", 9);
         cubeRC->GetMaterial()->setProperty<Vector3>("diffuse", Vector3(0.5f, 0.5f, 0.1f));
@@ -138,7 +158,7 @@ namespace LaurelEye {
         auto Camera = std::make_unique<Entity>("Camera");
         auto CameraT = Camera->addComponent<TransformComponent>();
         Transform cameraLocal;
-        cameraLocal.setPosition(-50.f, 15.f, 0.0f);
+        cameraLocal.setPosition(0.f, 15.f, 50.0f);
         cameraLocal.setScaling(1.0f, 1.0f, 1.0f);
         CameraT->setLocalTransform(cameraLocal);
 
@@ -146,8 +166,8 @@ namespace LaurelEye {
 
         auto CameraComponent = Camera->addComponent<Graphics::CameraComponent>();
         CameraComponent->setPositionRotation(
-            Vector3(-50.f, 15.f, 0.f),
-            Matrix4::lookAt(Vector3(-50.f, 15.f, 0.f), Vector3(0.f)).toQuaternion());
+            Vector3(0.f, 15.f, 50.f),
+            Matrix4::lookAt(Vector3(0.f, 15.f, 50.f), Vector3(0.f)).toQuaternion());
         CameraComponent->setPerspectiveProjection(45.0f * 3.14159f / 180.0f, 1280.f / 720.f, 0.1f, 1000.0f);
 
         renderSystem.registerComponent(CameraComponent);
