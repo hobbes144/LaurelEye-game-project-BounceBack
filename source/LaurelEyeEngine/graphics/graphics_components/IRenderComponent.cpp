@@ -4,6 +4,6 @@
 
 namespace LaurelEye::Graphics {
     IRenderComponent::~IRenderComponent() {
-        rs->deregisterComponent(this);
+        //rs->deregisterComponent(this);
     }
 } // namespace LaurelEye::Graphics

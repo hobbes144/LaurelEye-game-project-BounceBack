@@ -10,7 +10,7 @@ namespace LaurelEye::Scripting {
     }
 
     void Sol2State::shutdown() {
-
+        lua.collect_garbage();
     }
 
     std::unique_ptr<IScriptInstance> Sol2State::createInstance(const std::string& path, LaurelEye::Entity* owner) {

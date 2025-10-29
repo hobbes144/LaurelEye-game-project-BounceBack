@@ -29,7 +29,10 @@ namespace LaurelEye::Scripting {
                 comp->getScriptInstance()->onShutdown();
             }
         }
-        scriptEngineState->shutdown();
+        if ( scriptEngineState ) {
+            scriptEngineState->shutdown();
+            scriptEngineState.reset();
+        }
     }
 
     void ScriptSystem::registerComponent(const ComponentPtr comp){

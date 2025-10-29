@@ -43,6 +43,8 @@ namespace LaurelEye::Scripting{
         sol::environment env;
         sol::function startFunc, updateFunc, shutdownFunc;
         LaurelEye::Entity* owner;
+
+        void invalidate();
     };
 
 } // namespace LaurelEye

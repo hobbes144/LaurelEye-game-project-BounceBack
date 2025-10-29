@@ -32,6 +32,13 @@ namespace LaurelEye::Scripting {
 
     void Sol2ScriptInstance::onShutdown() {
         if ( shutdownFunc.valid() ) shutdownFunc();
+        invalidate();
     }
-
+    void Sol2ScriptInstance::invalidate() {
+        startFunc = sol::nil;
+        updateFunc = sol::nil;
+        shutdownFunc = sol::nil;
+        env = sol::nil;
+        owner = nullptr;
+    }
 } // namespace LaurelEye::Scripting

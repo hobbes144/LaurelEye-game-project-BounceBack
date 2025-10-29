@@ -17,6 +17,7 @@
 #include "LaurelEyeEngine/core/EngineContext.h"
 #include "LaurelEyeEngine/core/ResourceCoordinator.h"
 #include "LaurelEyeEngine/core/SystemCoordinator.h"
+#include "LaurelEyeEngine/window/IWindow.h"
 
 namespace LaurelEye {
     class Engine {
@@ -45,6 +46,12 @@ namespace LaurelEye {
         std::unique_ptr<ResourceCoordinator> resourceCoordinator;
         // Handles lifecycles, interfacing, and ticking for systems
         std::unique_ptr<SystemCoordinator> systemCoordinator;
+
+        // For window lifecycle
+        // TODO - this is set once and static.
+        // We should have an event listener for window changes
+        // in order to set this dynamically
+        IWindow* currentWindow;
 
         // Whether or not the engine is actively running
         bool isRunning = false;

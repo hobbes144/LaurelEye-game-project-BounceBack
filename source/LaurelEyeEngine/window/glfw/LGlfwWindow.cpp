@@ -67,7 +67,7 @@ namespace LaurelEye {
     }
 
     bool LGlfwWindow::shouldClose() const {
-        return false;
+        return glfwWindowShouldClose(static_cast<GLFWwindow*>(nativeHandle));
     }
 
     NativeWindowHandle LGlfwWindow::getNativeHandle() {

@@ -21,7 +21,7 @@ namespace LaurelEye {
         frameController->setTargetFramerate(engineConfig.render.targetFramerate);
         frameController->setPhysicsTimestep(engineConfig.physics.fixedDeltaTime);
 
-        while ( isRunning ) {
+        while ( isRunning && !currentWindow->shouldClose()) {
             frameController->startFrame();
 
             // --- Fixed timestep physics loop ---
@@ -43,7 +43,7 @@ namespace LaurelEye {
             frameController->endFrame();
 
         }
-
+        stop();
         shutdown();
     }
 
@@ -60,10 +60,14 @@ namespace LaurelEye {
 
         resourceCoordinator->initialize();
         systemCoordinator->initialize();
+
+        currentWindow = ctx->getService<WindowManager>()->getWindow(0);
+        if ( !currentWindow ) throw std::exception("No window registered to Engine, closing.");
     }
 
     void Engine::shutdown() {
         std::cout << "Engine Shutting down" << std::endl;
+        currentWindow = nullptr;
         systemCoordinator->shutdown();
         resourceCoordinator->shutdown();
     }

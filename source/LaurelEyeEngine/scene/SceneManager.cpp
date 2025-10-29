@@ -13,10 +13,9 @@ namespace LaurelEye {
 
     SceneManager::~SceneManager() {
         
-        currentScene->shutdown(*context);
+        currentScene = nullptr;
         scenes.clear();
         sceneFilePaths.clear();
-        currentScene = nullptr;
         switchingScene = false;
     }
 

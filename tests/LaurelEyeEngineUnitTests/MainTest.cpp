@@ -70,8 +70,10 @@ int main() {
                 waiting = false; // leave the inner loop, go to next test
             }
 
-            if ( inputManager.isKeyPressed(LaurelEye::Key::Escape) ) {
-                return 0; // bail out of program early
+            if ( window->shouldClose() || inputManager.isKeyPressed(LaurelEye::Key::Escape) ) {
+                wm.shutdown();
+                glfwP.shutdown();
+                return 0; // break out and close program
             }
         }
     }

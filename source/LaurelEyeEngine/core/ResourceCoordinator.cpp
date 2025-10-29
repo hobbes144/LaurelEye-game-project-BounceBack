@@ -41,10 +41,10 @@ namespace LaurelEye {
 
     void ResourceCoordinator::shutdown() {
         std::cout << "Resources Shutting Down" << std::endl;
+        sceneManager.reset();
         inputManager.reset();
         windowManager.reset();
         memoryManager.reset();
         assetManager.reset();
-        sceneManager.reset();
     }
 } // namespace LaurelEye

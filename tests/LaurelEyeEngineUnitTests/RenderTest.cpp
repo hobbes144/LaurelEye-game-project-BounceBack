@@ -161,7 +161,7 @@ namespace LaurelEye {
             glfwP->update();
             pInputManager->update();
 
-            if ( pInputManager->isKeyPressed(LaurelEye::Key::Space) || pInputManager->isKeyPressed(LaurelEye::Key::Escape) ) {
+            if ( pInputManager->isKeyPressed(LaurelEye::Key::Space) || pInputManager->isKeyPressed(LaurelEye::Key::Escape) || window->shouldClose() ) {
                 groundRC->SetMaterial(nullptr);
                 groundRC->SetMesh(nullptr);
 
