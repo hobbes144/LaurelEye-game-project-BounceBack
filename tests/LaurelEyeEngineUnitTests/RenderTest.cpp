@@ -1,15 +1,17 @@
 ﻿#include "LaurelEyeEngine/graphics/graphics_components/AmbientLightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/DirectionalLightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/PointLightComponent.h"
+#include "LaurelEyeEngine/graphics/graphics_components/Renderable2DComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/Renderable3DComponent.h"
+#include "LaurelEyeEngine/graphics/graphics_components/UIComponent.h"
 #include "LaurelEyeEngine/graphics/RenderSystem.h"
 #include "LaurelEyeEngine/graphics/resources/Material.h"
 #include "LaurelEyeEngine/graphics/resources/Mesh.h"
-#include "LaurelEyeEngine/math/Quaternion.h"
 #include "LaurelEyeEngine/io/importers/ImageImporter.h"
+#include "LaurelEyeEngine/math/Quaternion.h"
 #include "TestDefinitions.h"
-#include <memory>
 #include <filesystem>
+#include <memory>
 
 namespace LaurelEye {
     void renderTestExtended(IWindow* window, GlfwPlatform* glfwP, InputManager* pInputManager) {
@@ -47,7 +49,7 @@ namespace LaurelEye {
         groundRC->SetMesh(Graphics::Mesh::getShapeMesh(Graphics::Mesh::Cube));
         groundRC->SetMaterial(std::make_shared<Graphics::Material>());
 
-        //Texture Addition for testing
+        // Texture Addition for testing
         LaurelEye::IO::AssetManager assetManager(context);
         assetManager.initialize();
 
@@ -102,7 +104,6 @@ namespace LaurelEye {
         // Set shader flags / scale via PropertyMap (uniforms)
         cubeRC->GetMaterial()->setProperty<int>("useTexture", 1);
         cubeRC->GetMaterial()->setProperty<Vector2>("mainTextureScale", Vector2(1.0f));
-
 
         cubeRC->GetMaterial()->setProperty<int>("objectId", 9);
         cubeRC->GetMaterial()->setProperty<Vector3>("diffuse", Vector3(0.5f, 0.5f, 0.1f));
@@ -173,6 +174,38 @@ namespace LaurelEye {
         renderSystem.registerComponent(CameraComponent);
 
         transformSystem.update(0.016f);
+
+        // === Create Sprite Entity ===
+        auto sprite = std::make_unique<Entity>("Ground");
+        auto spriteT = sprite->addComponent<TransformComponent>();
+        Transform spriteLocal;
+        spriteLocal.setPosition(-0.5f, 0.5f, 0.0f);
+        spriteLocal.setScaling(0.25f, 0.25f, 0.0f);
+        spriteT->setLocalTransform(spriteLocal);
+
+        auto spriteRC = sprite->addComponent<Graphics::UIComponent>();
+        spriteRC->SetMaterial(std::make_shared<Graphics::Material>());
+
+        // Texture Addition for testing
+        const std::string importPath1 = "tests/LaurelEyeEngineUnitTests/TestMedia/textures/test.png";
+        auto spriteTextureAsset = assetManager.load(importPath1);
+
+        // retrieve the GPU handle (importer/register stores texture under the full path)
+        auto handle1 = renderSystem.getRenderResources()->texture(groundTextureAsset->getName());
+        // Set shader flags / scale via PropertyMap (uniforms)
+        spriteRC->GetMaterial()->setProperty<int>("useTexture", 1);
+        spriteRC->GetMaterial()->setProperty<Vector2>("mainTextureScale", Vector2(1.0f));
+
+        // Bind the texture by name (generic). Name must match the sampler name in the shader.
+        // In your fragment shader the sampler is `mainTexture`, so use that name here.
+        spriteRC->GetMaterial()->setTexture("mainTexture", handle1);
+        // End Texture Addition
+
+        spriteRC->GetMaterial()->setProperty<int>("objectId", 13);
+        spriteRC->GetMaterial()->setProperty<float>("transparency", 1.0f);
+
+        transformSystem.registerComponent(spriteT);
+        renderSystem.registerUIComponent(spriteRC);
 
         // Simulation loop
         float dt = 1.0f / 60.0f; // 60 Hz

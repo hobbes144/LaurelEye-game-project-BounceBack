@@ -1,4 +1,4 @@
-/// @file   RenderSystem.h
+﻿/// @file   RenderSystem.h
 /// @author Anish Murthy
 /// @par    **DigiPen Email**
 ///     anish.murthy@digipen.edu
@@ -20,13 +20,14 @@
 
 
 // Temp
-#include "LaurelEyeEngine/graphics/renderpass/SingleBufferedDataPass.h"
-#include "LaurelEyeEngine/graphics/renderpass/SinglePass.h"
 #include "LaurelEyeEngine/graphics/graphics_components/AmbientLightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/CameraComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/DirectionalLightComponent.h"
-#include "LaurelEyeEngine/graphics/graphics_components/PointLightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/LightComponent.h"
+#include "LaurelEyeEngine/graphics/graphics_components/PointLightComponent.h"
+#include "LaurelEyeEngine/graphics/renderpass/SingleBufferedDataPass.h"
+#include "LaurelEyeEngine/graphics/renderpass/SinglePass.h"
+#include "LaurelEyeEngine/graphics/renderpass/UIPass.h"
 #include "LaurelEyeEngine/graphics/resources/Lights.h"
 
 #include <memory>
@@ -84,9 +85,11 @@ namespace LaurelEye::Graphics {
 
         /// \copydoc ISystem::registerComponent
         void registerComponent(const ComponentPtr component) override;
+        void registerUIComponent(const ComponentPtr component);
 
         /// \copydoc ISystem::deregisterComponent
         void deregisterComponent(const ComponentPtr component) override;
+        void deregisterUIComponent(const ComponentPtr component);
 
         /// @brief Applies configuration settings to the Render System.
         /// @param config The configuration containing backend and window parameters.
@@ -120,7 +123,6 @@ namespace LaurelEye::Graphics {
             return tempRenderResources.get();
         }
 
-
     private:
         /// @brief Configuration data used to initialize the render system.
         RenderSystemConfig config;
@@ -136,6 +138,8 @@ namespace LaurelEye::Graphics {
         std::unordered_map<unsigned int, LightComponent*> lightProperties;
         /// @brief Mapping of unique camera component IDs to their instances.
         std::unordered_map<unsigned int, CameraComponent*> cameraProperties;
+        /// @brief List of UI render components registered with the system.
+        std::vector<ComponentPtr> uiComponents;
 
         /// @brief Initializes the chosen graphics backend and its associated device.
         void graphicsBackendInit();
@@ -147,6 +151,7 @@ namespace LaurelEye::Graphics {
         /// @brief A single-pass rendering pipeline used for simple frame rendering.
         // std::shared_ptr<SinglePass> sp;
         std::shared_ptr<SingleBufferedDataPass> sp;
+        std::shared_ptr<UIPass> uiPass;
 
         // Temp pointers to support lights and camera updates
         std::unique_ptr<Entity> defaultCamera = nullptr;

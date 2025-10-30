@@ -17,8 +17,10 @@
 
 #include "LaurelEyeEngine/graphics/graphics_components/CameraComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/LightComponent.h"
+#include "LaurelEyeEngine/graphics/graphics_components/UIComponent.h"
 #include "LaurelEyeEngine/graphics/renderpass/SingleBufferedDataPass.h"
 #include "LaurelEyeEngine/graphics/renderpass/SinglePass.h"
+#include "LaurelEyeEngine/graphics/renderpass/UIPass.h"
 #include "LaurelEyeEngine/graphics/RenderSystem.h"
 #include "LaurelEyeEngine/graphics/resources/FrameContext.h"
 #include "LaurelEyeEngine/graphics/resources/RenderResources.h"
@@ -65,6 +67,9 @@ namespace LaurelEye::Graphics {
         // sp = std::make_shared<SinglePass>();
         sp = std::make_shared<SingleBufferedDataPass>();
         sp->setup(*tempRenderResources.get());
+
+        uiPass = std::make_shared<UIPass>();
+        uiPass->setup(*tempRenderResources.get());
 
         initDefaultCamera();
         initGlobalLightsBuffer();
@@ -134,6 +139,15 @@ namespace LaurelEye::Graphics {
 
         sp->execute(ctx);
 
+        // UI pass
+        FrameContext uiCtx{
+            0.1f,
+            *device.get(),
+            *tempRenderResources.get(),
+            uiComponents};
+
+        uiPass->execute(uiCtx);
+
         windowSurfaces[0]->endFrame();
     }
 
@@ -141,6 +155,7 @@ namespace LaurelEye::Graphics {
         // tempMesh = nullptr;
         // tempShader = nullptr;
         sp = nullptr;
+        uiPass = nullptr;
         ShaderManager::getInstance().unloadShaders();
     }
 
@@ -158,7 +173,7 @@ namespace LaurelEye::Graphics {
             // TODO: This is currently updating camera to the new component
             // each time. This should be changed when we handle multiple
             // cameras.
-            if (defaultCamera) {
+            if ( defaultCamera ) {
                 defaultCamera = nullptr;
             }
             camera = static_cast<CameraComponent*>(component);
@@ -183,6 +198,11 @@ namespace LaurelEye::Graphics {
         component->rs = this;
     }
 
+    void RenderSystem::registerUIComponent(const ComponentPtr component) {
+
+        uiComponents.push_back(component);
+    }
+
     void RenderSystem::deregisterComponent(const ComponentPtr component) {
         switch ( component->GetRenderCompType() ) {
         case RenderComponentType::Renderable3D:
@@ -194,7 +214,7 @@ namespace LaurelEye::Graphics {
         case RenderComponentType::PropertyCamera: {
             auto it = cameraProperties.find(component->GetRenderID());
             if ( it != cameraProperties.end() ) {
-                if (it->second->getInitStatus())
+                if ( it->second->getInitStatus() )
                     destroyCameraBuffer(it->second);
                 cameraProperties.erase(it);
             }
@@ -210,6 +230,12 @@ namespace LaurelEye::Graphics {
         default:
             break;
         }
+    }
+
+    void RenderSystem::deregisterUIComponent(const ComponentPtr component) {
+        uiComponents.erase(
+            std::remove(uiComponents.begin(), uiComponents.end(), component),
+            uiComponents.end());
     }
 
     /*!****************************************************************************
