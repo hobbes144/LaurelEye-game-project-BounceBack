@@ -10,6 +10,8 @@
 #include "LaurelEyeEngine/physics/PhysicsBodyComponent.h"
 #include "LaurelEyeEngine/physics/interfaces/PhysicsTypes.h"
 #include "LaurelEyeEngine/scripting/ScriptComponent.h"
+#include "LaurelEyeEngine/io/AssetManager.h"
+#include "LaurelEyeEngine/graphics/RenderSystem.h"
 #include <iostream>
 
 namespace LaurelEye {
@@ -24,7 +26,7 @@ namespace LaurelEye {
 
         // --- Pass 1: create all entities and add to scene ---
         createAndAddEntitiesToScene(scene, entities, entityMap);
-        
+
         // --- Pass 2: resolve parent-child transforms ---
         resolveParentChildTransforms(scene, entities, entityMap);
     }
@@ -133,18 +135,90 @@ namespace LaurelEye {
         }
         entity.addComponent<TransformComponent>(transform);
     }
-    
+
     void EntityFactory::setupRender3DComponent(Entity& entity, const rapidjson::Value& render3DData) {
         // Register renderer component
-        // TODO - this needs to not be hard coded
 
+        //Make the Renderable Component
         std::unique_ptr<Graphics::Renderable3DComponent> renderComponent = std::make_unique<Graphics::Renderable3DComponent>();
-        renderComponent->SetMesh(Graphics::Mesh::getShapeMesh(Graphics::Mesh::Cube));
-        renderComponent->SetMaterial(std::make_shared<Graphics::Material>());
-        renderComponent->GetMaterial()->setProperty<int>("objectId", 9);
-        renderComponent->GetMaterial()->setProperty<Vector3>("diffuse", Vector3(0.5f, 0.5f, 0.1f));
-        renderComponent->GetMaterial()->setProperty<Vector3>("specular", Vector3(0.009f));
-        renderComponent->GetMaterial()->setProperty<float>("shininess", 100.f);
+       //---Mesh---
+        //If a Mesh member is identified as a string
+        if (render3DData.HasMember("mesh") && render3DData["mesh"].IsObject()) {
+            const auto& mesh = render3DData["mesh"];
+            if ( mesh.HasMember("file") && mesh["file"].IsString() ) {
+                std::string meshPath = mesh["file"].GetString();
+                auto asset = context.getService<IO::AssetManager>()->load(assetPath + meshPath);
+                auto meshAsset = std::dynamic_pointer_cast<IO::MeshAsset>(asset);
+                if ( !meshAsset ) {
+                    throw((void)("EntityFactory::setupRender3DComponent - Asset '{}' is not a MeshAsset."), meshPath);
+                    return;
+                }
+                auto meshObj = Graphics::Mesh::createMeshFromAsset(meshAsset);
+                renderComponent->SetMesh(meshObj);
+            }
+
+            else if (mesh.HasMember("primitiveType") && mesh["primitiveType"].IsString()) {
+                std::string shapeType = mesh["primitiveType"].GetString();
+                if ( shapeType == "Square" ) {
+                    renderComponent->SetMesh(Graphics::Mesh::getShapeMesh(Graphics::Mesh::Square));
+                }
+                else if ( shapeType == "Cube" ) {
+                    renderComponent->SetMesh(Graphics::Mesh::getShapeMesh(Graphics::Mesh::Cube));
+                }
+                else if (shapeType == "Sphere") {
+                    renderComponent->SetMesh(Graphics::Mesh::getShapeMesh(Graphics::Mesh::Sphere));
+                }
+            }
+        }
+
+        //---Material---
+        if ( render3DData.HasMember("material") && render3DData["material"].IsObject() ) {
+            const auto& material = render3DData["material"];
+            auto pMat = std::make_shared<Graphics::Material>();
+            renderComponent->SetMaterial(pMat);
+
+            // TODO: Make this a loop over all properties.
+
+            if ( material.HasMember("texture") && material["texture"].IsString() ) {
+                std::string texturePath = material["texture"].GetString();
+                auto texAsset = context.getService<IO::AssetManager>()->load(assetPath + texturePath);
+                auto handle = context.getService<Graphics::RenderSystem>()->getRenderResources()->texture(texAsset->getName());
+
+                renderComponent->GetMaterial()->setTexture("mainTexture", handle);
+                renderComponent->GetMaterial()->setProperty<int>("useTexture", 1);
+            }
+            else {
+                renderComponent->GetMaterial()->setProperty<int>("useTexture", 0);
+            }
+
+            if ( material.HasMember("mainTextureScale") && material["mainTextureScale"].IsArray() ) {
+                const auto& scale = material["mainTextureScale"].GetArray();
+                renderComponent->GetMaterial()->setProperty<Vector2>(
+                    "mainTextureScale",
+                    Vector2({scale[0].GetFloat(), scale[1].GetFloat()}));
+            }
+            else {
+                renderComponent->GetMaterial()->setProperty<Vector2>("mainTextureScale", Vector2(1.0f));
+            }
+
+            if ( material.HasMember("objectId") && material["objectId"].IsInt() ) {
+                int objectId = material["objectId"].GetInt();
+                renderComponent->GetMaterial()->setProperty<int>("objectId", objectId);
+            }
+            if ( material.HasMember("diffuse") && material["diffuse"].IsArray() ) {
+                const auto& diff = material["diffuse"].GetArray();
+                renderComponent->GetMaterial()->setProperty<Vector3>("diffuse", Vector3(diff[0].GetFloat(), diff[1].GetFloat(), diff[2].GetFloat()));
+            }
+            if ( material.HasMember("specular") && material["specular"].IsArray() ) {
+                const auto& spec = material["specular"].GetArray();
+                renderComponent->GetMaterial()->setProperty<Vector3>("specular", Vector3(spec[0].GetFloat(), spec[1].GetFloat(), spec[2].GetFloat()));
+            }
+            if ( material.HasMember("shininess") && material["shininess"].IsFloat() ) {
+                float shininess = material["shininess"].GetFloat();
+                renderComponent->GetMaterial()->setProperty<float>("shininess", shininess);
+            }
+        }
+
         entity.addComponent<Graphics::Renderable3DComponent>(std::move(renderComponent));
     }
 
@@ -327,5 +401,6 @@ namespace LaurelEye {
     }
 
     #pragma endregion
+
 
 } // namespace LaurelEye

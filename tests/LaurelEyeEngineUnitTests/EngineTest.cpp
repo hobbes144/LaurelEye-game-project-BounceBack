@@ -37,7 +37,7 @@ namespace LaurelEye {
 
         resourceCoord.initialize();
         sysCoord.initialize();
-        
+
         auto transformSys = context.getService<TransformSystem>();
         assert(transformSys && "TransformSystem should be registered in EngineContext after initialization");
 

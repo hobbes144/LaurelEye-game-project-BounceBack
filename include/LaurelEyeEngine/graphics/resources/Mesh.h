@@ -14,6 +14,7 @@
 
 #include "LaurelEyeEngine/graphics/resources/GeometryBuffer.h"
 #include "LaurelEyeEngine/math/Transform.h"
+#include "LaurelEyeEngine/io/Assets.h"
 
 // TODO: Move GL operations to the Device
 #include <glad/glad.h>
@@ -147,6 +148,8 @@ namespace LaurelEye::Graphics {
         static std::shared_ptr<Mesh> createSphereMesh(const std::string& name, const int n = 32);
         /// @brief Creates a Mesh from a predefined Type (Square, Cube, Sphere).
         static std::shared_ptr<Mesh> createMesh(const std::string& name, Type type);
+        /// @brief Creates a Mesh from an imported Mesh Asset
+        static std::shared_ptr<Mesh> createMeshFromAsset(const std::shared_ptr<IO::MeshAsset>& meshAsset);
         /// @brief Creates a simple 2D square mesh.
         static std::shared_ptr<Mesh> createSquareMesh(const std::string& name, float scale = 1.0f);
         /// @brief Creates a cube mesh.

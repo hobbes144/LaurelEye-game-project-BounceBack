@@ -12,14 +12,18 @@
 /// Copyright © 2025 DIGIPEN Institute of Technology. All rights reserved.
 
 #pragma once
-#include <memory>
+
 #include "LaurelEyeEngine/core/Config.h"
 #include "LaurelEyeEngine/core/EngineContext.h"
-#include "LaurelEyeEngine/core/ResourceCoordinator.h"
-#include "LaurelEyeEngine/core/SystemCoordinator.h"
-#include "LaurelEyeEngine/window/IWindow.h"
+
+#include <memory>
 
 namespace LaurelEye {
+
+    class IWindow;
+    class ResourceCoordinator;
+    class SystemCoordinator;
+
     class Engine {
     public:
         Engine(const EngineConfig& config);
@@ -32,6 +36,7 @@ namespace LaurelEye {
 
         // Return the engine context stored here
         EngineContext& getContext() { return *ctx; }
+
     private:
         /// @brief Initialize the engine
         void initialize();

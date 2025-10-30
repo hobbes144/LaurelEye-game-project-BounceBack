@@ -12,22 +12,17 @@
                     "scale": [ 50.0, 1.0, 50.0 ]
                 },
                 "Render3D": {
-                    "meshes": [
-                        {
-                            "name": "squareMesh",
-                            "file": "meshes/square.obj"
-                        }
-                    ],
-                    "materials": [
-                        {
-                            "name": "testMat",
-                            "properties": {
-                                "testString": "def",
-                                "testVec2": [ 1, 2 ],
-                                "testInt": 1
-                            }
-                        }
-                    ]
+                    "mesh":
+                    {
+                        "name": "cubeMesh",
+                        "primitiveType": "Cube"
+                    },
+                    "material": {
+                        "texture":  "textures/test.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
                 },
                 "Physics": {
                     "type": "Static",
@@ -99,11 +94,20 @@
             "components": {
                 "Transform": {
                     "position": [ 0.0, 10.0, 0.0 ],
-                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
-                    "scale": [ 1.0, 1.0, 1.0 ]
+                    "rotation": [ 180.0, 0.0, 180.0, 1.0 ],
+                    "scale": [ 0.08, 0.08, 0.08 ]
                 },
                 "Render3D": {
-
+                    "mesh":
+                    {
+                        "file": "models/roman_D.fbx"
+                    },
+                    "material": {
+                        "texture":  "textures/roman_blue_D_texture.jpg",
+                        "diffuse": [ 10.0, 1.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
                 },
                 "Physics": {
                     "type": "Dynamic",

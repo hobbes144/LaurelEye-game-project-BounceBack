@@ -486,6 +486,46 @@ namespace LaurelEye::Graphics {
         return nullptr;
     }
 
+    std::shared_ptr<Mesh> Mesh::createMeshFromAsset(const std::shared_ptr<IO::MeshAsset>& meshAsset) {
+        if ( !meshAsset || meshAsset->vertices.empty() ) {
+            throw("Mesh::FromAsset - Invalid or empty MeshAsset.");
+            return nullptr;
+        }
+
+        Mesh::Attributes attributes;
+
+        const size_t vertexCount = meshAsset->vertices.size();
+        std::vector<float> positions, normals, uvs, tangents, bitangents;
+
+        positions.reserve(vertexCount * 3);
+        normals.reserve(vertexCount * 3);
+        uvs.reserve(vertexCount * 2);
+        tangents.reserve(vertexCount * 3);
+        bitangents.reserve(vertexCount * 3);
+
+        for ( const auto& v : meshAsset->vertices ) {
+            positions.insert(positions.end(), v.position, v.position + 3);
+            normals.insert(normals.end(), v.normal, v.normal + 3);
+            uvs.insert(uvs.end(), v.uv, v.uv + 2);
+            tangents.insert(tangents.end(), v.tangent, v.tangent + 3);
+            bitangents.insert(bitangents.end(), v.bitangent, v.bitangent + 3);
+        }
+
+        attributes[GeometryBuffer::AttributeType::Position] = {positions, 3};
+        attributes[GeometryBuffer::AttributeType::Normal] = {normals, 3};
+        attributes[GeometryBuffer::AttributeType::TexCoord] = {uvs, 2};
+        attributes[GeometryBuffer::AttributeType::Tangent] = {tangents, 3};
+        attributes[GeometryBuffer::AttributeType::Bitangent] = {bitangents, 3};
+
+        std::shared_ptr<Mesh> mesh;
+        if ( !meshAsset->indices.empty() )
+            mesh = std::make_shared<Mesh>(meshAsset->getName(), attributes, meshAsset->indices);
+        else
+            mesh = std::make_shared<Mesh>(meshAsset->getName(), attributes);
+
+        return mesh;
+    }
+
     std::shared_ptr<Mesh> Mesh::getShapeMesh(Type type) {
         if ( shapeMeshes.contains(type) )
             return shapeMeshes[type];

@@ -4,10 +4,17 @@ namespace LaurelEye::IO {
     std::shared_ptr<IAsset> MeshImporter::import(const std::string& path) {
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(path,
-                                                aiProcess_Triangulate |
-                                                aiProcess_FlipUVs |
-                                                aiProcess_GenNormals |
-                                                aiProcess_CalcTangentSpace);
+                                                 aiProcess_CalcTangentSpace |
+                                                     aiProcess_JoinIdenticalVertices |
+                                                     aiProcess_MakeLeftHanded |
+                                                     aiProcess_Triangulate |
+                                                     aiProcess_GenSmoothNormals |
+                                                     aiProcess_ImproveCacheLocality |
+                                                     aiProcess_FixInfacingNormals |
+                                                     aiProcess_GenUVCoords |
+                                                     aiProcess_OptimizeMeshes |
+                                                     aiProcess_OptimizeGraph |
+                                                     aiProcess_FlipUVs);
 
         if ( !scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode ) {
             throw std::runtime_error("MeshImporter: Failed to load mesh: " + path +
@@ -69,6 +76,4 @@ namespace LaurelEye::IO {
 
         return meshAsset;
     }
-}
-
-
+} // namespace LaurelEye::IO

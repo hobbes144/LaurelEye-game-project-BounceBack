@@ -20,6 +20,10 @@
 #include <unordered_map>
 #include <variant>
 
+namespace LaurelEye::IO {
+    class ImageAsset;
+}
+
 namespace LaurelEye::Graphics {
 
     class Shader;
@@ -96,6 +100,8 @@ namespace LaurelEye::Graphics {
         static std::shared_ptr<T> getMaterial(
             const std::string& name);
 
+        static std::shared_ptr<Material> FromAsset(const std::shared_ptr<IO::ImageAsset>& imageAsset);
+
         /// @brief Bind a named texture to this material (generic).
         ///
         /// Example: setTexture("mainTexture", handle) or setTexture("normalMap", handle).
@@ -142,8 +148,8 @@ namespace LaurelEye::Graphics {
         bool useTexture = false;
         TextureHandle mainTexture = 0;
         VectorTemplated<float, 2> mainTextureScale = VectorTemplated<float, 2>({1.0f, 1.0f});
-        
-        
+
+
     };
 
 } // namespace LaurelEye::Graphics

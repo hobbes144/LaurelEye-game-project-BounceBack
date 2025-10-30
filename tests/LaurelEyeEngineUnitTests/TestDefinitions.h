@@ -35,6 +35,9 @@
 #include "LaurelEyeEngine/scripting/sol2/Sol2ScriptInstance.h"
 #include "LaurelEyeEngine/core/Engine.h"
 #include "LaurelEyeEngine/core/EngineContext.h"
+#include "LaurelEyeEngine/core/ResourceCoordinator.h"
+#include "LaurelEyeEngine/core/SystemCoordinator.h"
+
 #ifdef _WIN32
 #include <windows.h>
 #else
