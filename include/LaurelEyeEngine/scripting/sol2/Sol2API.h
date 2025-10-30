@@ -11,15 +11,15 @@
 
 #pragma once
 #include "LaurelEyeEngine/ecs/Entity.h"
+#include "LaurelEyeEngine/core/EngineContext.h"
 #include <sol/sol.hpp>
 
 namespace LaurelEye::Scripting {
-
     class Sol2API {
     public:
         /// @brief Registers api state wide (all scripts can access this). This is for systems and core logics
         /// @param lua The lua state to register - has controll of all scripts attached to it
-        static void registerState(sol::state& lua);
+        static void registerState(sol::state& lua, EngineContext* ctx);
 
         /// @brief Registers api state per environment (lua script instance). This would be per entity variables (mainly just entity itself)
         /// @param env The script env instance

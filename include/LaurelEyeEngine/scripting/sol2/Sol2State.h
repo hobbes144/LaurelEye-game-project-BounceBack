@@ -13,11 +13,13 @@
 #include <sol/sol.hpp>
 #include "LaurelEyeEngine/scripting/IScriptEngineState.h"
 #include "LaurelEyeEngine/scripting/IScriptInstance.h"
+#include "LaurelEyeEngine/core/EngineContext.h"
 
 namespace LaurelEye::Scripting {
+    
     class Sol2State : public IScriptEngineState{
     public:
-        void initialize() override;
+        void initialize(EngineContext* ctx) override;
         void shutdown() override;
         std::unique_ptr<IScriptInstance> createInstance(const std::string& path, LaurelEye::Entity* owner) override;
 

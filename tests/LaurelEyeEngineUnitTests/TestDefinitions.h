@@ -69,6 +69,7 @@ namespace LaurelEye {
     void scriptingBasicTest();
     void scriptingMultipleTest();
     void scriptingMathTest();
+    void scriptingInputTest(GlfwPlatform* glfwP, InputManager* pInputManager);
     void engineContextServiceTest();
     void engineSystemCoordinatorWiringTest();
     void engineContextOverwriteTest();

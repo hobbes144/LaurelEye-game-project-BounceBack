@@ -12,7 +12,7 @@ namespace LaurelEye::Scripting {
             scriptEngineState = std::make_unique<Sol2State>();
             break;
         }
-        scriptEngineState->initialize();
+        scriptEngineState->initialize(context);
     }
 
     void ScriptSystem::update(float deltaTime) {

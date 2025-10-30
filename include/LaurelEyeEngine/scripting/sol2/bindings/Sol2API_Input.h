@@ -8,6 +8,7 @@
 
 #pragma once
 #include "LaurelEyeEngine/input/InputManager.h"
+#include "LaurelEyeEngine/core/EngineContext.h"
 #include <sol/sol.hpp>
 
 namespace LaurelEye::Scripting {
@@ -16,10 +17,11 @@ namespace LaurelEye::Scripting {
     public:
         /// @brief Called by Sol2API in order to register all input bindings
         /// @param lua Lua state
-        static void setup(sol::state& lua);
+        static void setup(sol::state& lua, EngineContext* ctx);
 
     private:
-        static void setupInputManager(sol::state& lua);
+        static void setupInputManager(sol::state& lua, InputManager* input);
+        static void setupKeyBindings(sol::state& lua);
     };
 
 } // namespace LaurelEye::Scripting

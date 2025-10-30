@@ -34,6 +34,7 @@ namespace LaurelEye {
         audioSystem = std::make_unique<Audio::FModAudioManager>();
 
         scriptSystem = std::make_unique<Scripting::ScriptSystem>();
+        scriptSystem->setEngineContext(ctx);
 
         ctx.registerService<TransformSystem>(transformSystem.get());
         ctx.registerService<Graphics::RenderSystem>(renderSystem.get());

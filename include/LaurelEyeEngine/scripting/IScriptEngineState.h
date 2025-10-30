@@ -15,16 +15,16 @@
 #include <memory>
 #include <string>
 #include <LaurelEyeEngine/ecs/Entity.h>
+#include "LaurelEyeEngine/core/EngineContext.h"
 
 namespace LaurelEye::Scripting {
-
     class IScriptInstance;
     class IScriptEngineState {
     public:
         virtual ~IScriptEngineState() = default;
 
         /// @brief Initialize the scripting environment (open libraries, register API, etc.)
-        virtual void initialize() = 0;
+        virtual void initialize(EngineContext* context) = 0;
 
         /// @brief Shutdown and cleanup scripting resources
         virtual void shutdown() = 0;

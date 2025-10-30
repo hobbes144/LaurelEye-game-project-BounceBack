@@ -1,4 +1,4 @@
-﻿/// @file   ScriptComponent.h
+/// @file   ScriptComponent.h
 /// @author Alex Humphries (humphriesa02@gmail.com)
 /// @par    **DigiPen Email**
 ///     alex.humphries@digipen.edu

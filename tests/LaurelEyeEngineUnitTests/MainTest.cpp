@@ -79,7 +79,8 @@ int main() {
     }
 
     //Manual Tests
-    LaurelEye::inputPhysTest(glfwP, inputManager);
+    //LaurelEye::inputPhysTest(glfwP, inputManager);
+    LaurelEye::scriptingInputTest(&glfwP, &inputManager);
 
     std::cout << "Tests are finished, moving to gameplay demo" << std::endl;
 

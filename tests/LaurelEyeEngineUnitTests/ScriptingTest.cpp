@@ -1,13 +1,64 @@
 ﻿#include "TestDefinitions.h"
 
 namespace LaurelEye {
+    class MockWindow : public IWindow {
+    public:
+        MockWindow() {
+            attributes.width = 800;
+            attributes.height = 600;
+            attributes.title = "Mock Window";
+        }
+
+        // --- Core virtuals ---
+        bool shouldClose() const override {
+            return false;
+        }
+
+        NativeWindowHandle getNativeHandle() override {
+            // Just return nullptr since we don't need a real window
+            return nullptr;
+        }
+
+        double getTime() override {
+            static double fakeTime = 0.0;
+            fakeTime += 0.016; // Simulate ~60 FPS ticking
+            return fakeTime;
+        }
+
+        // --- Setters ---
+        void setTitle(std::string _title) override {
+            attributes.title = std::move(_title);
+        }
+
+        void setWidth(int _width) override {
+            attributes.width = _width;
+        }
+
+        void setHeight(int _height) override {
+            attributes.height = _height;
+        }
+
+        void setVsync(bool flag) override {
+            attributes.vsync = flag;
+        }
+
+        void setFullscreen(bool flag) override {
+            //attributes.fullscreen = flag;
+        }
+    };
     void scriptingBasicTest() {
         using namespace Scripting;
 
         std::cout << "[ScriptTest] Basic script execution...\n";
 
         // Create ScriptSystem with Sol2 backend
+        std::shared_ptr<EngineContext> context = std::make_shared<EngineContext>();
+        auto window = std::make_shared<MockWindow>();
+        auto inputManager = std::make_shared<InputManager>(*window);
+        context->registerService<InputManager>(inputManager.get());
+
         ScriptSystem scriptSystem(ScriptSystem::ScriptSystemType::Sol2);
+        scriptSystem.setEngineContext(*context);
         scriptSystem.initialize();
 
         // Create a dummy entity and attach a ScriptComponent
@@ -34,7 +85,13 @@ namespace LaurelEye {
         using namespace Scripting;
         std::cout << "[ScriptTest] Multiple components...\n";
 
+        std::shared_ptr<EngineContext> context = std::make_shared<EngineContext>();
+        auto window = std::make_shared<MockWindow>();
+        auto inputManager = std::make_shared<InputManager>(*window);
+        context->registerService<InputManager>(inputManager.get());
+
         ScriptSystem scriptSystem(ScriptSystem::ScriptSystemType::Sol2);
+        scriptSystem.setEngineContext(*context);
         scriptSystem.initialize();
 
         Entity e1, e2;
@@ -63,7 +120,13 @@ namespace LaurelEye {
         using namespace Scripting;
         std::cout << "[ScriptTest] API registration test...\n";
 
+        std::shared_ptr<EngineContext> context = std::make_shared<EngineContext>();
+        auto window = std::make_shared<MockWindow>();
+        auto inputManager = std::make_shared<InputManager>(*window);
+        context->registerService<InputManager>(inputManager.get());
+
         ScriptSystem scriptSystem(ScriptSystem::ScriptSystemType::Sol2);
+        scriptSystem.setEngineContext(*context);
         scriptSystem.initialize();
 
         // Simulate that Time.deltaTime was updated by the engine
@@ -97,7 +160,13 @@ namespace LaurelEye {
         using namespace Scripting;
         std::cout << "[ScriptTest] Math + Transform API test...\n";
 
+        std::shared_ptr<EngineContext> context = std::make_shared<EngineContext>();
+        auto window = std::make_shared<MockWindow>();
+        auto inputManager = std::make_shared<InputManager>(*window);
+        context->registerService<InputManager>(inputManager.get());
+
         ScriptSystem scriptSystem(ScriptSystem::ScriptSystemType::Sol2);
+        scriptSystem.setEngineContext(*context);
         scriptSystem.initialize();
 
         Entity entity("MathEntity");
@@ -157,4 +226,56 @@ namespace LaurelEye {
         std::cout << "[ScriptTest] Passed\n";
     }
 
+    void scriptingInputTest(GlfwPlatform* glfwP, InputManager* pInputManager) {
+        using namespace LaurelEye;
+        using namespace Scripting;
+
+        std::cout << "------- Scripting Input Test -------" << std::endl;
+
+        // === Initialize Script System ===
+        std::shared_ptr<EngineContext> context = std::make_shared<EngineContext>();;
+        context->registerService<InputManager>(pInputManager);
+
+        ScriptSystem scriptSystem(ScriptSystem::ScriptSystemType::Sol2);
+        scriptSystem.setEngineContext(*context);
+        scriptSystem.initialize();
+
+        // === Create Entity with Script ===
+        Entity entity("InputEntity");
+        auto* scriptComp = entity.addComponent<ScriptComponent>(
+            std::string(TEST_MEDIA_DIR) + "/scripts/test_input.lua");
+        scriptSystem.registerComponent(scriptComp);
+
+        // === Main Loop ===
+        std::cout << "Press keys to test scripting input. Escape to exit.\n";
+
+        float dt = 1.0f / 60.0f;
+        while ( !pInputManager->isKeyPressed(Key::Escape) ) {
+            glfwP->update();
+            pInputManager->update();
+            scriptSystem.update(dt);
+
+            // Pull some test vars from Lua to verify it reacts to real input
+            auto* scriptInstance = dynamic_cast<Sol2ScriptInstance*>(scriptComp->getScriptInstance());
+            assert(scriptInstance);
+
+            auto wPressed = scriptInstance->getVar<bool>("wPressed");
+            auto aPressed = scriptInstance->getVar<bool>("aPressed");
+            auto sPressed = scriptInstance->getVar<bool>("sPressed");
+            auto dPressed = scriptInstance->getVar<bool>("dPressed");
+
+            if ( wPressed && *wPressed ) std::cout << "Lua detected W pressed\n";
+            if ( aPressed && *aPressed ) std::cout << "Lua detected A pressed\n";
+            if ( sPressed && *sPressed ) std::cout << "Lua detected S pressed\n";
+            if ( dPressed && *dPressed ) std::cout << "Lua detected D pressed\n";
+
+            // Sleep to avoid spamming the console
+            glfwWaitEventsTimeout(0.05);
+        }
+
+        // === Cleanup ===
+        scriptSystem.shutdown();
+
+        std::cout << "------- Scripting Input Test End -------" << std::endl;
+    }
 }
