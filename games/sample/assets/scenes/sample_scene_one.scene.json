@@ -18,7 +18,7 @@
                         "primitiveType": "Cube"
                     },
                     "material": {
-                        "texture":  "textures/test.png",
+                        "texture":  "textures/texture_01_green.png",
                         "diffuse": [ 1.0, 10.0, 1.0 ],
                         "specular": [ 0.2, 0.2, 0.2 ],
                         "shininess": 32.0
