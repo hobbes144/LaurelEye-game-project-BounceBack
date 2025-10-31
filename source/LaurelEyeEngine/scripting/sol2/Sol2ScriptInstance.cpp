@@ -23,15 +23,34 @@ namespace LaurelEye::Scripting {
     }
 
     void Sol2ScriptInstance::onStart() {
-        if ( startFunc.valid() ) startFunc();
+        if ( startFunc.valid() ) {
+            auto result = startFunc();
+            if ( !result.valid() ) {
+                sol::error err = result;
+                std::cerr << "[Lua onStart Error] " << err.what() << std::endl;
+            }
+        }
     }
 
     void Sol2ScriptInstance::onUpdate(float dt) {
-        if ( updateFunc.valid() ) updateFunc(dt);
+        if ( updateFunc.valid() ) {
+            auto result = updateFunc(dt);
+            if ( !result.valid() ) {
+                sol::error err = result;
+                std::cerr << "[Lua onUpdate Error] " << err.what() << std::endl;
+            }
+        }
+
     }
 
     void Sol2ScriptInstance::onShutdown() {
-        if ( shutdownFunc.valid() ) shutdownFunc();
+        if ( shutdownFunc.valid() ) {
+            auto result = shutdownFunc();
+            if ( !result.valid() ) {
+                sol::error err = result;
+                std::cerr << "[Lua onShutdown Error] " << err.what() << std::endl;
+            }
+        }
         invalidate();
     }
     void Sol2ScriptInstance::invalidate() {

@@ -5,7 +5,7 @@
 namespace LaurelEye::Scripting {
 
     void Sol2State::initialize(EngineContext* ctx) {
-        lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::package);
+        lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::package, sol::lib::debug, sol::lib::string);
         Sol2API::registerState(lua, ctx);
     }
 

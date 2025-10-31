@@ -278,4 +278,42 @@ namespace LaurelEye {
 
         std::cout << "------- Scripting Input Test End -------" << std::endl;
     }
+
+    void scriptingECSTest() {
+        using namespace LaurelEye;
+        using namespace Scripting;
+
+        std::cout << "------- Scripting ECS Test -------" << std::endl;
+
+        // === Initialize Script System ===
+        std::shared_ptr<EngineContext> context = std::make_shared<EngineContext>();
+        ScriptSystem scriptSystem(ScriptSystem::ScriptSystemType::Sol2);
+        scriptSystem.setEngineContext(*context);
+        scriptSystem.initialize();
+
+        // === Create Entity ===
+        Entity entity("ECS_Test_Entity");
+        auto* transform = entity.addComponent<TransformComponent>();
+        auto* scriptComp = entity.addComponent<ScriptComponent>(
+            std::string(TEST_MEDIA_DIR) + "/scripts/test_ecs.lua");
+        scriptSystem.registerComponent(scriptComp);
+
+        // === Run Script Simulation ===
+        float dt = 1.0f / 60.0f;
+        for ( int i = 0; i < 5; ++i ) {
+            scriptSystem.update(dt);
+        }
+
+        // === Verify that script modified the Transform ===
+        if ( transform ) {
+            auto pos = transform->getWorldPosition();
+            std::cout << "Transform after script: ("
+                      << pos.x << ", " << pos.y << ", " << pos.z << ")\n";
+        }
+
+        // === Cleanup ===
+        scriptSystem.shutdown();
+
+        std::cout << "------- Scripting ECS Test End -------" << std::endl;
+    }
 }

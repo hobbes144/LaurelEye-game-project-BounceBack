@@ -1,6 +1,8 @@
 ﻿#include "LaurelEyeEngine/scripting/sol2/Sol2API.h"
 #include <iostream>
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Math.h"
+#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Transform.h"
+#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_ECS.h"
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Input.h"
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Time.h"
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Physics.h"
@@ -18,8 +20,14 @@ namespace LaurelEye::Scripting {
         /* Math */
         Sol2API_Math::setup(lua);
 
+        /* Transform */
+        Sol2API_Transform::setup(lua);
+
         /* Input*/
         Sol2API_Input::setup(lua, ctx);
+
+        /* ECS */
+        Sol2API_ECS::setup(lua);
 
         /* Renderer*/
 
