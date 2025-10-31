@@ -1,0 +1,791 @@
+﻿{
+    "settings": {
+        "resetOnLoad": true
+    },
+    "entities": [
+        {
+            "name": "Ground",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, -1.0, 0.0 ],
+                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "scale": [ 50.0, 1.0, 50.0 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "cubeMesh",
+                        "primitiveType": "Cube"
+                    },
+                    "material": {
+                        "texture": "textures/texture_01_dark.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 50.0,
+                            "y": 1.0,
+                            "z": 50.0
+                        }
+                    },
+                    "mass": 0.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.5,
+                    "restitution": 0.0,
+                    "collisionGroup": 1,
+                    "collisionMask": 4294967295,
+                    "gravityScale": 0.0
+                }
+            }
+        },
+        {
+            "name": "Camera",
+            "components": {
+                "Transform": {
+                    "position": [ 1.0, -1.0, 5.0 ],
+                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "scale": [ 50.0, 1.0, 50.0 ]
+                },
+                "Camera": {
+
+                }
+            }
+        },
+        {
+            "name": "DirectionalLight",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, -1.0, 0.0 ],
+                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Light": {
+                    "type": "Directional",
+                    "direction": [ 0.75, -1.0, 0.75 ],
+                    "intensity": 4.0,
+                    "color": [ 1.0, 1.0, 1.0 ]
+                }
+            }
+        },
+        {
+            "name": "AmbientLight",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 0.0, 0.0 ],
+                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Light": {
+                    "type": "Ambient",
+                    "intensity": 0.3,
+                    "color": [ 1.0, 1.0, 1.0 ]
+                }
+            }
+        },
+        {
+            "name": "Player",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 10.0, 0.0 ],
+                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "cubeMesh",
+                        "primitiveType": "Cube"
+                    },
+                    "material": {
+                        "texture": "textures/test.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Dynamic",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        },
+                        "radius": 1.0,
+                        "height": 1.0
+                    },
+                    "mass": 1.0,
+                    "inertia": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "centerOfMass": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "linearDamping": 0.05,
+                    "angularDamping": 0.1,
+                    "friction": 0.5,
+                    "restitution": 0.1,
+                    "collisionGroup": 1,
+                    "collisionMask": 4294967295,
+                    "useCCD": true,
+                    "ccdMotionThreshold": 0.01,
+                    "ccdSweptSphereRadius": 1.0,
+                    "gravityScale": 1.0
+                },
+                "Script": {
+                    "path": "scripts/player_script.lua"
+                }
+            }
+        },
+        {
+            "name": "BoxA",
+            "components": {
+                "Transform": {
+                    "position": [ 2.0, 10.0, 2.0 ],
+                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "cubeMesh",
+                        "primitiveType": "Cube"
+                    },
+                    "material": {
+                        "texture": "textures/texture_01_red.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Dynamic",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        },
+                        "radius": 1.0,
+                        "height": 1.0
+                    },
+                    "mass": 1.0,
+                    "inertia": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "centerOfMass": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "linearDamping": 0.05,
+                    "angularDamping": 0.1,
+                    "friction": 0.5,
+                    "restitution": 0.1,
+                    "collisionGroup": 1,
+                    "collisionMask": 4294967295,
+                    "useCCD": true,
+                    "ccdMotionThreshold": 0.01,
+                    "ccdSweptSphereRadius": 1.0,
+                    "gravityScale": 1.0
+                }
+            }
+        },
+        {
+            "name": "BoxB",
+            "components": {
+                "Transform": {
+                    "position": [ 1.4, 7.0, 1.4 ],
+                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "cubeMesh",
+                        "primitiveType": "Cube"
+                    },
+                    "material": {
+                        "texture": "textures/texture_01_dark.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        },
+                        "radius": 1.0,
+                        "height": 1.0
+                    },
+                    "mass": 1.0,
+                    "inertia": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "centerOfMass": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "linearDamping": 0.05,
+                    "angularDamping": 0.1,
+                    "friction": 0.5,
+                    "restitution": 0.1,
+                    "collisionGroup": 1,
+                    "collisionMask": 4294967295,
+                    "useCCD": true,
+                    "ccdMotionThreshold": 0.01,
+                    "ccdSweptSphereRadius": 1.0,
+                    "gravityScale": 1.0
+                }
+            }
+        },
+        {
+            "name": "BoxC",
+            "components": {
+                "Transform": {
+                    "position": [ 1.0, 7.0, 1.0 ],
+                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "cubeMesh",
+                        "primitiveType": "Cube"
+                    },
+                    "material": {
+                        "texture": "textures/texture_01_light.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Dynamic",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        },
+                        "radius": 0.5,
+                        "height": 1.0
+                    },
+                    "mass": 1.0,
+                    "inertia": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "centerOfMass": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "linearDamping": 0.05,
+                    "angularDamping": 0.1,
+                    "friction": 0.5,
+                    "restitution": 0.1,
+                    "collisionGroup": 1,
+                    "collisionMask": 4294967295,
+                    "useCCD": true,
+                    "ccdMotionThreshold": 0.01,
+                    "ccdSweptSphereRadius": 1.0,
+                    "gravityScale": 1.0
+                }
+            }
+        },
+        {
+            "name": "Sphere 1",
+            "components": {
+                "Transform": {
+                    "position": [ -3, 10.0, 3 ],
+                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "cubeMesh",
+                        "primitiveType": "Sphere"
+                    },
+                    "material": {
+                        "texture": "textures/texture_01_orange.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Dynamic",
+                    "shapeDefinition": {
+                        "type": "Sphere",
+                        "size": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        },
+                        "radius": 1.0,
+                        "height": 1.0
+                    },
+                    "mass": 1.0,
+                    "inertia": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "centerOfMass": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "linearDamping": 0.05,
+                    "angularDamping": 0.1,
+                    "friction": 0.5,
+                    "restitution": 0.1,
+                    "collisionGroup": 1,
+                    "collisionMask": 4294967295,
+                    "useCCD": true,
+                    "ccdMotionThreshold": 0.01,
+                    "ccdSweptSphereRadius": 1.0,
+                    "gravityScale": 1.0
+                }
+            }
+        },
+        {
+            "name": "Sphere 2",
+            "components": {
+                "Transform": {
+                    "position": [ -3.2, 7.0, 3 ],
+                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "cubeMesh",
+                        "primitiveType": "Sphere"
+                    },
+                    "material": {
+                        "texture": "textures/texture_01_purple.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Dynamic",
+                    "shapeDefinition": {
+                        "type": "Sphere",
+                        "size": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        },
+                        "radius": 1.0,
+                        "height": 1.0
+                    },
+                    "mass": 1.0,
+                    "inertia": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "centerOfMass": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "linearDamping": 0.05,
+                    "angularDamping": 0.1,
+                    "friction": 0.5,
+                    "restitution": 0.1,
+                    "collisionGroup": 1,
+                    "collisionMask": 4294967295,
+                    "useCCD": true,
+                    "ccdMotionThreshold": 0.01,
+                    "ccdSweptSphereRadius": 1.0,
+                    "gravityScale": 1.0
+                }
+            }
+        },
+        {
+            "name": "Sphere 3",
+            "components": {
+                "Transform": {
+                    "position": [ -2.8, 5.0, 3.2 ],
+                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "cubeMesh",
+                        "primitiveType": "Sphere"
+                    },
+                    "material": {
+                        "texture": "textures/texture_01_red.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Dynamic",
+                    "shapeDefinition": {
+                        "type": "Sphere",
+                        "size": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        },
+                        "radius": 1.0,
+                        "height": 1.0
+                    },
+                    "mass": 1.0,
+                    "inertia": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "centerOfMass": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "linearDamping": 0.05,
+                    "angularDamping": 0.1,
+                    "friction": 0.5,
+                    "restitution": 0.1,
+                    "collisionGroup": 1,
+                    "collisionMask": 4294967295,
+                    "useCCD": true,
+                    "ccdMotionThreshold": 0.01,
+                    "ccdSweptSphereRadius": 1.0,
+                    "gravityScale": 1.0
+                }
+            }
+        },
+        {
+            "name": "Sphere 1",
+            "components": {
+                "Transform": {
+                    "position": [ -3.0, 10.0, 3.0 ],
+                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "cubeMesh",
+                        "primitiveType": "Sphere"
+                    },
+                    "material": {
+                        "texture": "textures/texture_01_orange.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Dynamic",
+                    "shapeDefinition": {
+                        "type": "Sphere",
+                        "radius": 1.0
+                    },
+                    "mass": 1.0,
+                    "linearDamping": 0.05,
+                    "angularDamping": 0.1,
+                    "friction": 0.5,
+                    "restitution": 0.1,
+                    "useCCD": true,
+                    "ccdMotionThreshold": 0.01,
+                    "ccdSweptSphereRadius": 1.0,
+                    "gravityScale": 1.0
+                }
+            }
+        },
+        {
+            "name": "Sphere 2",
+            "components": {
+                "Transform": {
+                    "position": [ -3.2, 7.0, 3.0 ],
+                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "cubeMesh",
+                        "primitiveType": "Sphere"
+                    },
+                    "material": {
+                        "texture": "textures/texture_01_light.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Dynamic",
+                    "shapeDefinition": {
+                        "type": "Sphere",
+                        "radius": 1.0
+                    },
+                    "mass": 1.0,
+                    "linearDamping": 0.05,
+                    "angularDamping": 0.1,
+                    "friction": 0.5,
+                    "restitution": 0.1,
+                    "useCCD": true,
+                    "ccdMotionThreshold": 0.01,
+                    "ccdSweptSphereRadius": 1.0,
+                    "gravityScale": 1.0
+                }
+            }
+        },
+        {
+            "name": "Sphere 3",
+            "components": {
+                "Transform": {
+                    "position": [ -2.8, 5.0, 3.2 ],
+                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "cubeMesh",
+                        "primitiveType": "Sphere"
+                    },
+                    "material": {
+                        "texture": "textures/texture_01_dark.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Dynamic",
+                    "shapeDefinition": {
+                        "type": "Sphere",
+                        "radius": 1.0
+                    },
+                    "mass": 1.0,
+                    "linearDamping": 0.05,
+                    "angularDamping": 0.1,
+                    "friction": 0.5,
+                    "restitution": 0.1,
+                    "useCCD": true,
+                    "ccdMotionThreshold": 0.01,
+                    "ccdSweptSphereRadius": 1.0,
+                    "gravityScale": 1.0
+                }
+            }
+        },
+        {
+            "name": "Sphere 4",
+            "components": {
+                "Transform": {
+                    "position": [ -5.0, 9.0, 1.0 ],
+                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "cubeMesh",
+                        "primitiveType": "Sphere"
+                    },
+                    "material": {
+                        "texture": "textures/texture_01_red.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Dynamic",
+                    "shapeDefinition": {
+                        "type": "Sphere",
+                        "radius": 1.0
+                    },
+                    "mass": 1.0,
+                    "linearDamping": 0.05,
+                    "angularDamping": 0.1,
+                    "friction": 0.5,
+                    "restitution": 0.1,
+                    "useCCD": true,
+                    "ccdMotionThreshold": 0.01,
+                    "ccdSweptSphereRadius": 1.0,
+                    "gravityScale": 1.0
+                }
+            }
+        },
+        {
+            "name": "Sphere 5",
+            "components": {
+                "Transform": {
+                    "position": [ -1.5, 8.0, 2.0 ],
+                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "cubeMesh",
+                        "primitiveType": "Sphere"
+                    },
+                    "material": {
+                        "texture": "textures/texture_01_green.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Dynamic",
+                    "shapeDefinition": {
+                        "type": "Sphere",
+                        "radius": 1.0
+                    },
+                    "mass": 1.0,
+                    "linearDamping": 0.05,
+                    "angularDamping": 0.1,
+                    "friction": 0.5,
+                    "restitution": 0.1,
+                    "useCCD": true,
+                    "ccdMotionThreshold": 0.01,
+                    "ccdSweptSphereRadius": 1.0,
+                    "gravityScale": 1.0
+                }
+            }
+        },
+        {
+            "name": "Sphere 6",
+            "components": {
+                "Transform": {
+                    "position": [ -4.0, 6.0, 4.0 ],
+                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "cubeMesh",
+                        "primitiveType": "Sphere"
+                    },
+                    "material": {
+                        "texture": "textures/texture_01_orange.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Dynamic",
+                    "shapeDefinition": {
+                        "type": "Sphere",
+                        "radius": 1.0
+                    },
+                    "mass": 1.0,
+                    "linearDamping": 0.05,
+                    "angularDamping": 0.1,
+                    "friction": 0.5,
+                    "restitution": 0.1,
+                    "useCCD": true,
+                    "ccdMotionThreshold": 0.01,
+                    "ccdSweptSphereRadius": 1.0,
+                    "gravityScale": 1.0
+                }
+            }
+        },
+        {
+            "name": "Sphere 7",
+            "components": {
+                "Transform": {
+                    "position": [ -1.0, 9.0, 4.5 ],
+                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "cubeMesh",
+                        "primitiveType": "Sphere"
+                    },
+                    "material": {
+                        "texture": "textures/texture_01_purple.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Dynamic",
+                    "shapeDefinition": {
+                        "type": "Sphere",
+                        "radius": 1.0
+                    },
+                    "mass": 1.0,
+                    "linearDamping": 0.05,
+                    "angularDamping": 0.1,
+                    "friction": 0.5,
+                    "restitution": 0.1,
+                    "useCCD": true,
+                    "ccdMotionThreshold": 0.01,
+                    "ccdSweptSphereRadius": 1.0,
+                    "gravityScale": 1.0
+                }
+            }
+        },
+        {
+            "name": "Sphere 8",
+            "components": {
+                "Transform": {
+                    "position": [ -5.5, 8.5, 5.5 ],
+                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "cubeMesh",
+                        "primitiveType": "Sphere"
+                    },
+                    "material": {
+                        "texture": "textures/texture_01_light.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Dynamic",
+                    "shapeDefinition": {
+                        "type": "Sphere",
+                        "radius": 1.0
+                    },
+                    "mass": 1.0,
+                    "linearDamping": 0.05,
+                    "angularDamping": 0.1,
+                    "friction": 0.5,
+                    "restitution": 0.1,
+                    "useCCD": true,
+                    "ccdMotionThreshold": 0.01,
+                    "ccdSweptSphereRadius": 1.0,
+                    "gravityScale": 1.0
+                }
+            }
+        }
+    ]
+}
