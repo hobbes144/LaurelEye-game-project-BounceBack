@@ -6,6 +6,7 @@
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Input.h"
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Time.h"
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Physics.h"
+#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Scene.h"
 
 namespace LaurelEye::Scripting {
 
@@ -26,6 +27,9 @@ namespace LaurelEye::Scripting {
         /* Input*/
         Sol2API_Input::setup(lua, ctx);
 
+        /* Scene */
+        Sol2API_Scene::setup(lua, ctx);
+        
         /* ECS */
         Sol2API_ECS::setup(lua);
 

@@ -316,4 +316,56 @@ namespace LaurelEye {
 
         std::cout << "------- Scripting ECS Test End -------" << std::endl;
     }
+
+    void scriptingSceneTest() {
+        using namespace LaurelEye;
+        using namespace Scripting;
+
+        std::cout << "------- Scripting Scene Test -------" << std::endl;
+
+        // 1. EngineContext + SceneManager
+        std::shared_ptr<EngineContext> context = std::make_shared<EngineContext>();
+        EngineConfig config{};
+        config.assetRoot = TEST_MEDIA_DIR;
+
+        auto sceneManager = std::make_unique<SceneManager>(*context, config);
+        context->registerService<SceneManager>(sceneManager.get());
+
+        // 2. Inject a simple test scene
+        auto testScene = std::make_unique<Scene>("TestScene");
+        {
+            auto player = std::make_unique<Entity>("Player");
+            auto light = std::make_unique<Entity>("Light");
+            testScene->addEntity(std::move(player));
+            testScene->addEntity(std::move(light));
+        }
+
+        sceneManager->injectSceneForTest("TestScene", std::move(testScene));
+        sceneManager->setCurrentScene(sceneManager->getScene("TestScene"));
+
+        sceneManager->getCurrentScene()->initialize(*context);
+
+        // 3. Script system
+        ScriptSystem scriptSystem(ScriptSystem::ScriptSystemType::Sol2);
+        scriptSystem.setEngineContext(*context);
+        scriptSystem.initialize();
+
+        // 4. Entity with Lua script
+        Entity scriptEntity("SceneTestEntity");
+        auto* scriptComp = scriptEntity.addComponent<ScriptComponent>(
+            std::string(TEST_MEDIA_DIR) + "/scripts/test_scene.lua");
+        scriptSystem.registerComponent(scriptComp);
+
+        // 5. Update loop
+        std::cout << "Running scene script...\n";
+        const float dt = 1.0f / 60.0f;
+        for ( int i = 0; i < 5; ++i ) {
+            sceneManager->update(dt);
+            scriptSystem.update(dt);
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+
+        scriptSystem.shutdown();
+        std::cout << "------- Scripting Scene Test End -------" << std::endl;
+    }
 }

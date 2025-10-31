@@ -159,5 +159,16 @@ namespace LaurelEye {
             initialSceneName = doc["initialScene"].GetString();
         }
     }
+#if defined(DEBUG) || defined(_DEBUG)
+    void SceneManager::injectSceneForTest(const std::string& name, std::unique_ptr<Scene> scene) {
+        if ( !scene ) return;
+        scenes[name] = std::move(scene);
+        sceneFilePaths[name] = ""; // mark as manually inserted
+    }
+
+    void SceneManager::setCurrentScene(Scene* scene) {
+        currentScene = scene;
+    }
+#endif
 }
 

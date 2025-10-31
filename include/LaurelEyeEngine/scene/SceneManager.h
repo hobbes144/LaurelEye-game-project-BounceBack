@@ -50,6 +50,15 @@ namespace LaurelEye {
         bool hasScene(const std::string& name) const;
         Scene* getScene(const std::string& name);
 
+        // --- Test and manual setup utilities ---
+#if defined(DEBUG) || defined(_DEBUG)
+        /// @brief Allows tests or debug tools to directly insert a scene into the manager
+        void injectSceneForTest(const std::string& name, std::unique_ptr<Scene> scene);
+
+        /// @brief Sets the current scene manually, bypassing normal changeScene() flow.
+        /// Use only for testing or debug initialization.
+        void setCurrentScene(Scene* scene);
+#endif
     private:
         // Context for other engine services
         EngineContext* context = nullptr;

@@ -48,12 +48,18 @@ namespace LaurelEye {
 
         // --- Entity management (deferred) ---
         Entity* addEntity(std::unique_ptr<Entity> entityToAdd);
+        /// @brief Allows for creating an entity as a raw pointer, then transferring ownership
+        /// over to the scene
+        /// @param entity The entity to be transferred
+        /// @return The raw entity pointer back out
+        Entity* addEntityFromRaw(Entity* entity);
         void removeEntity(Entity* entity);
         void removeEntity(const std::string& entityName);
         Entity* findEntityByName(const std::string& name) const;
         Entity* findEntityById(unsigned int id) const;
         std::vector<Entity*> findEntitiesWithTag(const std::string& tag) const; // Note - this is unoptimal for now - use with caution
         const std::vector<std::unique_ptr<Entity>>& getEntities() const { return entities; }
+        std::vector<Entity*> getEntityPointers() const;
 
     private:
         void spawnPendingEntities();

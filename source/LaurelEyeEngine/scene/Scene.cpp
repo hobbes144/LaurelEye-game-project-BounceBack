@@ -86,7 +86,9 @@ namespace LaurelEye {
 
         // Sync world transforms before initial update frame.
         // TODO - better place for this?
-        transformSystem->update(0.016);
+        if ( transformSystem ) {
+            transformSystem->update(0.016);
+        }
 
         initialized = true;
     }
@@ -182,6 +184,11 @@ namespace LaurelEye {
         return nullptr;
     }
 
+    Entity* Scene::addEntityFromRaw(Entity* entity) {
+        if ( !entity ) return nullptr;
+        return addEntity(std::unique_ptr<Entity>(entity));
+    }
+
     void Scene::removeEntity(Entity* entityToRemove) {
         if ( entityToRemove ) {
             pendingRemovals.push_back(entityToRemove);
@@ -217,6 +224,12 @@ namespace LaurelEye {
             if ( e->compareTag(tag) ) results.push_back(e.get());
         }
         return results;
+    }
+    std::vector<Entity*> Scene::getEntityPointers() const {
+        std::vector<Entity*> ptrs;
+        ptrs.reserve(entities.size());
+        for ( auto& e : entities ) ptrs.push_back(e.get());
+        return ptrs;
     }
 
     void Scene::spawnPendingEntities() {
