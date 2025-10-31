@@ -59,4 +59,5 @@ namespace LaurelEye::Graphics {
         uint64_t sizeBytes{0};
         uint32_t bindingPoint{0};
     };
+
 } // namespace LaurelEye::Graphics

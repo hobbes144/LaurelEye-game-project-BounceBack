@@ -1,5 +1,5 @@
 ﻿{
-    "initialScene": "PhysicsScene",
+    "initialScene": "SampleScene1",
     "scenes": [
         {
             "name": "SampleScene1",
@@ -12,6 +12,10 @@
         {
             "name": "PhysicsScene",
             "path": "scenes/physics_scene_one.scene.json"
+        },
+        {
+            "name": "ParticleScene1",
+            "path": "scenes/particle_scene_one.scene.json"
         }
     ]
 }

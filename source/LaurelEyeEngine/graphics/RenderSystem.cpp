@@ -71,6 +71,9 @@ namespace LaurelEye::Graphics {
         uiPass = std::make_shared<UIPass>();
         uiPass->setup(*tempRenderResources.get());
 
+        prp = std::make_shared<ParticleRenderPass>();
+        prp->setup(*tempRenderResources.get());
+
         initDefaultCamera();
         initGlobalLightsBuffer();
     }
@@ -138,6 +141,7 @@ namespace LaurelEye::Graphics {
             components};
 
         sp->execute(ctx);
+        prp->execute(ctx);
 
         // UI pass
         FrameContext uiCtx{
@@ -156,6 +160,7 @@ namespace LaurelEye::Graphics {
         // tempShader = nullptr;
         sp = nullptr;
         uiPass = nullptr;
+        prp = nullptr;
         ShaderManager::getInstance().unloadShaders();
     }
 
@@ -302,6 +307,13 @@ namespace LaurelEye::Graphics {
         for ( const auto& pair : cameraProperties )
             values.push_back(pair.second);
         return values;
+    }
+
+    std::shared_ptr<SingleBufferedDataPass> RenderSystem::retrieveSinglePass() {
+        return sp;
+    }
+    std::shared_ptr<ParticleRenderPass> RenderSystem::retrieveParticlePass() {
+        return prp;
     }
 
     // Camera interactons

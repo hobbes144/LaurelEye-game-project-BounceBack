@@ -46,6 +46,10 @@ namespace LaurelEye {
         bool enableCCD = false; // continuous collision detection
     };
 
+    struct ParticleConfig {
+
+    };
+
     struct AudioConfig {
         int sampleRate = 48000;
         int numChannels = 2;
@@ -62,6 +66,7 @@ namespace LaurelEye {
         WindowConfig window;
         RenderConfig render;
         PhysicsConfig physics;
+        ParticleConfig particles;
         AudioConfig audio;
     };
 

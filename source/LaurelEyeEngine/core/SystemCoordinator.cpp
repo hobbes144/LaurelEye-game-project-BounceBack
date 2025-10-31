@@ -28,6 +28,8 @@ namespace LaurelEye {
         }
         renderSystem->setConfig(renderConfig);
 
+        particleSystem = std::make_unique<Particles::ParticleSystem>();
+        particleSystem->setEngineContext(ctx);
         physicsSystem = std::make_unique<Physics::PhysicsSystem>();
         physicsSystem->setEngineContext(ctx);
         // Calls its own initialize and shutdown methods - in future will get reworked
@@ -39,6 +41,7 @@ namespace LaurelEye {
         ctx.registerService<TransformSystem>(transformSystem.get());
         ctx.registerService<Graphics::RenderSystem>(renderSystem.get());
         ctx.registerService<Physics::PhysicsSystem>(physicsSystem.get());
+        ctx.registerService<Particles::ParticleSystem>(particleSystem.get());
         ctx.registerService<Audio::FModAudioManager>(audioSystem.get());
         ctx.registerService<Scripting::ScriptSystem>(scriptSystem.get());
     }
@@ -49,10 +52,12 @@ namespace LaurelEye {
         renderSystem->initialize();
         physicsSystem->initialize();
         scriptSystem->initialize();
+        particleSystem->initialize();
     }
     void SystemCoordinator::update(float deltaTime) {
         //std::cout << "SysCord Update\n";
         transformSystem->update(deltaTime);
+        particleSystem->update(deltaTime);
         renderSystem->update(deltaTime);
         audioSystem->update();
         scriptSystem->update(deltaTime);
@@ -63,14 +68,16 @@ namespace LaurelEye {
 
     void SystemCoordinator::shutdown() {
         std::cout << "Systems Shutting Down" << std::endl;
-        transformSystem->shutdown();
-        renderSystem->shutdown();
-        physicsSystem->shutdown();
+        particleSystem->shutdown();
         scriptSystem->shutdown();
+        physicsSystem->shutdown();
+        renderSystem->shutdown();
+        transformSystem->shutdown();
 
         transformSystem.reset();
         renderSystem.reset();
         physicsSystem.reset();
+        particleSystem.reset();
         audioSystem.reset();
         scriptSystem.reset();
     }

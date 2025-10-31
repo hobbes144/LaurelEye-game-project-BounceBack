@@ -7,6 +7,7 @@
 #include "LaurelEyeEngine/graphics/graphics_components/Renderable3DComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/CameraComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/LightComponent.h"
+#include "LaurelEyeEngine/particles/ParticleEmitterComponent.h"
 #include "LaurelEyeEngine/physics/PhysicsBodyComponent.h"
 #include "LaurelEyeEngine/scripting/ScriptComponent.h"
 
@@ -14,6 +15,7 @@
 #include "LaurelEyeEngine/physics/PhysicsSystem.h"
 #include "LaurelEyeEngine/graphics/RenderSystem.h"
 #include "LaurelEyeEngine/scripting/ScriptSystem.h"
+#include "LaurelEyeEngine/particles/ParticleSystem.h"
 
 namespace LaurelEye {
 
@@ -37,6 +39,7 @@ namespace LaurelEye {
         auto* physicsSystem = ctx.getService<Physics::PhysicsSystem>();
         auto* renderSystem = ctx.getService<Graphics::RenderSystem>();
         auto* scriptingSystem = ctx.getService<Scripting::ScriptSystem>();
+        auto* particleSystem = ctx.getService<Particles::ParticleSystem>();
 
         for ( auto& entity : entities ) {
             for ( auto& comp : entity->getComponents() ) {
@@ -78,6 +81,11 @@ namespace LaurelEye {
                 else if ( auto* scriptComp = dynamic_cast<Scripting::ScriptComponent*>(comp.get()) ) {
                     if ( scriptingSystem ) {
                         scriptingSystem->registerComponent(scriptComp);
+                    }
+                }
+                else if ( auto* emitterComp = dynamic_cast<Particles::ParticleEmitterComponent*>( comp.get() ) ) {
+                    if ( particleSystem ) {
+                        particleSystem->registerComponent(emitterComp);
                     }
                 }
                 // add more as needed...

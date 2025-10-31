@@ -14,6 +14,7 @@
 #include "LaurelEyeEngine/core/Config.h"
 #include "LaurelEyeEngine/transform/TransformSystem.h"
 #include "LaurelEyeEngine/graphics/RenderSystem.h"
+#include "LaurelEyeEngine/particles/ParticleSystem.h"
 #include "LaurelEyeEngine/physics/PhysicsSystem.h"
 #include "LaurelEyeEngine/audio/FModAudioManager.h"
 #include "LaurelEyeEngine/scripting/ScriptSystem.h"
@@ -32,6 +33,7 @@ namespace LaurelEye {
         // for now, add systems that are needed here.
         std::unique_ptr<TransformSystem> transformSystem;
         std::unique_ptr<Graphics::RenderSystem> renderSystem;
+        std::unique_ptr<Particles::ParticleSystem> particleSystem;
         std::unique_ptr<Physics::PhysicsSystem> physicsSystem;
         std::unique_ptr<Audio::FModAudioManager> audioSystem;
         std::unique_ptr<Scripting::ScriptSystem> scriptSystem;

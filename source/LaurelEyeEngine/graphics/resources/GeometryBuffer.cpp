@@ -351,7 +351,7 @@ namespace LaurelEye::Graphics {
         if ( !hasAttribute(type) ) {
             throw std::runtime_error("Attribute not found in buffer");
         }
-        glBindVertexArray(vbo);
+        glBindVertexArray(vao);
 
         glBufferSubData(
             GL_ARRAY_BUFFER,

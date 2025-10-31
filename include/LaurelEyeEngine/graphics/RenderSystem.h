@@ -20,6 +20,9 @@
 
 
 // Temp
+#include "LaurelEyeEngine/graphics/renderpass/SingleBufferedDataPass.h"
+#include "LaurelEyeEngine/graphics/renderpass/ParticleRenderPass.h"
+#include "LaurelEyeEngine/graphics/renderpass/SinglePass.h"
 #include "LaurelEyeEngine/graphics/graphics_components/AmbientLightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/CameraComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/DirectionalLightComponent.h"
@@ -119,6 +122,9 @@ namespace LaurelEye::Graphics {
         /// @return A vector containing pointers to all camera components.
         std::vector<CameraComponent*> GetCameraComponents() const;
 
+        std::shared_ptr<SingleBufferedDataPass> retrieveSinglePass();
+        std::shared_ptr<ParticleRenderPass> retrieveParticlePass();
+
         RenderResources* getRenderResources() {
             return tempRenderResources.get();
         }
@@ -152,6 +158,7 @@ namespace LaurelEye::Graphics {
         // std::shared_ptr<SinglePass> sp;
         std::shared_ptr<SingleBufferedDataPass> sp;
         std::shared_ptr<UIPass> uiPass;
+        std::shared_ptr<ParticleRenderPass> prp;
 
         // Temp pointers to support lights and camera updates
         std::unique_ptr<Entity> defaultCamera = nullptr;

@@ -7,6 +7,7 @@
 #include "LaurelEyeEngine/graphics/graphics_components/DirectionalLightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/PointLightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/AmbientLightComponent.h"
+#include "LaurelEyeEngine/particles/ParticleEmitterComponent.h"
 #include "LaurelEyeEngine/physics/PhysicsBodyComponent.h"
 #include "LaurelEyeEngine/physics/interfaces/PhysicsTypes.h"
 #include "LaurelEyeEngine/scripting/ScriptComponent.h"
@@ -69,6 +70,9 @@ namespace LaurelEye {
             }
             else if ( compName == "Script" ) {
                 setupScriptComponent(entity, compData);
+            }
+            else if ( compName == "ParticleEmitter" ) {
+                setupParticleEmitterComponent(entity, compData);
             }
             else {
                 std::cerr << "Entity Factory: Unknown component type trying to be added to entity: " << entity.getName() << std::endl;
@@ -398,6 +402,67 @@ namespace LaurelEye {
         std::string resolvedPath = assetPath + relPath;
 
         entity.addComponent<Scripting::ScriptComponent>(resolvedPath);
+    }
+
+    void EntityFactory::setupParticleEmitterComponent(Entity& entity, const rapidjson::Value& emitterData) {
+
+        Particles::ParticleEmitterData data;
+
+        // Position
+        if ( emitterData.HasMember("position") && emitterData["position"].IsArray() ) {
+            const auto& pos = emitterData["position"];
+            data.position.x = pos[0].GetFloat();
+            data.position.y = pos[1].GetFloat();
+            data.position.z = pos[2].GetFloat();
+        }
+
+        // Direction
+        if ( emitterData.HasMember("direction") && emitterData["direction"].IsArray() ) {
+            const auto& dir = emitterData["direction"];
+            data.direction.x = dir[0].GetFloat();
+            data.direction.y = dir[1].GetFloat();
+            data.direction.z = dir[2].GetFloat();
+        }
+
+        // Scalars
+        if ( emitterData.HasMember("emissionRate") ) data.emissionRate = emitterData["emissionRate"].GetFloat();
+        if ( emitterData.HasMember("spreadAngle") ) data.spreadAngle = emitterData["spreadAngle"].GetFloat();
+        if ( emitterData.HasMember("particleLifetime") ) data.particleLifetime = emitterData["particleLifetime"].GetFloat();
+        if ( emitterData.HasMember("lifetimeVariation") ) data.lifetimeVariation = emitterData["lifetimeVariation"].GetFloat();
+        if ( emitterData.HasMember("initialSpeed") ) data.initialSpeed = emitterData["initialSpeed"].GetFloat();
+        if ( emitterData.HasMember("speedVariation") ) data.speedVariation = emitterData["speedVariation"].GetFloat();
+        if ( emitterData.HasMember("startSize") ) data.startSize = emitterData["startSize"].GetFloat();
+        if ( emitterData.HasMember("endSize") ) data.endSize = emitterData["endSize"].GetFloat();
+        if ( emitterData.HasMember("sizeVariation") ) data.sizeVariation = emitterData["sizeVariation"].GetFloat();
+        if ( emitterData.HasMember("usePhysics") ) data.usePhysics = emitterData["usePhysics"].GetBool();
+
+        // Colors
+        if ( emitterData.HasMember("startColor") && emitterData["startColor"].IsArray() ) {
+            const auto& col = emitterData["startColor"];
+            data.startColor = Vector4();
+            data.startColor[0] = col[0].GetFloat();
+            data.startColor[1] = col[1].GetFloat();
+            data.startColor[2] = col[2].GetFloat();
+            data.startColor[3] = col[3].GetFloat();
+        }
+
+        if ( emitterData.HasMember("endColor") && emitterData["endColor"].IsArray() ) {
+            const auto& col = emitterData["endColor"];
+            data.endColor = Vector4();
+            data.endColor[0] = col[0].GetFloat();
+            data.endColor[1] = col[1].GetFloat();
+            data.endColor[2] = col[2].GetFloat();
+            data.endColor[3] = col[3].GetFloat();
+        }
+
+        // Create and initialize component
+        auto emitter = entity.addComponent<Particles::ParticleEmitterComponent>();
+        emitter->GetEmitterData() = data;
+
+        if ( emitterData.HasMember("maxParticles") ) {
+            emitter->SetMaxParticles(emitterData["maxParticles"].GetUint());
+        }
+
     }
 
     #pragma endregion
