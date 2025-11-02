@@ -20,6 +20,7 @@ namespace LaurelEye::Graphics {
 
     class LGLDataBufferFactory;
     class LGLTextureFactory;
+    class LGLFramebufferFactory;
 
     // This is a helper function to catch OpenGL errors.
 #define GL_CHECKERROR(msg)                                                                      \
@@ -65,7 +66,7 @@ namespace LaurelEye::Graphics {
         /* DataBuffer operations (UBOs/SSBOs) */
 
         /// \copydoc IRenderDevice::createDataBuffer
-        DataBufferHandle createDataBuffer(const DataBufferDesc& d, const void* initialData = nullptr) override;
+        [[nodiscard]] DataBufferHandle createDataBuffer(const DataBufferDesc& d, const void* initialData = nullptr) override;
 
         /// \copydoc IRenderDevice::destroyDataBuffer
         void destroyDataBuffer(DataBufferHandle h) override;
@@ -81,7 +82,7 @@ namespace LaurelEye::Graphics {
         /* Texture operations */
 
         /// \copydoc IRenderDevice::createTexture
-        TextureHandle createTexture(const TextureDesc& d, const void* init = nullptr) override;
+        [[nodiscard]] TextureHandle createTexture(const TextureDesc& d, const void* init = nullptr) override;
 
         /// \copydoc IRenderDevice::generateTextureMips
         void generateTextureMips(TextureHandle h) override;
@@ -98,9 +99,23 @@ namespace LaurelEye::Graphics {
         /// \copydoc IRenderDevice::destroyAllTextures
         void destroyAllTextures() override;
 
+        /* Texture operations */
+
+        /// \copydoc IRenderDevice::createFramebuffer
+        [[nodiscard]] FramebufferHandle createFramebuffer(const FramebufferDesc& d) override;
+
+        /// \copydoc IRenderDevice::destroyFramebuffer
+        void destroyFramebuffer(FramebufferHandle h) override;
+
+        /// \copydoc IRenderDevice::bindFramebufferBase
+        void bindFramebufferBase(FramebufferHandle h) override;
+
+        uint32_t attachTexturetoFramebuffer(FramebufferHandle h, const FramebufferAttachmentDesc& d) override;
+
     private:
         std::unique_ptr<LGLDataBufferFactory> dataBufferFactory;
         std::unique_ptr<LGLTextureFactory> textureFactory;
+        std::unique_ptr<LGLFramebufferFactory> framebufferFactory;
     };
 
 } // namespace LaurelEye::Graphics

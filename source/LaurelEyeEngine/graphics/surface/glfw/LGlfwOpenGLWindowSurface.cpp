@@ -14,10 +14,10 @@ namespace LaurelEye::Graphics {
 
     void LGlfwOpenGLWindowSurface::attachToWindow(IWindow& window) {
         this->nativeWindow = window.getNativeHandle();
-        this->width = window.getWidth();
-        this->height = window.getHeight();
-        this->pendingWidth = width;
-        this->pendingHeight = height;
+        this->windowSize.width = window.getWidth();
+        this->windowSize.height = window.getHeight();
+        this->pendingWidth = windowSize.width;
+        this->pendingHeight = windowSize.height;
         this->resizePending = false;
 
         // TODO: This is thread specific, we might need to change
@@ -29,7 +29,7 @@ namespace LaurelEye::Graphics {
             this->resizeSurfaceCallback();
         };
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        
+
     }
 
     // WindowSurface has no shutdown for OpenGL
@@ -40,7 +40,7 @@ namespace LaurelEye::Graphics {
         if ( resizePending ) {
             resizeSurface(pendingWidth, pendingHeight);
         }
-        glViewport(0, 0, width, height);
+        glViewport(0, 0, windowSize.width, windowSize.height);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
@@ -49,9 +49,9 @@ namespace LaurelEye::Graphics {
     }
 
     void LGlfwOpenGLWindowSurface::resizeSurface(int _width, int _height) {
-        this->width = _width;
-        this->height = _height;
-        glViewport(0, 0, width, height);
+        this->windowSize.width = _width;
+        this->windowSize.height = _height;
+        glViewport(0, 0, windowSize.width, windowSize.height);
         resizePending = false;
     }
 

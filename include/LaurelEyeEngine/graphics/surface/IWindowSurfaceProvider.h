@@ -14,6 +14,8 @@
 #include "LaurelEyeEngine/graphics/Graphics.h"
 #include "LaurelEyeEngine/window/IWindow.h"
 
+#include "LaurelEyeEngine/graphics/resources/SizeRegistry.h"
+
 #include <cstdint>
 
 namespace LaurelEye::Graphics {
@@ -67,6 +69,8 @@ namespace LaurelEye::Graphics {
         /// This function should be called at the end of each frame.
         virtual void endFrame() = 0;
 
+        virtual SizeRegistry getSize() { return windowSize; };
+        virtual const SizeRegistry* getSizePointer() { return &windowSize; };
        virtual void resizeSurfaceCallback() = 0;
        virtual void resizeSurface(int w, int h) = 0;
 
@@ -75,7 +79,7 @@ namespace LaurelEye::Graphics {
         NativeWindowHandle nativeWindow;
 
         // We would have SizeRegistry object here to manage viewport size.
-        
+        SizeRegistry windowSize;
     };
 }
 

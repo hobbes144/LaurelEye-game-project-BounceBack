@@ -31,7 +31,7 @@ namespace LaurelEye {
         ///
         /// @param wDesc WindowDescription struct.
         /// @return IWindow pointer.
-        IWindow* createWindow(const WindowDescription& wDesc);
+        [[nodiscard]] IWindow* createWindow(const WindowDescription& wDesc);
         // Discussion: How should we handle get? Do we use IDs?
 
         /// @brief Get window pointer from ID.

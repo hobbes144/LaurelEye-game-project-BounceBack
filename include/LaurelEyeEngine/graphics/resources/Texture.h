@@ -17,7 +17,8 @@ namespace LaurelEye::Graphics {
         RGB32F,
         R8,
         R16F,
-        R32F
+        R32F,
+        DEPTH32F,
     };
 
     /// @enum TextureFilterMode
@@ -43,7 +44,8 @@ namespace LaurelEye::Graphics {
     /// @brief Supported types of texture dimensionality.
     enum class TextureType {
         Texture2D,
-        Texture3D
+        Texture3D,
+        TextureStorage2D
     };
 
     /// @enum TextureMipMode

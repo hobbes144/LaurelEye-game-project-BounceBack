@@ -9,6 +9,7 @@
 #pragma once
 
 #include "LaurelEyeEngine/graphics/resources/DataBuffer.h"
+#include "LaurelEyeEngine/graphics/resources/Framebuffer.h"
 #include "LaurelEyeEngine/graphics/resources/Texture.h"
 
 namespace LaurelEye::Graphics {
@@ -47,7 +48,7 @@ namespace LaurelEye::Graphics {
         /// behavior.
         ///
         /// @return Handle of the Data Buffer.
-        virtual DataBufferHandle createDataBuffer(const DataBufferDesc& d, const void* init = nullptr) = 0;
+        [[nodiscard]] virtual DataBufferHandle createDataBuffer(const DataBufferDesc& d, const void* init = nullptr) = 0;
 
         /// @brief Destroy a Data Buffer.
         ///
@@ -90,7 +91,7 @@ namespace LaurelEye::Graphics {
         /// @param d Description of the texture to be created.
         /// @param init Initial data of the texture.
         /// @return Handle of the Texture.
-        virtual TextureHandle createTexture(const TextureDesc& d, const void* init = nullptr) = 0;
+        [[nodiscard]] virtual TextureHandle createTexture(const TextureDesc& d, const void* init = nullptr) = 0;
 
         /// @brief Generate Texture Mipmaps.
         ///
@@ -131,7 +132,37 @@ namespace LaurelEye::Graphics {
         /// This is called by LGLRenderDevice::shutdown.
         virtual void destroyAllTextures() = 0;
 
-        // virtual FramebufferHandle createFramebuffer(const FramebufferDesc&) = 0;
+        /* Frame buffer operations */
+
+        /// @brief Create a Data Buffer.
+        ///
+        /// @param d Description of the buffer to be created.
+        /// @param initialData Initial data for the buffer if any.
+        ///
+        /// Note that initialData must be at least DataBufferDesc::sizeBytes.
+        /// Providing a pointer to less than this size leads to undefined
+        /// behavior.
+        ///
+        /// @return Handle of the Data Buffer.
+        [[nodiscard]] virtual FramebufferHandle createFramebuffer(const FramebufferDesc& d) = 0;
+
+        /// @brief Destroy a Data Buffer.
+        ///
+        /// @param h Handle of the Data Buffer.
+        virtual void destroyFramebuffer(FramebufferHandle h) = 0;
+
+        /// @brief Bind a Data Buffer to use in a shader.
+        ///
+        /// The binding point it will bind to will be
+        /// DataBufferDesc::bindingPoint.
+        ///
+        /// @param h Handle of the Data Buffer.
+        virtual void bindFramebufferBase(FramebufferHandle h) = 0;
+
+        virtual uint32_t attachTexturetoFramebuffer(FramebufferHandle h, const FramebufferAttachmentDesc& d) = 0;
+
+        // TODO: virtual void destroyAllFrameBufffers() = 0;
+
         // virtual SamplerHandle createSampler(const SamplerDesc&) = 0;
         // virtual void destroy(BufferHandle) = 0; /* … */
 

@@ -46,13 +46,6 @@ namespace LaurelEye::Graphics {
 
         
     private:
-        /// @brief Width of the window surface.
-        /// @note Consider swapping this to a SizeRegistry in the future.
-        int width;
-        /// @brief Height of the window surface.
-        /// @note Consider swapping this to a SizeRegistry in the future.
-        int height;
-
         void resizeSurface(int w, int h) override;
 
         void resizeSurfaceCallback() override;

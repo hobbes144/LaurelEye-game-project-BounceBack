@@ -41,16 +41,24 @@ namespace LaurelEye::Graphics {
     /// @return OpenGL Texture Filter Mode.
     static GLint textureFilterToGLFilter(TextureFilterMode f);
 
+    static GLint textureFormatToGLUploadFormat(TextureFormat f);
+
     /// @brief Does the requested TextureFilterMode require Mipmaps
     ///
     /// @param f TextureFilterMode enum value.
     /// @return `true` if Mipmaps needed.
     static bool textureFilterNeedsMip(TextureFilterMode f);
 
+    static bool textureIsTextureStorage(TextureType t);
+
     class LGLTextureFactory {
     public:
         /// \copydoc IRenderDevice::createTexture
-        TextureHandle create(const TextureDesc&, const void* init = nullptr);
+        [[nodiscard]] TextureHandle create(const TextureDesc& d, const void* init = nullptr);
+
+        TextureHandle createTextureStorage(const TextureDesc& d);
+
+        TextureHandle createTexture(const TextureDesc& d, const void* init = nullptr);
 
         /// \copydoc IRenderDevice::generateTextureMips
         void generateMips(TextureHandle h);

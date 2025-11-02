@@ -8,10 +8,13 @@
 #include "LaurelEyeEngine/graphics/device/glfw/LGLRenderDevice.h"
 
 #include "LaurelEyeEngine/graphics/device/glfw/LGLDataBufferFactory.h"
+#include "LaurelEyeEngine/graphics/device/glfw/LGLFramebufferFactory.h"
 #include "LaurelEyeEngine/graphics/device/glfw/LGLTextureFactory.h"
 #include "LaurelEyeEngine/graphics/resources/DataBuffer.h"
+#include "LaurelEyeEngine/graphics/resources/Framebuffer.h"
 #include "LaurelEyeEngine/graphics/resources/Texture.h"
 
+#include <cstdint>
 #include <glad/glad.h>
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
@@ -117,6 +120,7 @@ namespace LaurelEye::Graphics {
 
         dataBufferFactory = std::make_unique<LGLDataBufferFactory>();
         textureFactory = std::make_unique<LGLTextureFactory>();
+        framebufferFactory = std::make_unique<LGLFramebufferFactory>(textureFactory.get());
     }
 
     void LGLRenderDevice::shutdown() {
@@ -167,6 +171,23 @@ namespace LaurelEye::Graphics {
 
     void LGLRenderDevice::destroyAllTextures() {
         textureFactory->destroyAll();
+    }
+
+    FramebufferHandle LGLRenderDevice::createFramebuffer(const FramebufferDesc& d) {
+        assert((d.size.width != -1) && "Window size FB not supported yet.");
+        return framebufferFactory->create(d);
+    }
+
+    void LGLRenderDevice::destroyFramebuffer(FramebufferHandle h) {
+        framebufferFactory->destroy(h);
+    }
+
+    void LGLRenderDevice::bindFramebufferBase(FramebufferHandle h) {
+        framebufferFactory->bindBase(h);
+    }
+
+    uint32_t LGLRenderDevice::attachTexturetoFramebuffer(FramebufferHandle h, const FramebufferAttachmentDesc& d) {
+        return framebufferFactory->attachTexture(h, d);
     }
 
 } // namespace LaurelEye::Graphics

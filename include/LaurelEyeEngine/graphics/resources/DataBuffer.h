@@ -28,7 +28,7 @@ namespace LaurelEye::Graphics {
     /// @brief Checks whether a given buffer handle is valid.
     /// @param h The handle to validate.
     /// @return `true` if the handle refers to a valid buffer, otherwise `false`.
-    inline bool isValid(DataBufferHandle h) noexcept {
+    inline bool isValidDataBuffer(DataBufferHandle h) noexcept {
         return h != InvalidDataBuffer;
     }
 

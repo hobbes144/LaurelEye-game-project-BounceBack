@@ -386,7 +386,7 @@ namespace LaurelEye::Graphics {
     }
 
     void RenderSystem::updateGlobalLights() const {
-        assert(isValid(globalLightsBufferHandle) && "ERROR::GRAPHICS::RENDERSYSTEM::GLOBALLIGHTS_UNINITIALIZED");
+        assert(isValidDataBuffer(globalLightsBufferHandle) && "ERROR::GRAPHICS::RENDERSYSTEM::GLOBALLIGHTS_UNINITIALIZED");
         device->updateDataBufferSubData(
             globalLightsBufferHandle, 0,
             sizeof(GlobalLights), &globalLights);

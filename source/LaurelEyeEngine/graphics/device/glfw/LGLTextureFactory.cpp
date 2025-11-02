@@ -7,6 +7,7 @@
 
 #include "LaurelEyeEngine/graphics/device/glfw/LGLTextureFactory.h"
 
+#include "LaurelEyeEngine/graphics/device/glfw/LGLRenderDevice.h"
 #include "LaurelEyeEngine/graphics/resources/Texture.h"
 
 namespace LaurelEye::Graphics {
@@ -31,32 +32,33 @@ namespace LaurelEye::Graphics {
             return GL_R16F;
         case TextureFormat::R32F:
             return GL_R32F;
+        case TextureFormat::DEPTH32F:
+            return GL_DEPTH_COMPONENT32F;
         }
 
         assert(false && "ERROR::RENDERSYSTEM::INVALIDFORMAT");
     }
 
     GLint textureFormatToGLBaseFormat(TextureFormat f) {
-        std::vector<TextureFormat> rgbFormats = {TextureFormat::RGB8, TextureFormat::RGB16F, TextureFormat::RGB32F};
-        std::vector<TextureFormat> rgbaFormats = {TextureFormat::RGBA8, TextureFormat::RGBA16F, TextureFormat::RGBA32F};
-        GLint baseFormat;
-
-        if ( std::any_of(rgbFormats.begin(), rgbFormats.end(), [&](TextureFormat e) { return e == f; }) ) {
-            baseFormat = GL_RGB;
-        }
-        else if ( std::any_of(rgbaFormats.begin(), rgbaFormats.end(), [&](TextureFormat e) { return e == f; }) ) {
-            baseFormat = GL_RGBA;
-        }
-        else {
-            // TODO: Add code to handle 1D texture R8 here
-            //
-            // TODO: Change this to warning logging.
+        switch ( f ) {
+        case TextureFormat::R8:
+        case TextureFormat::R16F:
+        case TextureFormat::R32F:
+            return GL_RED;
+        case TextureFormat::RGB8:
+        case TextureFormat::RGB16F:
+        case TextureFormat::RGB32F:
+            return GL_RGB;
+        case TextureFormat::RGBA8:
+        case TextureFormat::RGBA16F:
+        case TextureFormat::RGBA32F:
+            return GL_RGBA;
+        default:
+            // TODO: Replace this with proper warning logging.
             std::cout << "WARNING::RENDERSYSTEM::TEXTUREFACTORY::CREATE::INVALIDFORMAT"
                       << "::Defaulting to RGBA" << std::endl;
-            baseFormat = GL_RGBA;
+            return GL_RGBA;
         }
-
-        return baseFormat;
     }
 
     GLint textureWrapToGLWrap(TextureWrapMode w) {
@@ -91,6 +93,27 @@ namespace LaurelEye::Graphics {
         assert(false && "ERROR::RENDERSYSTEM::INVALIDFILTERMODE");
     }
 
+    GLint textureFormatToGLUploadFormat(TextureFormat f) {
+        switch ( f ) {
+        case TextureFormat::R8:
+        case TextureFormat::R16F:
+        case TextureFormat::R32F:
+        case TextureFormat::RGB8:
+        case TextureFormat::RGB16F:
+        case TextureFormat::RGB32F:
+            return GL_UNSIGNED_BYTE;
+        case TextureFormat::RGBA8:
+        case TextureFormat::RGBA16F:
+        case TextureFormat::RGBA32F:
+            return GL_FLOAT;
+        default:
+            // TODO: Replace this with proper warning logging.
+            std::cout << "WARNING::RENDERSYSTEM::TEXTUREFACTORY::CREATE::INVALIDFORMAT"
+                      << "::Defaulting to RGBA" << std::endl;
+            return GL_FLOAT;
+        }
+    }
+
     bool textureFilterNeedsMip(TextureFilterMode f) {
         switch ( f ) {
         case TextureFilterMode::NearestMipmapNearest:
@@ -103,17 +126,67 @@ namespace LaurelEye::Graphics {
         }
     }
 
+    bool textureIsTextureStorage(TextureType t) {
+        switch ( t ) {
+        case TextureType::TextureStorage2D:
+            return true;
+        default:
+            return false;
+        }
+    }
+
     TextureHandle LGLTextureFactory::create(const TextureDesc& d, const void* init) {
+        if ( textureIsTextureStorage(d.type) ) {
+            return createTextureStorage(d);
+        }
+        else {
+            return createTexture(d, init);
+        }
+    }
+
+    TextureHandle LGLTextureFactory::createTextureStorage(const TextureDesc& d) {
         TextureHandle h;
+
+        assert(
+            d.type == TextureType::TextureStorage2D &&
+            "ERROR::RENDERSYSTEM::TEXTUREFACTORY::CREATE::INVALIDTYPE::TextureStorage3D not supported");
+
+        glCreateTextures(GL_TEXTURE_2D, 1, &h);
+
+        textures[h] = d;
+
+        glTextureStorage2D(h, d.mipLevels,
+                           textureFormatToGLFormat(d.format),
+                           d.width, d.height);
+
+        // Reasonable defaults (you’ll likely use separate samplers anyway)
+        glTextureParameteri(h, GL_TEXTURE_MIN_FILTER, d.mipLevels > 1 ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
+        glTextureParameteri(h, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTextureParameteri(h, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTextureParameteri(h, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+        return h;
+    }
+
+    TextureHandle LGLTextureFactory::createTexture(const TextureDesc& d, const void* init) {
+        TextureHandle h;
+
+        assert(
+            d.type == TextureType::Texture2D &&
+            "ERROR::RENDERSYSTEM::TEXTUREFACTORY::CREATE::INVALIDTYPE::Texture3D not supported");
+
         glGenTextures(1, &h);
 
         textures[h] = d;
 
-        assert(d.type == TextureType::Texture2D && "ERROR::RENDERSYSTEM::TEXTUREFACTORY::CREATE::INVALIDTYPE::Texture3D not supported");
         glBindTexture(GL_TEXTURE_2D, h);
 
-        glTexImage2D(GL_TEXTURE_2D, 0, textureFormatToGLFormat(d.format),
-                     d.width, d.height, 0, textureFormatToGLBaseFormat(d.format), GL_UNSIGNED_BYTE, init);
+        glTexImage2D(
+            GL_TEXTURE_2D, 0,
+            textureFormatToGLFormat(d.format),
+            d.width, d.height, 0,
+            textureFormatToGLBaseFormat(d.format),
+            textureFormatToGLUploadFormat(d.format), init);
 
         if ( init != nullptr && d.mipMode == TextureMipMode::AutoGenerate )
             glGenerateMipmap(GL_TEXTURE_2D);
@@ -138,8 +211,11 @@ namespace LaurelEye::Graphics {
         glBindTexture(GL_TEXTURE_2D, h);
 
         glTexImage2D(
-            GL_TEXTURE_2D, 0, textureFormatToGLFormat(d.format),
-            newW, newH, 0, textureFormatToGLBaseFormat(d.format), GL_UNSIGNED_BYTE, nullptr);
+            GL_TEXTURE_2D, 0,
+            textureFormatToGLFormat(d.format),
+            newW, newH, 0,
+            textureFormatToGLBaseFormat(d.format),
+            textureFormatToGLUploadFormat(d.format), nullptr);
 
         glBindTexture(GL_TEXTURE_2D, 0);
     }
