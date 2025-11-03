@@ -15,6 +15,7 @@
 #include <random>
 
 #include "LaurelEyeEngine/ecs/IComponent.h"
+#include "LaurelEyeEngine/transform/TransformComponent.h"
 #include "LaurelEyeEngine/math/Vector3.h"
 #include "LaurelEyeEngine/math/VectorTemplated.h"
 
@@ -32,9 +33,6 @@ namespace LaurelEye::Particles {
     };
 
     struct ParticleEmitterData {
-        LaurelEye::Vector3 position = {0.0f, 0.0f, 0.0f};
-        LaurelEye::Vector3 direction = {0.0f, 1.0f, 0.0f};
-
         float emissionRate = 50.0f;
         float spreadAngle = 30.0f;
 
@@ -78,12 +76,17 @@ namespace LaurelEye::Particles {
         void PopulateParticles();
         void ClearParticles();
 
+        void BindTransform(LaurelEye::TransformComponent* t);
+        LaurelEye::TransformComponent* GetBoundTransform() const;
+
         std::default_random_engine rng;
         std::uniform_real_distribution<float> randomSpread{-1.0f, 1.0f};
 
     private:
         ParticleEmitterData emitterData;
         size_t maxParticles = 500;
+
+        TransformComponent* boundTransform = nullptr;
 
         std::vector<ParticleData> particles;
         float emissionAccumulator = 0.0f;

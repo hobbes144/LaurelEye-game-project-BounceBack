@@ -48,7 +48,9 @@ namespace LaurelEye::Graphics {
             TexCoord, ///< Texture coordinate attribute.
             Color,    ///< Vertex color attribute.
             Tangent,  ///< Tangent vector attribute.
-            Bitangent ///< Bitangent vector attribute.
+            Bitangent, ///< Bitangent vector attribute.
+            ParticleSize,
+            ParticleRotation
         };
 
         /// @enum AttributeInfo

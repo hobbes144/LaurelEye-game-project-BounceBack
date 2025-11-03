@@ -26,8 +26,12 @@ namespace LaurelEye::Particles {
 
         void registerComponent(const ComponentPtr component) override;
 
+        void setMaxParticles(unsigned int);
+
     private:
         unsigned int activeParticles = 0;
+
+        unsigned int MaxParticles = 1000;
 
         std::shared_ptr<Graphics::ParticleRenderPass> prp;
         std::shared_ptr<Graphics::GeometryBuffer> particleBuffer;

@@ -30,6 +30,8 @@ namespace LaurelEye {
 
         particleSystem = std::make_unique<Particles::ParticleSystem>();
         particleSystem->setEngineContext(ctx);
+        particleSystem->setMaxParticles(engineConfig.particles.MaxParticles);
+
         physicsSystem = std::make_unique<Physics::PhysicsSystem>();
         physicsSystem->setEngineContext(ctx);
         // Calls its own initialize and shutdown methods - in future will get reworked

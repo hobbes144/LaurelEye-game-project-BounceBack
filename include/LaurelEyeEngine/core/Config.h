@@ -47,7 +47,7 @@ namespace LaurelEye {
     };
 
     struct ParticleConfig {
-
+        int MaxParticles = 5000;
     };
 
     struct AudioConfig {

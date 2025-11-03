@@ -66,4 +66,12 @@ namespace LaurelEye::Particles {
         emissionAccumulator = 0.0f;
     }
 
+    void ParticleEmitterComponent::BindTransform(LaurelEye::TransformComponent* t) {
+        boundTransform = t;
+    }
+
+    LaurelEye::TransformComponent* ParticleEmitterComponent::GetBoundTransform() const {
+        return boundTransform;
+    }
+
 } // namespace LaurelEye::Particles

@@ -141,7 +141,13 @@ namespace LaurelEye::Graphics {
             components};
 
         sp->execute(ctx);
-        prp->execute(ctx);
+
+        FrameContext prpCtx{
+            0.1f,
+            *device.get(),
+            *tempRenderResources.get(),
+            components};
+        prp->execute(prpCtx);
 
         // UI pass
         FrameContext uiCtx{

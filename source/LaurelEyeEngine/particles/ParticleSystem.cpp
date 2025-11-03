@@ -79,9 +79,10 @@ namespace LaurelEye::Particles {
 
                 // Interpolate Color / Size
                 float t = p.lifetime / p.maxLifetime;
-                for ( int i = 0; i < 4; ++i )
+                for ( int i = 0; i < 4; ++i ) {
                     p.color[i] = emitter->GetEmitterData().startColor[i] * (1 - t) + emitter->GetEmitterData().endColor[i] * t;
-                p.size = emitter->GetEmitterData().startSize * (1 - t) + emitter->GetEmitterData().endSize * t;
+                    p.size = emitter->GetEmitterData().startSize * (1 - t) + emitter->GetEmitterData().endSize * t;
+                }
             }
         }
 
@@ -98,14 +99,23 @@ namespace LaurelEye::Particles {
         // Call base
         LaurelEye::ISystem<ParticleEmitterComponent>::registerComponent(component);
 
+        component->BindTransform(component->getOwner()->findComponent<TransformComponent>());
+
         // Configure New Emitter Components Properly
         component->ClearParticles();
         component->PopulateParticles();
         component->rng.seed(std::random_device{}());
     }
 
+    void ParticleSystem::setMaxParticles(unsigned int mp) {
+        MaxParticles = mp;
+    }
+
     void ParticleSystem::spawnParticle(ParticleEmitterComponent& emitter) {
+
         for ( auto& p : emitter.GetParticles() ) {
+            assert(emitter.GetBoundTransform() != nullptr);
+
             if ( !p.active ) {
                 ++activeParticles;
                 p.active = true;
@@ -117,10 +127,12 @@ namespace LaurelEye::Particles {
                 };
 
                 p.maxLifetime = std::max(0.05f, rand(data.particleLifetime, data.lifetimeVariation));
-                p.position = data.position;
+                p.position = emitter.GetBoundTransform()->getWorldPosition();
                 p.velocity = randomDirection(emitter) * rand(data.initialSpeed, data.speedVariation);
                 p.size = rand(data.startSize, data.sizeVariation);
-                p.rotation = emitter.randomSpread(emitter.rng) * 3.14159f;
+                float baseRotation = emitter.GetBoundTransform()->getWorldRotation().toEuler().y;
+                float randomOffset = (emitter.randomSpread(emitter.rng) - 0.5f) * 15;
+                p.rotation = baseRotation + randomOffset;
 
                 // Slight random tint
                 p.color = data.startColor;
@@ -145,7 +157,7 @@ namespace LaurelEye::Particles {
             Graphics::GeometryBuffer::ModifiableAttributes tempAttributes;
 
             tempAttributes[Graphics::GeometryBuffer::AttributeType::Position] = {
-                std::vector<float>(500 * 3), // data
+                std::vector<float>(MaxParticles * 3), // data
                 3,                           // elementSize (x, y, z)
                 GL_FLOAT,
                 GL_FALSE,
@@ -153,11 +165,27 @@ namespace LaurelEye::Particles {
             };
 
             tempAttributes[LaurelEye::Graphics::GeometryBuffer::AttributeType::Color] = {
-                std::vector<float>(500 * 4), // data
+                std::vector<float>(MaxParticles * 4), // data
                 4,                           // elementSize (r, g, b, a)
                 GL_FLOAT,
                 GL_FALSE,
+                0
+            };
+
+            tempAttributes[Graphics::GeometryBuffer::AttributeType::ParticleSize] = {
+                std::vector<float>(MaxParticles * 1),
+                1,
+                GL_FLOAT,
+                GL_FALSE,
                 0};
+
+            tempAttributes[Graphics::GeometryBuffer::AttributeType::ParticleRotation] = {
+                std::vector<float>(MaxParticles * 1),
+                1,
+                GL_FLOAT,
+                GL_FALSE,
+                0};
+
 
             particleBuffer = Graphics::GeometryBuffer::create(
                 tempAttributes,
@@ -191,13 +219,15 @@ namespace LaurelEye::Particles {
             GL_FALSE,
             0 // stride handled internally if interleaved
         };
-
-        attributes[LaurelEye::Graphics::GeometryBuffer::AttributeType::Color] = {
+        attributes[Graphics::GeometryBuffer::AttributeType::Color] = {
             {}, // data
             4,  // elementSize (r, g, b, a)
             GL_FLOAT,
             GL_FALSE,
-            0};
+            0
+        };
+        attributes[Graphics::GeometryBuffer::AttributeType::ParticleSize] = {{}, 1, GL_FLOAT, GL_FALSE, 0};
+        attributes[Graphics::GeometryBuffer::AttributeType::ParticleRotation] = {{}, 1, GL_FLOAT, GL_FALSE, 0};
 
         for ( auto* emitter : components ) {
             for ( const auto& p : emitter->GetParticles() ) {
@@ -214,6 +244,13 @@ namespace LaurelEye::Particles {
                 attributes[Graphics::GeometryBuffer::AttributeType::Color].data.push_back(p.color[1]);
                 attributes[Graphics::GeometryBuffer::AttributeType::Color].data.push_back(p.color[2]);
                 attributes[Graphics::GeometryBuffer::AttributeType::Color].data.push_back(p.color[3]);
+
+                // Size
+                attributes[Graphics::GeometryBuffer::AttributeType::ParticleSize].data.push_back(p.size);
+
+                // Rotation
+                attributes[Graphics::GeometryBuffer::AttributeType::ParticleRotation].data.push_back(p.rotation);
+
             }
         }
 
@@ -226,6 +263,16 @@ namespace LaurelEye::Particles {
             particleBuffer->updateVertexAttribute(
                 Graphics::GeometryBuffer::AttributeType::Color,
                 attributes[Graphics::GeometryBuffer::AttributeType::Color].data);
+        }
+        if ( particleBuffer->hasAttribute(Graphics::GeometryBuffer::AttributeType::ParticleSize) ) {
+            particleBuffer->updateVertexAttribute(
+                Graphics::GeometryBuffer::AttributeType::ParticleSize,
+                attributes[Graphics::GeometryBuffer::AttributeType::ParticleSize].data);
+        }
+        if ( particleBuffer->hasAttribute(Graphics::GeometryBuffer::AttributeType::ParticleRotation) ) {
+            particleBuffer->updateVertexAttribute(
+                Graphics::GeometryBuffer::AttributeType::ParticleRotation,
+                attributes[Graphics::GeometryBuffer::AttributeType::ParticleRotation].data);
         }
     }
 

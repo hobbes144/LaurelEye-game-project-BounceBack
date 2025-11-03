@@ -31,8 +31,13 @@ namespace LaurelEye::Graphics {
         particleBuffer->bind();
 
         glClear(GL_DEPTH_BUFFER_BIT);
+
         glDisable(GL_DEPTH_TEST);
+        glEnable(GL_PROGRAM_POINT_SIZE);
+
         glDrawArrays(GL_POINTS, 0, numParticles);
+
+        glDisable(GL_PROGRAM_POINT_SIZE);
         glEnable(GL_DEPTH_TEST);
     }
 

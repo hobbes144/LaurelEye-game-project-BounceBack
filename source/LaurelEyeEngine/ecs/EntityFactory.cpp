@@ -408,22 +408,6 @@ namespace LaurelEye {
 
         Particles::ParticleEmitterData data;
 
-        // Position
-        if ( emitterData.HasMember("position") && emitterData["position"].IsArray() ) {
-            const auto& pos = emitterData["position"];
-            data.position.x = pos[0].GetFloat();
-            data.position.y = pos[1].GetFloat();
-            data.position.z = pos[2].GetFloat();
-        }
-
-        // Direction
-        if ( emitterData.HasMember("direction") && emitterData["direction"].IsArray() ) {
-            const auto& dir = emitterData["direction"];
-            data.direction.x = dir[0].GetFloat();
-            data.direction.y = dir[1].GetFloat();
-            data.direction.z = dir[2].GetFloat();
-        }
-
         // Scalars
         if ( emitterData.HasMember("emissionRate") ) data.emissionRate = emitterData["emissionRate"].GetFloat();
         if ( emitterData.HasMember("spreadAngle") ) data.spreadAngle = emitterData["spreadAngle"].GetFloat();

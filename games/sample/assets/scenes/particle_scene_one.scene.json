@@ -89,7 +89,7 @@
             }
         },
         {
-            "name": "Sparkler",
+            "name": "Joker Gas",
             "components": {
                 "Transform": {
                     "position": [ 0.0, 1.0, 2.0 ],
@@ -97,83 +97,78 @@
                     "scale": [ 1.0, 1.0, 1.0 ]
                 },
                 "ParticleEmitter": {
-                    "emissionRate": 100.0,
-                    "spreadAngle": 45.0,
-                    "particleLifetime": 1.5,
-                    "lifetimeVariation": 0.3,
-                    "initialSpeed": 8.0,
-                    "speedVariation": 2.0,
-                    "startSize": 0.2,
-                    "endSize": 0.0,
-                    "sizeVariation": 0.05,
+                    "emissionRate": 80.0,
+                    "spreadAngle": 70.0,
+                    "particleLifetime": 4.0,
+                    "lifetimeVariation": 1.0,
+                    "initialSpeed": 1.0,
+                    "speedVariation": 0.5,
 
-                    "startColor": [ 1.0, 0.8, 0.3, 1.0 ],
-                    "endColor": [ 0.5, 0.1, 0.0, 0.0 ],
+                    "startSize": 1.2,
+                    "endSize": 3.5,
+                    "sizeVariation": 0.3,
 
-                    "direction": [ 0.0, 1.0, 0.0 ],
-                    "position": [ 0.0, 0.0, 0.0 ],
+                    "startColor": [ 0.6, 0.0, 0.8, 0.8 ],
+                    "endColor": [ 0.1, 1.0, 0.2, 0.0 ],
 
                     "usePhysics": false,
-                    "maxParticles": 500
+                    "maxParticles": 600
                 }
             }
         },
         {
-            "name": "Player",
+            "name": "Smoke Ploom",
             "components": {
                 "Transform": {
-                    "position": [ -5.0, 10.0, 5.0 ],
+                    "position": [ -5.0, 1.0, -8.0 ],
                     "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
                     "scale": [ 1.0, 1.0, 1.0 ]
                 },
-                "Render3D": {
-                    "mesh": {
-                        "name": "cubeMesh",
-                        "primitiveType": "Sphere"
-                    },
-                    "material": {
-                        "texture": "textures/test.png",
-                        "diffuse": [ 1.0, 10.0, 1.0 ],
-                        "specular": [ 0.2, 0.2, 0.2 ],
-                        "shininess": 32.0
-                    }
+                "ParticleEmitter": {
+                    "emissionRate": 150.0,
+                    "spreadAngle": 85.0,
+                    "particleLifetime": 6.0,
+                    "lifetimeVariation": 1.5,
+                    "initialSpeed": 0.6,
+                    "speedVariation": 0.3,
+
+                    "startSize": 20.0,
+                    "endSize": 10.0,
+                    "sizeVariation": 1.5,
+
+                    "startColor": [ 0.2, 0.2, 0.2, 0.9 ],
+                    "endColor": [ 1, 1, 1, 0.0 ],
+
+                    "usePhysics": true,
+                    "maxParticles": 800
+                }
+            }
+        },
+        {
+            "name": "Jet Burner",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 1.0, 10.0 ],
+                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
                 },
-                "Physics": {
-                    "type": "Dynamic",
-                    "shapeDefinition": {
-                        "type": "Box",
-                        "size": {
-                            "x": 1.0,
-                            "y": 1.0,
-                            "z": 1.0
-                        },
-                        "radius": 0.5, 
-                        "height": 1.0
-                    },
-                    "mass": 1.0,
-                    "inertia": {
-                        "x": 0.0,
-                        "y": 0.0,
-                        "z": 0.0
-                    },
-                    "centerOfMass": {
-                        "x": 0.0,
-                        "y": 0.0,
-                        "z": 0.0
-                    },
-                    "linearDamping": 0.05,
-                    "angularDamping": 0.1,
-                    "friction": 0.5,
-                    "restitution": 0.1,
-                    "collisionGroup": 1,
-                    "collisionMask": 4294967295,
-                    "useCCD": true,
-                    "ccdMotionThreshold": 0.01,
-                    "ccdSweptSphereRadius": 1.0,
-                    "gravityScale": 1.0
-                },
-                "Script": {
-                    "path": "scripts/player_script.lua"
+                "ParticleEmitter": {
+                    "emissionRate": 400.0,
+                    "spreadAngle": 10.0,
+                    "particleLifetime": 0.2,
+                    "lifetimeVariation": 0.1,
+                    "initialSpeed": 20.0,
+                    "speedVariation": 4.0,
+
+                    "startSize": 5.6,
+                    "endSize": 0.6,
+                    "sizeVariation": 0.1,
+
+                    "startColor": [ 1.0, 0.6, 0.1, 1.0 ],
+                    "endColor": [ 0.2, 0.4, 1.0, 0.0 ],
+
+                    "usePhysics": false,
+                    "maxParticles": 600
                 }
             }
         }
