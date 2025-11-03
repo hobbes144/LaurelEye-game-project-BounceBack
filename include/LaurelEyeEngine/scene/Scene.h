@@ -16,11 +16,14 @@
 #include <rapidjson/document.h>
 #include "LaurelEyeEngine/core/EngineContext.h"
 #include "LaurelEyeEngine/io/Assets.h"
+#include "LaurelEyeEngine/math/Vector3.h"
 
 namespace LaurelEye {
     class Entity;
     struct SceneSettings {
         bool resetOnLoad = false; // If true the scene resets to default when loaded in. False by default
+        Vector3 color = Vector3(0.0f, 0.0f, 0.0f); // Background color for the scene
+        std::string backgroundTexturePath = ""; // Path to background texture
     };
     class Scene {
     public:
@@ -42,7 +45,7 @@ namespace LaurelEye {
         void shutdown();
         /// @brief Deserializes the settings for the scene, setting them into the member variable
         /// @param doc The rapidjson to deserialize
-        void deserializeSettings(const rapidjson::Value& settingsValue);
+        void deserializeSettings(const rapidjson::Value& settingsValue, const std::string& assetRoot);
 
         /* Scene monitoring */
         const std::string& getName() const { return name; }

@@ -68,6 +68,9 @@ namespace LaurelEye::Graphics {
         sp = std::make_shared<SingleBufferedDataPass>();
         sp->setup(*tempRenderResources.get());
 
+        bp = std::make_shared<SkydomePass>();
+        bp->setup(*tempRenderResources.get());
+
         uiPass = std::make_shared<UIPass>();
         uiPass->setup(*tempRenderResources.get());
 
@@ -142,6 +145,9 @@ namespace LaurelEye::Graphics {
             *tempRenderResources.get(),
             components};
 
+        if (bp->getTexture() != InvalidTexture) {
+            bp->execute(ctx);
+        }
         sp->execute(ctx);
 
         if ( testParticles ) {
@@ -327,7 +333,9 @@ namespace LaurelEye::Graphics {
     std::shared_ptr<ParticleRenderPass> RenderSystem::retrieveParticlePass() {
         return prp;
     }
-
+    std::shared_ptr<SkydomePass> RenderSystem::retrieveSkydomePass() {
+        return bp;
+    }
     // Camera interactons
 
     // TODO: Delete this when the full scenegraph is up, we don't want to do this.

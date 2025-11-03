@@ -16,6 +16,8 @@
 #include "LaurelEyeEngine/graphics/RenderSystem.h"
 #include "LaurelEyeEngine/scripting/ScriptSystem.h"
 #include "LaurelEyeEngine/particles/ParticleSystem.h"
+#include "LaurelEyeEngine/io/AssetManager.h"
+#include "LaurelEyeEngine/graphics/resources/Texture.h"
 
 namespace LaurelEye {
 
@@ -200,18 +202,30 @@ namespace LaurelEye {
     void Scene::deserialize(const rapidjson::Document& doc, const std::string& assetRoot) {
         // Check for and set settings
         if ( doc.HasMember("settings") && doc["settings"].IsObject() ) {
-            deserializeSettings(doc["settings"]);
+            deserializeSettings(doc["settings"], assetRoot);
         }
         // Deserialize entity list
         EntityFactory factory(ctx, assetRoot);
         factory.populateSceneFromJson(*this, doc);
     }
 
-    void Scene::deserializeSettings(const rapidjson::Value& settingsValue) {
+    void Scene::deserializeSettings(const rapidjson::Value& settingsValue, const std::string& assetRoot) {
         // Reset on load
         if ( settingsValue.HasMember("resetOnLoad") && settingsValue["resetOnLoad"].IsBool() ) {
             settings.resetOnLoad = settingsValue["resetOnLoad"].GetBool();
         }
+        if ( settingsValue.HasMember("backgroundColor") && settingsValue["backgroundColor"].IsArray() ) {
+            const auto& color = settingsValue["backgroundColor"];
+            ctx.getService<Graphics::RenderSystem>()->setClearColor(color[0].GetFloat(), color[1].GetFloat(), color[2].GetFloat());
+            ctx.getService<Graphics::RenderSystem>()->retrieveSkydomePass()->setTexture(Graphics::InvalidTexture);
+        }
+        else if ( settingsValue.HasMember("backgroundTexture") && settingsValue["backgroundTexture"].IsString() ) {
+            settings.backgroundTexturePath = settingsValue["backgroundTexture"].GetString();
+            auto texAsset = ctx.getService<IO::AssetManager>()->load(assetRoot + settings.backgroundTexturePath);
+            auto handle = ctx.getService<Graphics::RenderSystem>()->getRenderResources()->texture(texAsset->getName());
+            ctx.getService<Graphics::RenderSystem>()->retrieveSkydomePass()->addTexture(handle);
+        }
+        
     }
 
     Entity* Scene::addEntity(std::unique_ptr<Entity> entityToAdd) {

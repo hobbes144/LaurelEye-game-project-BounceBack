@@ -31,7 +31,7 @@ namespace LaurelEye::IO {
         /*TextureParameters textureParameters = TextureParameters(10,
                                                                 TEXTURE_NEAREST, TEXTURE_LINEAR_MIPMAP_LINEAR,
                                                                 TEXTURE_REPEAT, TEXTURE_REPEAT);*/
-        // stbi_set_flip_vertically_on_load(true);
+        stbi_set_flip_vertically_on_load(true);
         int channels = 0;
         int w = 0, h = 0;
         // Request 4 components (RGBA float)
@@ -62,7 +62,7 @@ namespace LaurelEye::IO {
         /*TextureParameters textureParameters = TextureParameters(10,
                                                                 TEXTURE_NEAREST, TEXTURE_LINEAR_MIPMAP_LINEAR,
                                                                 TEXTURE_REPEAT, TEXTURE_REPEAT);*/
-        // stbi_set_flip_vertically_on_load(true);
+        stbi_set_flip_vertically_on_load(true);
         int channels = 0;
         int w = 0, h = 0;
         unsigned char* data = stbi_load(path.c_str(), &w, &h, &channels, 0);

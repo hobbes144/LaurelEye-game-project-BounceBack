@@ -1,6 +1,7 @@
 ﻿{
     "settings": {
-        "resetOnLoad": true
+        "resetOnLoad": true,
+        "backgroundTexture": "textures/Tropical_Beach_8k.jpg"
     },
     "entities": [
         {
@@ -12,13 +13,12 @@
                     "scale": [ 50.0, 1.0, 50.0 ]
                 },
                 "Render3D": {
-                    "mesh":
-                    {
+                    "mesh": {
                         "name": "cubeMesh",
                         "primitiveType": "Cube"
                     },
                     "material": {
-                        "texture":  "textures/texture_01_green.png",
+                        "texture": "textures/texture_01_green.png",
                         "diffuse": [ 1.0, 10.0, 1.0 ],
                         "specular": [ 0.2, 0.2, 0.2 ],
                         "shininess": 32.0

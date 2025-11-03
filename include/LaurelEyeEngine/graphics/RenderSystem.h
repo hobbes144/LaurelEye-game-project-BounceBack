@@ -30,6 +30,7 @@
 #include "LaurelEyeEngine/graphics/graphics_components/PointLightComponent.h"
 #include "LaurelEyeEngine/graphics/renderpass/SingleBufferedDataPass.h"
 #include "LaurelEyeEngine/graphics/renderpass/SinglePass.h"
+#include "LaurelEyeEngine/graphics/renderpass/SkydomePass.h"
 #include "LaurelEyeEngine/graphics/renderpass/UIPass.h"
 #include "LaurelEyeEngine/graphics/resources/Lights.h"
 
@@ -124,11 +125,15 @@ namespace LaurelEye::Graphics {
 
         std::shared_ptr<SingleBufferedDataPass> retrieveSinglePass();
         std::shared_ptr<ParticleRenderPass> retrieveParticlePass();
+        std::shared_ptr<SkydomePass> retrieveSkydomePass();
 
         RenderResources* getRenderResources() {
             return tempRenderResources.get();
         }
 
+        void setClearColor(float x, float y, float z) {
+            glClearColor(x, y, z, 1.0f);
+        }
         bool testParticles = true;
 
     private:
@@ -158,6 +163,7 @@ namespace LaurelEye::Graphics {
         std::unique_ptr<RenderResources> tempRenderResources;
         /// @brief A single-pass rendering pipeline used for simple frame rendering.
         // std::shared_ptr<SinglePass> sp;
+        std::shared_ptr<SkydomePass> bp;
         std::shared_ptr<SingleBufferedDataPass> sp;
         std::shared_ptr<UIPass> uiPass;
         std::shared_ptr<ParticleRenderPass> prp;

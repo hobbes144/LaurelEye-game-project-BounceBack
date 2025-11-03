@@ -13,8 +13,7 @@ namespace LaurelEye::IO {
                                                      aiProcess_FixInfacingNormals |
                                                      aiProcess_GenUVCoords |
                                                      aiProcess_OptimizeMeshes |
-                                                     aiProcess_OptimizeGraph |
-                                                     aiProcess_FlipUVs);
+                                                     aiProcess_OptimizeGraph);
 
         if ( !scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode ) {
             throw std::runtime_error("MeshImporter: Failed to load mesh: " + path +
