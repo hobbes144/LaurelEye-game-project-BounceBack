@@ -89,34 +89,6 @@
             }
         },
         {
-            "name": "Joker Gas",
-            "components": {
-                "Transform": {
-                    "position": [ 0.0, 1.0, 2.0 ],
-                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
-                    "scale": [ 1.0, 1.0, 1.0 ]
-                },
-                "ParticleEmitter": {
-                    "emissionRate": 80.0,
-                    "spreadAngle": 70.0,
-                    "particleLifetime": 4.0,
-                    "lifetimeVariation": 1.0,
-                    "initialSpeed": 1.0,
-                    "speedVariation": 0.5,
-
-                    "startSize": 1.2,
-                    "endSize": 3.5,
-                    "sizeVariation": 0.3,
-
-                    "startColor": [ 0.6, 0.0, 0.8, 0.8 ],
-                    "endColor": [ 0.1, 1.0, 0.2, 0.0 ],
-
-                    "usePhysics": false,
-                    "maxParticles": 600
-                }
-            }
-        },
-        {
             "name": "SceneManager",
             "components": {
                 "Transform": {
@@ -130,7 +102,7 @@
             }
         },
         {
-          "name": "Joker Gas",
+            "name": "Joker Gas",
             "components": {
                 "Transform": {
                     "position": [ 0.0, 1.0, 2.0 ],

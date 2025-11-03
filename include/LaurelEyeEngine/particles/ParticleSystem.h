@@ -25,6 +25,7 @@ namespace LaurelEye::Particles {
         void shutdown() override;
 
         void registerComponent(const ComponentPtr component) override;
+        void deregisterComponent(const ComponentPtr component) override;
 
         void setMaxParticles(unsigned int);
 

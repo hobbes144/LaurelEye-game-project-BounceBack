@@ -22,6 +22,10 @@ namespace LaurelEye::Scripting {
         shutdownFunc = env["onShutdown"];
     }
 
+    Sol2ScriptInstance::~Sol2ScriptInstance() {
+        invalidate();
+    }
+
     void Sol2ScriptInstance::onStart() {
         if ( startFunc.valid() ) {
             auto result = startFunc();

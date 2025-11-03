@@ -55,6 +55,29 @@ namespace LaurelEye::Physics {
         newBody->BindTransform(component->GetBodyData().transformRef);
     }
 
+    void PhysicsSystem::deregisterComponent(const ComponentPtr component) {
+        if ( !component ) return;
+
+        // Get body ref
+        auto bodyRef = component->GetBodyRef();
+        if ( bodyRef ) {
+            // Unbind from component and transform
+            bodyRef->BindPhysicsBodyComponent(nullptr);
+            bodyRef->BindTransform(nullptr);
+
+            // Remove from world
+            if ( world ) {
+                world->RemoveBody(bodyRef);
+            }
+
+            // Reset the component's body reference
+            component->SetBodyRef(nullptr);
+        }
+
+        // Finally remove from active list
+        ISystem<PhysicsBodyComponent>::deregisterComponent(component);
+    }
+
     std::shared_ptr<IBody> PhysicsSystem::CreateBody(const PhysicsBodyData& data) {
         return world ? world->CreateBody(data) : nullptr;
     }

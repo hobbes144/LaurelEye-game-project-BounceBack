@@ -81,6 +81,7 @@ namespace LaurelEye {
         std::string nextSceneQueued;
         // Whether we are switching scenes or not
         bool switchingScene = false;
+        bool pendingReload = false;
 
         /// @brief Called between frames. Searches the sceneFilePaths for the given name
         /// and calls AssetManager to load the scene json

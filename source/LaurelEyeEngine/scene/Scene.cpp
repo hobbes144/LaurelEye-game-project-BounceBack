@@ -19,17 +19,27 @@
 
 namespace LaurelEye {
 
-    Scene::Scene(const std::string& name) : name(name), initialized(false), paused(false) {}
+    Scene::Scene(const std::string& name, EngineContext& context, std::shared_ptr<IO::JsonAsset> json, const std::string& assetPath)
+        : name(name), active(false), paused(false),
+        ctx(context), sceneJson(json), assetRootPath(assetPath) {}
     Scene::~Scene() {
         entities.clear();
         pendingAdditions.clear();
         pendingRemovals.clear();
-        initialized = false;
+        sceneJson.reset();
     }
 
-    void Scene::initialize(EngineContext& ctx) {
+    void Scene::initialize()
+    {
         std::cout << "Initializing scene: " << name << std::endl;
-        initialized = true;
+        assert(sceneJson && "No valid scene asset for scene.");
+        assert(!assetRootPath.empty() && "No valid asset root path for scene.");
+
+        deserialize(sceneJson->jsonDocument, assetRootPath);
+    }
+
+    void Scene::registerScene() {
+        if ( active ) return;
 
         // Refresh the entity list
         spawnPendingEntities();
@@ -43,7 +53,7 @@ namespace LaurelEye {
 
         for ( auto& entity : entities ) {
             for ( auto& comp : entity->getComponents() ) {
-                if ( auto* transformComp = dynamic_cast<TransformComponent*>( comp.get() )) {
+                if ( auto* transformComp = dynamic_cast<TransformComponent*>(comp.get()) ) {
                     if ( transformSystem ) {
                         transformSystem->registerComponent(transformComp);
                     }
@@ -83,7 +93,7 @@ namespace LaurelEye {
                         scriptingSystem->registerComponent(scriptComp);
                     }
                 }
-                else if ( auto* emitterComp = dynamic_cast<Particles::ParticleEmitterComponent*>( comp.get() ) ) {
+                else if ( auto* emitterComp = dynamic_cast<Particles::ParticleEmitterComponent*>(comp.get()) ) {
                     if ( particleSystem ) {
                         particleSystem->registerComponent(emitterComp);
                     }
@@ -91,33 +101,21 @@ namespace LaurelEye {
                 // add more as needed...
             }
         }
-
-        // Sync world transforms before initial update frame.
-        // TODO - better place for this?
         if ( transformSystem ) {
             transformSystem->update(0.016);
         }
 
-        initialized = true;
+        active = true;
     }
 
-    void Scene::update(float deltaTime) {
-        //std::cout << "Updating scene: " << name << std::endl;
-        // Handle any pending add/remove
-        spawnPendingEntities();
-        cleanupDestroyedEntities();
-    }
-
-    void Scene::shutdown(EngineContext& ctx) {
-        std::cout << "Shutting down scene: " << name << std::endl;
-        // TODO - deregister all stored entities from their systems
-        spawnPendingEntities();
-        cleanupDestroyedEntities();
+    void Scene::deregisterScene() {
+        if ( !active ) return;
 
         auto* transformSystem = ctx.getService<TransformSystem>();
         auto* physicsSystem = ctx.getService<Physics::PhysicsSystem>();
         auto* renderSystem = ctx.getService<Graphics::RenderSystem>();
         auto* scriptingSystem = ctx.getService<Scripting::ScriptSystem>();
+        auto* particleSystem = ctx.getService<Particles::ParticleSystem>();
 
         for ( auto& entity : entities ) {
             for ( auto& comp : entity->getComponents() ) {
@@ -161,12 +159,45 @@ namespace LaurelEye {
                         scriptingSystem->deregisterComponent(scriptComp);
                     }
                 }
+                else if ( auto* emitterComp = dynamic_cast<Particles::ParticleEmitterComponent*>(comp.get()) ) {
+                    if ( particleSystem ) {
+                        particleSystem->deregisterComponent(emitterComp);
+                    }
+                }
                 // add more as needed...
             }
         }
+
+        active = false;
     }
 
-    void Scene::deserialize(const rapidjson::Document& doc, EngineContext& ctx, const std::string& assetRoot) {
+    void Scene::update(float deltaTime) {
+        //std::cout << "Updating scene: " << name << std::endl;
+        // Handle any pending add/remove
+        spawnPendingEntities();
+        cleanupDestroyedEntities();
+    }
+
+    void Scene::shutdown() {
+        std::cout << "Shutting down scene: " << name << std::endl;
+
+        if ( active ) {
+            std::cerr << "Warning: Scene::shutdown called while still active. Force deactivating.\n";
+            deregisterScene(); // attempt to make things safe
+        }
+
+        entities.clear();
+        pendingAdditions.clear();
+        pendingRemovals.clear();
+
+
+        // TODO - for scene saving
+        // if (serializeScene){
+        // sceneJson->serialize();
+        //}
+    }
+
+    void Scene::deserialize(const rapidjson::Document& doc, const std::string& assetRoot) {
         // Check for and set settings
         if ( doc.HasMember("settings") && doc["settings"].IsObject() ) {
             deserializeSettings(doc["settings"]);

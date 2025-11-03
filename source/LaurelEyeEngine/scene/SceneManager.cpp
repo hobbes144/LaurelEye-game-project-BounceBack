@@ -36,14 +36,29 @@ namespace LaurelEye {
             performSceneSwitch();
         }
 
+        if ( pendingReload ) {
+            pendingReload = false;
+            if ( currentScene ) {
+                currentScene->shutdown();
+                currentScene->initialize();
+                currentScene->registerScene();
+            }
+        }
+
         if ( currentScene ) {
             currentScene->update(deltaTime);
         }
+
     }
 
     void SceneManager::changeScene(const std::string& nextScene) {
         if ( !hasScene(nextScene) ) {
             throw std::runtime_error("SceneManager: Unknown scene '" + nextScene + "'");
+        }
+        // Prevent changing into the current scene
+        if ( currentScene && nextScene == currentScene->getName() ) {
+            reloadCurrentScene();
+            return;
         }
         nextSceneQueued = nextScene;
         switchingScene = true;
@@ -52,9 +67,7 @@ namespace LaurelEye {
     void SceneManager::reloadCurrentScene() {
         if ( !currentScene ) return;
 
-        std::string sceneName = currentScene->getName();
-        currentScene->shutdown(*context);
-        currentScene->initialize(*context);
+        pendingReload = true;
     }
 
     bool SceneManager::hasScene(const std::string& name) const {
@@ -87,8 +100,8 @@ namespace LaurelEye {
         }
 
         // Create a Scene instance
-        auto scene = std::make_unique<Scene>(sceneName);
-        scene->deserialize(jsonAsset->jsonDocument, *context, assetsRoot);
+        auto scene = std::make_unique<Scene>(sceneName, *context, jsonAsset, assetsRoot);
+        scene->initialize(); // Initialize the scene once when its created
 
         // Cache for future reuse
         scenes[sceneName] = std::move(scene);
@@ -98,7 +111,7 @@ namespace LaurelEye {
         if ( nextSceneQueued.empty() ) return;
 
         if ( currentScene ) {
-            currentScene->shutdown(*context);
+            currentScene->deregisterScene();
         }
 
         const std::string targetName = nextSceneQueued;
@@ -116,7 +129,7 @@ namespace LaurelEye {
         }
 
         if ( currentScene ) {
-            currentScene->initialize(*context);
+            currentScene->registerScene();
         }
     }
 

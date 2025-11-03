@@ -41,7 +41,17 @@ namespace LaurelEye::Scripting {
             if ( comp->getScriptInstance() )
                 comp->getScriptInstance()->onStart();
         }
-        components.push_back(comp);
+        ISystem<ScriptComponent>::registerComponent(comp);
+    }
+
+    void ScriptSystem::deregisterComponent(const ComponentPtr comp) {
+        if ( !comp ) return;
+        // Clean up Lua instance
+        if ( auto* inst = comp->getScriptInstance() ) {
+            inst->onShutdown(); // Let the Lua script handle cleanup
+            comp->destroyScriptInstance();
+        }
+        ISystem<ScriptComponent>::deregisterComponent(comp);
     }
  
 } // namespace LaurelEye::Scripting

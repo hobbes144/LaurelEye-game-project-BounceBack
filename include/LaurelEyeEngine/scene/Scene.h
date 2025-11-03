@@ -15,6 +15,7 @@
 #include <vector>
 #include <rapidjson/document.h>
 #include "LaurelEyeEngine/core/EngineContext.h"
+#include "LaurelEyeEngine/io/Assets.h"
 
 namespace LaurelEye {
     class Entity;
@@ -23,27 +24,28 @@ namespace LaurelEye {
     };
     class Scene {
     public:
-        explicit Scene(const std::string& name);
+        explicit Scene(const std::string& name, EngineContext& context,
+            std::shared_ptr<IO::JsonAsset> sceneJson, const std::string& assetPath);
         ~Scene();
 
         /* Core scene lifecycle */
 
-        /// @brief Register all entities' components into their respective systems
-        void initialize(EngineContext& ctx);
+        /// @brief Initialize the scene with the given data stub where to load it from,
+        /// which are passed in when the scene is created.
+        void initialize();
+        /// @brief Register the scene. Registers the entities of a scene within their respective system
+        void registerScene();
+        /// @brief Deregister the scene. Deregisters the entities of a scene within their respective system
+        void deregisterScene();
         void update(float deltaTime);
         /// @brief Deregister all entities' components from their respective systems
-        void shutdown(EngineContext& ctx);
-        /// @brief Given a rapidjson document describing the scene, initialize with the given data
-        /// @param doc The rapidjson document describing the state of the scene
-        /// @param assetPath localized path to the assets folder for the given game
-        void deserialize(const rapidjson::Document& doc, EngineContext& ctx, const std::string& assetRoot);
+        void shutdown();
         /// @brief Deserializes the settings for the scene, setting them into the member variable
         /// @param doc The rapidjson to deserialize
         void deserializeSettings(const rapidjson::Value& settingsValue);
 
         /* Scene monitoring */
         const std::string& getName() const { return name; }
-        bool gsInitialize() const { return initialized; }
         bool isPaused() const { return paused; }
 
         // --- Entity management (deferred) ---
@@ -64,15 +66,23 @@ namespace LaurelEye {
     private:
         void spawnPendingEntities();
         void cleanupDestroyedEntities();
+        /// @brief Given a rapidjson document describing the scene, initialize with the given data
+        /// @param doc The rapidjson document describing the state of the scene
+        /// @param assetPath localized path to the assets folder for the given game
+        void deserialize(const rapidjson::Document& doc, const std::string& assetRoot);
 
+        EngineContext& ctx;
         std::string name;
 
         std::vector<std::unique_ptr<Entity>> entities; // Flat list of entities for the scene
         std::vector<std::unique_ptr<Entity>> pendingAdditions;
         std::vector<Entity*> pendingRemovals;
 
-        bool initialized;
+        bool active; // Whether or not the scene is active
         bool paused;
+
+        std::shared_ptr<IO::JsonAsset> sceneJson;
+        const std::string& assetRootPath;
 
         SceneSettings settings;
     };

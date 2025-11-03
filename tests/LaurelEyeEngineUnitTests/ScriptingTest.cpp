@@ -324,16 +324,21 @@ namespace LaurelEye {
 
         std::cout << "------- Scripting Scene Test -------" << std::endl;
 
-        // 1. EngineContext + SceneManager
-        std::shared_ptr<EngineContext> context = std::make_shared<EngineContext>();
+        // === 1. Context & SceneManager ===
+        auto context = std::make_shared<EngineContext>();
         EngineConfig config{};
         config.assetRoot = TEST_MEDIA_DIR;
 
         auto sceneManager = std::make_unique<SceneManager>(*context, config);
         context->registerService<SceneManager>(sceneManager.get());
 
-        // 2. Inject a simple test scene
-        auto testScene = std::make_unique<Scene>("TestScene");
+        // === 2. Dummy JsonAsset for Scene ===
+        auto dummyJson = std::make_shared<IO::JsonAsset>("");
+        dummyJson->jsonDocument.SetObject(); // empty document
+
+        auto testScene = std::make_unique<Scene>("TestScene", *context, dummyJson, config.assetRoot);
+
+        // Add a couple dummy entities
         {
             auto player = std::make_unique<Entity>("Player");
             auto light = std::make_unique<Entity>("Light");
@@ -344,20 +349,22 @@ namespace LaurelEye {
         sceneManager->injectSceneForTest("TestScene", std::move(testScene));
         sceneManager->setCurrentScene(sceneManager->getScene("TestScene"));
 
-        sceneManager->getCurrentScene()->initialize(*context);
+        auto* scene = sceneManager->getCurrentScene();
+        scene->initialize();
+        scene->registerScene();
 
-        // 3. Script system
+        // === 3. Script System ===
         ScriptSystem scriptSystem(ScriptSystem::ScriptSystemType::Sol2);
         scriptSystem.setEngineContext(*context);
         scriptSystem.initialize();
 
-        // 4. Entity with Lua script
+        // === 4. Entity with Lua script ===
         Entity scriptEntity("SceneTestEntity");
         auto* scriptComp = scriptEntity.addComponent<ScriptComponent>(
             std::string(TEST_MEDIA_DIR) + "/scripts/test_scene.lua");
         scriptSystem.registerComponent(scriptComp);
 
-        // 5. Update loop
+        // === 5. Run Update Loop ===
         std::cout << "Running scene script...\n";
         const float dt = 1.0f / 60.0f;
         for ( int i = 0; i < 5; ++i ) {
@@ -366,7 +373,10 @@ namespace LaurelEye {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
 
+        // Cleanup
         scriptSystem.shutdown();
+        scene->deregisterScene();
+
         std::cout << "------- Scripting Scene Test End -------" << std::endl;
 #endif
     }

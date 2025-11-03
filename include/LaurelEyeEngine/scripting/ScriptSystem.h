@@ -25,6 +25,7 @@ namespace LaurelEye::Scripting {
         void update(float deltaTime) override;
         void shutdown() override;
         void registerComponent(const ComponentPtr component) override;
+        void deregisterComponent(const ComponentPtr component) override;
 
         IScriptEngineState* getEngineState() const { return scriptEngineState.get(); }
     private:

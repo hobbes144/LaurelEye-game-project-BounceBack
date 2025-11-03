@@ -22,7 +22,6 @@ void Sol2API_Scene::setupScene(sol::state& lua) {
         // Info
         "getName", &Scene::getName,
         "isPaused", &Scene::isPaused,
-        "gsInitialize", &Scene::gsInitialize,
 
         // Entity management
         "addEntity", &Scene::addEntityFromRaw,

@@ -110,6 +110,21 @@ namespace LaurelEye::Physics {
         return newBody;
     }
 
+    void BulletWorld::RemoveBody(std::shared_ptr<IBody> body) {
+        if ( !body ) return;
+        auto bulletBody = std::dynamic_pointer_cast<BulletBody>(body);
+        if ( !bulletBody ) return;
+
+        auto internal = bulletBody->GetInternal();
+        if ( internal ) world->removeRigidBody(internal.get());
+
+        // Erase body
+        bodies.erase(
+            std::remove_if(bodies.begin(), bodies.end(),
+                           [&](const std::shared_ptr<IBody>& b) { return b == body; }),
+            bodies.end());
+    }
+
     std::shared_ptr<ICollisionShape> BulletWorld::CreateShape(const CollisionShapePhys& csp) {
         btCollisionShape* btShape = nullptr;
         switch ( csp.type ) {

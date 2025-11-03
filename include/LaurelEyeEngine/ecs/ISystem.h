@@ -19,21 +19,24 @@ namespace LaurelEye {
     public:
         using ComponentPtr = ComponentType*;
 
-        virtual ~ISystem() {
-            for (auto component : components) {
-                deregisterComponent(component);
-            }
-        }
-
         virtual void initialize() = 0;
         virtual void update(float deltaTime) = 0;
         virtual void shutdown() = 0;
 
+        /// @brief Called ONLY ONCE when a system first sees a component.
+        /// Sets up any system specific stuff within the component
+        /// @param component Component to register
         virtual void registerComponent(const ComponentPtr component) {
+            if ( !component ) return;
             components.push_back(component);
         }
 
+        /// @brief Called ONLY ONCE when a system last sees a component.
+        /// Tears down any scene specific stuff within the component
+        /// @param component Component to deregister
         virtual void deregisterComponent(ComponentPtr component) {
+            if ( !component ) return;
+
             components.erase(
                 std::remove(components.begin(), components.end(), component),
                 components.end());

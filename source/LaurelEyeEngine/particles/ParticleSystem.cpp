@@ -107,6 +107,33 @@ namespace LaurelEye::Particles {
         component->rng.seed(std::random_device{}());
     }
 
+    void ParticleSystem::deregisterComponent(const ComponentPtr component) {
+        if ( !component )
+            return;
+
+        // --- 1. Clear all particle data from this emitter ---
+        component->ClearParticles();
+
+        // --- 2. Remove from our component list ---
+        LaurelEye::ISystem<ParticleEmitterComponent>::deregisterComponent(component);
+
+        // --- 3. Recompute active particle count ---
+        activeParticles = 0;
+        for ( auto* emitter : components ) {
+            for ( const auto& p : emitter->GetParticles() ) {
+                if ( p.active )
+                    ++activeParticles;
+            }
+        }
+
+        // --- 4. If this was the last emitter, release GPU resources ---
+        if ( components.empty() ) {
+            particleBuffer.reset(); // release the GeometryBuffer
+            if ( prp )
+                prp->updateParticleBuffer(nullptr); // tell the render pass it’s gone
+        }
+    }
+
     void ParticleSystem::setMaxParticles(unsigned int mp) {
         MaxParticles = mp;
     }

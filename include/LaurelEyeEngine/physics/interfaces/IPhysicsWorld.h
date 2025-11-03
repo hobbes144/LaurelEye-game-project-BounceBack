@@ -39,6 +39,8 @@ namespace LaurelEye::Physics {
         /// @return A shared pointer to the created body.
         virtual std::shared_ptr<IBody> CreateBody(const PhysicsBodyData& data) = 0;
 
+        virtual void RemoveBody(std::shared_ptr<IBody> body) = 0;
+
         /// @brief Create a new collision shape.
         /// @param csPhys Collision shape description.
         /// @return A shared pointer to the created collision shape.

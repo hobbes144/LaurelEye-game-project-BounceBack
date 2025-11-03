@@ -1,4 +1,4 @@
-/// @file   ScriptComponent.h
+﻿/// @file   ScriptComponent.h
 /// @author Alex Humphries (humphriesa02@gmail.com)
 /// @par    **DigiPen Email**
 ///     alex.humphries@digipen.edu
@@ -24,6 +24,7 @@ namespace LaurelEye::Scripting {
 
         const std::string& getScriptPath() const { return scriptPath; }
         IScriptInstance* getScriptInstance() const { return scriptInstance.get(); }
+        void destroyScriptInstance() { scriptInstance.reset(); }
 
         void setScriptInstance(std::unique_ptr<IScriptInstance> instance) {
             scriptInstance = std::move(instance);

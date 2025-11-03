@@ -21,7 +21,7 @@ function onUpdate(dt)
         SceneManager:changeScene("ParticleScene")
     elseif Input:isKeyPressed(Key.Five) then
         log("Reloading Current Scene")
-        SceneManager:rechangeScene()
+        SceneManager:reloadCurrentScene()
     end
 end
 

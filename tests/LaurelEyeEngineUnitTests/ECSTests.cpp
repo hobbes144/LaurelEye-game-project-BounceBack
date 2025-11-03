@@ -41,22 +41,26 @@ namespace LaurelEye {
     }
 
     void sceneTest() {
+        using namespace LaurelEye;
+
+        std::cout << "------- Scene Test -------" << std::endl;
+
         // Dummy component for testing
         struct ShootyComponent : public IComponent {
             int bullets{50};
         };
 
-        // Create test scene
-        struct TestScene : public Scene {
-            explicit TestScene(const std::string& name)
-                : Scene(name) {}
-        };
+        // === Setup Context & Dummy Scene ===
+        EngineContext ctx;
+        auto dummyJson = std::make_shared<IO::JsonAsset>("");
+        dummyJson->jsonDocument.SetObject(); // empty
 
-        auto testScene = std::make_unique<TestScene>("TestScene");
+        std::string assetRoot = TEST_MEDIA_DIR;
+
+        auto testScene = std::make_unique<Scene>("TestScene", ctx, dummyJson, assetRoot);
         assert(testScene->getName() == "TestScene");
-        assert(!testScene->gsInitialize());
 
-        // Create and tag entities
+        // === Entities ===
         auto player = std::make_unique<Entity>("Player");
         auto child1 = std::make_unique<Entity>("Child1");
         auto child2 = std::make_unique<Entity>("Child2");
@@ -65,39 +69,40 @@ namespace LaurelEye {
         child1->addTag("Ally");
         child2->addTag("Enemy");
 
-        // Add component to player
+        // Add component
         auto comp = player->addComponent<ShootyComponent>();
-        assert(comp != nullptr);
-        assert(comp->bullets == 50);
+        assert(comp && comp->bullets == 50);
 
-        // Add entities to scene
+        // Add entities
         testScene->addEntity(std::move(player));
         testScene->addEntity(std::move(child1));
         testScene->addEntity(std::move(child2));
 
-        // Before update: entities not yet spawned
+        // Before update: not spawned
         auto preUpdatePlayers = testScene->findEntitiesWithTag("Player");
         assert(preUpdatePlayers.empty());
         std::cout << "Pre-update: No Player Found\n";
 
-        // Run updates to trigger entity spawn
-        for ( int frame = 0; frame < 10; ++frame ) {
-            testScene->update(0.016f); // ~60 FPS
+        // Trigger spawn
+        for ( int i = 0; i < 2; ++i ) {
+            testScene->update(0.016f);
         }
 
-        // After update: entities should be active
+        // After update
         auto postUpdatePlayers = testScene->findEntitiesWithTag("Player");
         assert(!postUpdatePlayers.empty());
         std::cout << "Post-update: Player Found\n";
 
         // Additional checks
         auto foundPlayer = testScene->findEntityByName("Player");
-        assert(foundPlayer != nullptr);
-        assert(foundPlayer->compareTag("Player"));
+        assert(foundPlayer && foundPlayer->compareTag("Player"));
 
         auto allies = testScene->findEntitiesWithTag("Ally");
         auto enemies = testScene->findEntitiesWithTag("Enemy");
         assert(allies.size() == 1);
         assert(enemies.size() == 1);
+
+        std::cout << "------- Scene Test End -------" << std::endl;
     }
+
 } // namespace LaurelEye

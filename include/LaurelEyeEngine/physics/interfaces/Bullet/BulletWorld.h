@@ -26,6 +26,8 @@ namespace LaurelEye::Physics {
 
         std::shared_ptr<IBody> CreateBody(const PhysicsBodyData& data) override;
 
+        void RemoveBody(std::shared_ptr<IBody> body);
+
         std::shared_ptr<ICollisionShape> CreateShape(
             const CollisionShapePhys& csPhys) override;
 
