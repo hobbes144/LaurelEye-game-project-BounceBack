@@ -7,11 +7,11 @@
 
 #include "LaurelEyeEngine/graphics/resources/Shader.h"
 
-#include "LaurelEyeEngine/math/Vector3.h"
 #include "LaurelEyeEngine/math/Matrix4.h"
+#include "LaurelEyeEngine/math/Vector3.h"
 
-#include <sstream>
 #include <fstream>
+#include <sstream>
 #include <string>
 
 namespace LaurelEye::Graphics {
@@ -251,9 +251,11 @@ namespace LaurelEye::Graphics {
         }
         GLint location = glGetUniformLocation(programID, name.c_str());
         uniformLocationCache[name] = location;
+#if !defined(NDEBUG)
         if ( location == -1 ) {
             std::cerr << "ERROR::SHADER::UNIFORM::NOT_EXISTS::" << name << std::endl;
         }
+#endif
 
         return location;
     }
@@ -351,42 +353,39 @@ namespace LaurelEye::Graphics {
         glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, value.getData());
     }
 
-     void Shader::bindTexture(
-       unsigned int textureUnit,
-       const std::string& name,
-       TextureHandle texHandle) const
-     {
+    void Shader::bindTexture(
+        unsigned int textureUnit,
+        const std::string& name,
+        TextureHandle texHandle) const {
 
-       // Validate texture unit against device limits to avoid GL_INVALID_ENUM.
-       GLint maxUnits = 0;
-       glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxUnits);
-       if ( static_cast<GLint>(textureUnit) >= maxUnits ) {
-           std::cout << "Poopoo Peepee" << std::endl;
-           return;
-
-       }
+        // Validate texture unit against device limits to avoid GL_INVALID_ENUM.
+        GLint maxUnits = 0;
+        glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxUnits);
+        if ( static_cast<GLint>(textureUnit) >= maxUnits ) {
+            std::cout << "Poopoo Peepee" << std::endl;
+            return;
+        }
         glActiveTexture(GL_TEXTURE0 + textureUnit);
         // always 2D textures for now
-           glBindTexture(GL_TEXTURE_2D, texHandle);
+        glBindTexture(GL_TEXTURE_2D, texHandle);
         // set the sampler uniform to the texture unit index
-           setInt(name, static_cast<int>(textureUnit));
-     }
+        setInt(name, static_cast<int>(textureUnit));
+    }
 
-     void Shader::unbindTexture(unsigned int textureUnit) const
-     {
-       glActiveTexture(GL_TEXTURE0 + textureUnit);
-         glBindTexture(static_cast<GLenum>(TextureType::Texture2D), 0);
-     }
+    void Shader::unbindTexture(unsigned int textureUnit) const {
+        glActiveTexture(GL_TEXTURE0 + textureUnit);
+        glBindTexture(static_cast<GLenum>(TextureType::Texture2D), 0);
+    }
 
-     //void Shader::bindImageTexture(
-     //  unsigned int bindingUnit,
-     //  TextureHandle texHandle,
-     //  GLenum access) const
-     //{
+    // void Shader::bindImageTexture(
+    //   unsigned int bindingUnit,
+    //   TextureHandle texHandle,
+    //   GLenum access) const
+    //{
 
-     //  //Find a way to get the format from the texHandle for the last argument
-     //  glBindImageTexture(
-     //    bindingUnit, texHandle, 0, GL_FALSE, 0, access, );
-     //}
+    //  //Find a way to get the format from the texHandle for the last argument
+    //  glBindImageTexture(
+    //    bindingUnit, texHandle, 0, GL_FALSE, 0, access, );
+    //}
 
 } // namespace LaurelEye::Graphics

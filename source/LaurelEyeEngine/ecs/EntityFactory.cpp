@@ -205,10 +205,6 @@ namespace LaurelEye {
                 renderComponent->GetMaterial()->setProperty<Vector2>("mainTextureScale", Vector2(1.0f));
             }
 
-            if ( material.HasMember("objectId") && material["objectId"].IsInt() ) {
-                int objectId = material["objectId"].GetInt();
-                renderComponent->GetMaterial()->setProperty<int>("objectId", objectId);
-            }
             if ( material.HasMember("diffuse") && material["diffuse"].IsArray() ) {
                 const auto& diff = material["diffuse"].GetArray();
                 renderComponent->GetMaterial()->setProperty<Vector3>("diffuse", Vector3(diff[0].GetFloat(), diff[1].GetFloat(), diff[2].GetFloat()));

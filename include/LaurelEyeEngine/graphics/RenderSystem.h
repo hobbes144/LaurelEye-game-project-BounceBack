@@ -129,6 +129,8 @@ namespace LaurelEye::Graphics {
             return tempRenderResources.get();
         }
 
+        bool testParticles = true;
+
     private:
         /// @brief Configuration data used to initialize the render system.
         RenderSystemConfig config;

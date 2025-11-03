@@ -14,6 +14,7 @@
 #include "LaurelEyeEngine/graphics/resources/GeometryBuffer.h"
 #include "LaurelEyeEngine/graphics/resources/Shader.h"
 #include "LaurelEyeEngine/graphics/ShaderManager.h"
+#include <stdexcept>
 
 namespace LaurelEye::Graphics {
 
@@ -27,6 +28,9 @@ namespace LaurelEye::Graphics {
 
         shader->use();
         // Action
+        if (!particleBuffer) {
+            throw std::runtime_error("ERROR::PARTICLE_RENDER_PASS::particleBuffer not initialized");
+        }
 
         particleBuffer->bind();
 

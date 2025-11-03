@@ -82,13 +82,22 @@ namespace LaurelEye::Graphics {
             glNamedFramebufferTexture(createdBuffers[h].id, a.glAttachment, a.texture, 0);
 
             createdBuffers[h].attachments.push_back(a);
-            return colorAttachmentIndex-1;
+            return colorAttachmentIndex - 1;
         }
         case LaurelEye::Graphics::FramebufferAttachmentType::DepthStencil:
         case LaurelEye::Graphics::FramebufferAttachmentType::Stencil:
         default:
             assert(false && "ERROR::RENDER_SYSTEM::FRAMEBUFFER_FACTORY::CREATE::INVALID_ATTACHMENT_TYPE");
         }
+
+        // This should never happen, but is here as fallback
+        a.glAttachment = GL_COLOR_ATTACHMENT0 + colorAttachmentIndex;
+        ++colorAttachmentIndex;
+
+        glNamedFramebufferTexture(createdBuffers[h].id, a.glAttachment, a.texture, 0);
+
+        createdBuffers[h].attachments.push_back(a);
+        return colorAttachmentIndex - 1;
     }
 
     FramebufferAttachment LGLFramebufferFactory::createDepthAttachment(

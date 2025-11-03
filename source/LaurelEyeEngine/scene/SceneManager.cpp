@@ -12,7 +12,7 @@ namespace LaurelEye {
     }
 
     SceneManager::~SceneManager() {
-        
+
         currentScene = nullptr;
         scenes.clear();
         sceneFilePaths.clear();
@@ -159,7 +159,7 @@ namespace LaurelEye {
             initialSceneName = doc["initialScene"].GetString();
         }
     }
-#if defined(DEBUG) || defined(_DEBUG)
+#if !defined(NDEBUG)
     void SceneManager::injectSceneForTest(const std::string& name, std::unique_ptr<Scene> scene) {
         if ( !scene ) return;
         scenes[name] = std::move(scene);

@@ -1,16 +1,12 @@
 ﻿#include "LaurelEyeEngine/graphics/graphics_components/AmbientLightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/DirectionalLightComponent.h"
-#include "LaurelEyeEngine/graphics/graphics_components/PointLightComponent.h"
-#include "LaurelEyeEngine/graphics/graphics_components/Renderable2DComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/Renderable3DComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/UIComponent.h"
 #include "LaurelEyeEngine/graphics/RenderSystem.h"
 #include "LaurelEyeEngine/graphics/resources/Material.h"
 #include "LaurelEyeEngine/graphics/resources/Mesh.h"
 #include "LaurelEyeEngine/io/importers/ImageImporter.h"
-#include "LaurelEyeEngine/math/Quaternion.h"
 #include "TestDefinitions.h"
-#include <filesystem>
 #include <memory>
 
 namespace LaurelEye {
@@ -20,6 +16,7 @@ namespace LaurelEye {
         LaurelEye::Graphics::RenderSystemConfig renderConfig;
         renderConfig.windows.push_back(window);
         renderSystem.setConfig(renderConfig);
+        renderSystem.testParticles = false;
         renderSystem.initialize();
         context.registerService<LaurelEye::Graphics::RenderSystem>(&renderSystem);
 
@@ -67,7 +64,6 @@ namespace LaurelEye {
         groundRC->GetMaterial()->setTexture("mainTexture", handle);
         // End Texture Addition
 
-        groundRC->GetMaterial()->setProperty<int>("objectId", 3);
         groundRC->GetMaterial()->setProperty<Vector3>("diffuse", Vector3(62.0 / 255.0, 102.0 / 255.0, 38.0 / 255.0));
         groundRC->GetMaterial()->setProperty<Vector3>("specular", Vector3(0.f));
         groundRC->GetMaterial()->setProperty<float>("shininess", 1.f);
@@ -105,7 +101,6 @@ namespace LaurelEye {
         cubeRC->GetMaterial()->setProperty<int>("useTexture", 1);
         cubeRC->GetMaterial()->setProperty<Vector2>("mainTextureScale", Vector2(1.0f));
 
-        cubeRC->GetMaterial()->setProperty<int>("objectId", 9);
         cubeRC->GetMaterial()->setProperty<Vector3>("diffuse", Vector3(0.5f, 0.5f, 0.1f));
         cubeRC->GetMaterial()->setProperty<Vector3>("specular", Vector3(0.009f));
         cubeRC->GetMaterial()->setProperty<float>("shininess", 100.f);
@@ -201,7 +196,6 @@ namespace LaurelEye {
         spriteRC->GetMaterial()->setTexture("mainTexture", handle1);
         // End Texture Addition
 
-        spriteRC->GetMaterial()->setProperty<int>("objectId", 13);
         spriteRC->GetMaterial()->setProperty<float>("transparency", 1.0f);
 
         transformSystem.registerComponent(spriteT);

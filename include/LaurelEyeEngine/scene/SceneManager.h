@@ -51,7 +51,7 @@ namespace LaurelEye {
         Scene* getScene(const std::string& name);
 
         // --- Test and manual setup utilities ---
-#if defined(DEBUG) || defined(_DEBUG)
+#if !defined(NDEBUG)
         /// @brief Allows tests or debug tools to directly insert a scene into the manager
         void injectSceneForTest(const std::string& name, std::unique_ptr<Scene> scene);
 

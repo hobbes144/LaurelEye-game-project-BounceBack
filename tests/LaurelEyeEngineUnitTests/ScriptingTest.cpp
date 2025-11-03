@@ -43,7 +43,7 @@ namespace LaurelEye {
         }
 
         void setFullscreen(bool flag) override {
-            //attributes.fullscreen = flag;
+            // attributes.fullscreen = flag;
         }
     };
     void scriptingBasicTest() {
@@ -233,7 +233,7 @@ namespace LaurelEye {
         std::cout << "------- Scripting Input Test -------" << std::endl;
 
         // === Initialize Script System ===
-        std::shared_ptr<EngineContext> context = std::make_shared<EngineContext>();;
+        std::shared_ptr<EngineContext> context = std::make_shared<EngineContext>();
         context->registerService<InputManager>(pInputManager);
 
         ScriptSystem scriptSystem(ScriptSystem::ScriptSystemType::Sol2);
@@ -318,6 +318,7 @@ namespace LaurelEye {
     }
 
     void scriptingSceneTest() {
+#if !defined(NDEBUG)
         using namespace LaurelEye;
         using namespace Scripting;
 
@@ -367,5 +368,6 @@ namespace LaurelEye {
 
         scriptSystem.shutdown();
         std::cout << "------- Scripting Scene Test End -------" << std::endl;
+#endif
     }
-}
+} // namespace LaurelEye

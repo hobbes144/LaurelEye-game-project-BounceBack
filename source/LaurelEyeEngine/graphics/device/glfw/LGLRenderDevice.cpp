@@ -112,8 +112,10 @@ namespace LaurelEye::Graphics {
         }
 
         // Enabling debug output for now
+#if !defined (NDEBUG)
         glDebugMessageCallback(openglCallbackFunction, nullptr);
         glEnable(GL_DEBUG_OUTPUT);
+#endif
 
         glEnable(GL_DEPTH_TEST);
         glDepthMask(GL_TRUE);

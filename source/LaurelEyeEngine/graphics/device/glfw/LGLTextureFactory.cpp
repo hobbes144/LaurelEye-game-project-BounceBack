@@ -37,6 +37,7 @@ namespace LaurelEye::Graphics {
         }
 
         assert(false && "ERROR::RENDERSYSTEM::INVALIDFORMAT");
+        return GL_RGBA8;
     }
 
     GLint textureFormatToGLBaseFormat(TextureFormat f) {
@@ -72,6 +73,7 @@ namespace LaurelEye::Graphics {
         }
 
         assert(false && "ERROR::RENDERSYSTEM::INVALIDWRAPMODE");
+        return GL_REPEAT;
     }
 
     GLint textureFilterToGLFilter(TextureFilterMode f) {
@@ -91,6 +93,7 @@ namespace LaurelEye::Graphics {
         }
 
         assert(false && "ERROR::RENDERSYSTEM::INVALIDFILTERMODE");
+        return GL_LINEAR;
     }
 
     GLint textureFormatToGLUploadFormat(TextureFormat f) {

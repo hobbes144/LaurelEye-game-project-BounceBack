@@ -71,8 +71,10 @@ namespace LaurelEye::Graphics {
         uiPass = std::make_shared<UIPass>();
         uiPass->setup(*tempRenderResources.get());
 
-        prp = std::make_shared<ParticleRenderPass>();
-        prp->setup(*tempRenderResources.get());
+        if ( testParticles ) {
+            prp = std::make_shared<ParticleRenderPass>();
+            prp->setup(*tempRenderResources.get());
+        }
 
         initDefaultCamera();
         initGlobalLightsBuffer();
@@ -142,12 +144,16 @@ namespace LaurelEye::Graphics {
 
         sp->execute(ctx);
 
-        FrameContext prpCtx{
-            0.1f,
-            *device.get(),
-            *tempRenderResources.get(),
-            components};
-        prp->execute(prpCtx);
+        if ( testParticles ) {
+            // WARNING: PARTICLE PASS DOES NOT WORK IN RELEASE MODE
+            FrameContext prpCtx{
+                0.1f,
+                *device.get(),
+                *tempRenderResources.get(),
+                components};
+
+            prp->execute(prpCtx);
+        }
 
         // UI pass
         FrameContext uiCtx{
