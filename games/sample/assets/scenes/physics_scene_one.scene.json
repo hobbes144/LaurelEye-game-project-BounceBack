@@ -786,6 +786,19 @@
                     "gravityScale": 1.0
                 }
             }
+        },
+        {
+            "name": "SceneManager",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 10.0, 0.0 ],
+                    "rotation": [ 180.0, 0.0, 180.0, 1.0 ],
+                    "scale": [ 0.08, 0.08, 0.08 ]
+                },
+                "Script": {
+                    "path": "scripts/scene_manager.lua"
+                }
+            }
         }
     ]
 }

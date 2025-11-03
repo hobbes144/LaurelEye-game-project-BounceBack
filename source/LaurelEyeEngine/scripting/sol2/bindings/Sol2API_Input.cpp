@@ -26,7 +26,12 @@ namespace LaurelEye::Scripting {
                      "ArrowUp", Key::arrowUp,
                      "ArrowDown", Key::arrowDown,
                      "ArrowRight", Key::arrowRight,
-                     "ArrowLeft", Key::arrowLeft);
+                     "ArrowLeft", Key::arrowLeft,
+                     "One", Key::One,
+                     "Two", Key::Two,
+                     "Three", Key::Three,
+                     "Four", Key::Four,
+                     "Five", Key::Five);
 
         // --- MouseButton Enum ---
         lua.new_enum("MouseButton",

@@ -12,7 +12,12 @@ namespace LaurelEye {
         arrowUp,
         arrowDown,
         arrowRight,
-        arrowLeft
+        arrowLeft,
+        One,
+        Two,
+        Three,
+        Four,
+        Five
     };
 
     enum class MouseButton {

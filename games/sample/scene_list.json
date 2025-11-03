@@ -1,12 +1,12 @@
 ﻿{
-    "initialScene": "SampleScene1",
+    "initialScene": "Level1",
     "scenes": [
         {
-            "name": "SampleScene1",
+            "name": "Level1",
             "path": "scenes/sample_scene_one.scene.json"
         },
         {
-            "name": "SampleScene2",
+            "name": "Level2",
             "path": "scenes/sample_scene_two.scene.json"
         },
         {
@@ -14,7 +14,7 @@
             "path": "scenes/physics_scene_one.scene.json"
         },
         {
-            "name": "ParticleScene1",
+            "name": "ParticleScene",
             "path": "scenes/particle_scene_one.scene.json"
         }
     ]

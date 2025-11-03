@@ -98,12 +98,11 @@
                     "scale": [ 0.08, 0.08, 0.08 ]
                 },
                 "Render3D": {
-                    "mesh":
-                    {
+                    "mesh": {
                         "file": "models/roman_D.fbx"
                     },
                     "material": {
-                        "texture":  "textures/roman_blue_D_texture.jpg",
+                        "texture": "textures/roman_blue_D_texture.jpg",
                         "diffuse": [ 10.0, 1.0, 1.0 ],
                         "specular": [ 0.2, 0.2, 0.2 ],
                         "shininess": 32.0
@@ -145,6 +144,19 @@
                 },
                 "Script": {
                     "path": "scripts/player_script.lua"
+                }
+            }
+        },
+        {
+            "name": "SceneManager",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 10.0, 0.0 ],
+                    "rotation": [ 180.0, 0.0, 180.0, 1.0 ],
+                    "scale": [ 0.08, 0.08, 0.08 ]
+                },
+                "Script": {
+                    "path": "scripts/scene_manager.lua"
                 }
             }
         }
