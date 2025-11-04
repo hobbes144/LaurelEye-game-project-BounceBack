@@ -198,6 +198,8 @@ namespace LaurelEye {
             return GLFW_KEY_4;
         case Key::Five:
             return GLFW_KEY_5;
+        case Key::Six:
+            return GLFW_KEY_6;
         default:
             return -1;
         }

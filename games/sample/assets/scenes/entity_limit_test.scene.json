@@ -1,7 +1,6 @@
 ﻿{
     "settings": {
-        "resetOnLoad": true,
-        "backgroundTexture": "textures/Tropical_Beach_8k.jpg"
+        "resetOnLoad": true
     },
     "entities": [
         {
@@ -90,8 +89,17 @@
             }
         },
         {
-            "name": "Level1Player",
-            "prefab": "prefabs/player.prefab.json"
+            "name": "Spawner",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 10.0, 0.0 ],
+                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Script": {
+                    "path": "scripts/spawner_script.lua"
+                }
+            }
         },
         {
             "name": "SceneManager",

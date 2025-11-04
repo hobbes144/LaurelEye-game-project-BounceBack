@@ -60,8 +60,12 @@ namespace LaurelEye {
         template <typename ComponentType>
         ComponentType* findComponent();
 
+        void setName(std::string newName) { name = newName; }
         const std::string& getName() const { return name; }
         unsigned int getId() const { return id; }
+
+        void setRegistered(bool isRegistered) { registered = isRegistered; }
+        bool getRegistered() const { return registered; }
 
         void addTag(std::string tagToAdd) {
             tags.insert(tagToAdd);
@@ -86,6 +90,7 @@ namespace LaurelEye {
         std::string name;
         unsigned int id;
         bool active;
+        bool registered = false;
 
         /* TODO - when systems own components and their lifespans, remove this */
         std::vector<std::unique_ptr<IComponent>> components;

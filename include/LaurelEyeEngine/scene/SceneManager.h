@@ -50,6 +50,10 @@ namespace LaurelEye {
         bool hasScene(const std::string& name) const;
         Scene* getScene(const std::string& name);
 
+        /// @brief Called from script or other systems. Instantiates prefab into the current scene
+        /// @param prefabPath 
+        Entity* instantiate(const std::string& prefabPath);
+
         // --- Test and manual setup utilities ---
 #if !defined(NDEBUG)
         /// @brief Allows tests or debug tools to directly insert a scene into the manager

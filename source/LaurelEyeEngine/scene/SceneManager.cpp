@@ -74,11 +74,17 @@ namespace LaurelEye {
         return scenes.find(name) != scenes.end();
     }
 
-     Scene* SceneManager::getScene(const std::string& name) {
+    Scene* SceneManager::getScene(const std::string& name) {
         auto it = scenes.find(name);
         if ( it != scenes.end() )
             return it->second.get();
         return nullptr;
+    }
+
+    Entity* SceneManager::instantiate(const std::string& prefabPath) {
+        if ( currentScene ) {
+            return currentScene->instantiate(prefabPath);
+        }
     }
 
 

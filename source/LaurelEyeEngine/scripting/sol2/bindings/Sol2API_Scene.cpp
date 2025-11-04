@@ -25,6 +25,7 @@ void Sol2API_Scene::setupScene(sol::state& lua) {
 
         // Entity management
         "addEntity", &Scene::addEntityFromRaw,
+        "instantiate", &Scene::instantiate,
         "removeEntity", sol::overload(
             static_cast<void(Scene::*)(Entity*)>(&Scene::removeEntity),
             static_cast<void(Scene::*)(const std::string&)>(&Scene::removeEntity)
@@ -46,7 +47,8 @@ void Sol2API_Scene::setupSceneManager(sol::state& lua, SceneManager* manager) {
         "hasScene", &SceneManager::hasScene,
         "getScene", &SceneManager::getScene,
         "changeScene", &SceneManager::changeScene,
-        "reloadCurrentScene", &SceneManager::reloadCurrentScene
+        "reloadCurrentScene", &SceneManager::reloadCurrentScene,
+        "instantiate", &SceneManager::instantiate
     );
 
     // Expose the instance globally

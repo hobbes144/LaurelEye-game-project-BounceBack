@@ -58,6 +58,11 @@ namespace LaurelEye {
         /// @param entity The entity to be transferred
         /// @return The raw entity pointer back out
         Entity* addEntityFromRaw(Entity* entity);
+
+        /// @brief Given a path to a prefab, instantiate an entity at runtime
+        /// @param prefabPath The path to the prefab
+        /// @param prefabName The scene specific name for the prefab
+        Entity* instantiate(const std::string& prefabPath);
         void removeEntity(Entity* entity);
         void removeEntity(const std::string& entityName);
         Entity* findEntityByName(const std::string& name) const;
@@ -67,12 +72,15 @@ namespace LaurelEye {
         std::vector<Entity*> getEntityPointers() const;
 
     private:
-        void spawnPendingEntities();
+        std::vector<Entity*> spawnPendingEntities();
         void cleanupDestroyedEntities();
+        void registerEntityComponents(Entity* entity);
+        void deregisterEntityComponents(Entity* entity);
+        void registerEntities(const std::vector<Entity*>& list);
         /// @brief Given a rapidjson document describing the scene, initialize with the given data
         /// @param doc The rapidjson document describing the state of the scene
         /// @param assetPath localized path to the assets folder for the given game
-        void deserialize(const rapidjson::Document& doc, const std::string& assetRoot);
+        void deserialize(const rapidjson::Document& doc);
 
         EngineContext& ctx;
         std::string name;

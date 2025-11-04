@@ -17,7 +17,8 @@ namespace LaurelEye {
         Two,
         Three,
         Four,
-        Five
+        Five,
+        Six
     };
 
     enum class MouseButton {

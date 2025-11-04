@@ -44,6 +44,16 @@ namespace LaurelEye {
             const auto& comps = entityJson["components"];
             addComponentsFromJson(*entity, comps);
         }
+        else if ( entityJson.HasMember("prefab") && entityJson["prefab"].IsString() ) {
+            const std::string& prefabPath = assetPath + entityJson["prefab"].GetString();
+            auto* assetManager = context.getService<IO::AssetManager>();
+            auto asset = assetManager->load(prefabPath);
+            auto jsonAsset = std::dynamic_pointer_cast<IO::JsonAsset>(asset);
+            if ( !jsonAsset ) {
+                std::cerr << "EntityFactory: Could not parse prefab for entity";
+            }
+            entity = createEntityFromJson(jsonAsset->jsonDocument);
+        }
 
         return entity;
     }
@@ -79,6 +89,21 @@ namespace LaurelEye {
             }
         }
     }
+
+    Entity* EntityFactory::addPrefabToScene(Scene& scene, const std::string& prefabPath) {
+        std::string fullPath = assetPath + prefabPath;
+        auto* assetManager = context.getService<IO::AssetManager>();
+        auto asset = assetManager->load(fullPath);
+        auto jsonAsset = std::dynamic_pointer_cast<IO::JsonAsset>(asset);
+        if ( !jsonAsset ) {
+            std::cerr << "EntityFactory: Could not parse prefab for entity";
+        }
+        auto entity = createEntityFromJson(jsonAsset->jsonDocument); 
+        Entity* tempEntity = entity.get();
+        scene.addEntity(std::move(entity));
+        return tempEntity;
+    }
+
 
     void EntityFactory::createAndAddEntitiesToScene(Scene& scene,
                                                     const rapidjson::GenericArray<true, rapidjson::Value>& entities,

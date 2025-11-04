@@ -28,6 +28,7 @@ namespace LaurelEye {
         /// @param component Component to register
         virtual void registerComponent(const ComponentPtr component) {
             if ( !component ) return;
+            if ( std::find(components.begin(), components.end(), component) != components.end() ) return;
             components.push_back(component);
         }
 
@@ -48,6 +49,9 @@ namespace LaurelEye {
 
     protected:
         EngineContext* context = nullptr;
+        // TODO - Need to find a safer way of storing and iterating over
+        // components to allow for mid frame mutation; OR,
+        // strictly do not allow mid frame mutation (register/deregister).
         std::vector<ComponentPtr> components;
     };
 } // namespace LaurelEye

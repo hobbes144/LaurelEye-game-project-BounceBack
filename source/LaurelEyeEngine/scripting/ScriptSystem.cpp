@@ -16,7 +16,15 @@ namespace LaurelEye::Scripting {
     }
 
     void ScriptSystem::update(float deltaTime) {
-        for ( auto* comp : components ) {
+
+        // Make a snapshot of the component pointers so we can iterate safely
+        // even if registerComponent() / deregisterComponent() mutates `components`
+        // a better bandaid fix, but could become a pain point for 1000's of scripts
+        std::vector<ComponentPtr> snapshot;
+        snapshot.reserve(components.size());
+        snapshot.insert(snapshot.end(), components.begin(), components.end());
+
+        for ( auto* comp : snapshot ) {
             if ( comp->isActive() && comp->getScriptInstance()) {
                 comp->getScriptInstance()->onUpdate(deltaTime);
             }
@@ -35,7 +43,7 @@ namespace LaurelEye::Scripting {
         }
     }
 
-    void ScriptSystem::registerComponent(const ComponentPtr comp){
+     void ScriptSystem::registerComponent(const ComponentPtr comp) {
         if ( !comp->getScriptPath().empty() ) {
             comp->setScriptInstance(scriptEngineState->createInstance(comp->getScriptPath(), comp->getOwner()));
             if ( comp->getScriptInstance() )
@@ -53,5 +61,4 @@ namespace LaurelEye::Scripting {
         }
         ISystem<ScriptComponent>::deregisterComponent(comp);
     }
- 
 } // namespace LaurelEye::Scripting

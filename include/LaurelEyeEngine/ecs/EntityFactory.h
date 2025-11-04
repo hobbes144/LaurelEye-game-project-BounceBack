@@ -30,6 +30,11 @@ namespace LaurelEye{
 
         ///@brief Deserializes all components for a given entity, adding them to the entity
         void addComponentsFromJson(Entity& entity, const rapidjson::Value& componentsJson);
+
+        /// @brief Given a path to a prefab, add it to the given scene
+        /// @param scene 
+        /// @param prefabPath 
+        Entity* addPrefabToScene(Scene& scene, const std::string& prefabPath);
     private:
         EngineContext& context;
         const std::string& assetPath;

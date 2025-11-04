@@ -37,141 +37,37 @@ namespace LaurelEye {
         assert(sceneJson && "No valid scene asset for scene.");
         assert(!assetRootPath.empty() && "No valid asset root path for scene.");
 
-        deserialize(sceneJson->jsonDocument, assetRootPath);
+        deserialize(sceneJson->jsonDocument);
     }
 
     void Scene::registerScene() {
-        if ( active ) return;
-
-        // Refresh the entity list
-        spawnPendingEntities();
-        cleanupDestroyedEntities();
-
-        auto* transformSystem = ctx.getService<TransformSystem>();
-        auto* physicsSystem = ctx.getService<Physics::PhysicsSystem>();
-        auto* renderSystem = ctx.getService<Graphics::RenderSystem>();
-        auto* scriptingSystem = ctx.getService<Scripting::ScriptSystem>();
-        auto* particleSystem = ctx.getService<Particles::ParticleSystem>();
-
-        for ( auto& entity : entities ) {
-            for ( auto& comp : entity->getComponents() ) {
-                if ( auto* transformComp = dynamic_cast<TransformComponent*>(comp.get()) ) {
-                    if ( transformSystem ) {
-                        transformSystem->registerComponent(transformComp);
-                    }
-                }
-                else if ( auto* physComp = dynamic_cast<Physics::PhysicsBodyComponent*>(comp.get()) ) {
-                    if ( physicsSystem ) {
-                        physicsSystem->registerComponent(physComp);
-                    }
-                }
-                else if ( auto* renderComp = dynamic_cast<Graphics::Renderable3DComponent*>(comp.get()) ) {
-                    if ( renderSystem ) {
-                        renderSystem->registerComponent(renderComp);
-                    }
-                }
-                else if ( auto* cameraComp = dynamic_cast<Graphics::CameraComponent*>(comp.get()) ) {
-                    if ( renderSystem ) {
-                        renderSystem->registerComponent(cameraComp);
-                    }
-                }
-                else if ( auto* lightComp = dynamic_cast<Graphics::DirectionalLightComponent*>(comp.get()) ) {
-                    if ( renderSystem ) {
-                        renderSystem->registerComponent(lightComp);
-                    }
-                }
-                else if ( auto* lightComp = dynamic_cast<Graphics::AmbientLightComponent*>(comp.get()) ) {
-                    if ( renderSystem ) {
-                        renderSystem->registerComponent(lightComp);
-                    }
-                }
-                else if ( auto* lightComp = dynamic_cast<Graphics::PointLightComponent*>(comp.get()) ) {
-                    if ( renderSystem ) {
-                        renderSystem->registerComponent(lightComp);
-                    }
-                }
-                else if ( auto* scriptComp = dynamic_cast<Scripting::ScriptComponent*>(comp.get()) ) {
-                    if ( scriptingSystem ) {
-                        scriptingSystem->registerComponent(scriptComp);
-                    }
-                }
-                else if ( auto* emitterComp = dynamic_cast<Particles::ParticleEmitterComponent*>(comp.get()) ) {
-                    if ( particleSystem ) {
-                        particleSystem->registerComponent(emitterComp);
-                    }
-                }
-                // add more as needed...
+        if ( active ) return; // whole scene already registered
+        // commit pending additions and register everything
+        auto committed = spawnPendingEntities();
+        // Also register any existing entities (for activation we want whole scene)
+        for ( auto& e : entities ) {
+            if ( !e->getRegistered() ) {
+                registerEntityComponents(e.get());
+                e->setRegistered(true);
             }
         }
-        if ( transformSystem ) {
-            transformSystem->update(0.016);
-        }
-
+        if ( auto* t = ctx.getService<TransformSystem>() ) t->update(0.016f);
         active = true;
     }
 
     void Scene::deregisterScene() {
         if ( !active ) return;
 
-        auto* transformSystem = ctx.getService<TransformSystem>();
-        auto* physicsSystem = ctx.getService<Physics::PhysicsSystem>();
-        auto* renderSystem = ctx.getService<Graphics::RenderSystem>();
-        auto* scriptingSystem = ctx.getService<Scripting::ScriptSystem>();
-        auto* particleSystem = ctx.getService<Particles::ParticleSystem>();
-
-        for ( auto& entity : entities ) {
-            for ( auto& comp : entity->getComponents() ) {
-                if ( auto* transformComp = dynamic_cast<TransformComponent*>(comp.get()) ) {
-                    if ( transformSystem ) {
-                        transformSystem->deregisterComponent(transformComp);
-                    }
-                }
-                else if ( auto* physComp = dynamic_cast<Physics::PhysicsBodyComponent*>(comp.get()) ) {
-                    if ( physicsSystem ) {
-                        physicsSystem->deregisterComponent(physComp);
-                    }
-                }
-                else if ( auto* renderComp = dynamic_cast<Graphics::Renderable3DComponent*>(comp.get()) ) {
-                    if ( renderSystem ) {
-                        renderSystem->deregisterComponent(renderComp);
-                    }
-                }
-                else if ( auto* cameraComp = dynamic_cast<Graphics::CameraComponent*>(comp.get()) ) {
-                    if ( renderSystem ) {
-                        renderSystem->deregisterComponent(cameraComp);
-                    }
-                }
-                else if ( auto* lightComp = dynamic_cast<Graphics::DirectionalLightComponent*>(comp.get()) ) {
-                    if ( renderSystem ) {
-                        renderSystem->deregisterComponent(lightComp);
-                    }
-                }
-                else if ( auto* lightComp = dynamic_cast<Graphics::AmbientLightComponent*>(comp.get()) ) {
-                    if ( renderSystem ) {
-                        renderSystem->deregisterComponent(lightComp);
-                    }
-                }
-                else if ( auto* lightComp = dynamic_cast<Graphics::PointLightComponent*>(comp.get()) ) {
-                    if ( renderSystem ) {
-                        renderSystem->deregisterComponent(lightComp);
-                    }
-                }
-                else if ( auto* scriptComp = dynamic_cast<Scripting::ScriptComponent*>(comp.get()) ) {
-                    if ( scriptingSystem ) {
-                        scriptingSystem->deregisterComponent(scriptComp);
-                    }
-                }
-                else if ( auto* emitterComp = dynamic_cast<Particles::ParticleEmitterComponent*>(comp.get()) ) {
-                    if ( particleSystem ) {
-                        particleSystem->deregisterComponent(emitterComp);
-                    }
-                }
-                // add more as needed...
+        for ( auto& e : entities ) {
+            if ( e->getRegistered() ) {
+                deregisterEntityComponents(e.get());
+                e->setRegistered(false);
             }
         }
-
+            
         active = false;
     }
+
 
     void Scene::update(float deltaTime) {
         //std::cout << "Updating scene: " << name << std::endl;
@@ -199,13 +95,13 @@ namespace LaurelEye {
         //}
     }
 
-    void Scene::deserialize(const rapidjson::Document& doc, const std::string& assetRoot) {
+    void Scene::deserialize(const rapidjson::Document& doc) {
         // Check for and set settings
         if ( doc.HasMember("settings") && doc["settings"].IsObject() ) {
-            deserializeSettings(doc["settings"], assetRoot);
+            deserializeSettings(doc["settings"], assetRootPath);
         }
         // Deserialize entity list
-        EntityFactory factory(ctx, assetRoot);
+        EntityFactory factory(ctx, assetRootPath);
         factory.populateSceneFromJson(*this, doc);
     }
 
@@ -240,6 +136,17 @@ namespace LaurelEye {
     Entity* Scene::addEntityFromRaw(Entity* entity) {
         if ( !entity ) return nullptr;
         return addEntity(std::unique_ptr<Entity>(entity));
+    }
+
+    Entity* Scene::instantiate(const std::string& prefabPath) {
+        EntityFactory factory(ctx, assetRootPath);
+        Entity* prefabEntity = factory.addPrefabToScene(*this, prefabPath);
+        auto newEntities = spawnPendingEntities();
+        registerEntities(newEntities);
+
+        if ( auto* t = ctx.getService<TransformSystem>() ) t->update(0.016f);
+
+        return prefabEntity;
     }
 
     void Scene::removeEntity(Entity* entityToRemove) {
@@ -285,25 +192,172 @@ namespace LaurelEye {
         return ptrs;
     }
 
-    void Scene::spawnPendingEntities() {
-        if ( !pendingAdditions.empty() ) {
-            entities.insert(
-                entities.end(),
-                std::make_move_iterator(pendingAdditions.begin()),
-                std::make_move_iterator(pendingAdditions.end()));
-            pendingAdditions.clear();
+    std::vector<Entity*> Scene::spawnPendingEntities() {
+        std::vector<Entity*> newPtrs;
+        if ( pendingAdditions.empty() ) return newPtrs;
+
+        std::cout << "[Scene] Spawning " << pendingAdditions.size() << " pending entities..." << std::endl;
+
+        size_t count = 0;
+        for ( auto& e : pendingAdditions ) {
+            if ( !e ) {
+                std::cerr << "[Scene] ERROR: Null entity in pending additions!" << std::endl;
+                continue;
+            }
+            std::cout << "  + Adding entity: " << e->getName() << " (ID: " << e->getId() << ")" << std::endl;
+            newPtrs.push_back(e.get());
+            entities.push_back(std::move(e));
+            count++;
         }
+
+        std::cout << "[Scene] Added " << count << " entities. Total now: " << entities.size() << std::endl;
+
+        pendingAdditions.clear();
+        return newPtrs;
     }
 
     void Scene::cleanupDestroyedEntities() {
-        if ( !pendingRemovals.empty() ) {
-            for ( Entity* entity : pendingRemovals ) {
-                auto it = std::remove_if(
-                    entities.begin(), entities.end(),
-                    [entity](const std::unique_ptr<Entity>& e) { return e.get() == entity; });
-                entities.erase(it, entities.end());
+        if ( pendingRemovals.empty() ) return;
+        for ( auto* entity : pendingRemovals ) {
+            deregisterEntityComponents(entity);
+            entity->setRegistered(false);
+        }
+
+        // Then erase all in one pass
+        entities.erase(
+            std::remove_if(
+                entities.begin(),
+                entities.end(),
+                [&](const std::unique_ptr<Entity>& e) {
+                    return std::find(pendingRemovals.begin(), pendingRemovals.end(), e.get()) != pendingRemovals.end();
+                }),
+            entities.end());
+
+        pendingRemovals.clear();
+    }
+
+    void Scene::registerEntityComponents(Entity* entity) {
+        if ( !entity ) return;
+        auto* transformSystem = ctx.getService<TransformSystem>();
+        auto* physicsSystem = ctx.getService<Physics::PhysicsSystem>();
+        auto* renderSystem = ctx.getService<Graphics::RenderSystem>();
+        auto* scriptingSystem = ctx.getService<Scripting::ScriptSystem>();
+        auto* particleSystem = ctx.getService<Particles::ParticleSystem>();
+
+        for (auto& comp : entity->getComponents()) {
+            if ( auto* transformComp = dynamic_cast<TransformComponent*>(comp.get()) ) {
+                if ( transformSystem ) {
+                    transformSystem->registerComponent(transformComp);
+                }
             }
-            pendingRemovals.clear();
+            else if ( auto* physComp = dynamic_cast<Physics::PhysicsBodyComponent*>(comp.get()) ) {
+                if ( physicsSystem ) {
+                    physicsSystem->registerComponent(physComp);
+                }
+            }
+            else if ( auto* renderComp = dynamic_cast<Graphics::Renderable3DComponent*>(comp.get()) ) {
+                if ( renderSystem ) {
+                    renderSystem->registerComponent(renderComp);
+                }
+            }
+            else if ( auto* cameraComp = dynamic_cast<Graphics::CameraComponent*>(comp.get()) ) {
+                if ( renderSystem ) {
+                    renderSystem->registerComponent(cameraComp);
+                }
+            }
+            else if ( auto* lightComp = dynamic_cast<Graphics::DirectionalLightComponent*>(comp.get()) ) {
+                if ( renderSystem ) {
+                    renderSystem->registerComponent(lightComp);
+                }
+            }
+            else if ( auto* lightComp = dynamic_cast<Graphics::AmbientLightComponent*>(comp.get()) ) {
+                if ( renderSystem ) {
+                    renderSystem->registerComponent(lightComp);
+                }
+            }
+            else if ( auto* lightComp = dynamic_cast<Graphics::PointLightComponent*>(comp.get()) ) {
+                if ( renderSystem ) {
+                    renderSystem->registerComponent(lightComp);
+                }
+            }
+            else if ( auto* scriptComp = dynamic_cast<Scripting::ScriptComponent*>(comp.get()) ) {
+                if ( scriptingSystem ) {
+                    scriptingSystem->registerComponent(scriptComp);
+                }
+            }
+            else if ( auto* emitterComp = dynamic_cast<Particles::ParticleEmitterComponent*>(comp.get()) ) {
+                if ( particleSystem ) {
+                    particleSystem->registerComponent(emitterComp);
+                }
+            }
+            // add more as needed...
+        }
+    }
+
+    void Scene::deregisterEntityComponents(Entity* entity) {
+        if ( !entity ) return;
+        auto* transformSystem = ctx.getService<TransformSystem>();
+        auto* physicsSystem = ctx.getService<Physics::PhysicsSystem>();
+        auto* renderSystem = ctx.getService<Graphics::RenderSystem>();
+        auto* scriptingSystem = ctx.getService<Scripting::ScriptSystem>();
+        auto* particleSystem = ctx.getService<Particles::ParticleSystem>();
+
+        for ( auto& comp : entity->getComponents() ) {
+            if ( auto* transformComp = dynamic_cast<TransformComponent*>(comp.get()) ) {
+                if ( transformSystem ) {
+                    transformSystem->deregisterComponent(transformComp);
+                }
+            }
+            else if ( auto* physComp = dynamic_cast<Physics::PhysicsBodyComponent*>(comp.get()) ) {
+                if ( physicsSystem ) {
+                    physicsSystem->deregisterComponent(physComp);
+                }
+            }
+            else if ( auto* renderComp = dynamic_cast<Graphics::Renderable3DComponent*>(comp.get()) ) {
+                if ( renderSystem ) {
+                    renderSystem->deregisterComponent(renderComp);
+                }
+            }
+            else if ( auto* cameraComp = dynamic_cast<Graphics::CameraComponent*>(comp.get()) ) {
+                if ( renderSystem ) {
+                    renderSystem->deregisterComponent(cameraComp);
+                }
+            }
+            else if ( auto* lightComp = dynamic_cast<Graphics::DirectionalLightComponent*>(comp.get()) ) {
+                if ( renderSystem ) {
+                    renderSystem->deregisterComponent(lightComp);
+                }
+            }
+            else if ( auto* lightComp = dynamic_cast<Graphics::AmbientLightComponent*>(comp.get()) ) {
+                if ( renderSystem ) {
+                    renderSystem->deregisterComponent(lightComp);
+                }
+            }
+            else if ( auto* lightComp = dynamic_cast<Graphics::PointLightComponent*>(comp.get()) ) {
+                if ( renderSystem ) {
+                    renderSystem->deregisterComponent(lightComp);
+                }
+            }
+            else if ( auto* scriptComp = dynamic_cast<Scripting::ScriptComponent*>(comp.get()) ) {
+                if ( scriptingSystem ) {
+                    scriptingSystem->deregisterComponent(scriptComp);
+                }
+            }
+            else if ( auto* emitterComp = dynamic_cast<Particles::ParticleEmitterComponent*>(comp.get()) ) {
+                if ( particleSystem ) {
+                    particleSystem->deregisterComponent(emitterComp);
+                }
+            }
+            // add more as needed...
+        }
+    }
+
+    void Scene::registerEntities(const std::vector<Entity*>& list) {
+        for ( auto* ent : list ) {
+            if ( !ent->getRegistered() ) {
+                registerEntityComponents(ent);
+                ent->setRegistered(true);
+            }
         }
     }
 } // namespace LaurelEye

@@ -16,6 +16,10 @@
         {
             "name": "ParticleScene",
             "path": "scenes/particle_scene_one.scene.json"
+        },
+        {
+            "name": "SpawnerScene",
+            "path": "scenes/entity_limit_test.scene.json"
         }
     ]
 }

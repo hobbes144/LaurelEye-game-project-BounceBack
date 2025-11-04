@@ -6,7 +6,11 @@ function onStart()
 end
 
 function onUpdate(dt)
-    -- Example key bindings for switching scenes
+    if Input:isKeyPressed(Key.Space) then
+        log("Adding a player")
+        SceneManager:instantiate("prefabs/player.prefab.json")
+    end
+
     if Input:isKeyPressed(Key.One) then
         log("Loading Scene: Level1")
         SceneManager:changeScene("Level1")
@@ -20,9 +24,13 @@ function onUpdate(dt)
         log("Loading Scene: ParticleScene")
         SceneManager:changeScene("ParticleScene")
     elseif Input:isKeyPressed(Key.Five) then
+        log("Loading Scene: SpawnerScene")
+        SceneManager:changeScene("SpawnerScene")
+    elseif Input:isKeyPressed(Key.Six) then
         log("Reloading Current Scene")
         SceneManager:reloadCurrentScene()
     end
+
 end
 
 function onShutdown()
