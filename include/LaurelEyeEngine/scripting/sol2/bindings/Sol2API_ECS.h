@@ -17,7 +17,7 @@ namespace LaurelEye::Scripting {
     public:
         /// @brief Called by Sol2API in order to register all ecs bindings
         /// @param lua Lua state
-        static void setup(sol::state& lua);
+        static void setup(sol::state& lua, EngineContext* ctx);
 
     private:
         static void setupEntityType(sol::state& lua);

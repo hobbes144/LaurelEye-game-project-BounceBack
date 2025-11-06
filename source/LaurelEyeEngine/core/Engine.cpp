@@ -55,6 +55,7 @@ namespace LaurelEye {
     void Engine::initialize() {
 
         ctx = std::make_unique<EngineContext>();
+        ctx->registerService<Engine>(this);
 
         resourceCoordinator = std::make_unique<ResourceCoordinator>(*ctx, engineConfig);
         systemCoordinator = std::make_unique<SystemCoordinator>(*ctx, engineConfig);

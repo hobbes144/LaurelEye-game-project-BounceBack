@@ -105,6 +105,10 @@
                     "path": "scripts/scene_manager.lua"
                 }
             }
+        },
+        {
+            "name": "FigureEight",
+            "prefab": "prefabs/figure_eight_cube.prefab.json"
         }
     ]
 }

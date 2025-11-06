@@ -29,6 +29,8 @@ function onUpdate(dt)
     elseif Input:isKeyPressed(Key.Six) then
         log("Reloading Current Scene")
         SceneManager:reloadCurrentScene()
+    elseif Input:isKeyPressed(Key.Escape) then
+        Engine:stop()
     end
 
 end

@@ -1,4 +1,5 @@
 ﻿#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_ECS.h"
+#include "LaurelEyeEngine/core/Engine.h"
 #include "LaurelEyeEngine/transform/TransformComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/Renderable3DComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/Renderable2DComponent.h"
@@ -11,8 +12,17 @@
 #include "LaurelEyeEngine/audio/SpeakerComponent.h"
 
 namespace LaurelEye::Scripting {
-    void Sol2API_ECS::setup(sol::state& lua) {
+    void Sol2API_ECS::setup(sol::state& lua, EngineContext* ctx) {
         setupEntityType(lua);
+
+        // Engine setup - TODO move to engine binding file later
+        auto* engine = ctx->getService<Engine>();
+        assert(engine && "Engine service not found in context!");
+
+        // Expose as an object in Lua
+        lua.new_usertype<Engine>("Engine",
+                                 "stop", &Engine::stop);
+        lua["Engine"] = engine;
     }
 
     void Sol2API_ECS::setupEntityType(sol::state& lua) {

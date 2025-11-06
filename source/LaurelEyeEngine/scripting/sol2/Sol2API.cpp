@@ -31,7 +31,7 @@ namespace LaurelEye::Scripting {
         Sol2API_Scene::setup(lua, ctx);
         
         /* ECS */
-        Sol2API_ECS::setup(lua);
+        Sol2API_ECS::setup(lua, ctx);
 
         /* Renderer*/
 
