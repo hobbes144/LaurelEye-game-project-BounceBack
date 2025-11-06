@@ -31,6 +31,7 @@ namespace LaurelEye::Graphics {
 
     DataBufferHandle RenderResources::createDataBuffer(
         const std::string& name, const DataBufferDesc& d, const std::string& tag) {
+        if (dataBuffers.contains(name)) return dataBuffers[name].handle;
         DataBufferResource r{};
         r.handle = device.createDataBuffer(d);
         r.desc = d;
@@ -43,10 +44,12 @@ namespace LaurelEye::Graphics {
 
     TextureHandle RenderResources::createTexture(const std::string& name, const TextureDesc& d,
                                                  const std::string& tag, const void* init) {
-        if ( textures.contains(name) ) {
-            // Destroy existing before recreating to avoid leaks or name collision
-            destroyTexture(name);
-        }
+        // if ( textures.contains(name) ) {
+        //     // Destroy existing before recreating to avoid leaks or name collision
+        //     destroyTexture(name);
+        // }
+        if (textures.contains(name)) return textures[name].handle;
+
         TextureResource r{};
         r.handle = device.createTexture(d, init);
         r.desc = d;
@@ -57,6 +60,7 @@ namespace LaurelEye::Graphics {
 
     FramebufferHandle RenderResources::createFramebuffer(const std::string& name, const FramebufferDesc& d,
                                                          const std::string& tag) {
+        if (framebuffers.contains(name)) return framebuffers[name].handle;
         FramebufferResource r{};
         r.desc = d;
         r.tag = tag;

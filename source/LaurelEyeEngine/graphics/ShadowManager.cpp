@@ -176,13 +176,13 @@ namespace LaurelEye::Graphics {
         ShadowResource& r = shadowResources[h];
 
         device->bindFramebufferBase(r.framebuffer);
+
+        glViewport(0, 0, shadow.desc.resolution.width, shadow.desc.resolution.height);
         GLfloat bkColor[4];
         glGetFloatv(GL_COLOR_CLEAR_VALUE, bkColor);
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         device->clear();
         glClearColor(bkColor[0], bkColor[1], bkColor[2], bkColor[3]);
-
-        glViewport(0, 0, shadow.desc.resolution.width, shadow.desc.resolution.height);
 
         if ( shadow.source == ShadowSourceType::Point ) {
             const Matrix4 viewMatrix = Matrix4::lookAt(
