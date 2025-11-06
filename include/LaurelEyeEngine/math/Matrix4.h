@@ -51,7 +51,7 @@ namespace LaurelEye {
         Matrix4 operator*(const float scalar) const;
         Matrix4 operator*(const Matrix4& other) const;
         Vector3 operator*(const Vector3& vec) const;
-        VectorTemplated<float, 4> operator*(const VectorTemplated<float, 4>& vec) const;
+        Vector4 operator*(const Vector4& vec) const;
 
         float* operator[](int row);
         const float* operator[](int row) const;
@@ -117,6 +117,11 @@ namespace LaurelEye {
             // Return the Euler angles as a Vector3 (yaw, pitch, roll)
             return Vector3(yaw, pitch, roll);
         }
+
+        float determinant() const;
+
+        Vector3 position() const;
+        Vector3 scaling() const;
     };
 
     std::ostream& operator<<(std::ostream& os, const Matrix4& m);

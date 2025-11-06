@@ -14,11 +14,13 @@
 
 #include <array>
 #include <cmath>
+#include <cstddef>
 #include <stdexcept>
 
 namespace LaurelEye {
 
     template <typename T, size_t N>
+        requires std::integral<T> or std::floating_point<T>
     class VectorTemplated {
     protected:
         std::array<T, N> data;
@@ -36,6 +38,16 @@ namespace LaurelEye {
                 data[i] = val;
             }
         }
+
+        VectorTemplated(const T val1, const T val2)
+            requires(N == 2)
+            : data{val1, val2} {}
+        VectorTemplated(const T val1, const T val2, const T val3)
+            requires(N == 3)
+            : data{val1, val2, val3} {}
+        VectorTemplated(const T val1, const T val2, const T val3, const T val4)
+            requires(N == 4)
+            : data{val1, val2, val3, val4} {}
 
         VectorTemplated& operator=(const VectorTemplated& other) {
             if ( *this == other ) {
@@ -151,11 +163,24 @@ namespace LaurelEye {
         }
     };
 
+    // Using extern to force only one instantiation.
+    // Reduces header compile size and time a tiny bit.
+    extern template class VectorTemplated<int, 2>;
+    extern template class VectorTemplated<float, 2>;
+    extern template class VectorTemplated<double, 2>;
+    extern template class VectorTemplated<int, 3>;
+    extern template class VectorTemplated<double, 3>;
+    extern template class VectorTemplated<int, 4>;
+    extern template class VectorTemplated<float, 4>;
+    extern template class VectorTemplated<double, 4>;
+    using IVector2 = VectorTemplated<int, 2>;
     using Vector2 = VectorTemplated<float, 2>;
     using FVector2 = VectorTemplated<float, 2>;
+    using DVector2 = VectorTemplated<double, 2>;
+    using IVector3 = VectorTemplated<int, 3>;
+    using DVector3 = VectorTemplated<double, 3>;
+    using IVector4 = VectorTemplated<int, 4>;
     using Vector4 = VectorTemplated<float, 4>;
     using FVector4 = VectorTemplated<float, 4>;
-    using IVector2 = VectorTemplated<int, 2>;
-    using IVector3 = VectorTemplated<int, 3>;
-    using IVector4 = VectorTemplated<int, 4>;
+    using DVector4 = VectorTemplated<double, 4>;
 } // namespace LaurelEye

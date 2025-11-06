@@ -7,7 +7,7 @@
 ///    GAM541
 /// @date   10-27-2025
 /// @brief
-/// 
+///
 
 #pragma once
 
@@ -46,8 +46,8 @@ namespace LaurelEye::Particles {
         float endSize = 0.0f;
         float sizeVariation = 0.05f;
 
-        LaurelEye::Vector4 startColor = LaurelEye::Vector4({1.0f, 0.5f, 0.0f, 1.0f});
-        LaurelEye::Vector4 endColor = LaurelEye::Vector4({1.0f, 0.0f, 0.0f, 0.0f});
+        LaurelEye::Vector4 startColor = LaurelEye::Vector4(1.0f, 0.5f, 0.0f, 1.0f);
+        LaurelEye::Vector4 endColor = LaurelEye::Vector4(1.0f, 0.0f, 0.0f, 0.0f);
         bool usePhysics = false;
     };
 

@@ -8,8 +8,8 @@
 #include "LaurelEyeEngine/graphics/resources/Material.h"
 #include "LaurelEyeEngine/graphics/resources/Shader.h"
 #include "LaurelEyeEngine/graphics/resources/Texture.h"
-#include "LaurelEyeEngine/math/Vector3.h"
 #include "LaurelEyeEngine/math/Matrix4.h"
+#include "LaurelEyeEngine/math/Vector3.h"
 
 namespace LaurelEye::Graphics {
 
@@ -60,11 +60,14 @@ namespace LaurelEye::Graphics {
             else if ( auto item = std::get_if<float>(&value) ) {
                 shader->setFloat(name, *item);
             }
-            else if ( auto item = std::get_if<VectorTemplated<float, 2>>(&value) ) {
+            else if ( auto item = std::get_if<Vector2>(&value) ) {
                 shader->setVec2(name, (*item)[0], (*item)[1]);
             }
             else if ( auto item = std::get_if<Vector3>(&value) ) {
                 shader->setVec3(name, *item);
+            }
+            else if ( auto item = std::get_if<DVector4>(&value) ) {
+                shader->setVec4(name, (*item)[0], (*item)[1], (*item)[2], (*item)[3]);
             }
             else if ( auto item = std::get_if<Matrix4>(&value) ) {
                 shader->setMat4(name, *item);
@@ -88,18 +91,21 @@ namespace LaurelEye::Graphics {
             else if ( auto item = std::get_if<Vector3>(&value) ) {
                 shader->setVec3(name, *item);
             }
+            else if ( auto item = std::get_if<DVector4>(&value) ) {
+                shader->setVec4(name, (*item)[0], (*item)[1], (*item)[2], (*item)[3]);
+            }
             else if ( auto item = std::get_if<Matrix4>(&value) ) {
                 shader->setMat4(name, *item);
             }
         }
 
         // Ensure shader has deterministic texture-related uniforms set even if the
-             // property map doesn't contain them. This prevents uniform carry-over between
-             // draws when the same shader program is used for multiple objects.
+        // property map doesn't contain them. This prevents uniform carry-over between
+        // draws when the same shader program is used for multiple objects.
         // shader->setInt("useTexture", useTexture ? 1 : 0);
         // shader->setVec2("mainTextureScale", mainTextureScale[0], mainTextureScale[1]);
-         // Bind textures previously set via setTexture(...)
-          // Start from texture unit 0 and increment for each bound texture.
+        // Bind textures previously set via setTexture(...)
+        // Start from texture unit 0 and increment for each bound texture.
         unsigned int textureUnit = 0;
         // GLint maxUnits = 0;
         // glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxUnits);
@@ -111,12 +117,9 @@ namespace LaurelEye::Graphics {
                 //
                 // }
                 shader->bindTexture(textureUnit, name, textureID);
-                 ++textureUnit;
-
+                ++textureUnit;
             }
-
         }
-
     }
 
 } // namespace LaurelEye::Graphics

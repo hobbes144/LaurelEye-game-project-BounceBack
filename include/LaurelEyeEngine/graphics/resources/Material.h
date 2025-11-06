@@ -11,10 +11,10 @@
 
 #pragma once
 
+#include "LaurelEyeEngine/graphics/resources/Texture.h"
 #include "LaurelEyeEngine/math/Matrix4.h"
 #include "LaurelEyeEngine/math/Vector3.h"
 #include "LaurelEyeEngine/math/VectorTemplated.h"
-#include "LaurelEyeEngine/graphics/resources/Texture.h"
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -46,7 +46,7 @@ namespace LaurelEye::Graphics {
         using PropertyMap = std::unordered_map<
             std::string,
             std::variant<
-                unsigned int, int, float, VectorTemplated<float, 2>, Vector3, Matrix4>>;
+                unsigned int, int, float, Vector2, Vector3, DVector4, Matrix4>>;
 
         /// @brief Default constructor for Material.
         Material() = default;
@@ -116,7 +116,7 @@ namespace LaurelEye::Graphics {
         // Backwards-compatible helpers (convenience)
         bool isUsingTexture() const { return useTexture; }
         TextureHandle getMainTexture() const { return mainTexture; }
-        VectorTemplated<float, 2> getTextureScale() const { return mainTextureScale; }
+        Vector2 getTextureScale() const { return mainTextureScale; }
 
         // Legacy helpers retained for existing call sites: they now propagate to the generic API.
         void useTextureFlag() {
@@ -128,10 +128,10 @@ namespace LaurelEye::Graphics {
             mainTexture = texture;
             setTexture("mainTexture", texture);
         }
-        void setTextureScale(const VectorTemplated<float, 2>& scale) {
+        void setTextureScale(const Vector2& scale) {
             mainTextureScale = scale;
             // Ensure shader uniform property gets set by property loop in apply.
-            setProperty<VectorTemplated<float, 2>>("mainTextureScale", scale);
+            setProperty<Vector2>("mainTextureScale", scale);
         }
 
     protected:
@@ -147,9 +147,7 @@ namespace LaurelEye::Graphics {
         // Legacy / convenience members (kept for compatibility)
         bool useTexture = false;
         TextureHandle mainTexture = 0;
-        VectorTemplated<float, 2> mainTextureScale = VectorTemplated<float, 2>({1.0f, 1.0f});
-
-
+        Vector2 mainTextureScale = Vector2(1.0f, 1.0f);
     };
 
 } // namespace LaurelEye::Graphics

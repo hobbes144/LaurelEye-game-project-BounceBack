@@ -21,8 +21,19 @@ namespace LaurelEye {
 
     class Transform {
     public:
-        Transform() : position(0, 0, 0), rotation(1, 0, 0, 0), scaling(1, 1, 1) {}
-        Transform(Vector3 _position, Quaternion _rotation, Vector3 _scale) : position(_position), rotation(_rotation), scaling(_scale) {}
+        Transform() : position(0, 0, 0),
+                      rotation(1, 0, 0, 0),
+                      scaling(1, 1, 1) {}
+
+        Transform(const Vector3& _position,
+                  const Quaternion& _rotation,
+                  const Vector3& _scale) : position(_position),
+                                           rotation(_rotation),
+                                           scaling(_scale) {}
+
+        Transform(const Matrix4& matrix) : position(matrix.position()),
+                                           rotation(matrix.toQuaternion()),
+                                           scaling(matrix.scaling()) {};
 
         Transform operator*(const Transform& other) const {
             Transform res;
@@ -91,12 +102,12 @@ namespace LaurelEye {
             return *this;
         }
 
-        Transform& rotate(const Quaternion quaternionDelta) {
+        Transform& rotate(const Quaternion& quaternionDelta) {
             rotation = rotation * quaternionDelta;
             return *this;
         }
 
-        Transform& rotate(const Vector3 rotationDelta) {
+        Transform& rotate(const Vector3& rotationDelta) {
             Quaternion quaternionDelta = Quaternion::fromEuler(rotationDelta);
             rotation = rotation * quaternionDelta;
             return *this;

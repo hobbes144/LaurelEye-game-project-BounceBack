@@ -98,7 +98,7 @@ namespace LaurelEye {
         if ( !jsonAsset ) {
             std::cerr << "EntityFactory: Could not parse prefab for entity";
         }
-        auto entity = createEntityFromJson(jsonAsset->jsonDocument); 
+        auto entity = createEntityFromJson(jsonAsset->jsonDocument);
         Entity* tempEntity = entity.get();
         scene.addEntity(std::move(entity));
         return tempEntity;
@@ -183,7 +183,7 @@ namespace LaurelEye {
                     return;
                 }
                 renderComponent->SetMeshAsset(meshAsset);
-                
+
             }
 
             else if (mesh.HasMember("primitiveType") && mesh["primitiveType"].IsString()) {
@@ -222,7 +222,7 @@ namespace LaurelEye {
                 const auto& scale = material["mainTextureScale"].GetArray();
                 renderComponent->GetMaterial()->setProperty<Vector2>(
                     "mainTextureScale",
-                    Vector2({scale[0].GetFloat(), scale[1].GetFloat()}));
+                    Vector2(scale[0].GetFloat(), scale[1].GetFloat()));
             }
             else {
                 renderComponent->GetMaterial()->setProperty<Vector2>("mainTextureScale", Vector2(1.0f));

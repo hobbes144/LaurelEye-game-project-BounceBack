@@ -553,6 +553,90 @@ namespace LaurelEye {
         return q.normalized();
     }
 
+    float Matrix4::determinant() const {
+        const auto& m = data;
+
+        float Coef00 = m[2][2] * m[3][3] - m[3][2] * m[2][3];
+        float Coef02 = m[1][2] * m[3][3] - m[3][2] * m[1][3];
+        float Coef03 = m[1][2] * m[2][3] - m[2][2] * m[1][3];
+
+        float Coef04 = m[2][1] * m[3][3] - m[3][1] * m[2][3];
+        float Coef06 = m[1][1] * m[3][3] - m[3][1] * m[1][3];
+        float Coef07 = m[1][1] * m[2][3] - m[2][1] * m[1][3];
+
+        float Coef08 = m[2][1] * m[3][2] - m[3][1] * m[2][2];
+        float Coef10 = m[1][1] * m[3][2] - m[3][1] * m[1][2];
+        float Coef11 = m[1][1] * m[2][2] - m[2][1] * m[1][2];
+
+        float Coef12 = m[2][0] * m[3][3] - m[3][0] * m[2][3];
+        float Coef14 = m[1][0] * m[3][3] - m[3][0] * m[1][3];
+        float Coef15 = m[1][0] * m[2][3] - m[2][0] * m[1][3];
+
+        float Coef16 = m[2][0] * m[3][2] - m[3][0] * m[2][2];
+        float Coef18 = m[1][0] * m[3][2] - m[3][0] * m[1][2];
+        float Coef19 = m[1][0] * m[2][2] - m[2][0] * m[1][2];
+
+        float Coef20 = m[2][0] * m[3][1] - m[3][0] * m[2][1];
+        float Coef22 = m[1][0] * m[3][1] - m[3][0] * m[1][1];
+        float Coef23 = m[1][0] * m[2][1] - m[2][0] * m[1][1];
+
+        VectorTemplated<float, 4> Fac0(std::array<float, 4>{Coef00, Coef00, Coef02, Coef03});
+        VectorTemplated<float, 4> Fac1(std::array<float, 4>{Coef04, Coef04, Coef06, Coef07});
+        VectorTemplated<float, 4> Fac2(std::array<float, 4>{Coef08, Coef08, Coef10, Coef11});
+        VectorTemplated<float, 4> Fac3(std::array<float, 4>{Coef12, Coef12, Coef14, Coef15});
+        VectorTemplated<float, 4> Fac4(std::array<float, 4>{Coef16, Coef16, Coef18, Coef19});
+        VectorTemplated<float, 4> Fac5(std::array<float, 4>{Coef20, Coef20, Coef22, Coef23});
+
+        VectorTemplated<float, 4> Vec0(std::array<float, 4>{m[1][0], m[0][0], m[0][0], m[0][0]});
+        VectorTemplated<float, 4> Vec1(std::array<float, 4>{m[1][1], m[0][1], m[0][1], m[0][1]});
+        VectorTemplated<float, 4> Vec2(std::array<float, 4>{m[1][2], m[0][2], m[0][2], m[0][2]});
+        VectorTemplated<float, 4> Vec3(std::array<float, 4>{m[1][3], m[0][3], m[0][3], m[0][3]});
+
+        VectorTemplated<float, 4> Inv0(Vec1 * Fac0 - Vec2 * Fac1 + Vec3 * Fac2);
+        VectorTemplated<float, 4> Inv1(Vec0 * Fac0 - Vec2 * Fac3 + Vec3 * Fac4);
+        VectorTemplated<float, 4> Inv2(Vec0 * Fac1 - Vec1 * Fac3 + Vec3 * Fac5);
+        VectorTemplated<float, 4> Inv3(Vec0 * Fac2 - Vec1 * Fac4 + Vec2 * Fac5);
+
+        VectorTemplated<float, 4> SignA(std::array<float, 4>{+1, -1, +1, -1});
+        VectorTemplated<float, 4> SignB(std::array<float, 4>{-1, +1, -1, +1});
+        VectorTemplated<float, 4> InverseA(Inv0 * SignA);
+        VectorTemplated<float, 4> InverseB(Inv1 * SignB);
+        VectorTemplated<float, 4> InverseC(Inv2 * SignA);
+        VectorTemplated<float, 4> InverseD(Inv3 * SignB);
+        Matrix4 Inverse(InverseA[0], InverseA[1], InverseA[2], InverseA[3],
+                        InverseB[0], InverseB[1], InverseB[2], InverseB[3],
+                        InverseC[0], InverseC[1], InverseC[2], InverseC[3],
+                        InverseD[0], InverseD[1], InverseD[2], InverseD[3]);
+
+        VectorTemplated<float, 4> Row0(std::array<float, 4>{Inverse[0][0], Inverse[1][0], Inverse[2][0], Inverse[3][0]});
+
+        VectorTemplated<float, 4> Dot0(VectorTemplated<float, 4>(m[0]) * Row0);
+        float Dot1 = (Dot0[0] + Dot0[1]) + (Dot0[2] + Dot0[3]);
+        return Dot1;
+    }
+
+    Vector3 Matrix4::position() const {
+        return Vector3(data[0][3], data[1][3], data[2][3]);
+    }
+
+    Vector3 Matrix4::scaling() const {
+        Vector3 vCols[3] = {
+            Vector3(data[0][0], data[1][0], data[2][0]),
+            Vector3(data[0][1], data[1][1], data[2][1]),
+            Vector3(data[0][2], data[1][2], data[2][2])};
+
+        Vector3 s;
+        /* extract the scaling factors */
+        s.x = vCols[0].magnitude();
+        s.y = vCols[1].magnitude();
+        s.z = vCols[2].magnitude();
+
+        /* and the sign of the scaling */
+        if ( this->determinant() < 0 ) s = -s;
+
+        return s;
+    }
+
     /// @brief << Operator overload for printing a Matrix's data
     /// @param os ostream to which the output is printed.
     /// @param m Matrix to be printed.

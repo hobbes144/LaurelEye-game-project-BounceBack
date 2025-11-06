@@ -13,7 +13,7 @@
 
 namespace LaurelEye {
 
-    class Quaternion : public VectorTemplated<float, 4> {
+    class Quaternion : public Vector4 {
     private:
         bool isNormalized = false;
         bool isEulerVector = false;
@@ -23,15 +23,12 @@ namespace LaurelEye {
         void setDirty();
 
     public:
-        Quaternion(float w = 1.0f, float x = .0f, float y = .0f, float z = .0f) : VectorTemplated(), eulerVector(Vector3()) {
-            data[0] = w;
-            data[1] = x;
-            data[2] = y;
-            data[3] = z;
-        }
+        Quaternion(float w = 1.0f, float x = .0f,
+                   float y = .0f, float z = .0f) : VectorTemplated(w, x, y, z),
+                                                   eulerVector(Vector3()) {}
 
-        Quaternion(VectorTemplated<float, 4> vec) : VectorTemplated(vec),
-                                                    eulerVector(Vector3()) {
+        Quaternion(Vector4 vec) : VectorTemplated(vec),
+                                  eulerVector(Vector3()) {
         }
 
         // Getter functions for w, x, y, z
@@ -62,6 +59,8 @@ namespace LaurelEye {
 
         // Computes the up vector
         Vector3 up();
+
+        Quaternion operator-() const;
 
         friend Quaternion operator+(Quaternion q, const Quaternion& other) {
             return q += other;
@@ -95,6 +94,8 @@ namespace LaurelEye {
             return v + ((uv * data[0]) + uuv) * 2.0f;
         }
 
+        Quaternion operator/(const float& b) const;
+
         Quaternion inverse();
         Quaternion conjugate() const;
         void normalize();
@@ -107,6 +108,8 @@ namespace LaurelEye {
         static Quaternion fromEuler(const Vector3& euler);
         static Quaternion fromEuler(const float pitch, const float yaw, const float roll);
         static Quaternion axisAngleToQuaternion(const Vector3& axis, float angle);
+
+        static Quaternion slerp(const Quaternion& start, const Quaternion& end, float time);
     };
 
     std::ostream& operator<<(std::ostream& os, const Quaternion& q);

@@ -71,7 +71,7 @@ namespace LaurelEye::Scripting {
             // Operator Overloads
             sol::meta_function::multiplication, sol::overload(
                 [](const Matrix4& m, float scalar) { return m * scalar; },
-                [](const Matrix4& m, const Matrix4& other) { 
+                [](const Matrix4& m, const Matrix4& other) {
                     Matrix4 copy = m;
                     return copy * other;
                 },
@@ -209,8 +209,8 @@ namespace LaurelEye::Scripting {
                 static_cast<Transform&(Transform::*)(float,float,float)>(&Transform::translate)
             ),
             "rotate", sol::overload(
-                static_cast<Transform&(Transform::*)(const LaurelEye::Quaternion)>(&Transform::rotate),
-                static_cast<Transform&(Transform::*)(const LaurelEye::Vector3)>(&Transform::rotate),
+                static_cast<Transform&(Transform::*)(const LaurelEye::Quaternion&)>(&Transform::rotate),
+                static_cast<Transform&(Transform::*)(const LaurelEye::Vector3&)>(&Transform::rotate),
                 static_cast<Transform&(Transform::*)(float,float,float)>(&Transform::rotate)
             ),
             "scale", sol::overload(

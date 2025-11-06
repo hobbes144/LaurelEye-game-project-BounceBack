@@ -8,6 +8,7 @@
 ///
 /// Copyright © 2025 DIGIPEN Institute of Technology. All rights reserved.
 #include "LaurelEyeEngine/math/Quaternion.h"
+#include <cfloat>
 
 namespace LaurelEye {
 
@@ -43,7 +44,13 @@ namespace LaurelEye {
             2.0f * (data[2] * data[3] + data[0] * data[1]));
     }
 
-    // Axis 0 = x, 1 = y, 2 = z
+    Quaternion Quaternion::operator-() const {
+        return Quaternion(-data[0], -data[1], -data[2], -data[3]);
+    }
+
+    Quaternion Quaternion::operator/(const float& b) const {
+        return Quaternion(data[0] / b, data[1] / b, data[2] / b, data[3] / b);
+    }
 
     Quaternion Quaternion::inverse() {
         normalize();
@@ -69,6 +76,7 @@ namespace LaurelEye {
         return result;
     }
 
+    // Axis 0 = x, 1 = y, 2 = z
     Vector3 Quaternion::getAxis(const int axis) const {
         switch ( axis ) {
         case 0:
@@ -156,6 +164,34 @@ namespace LaurelEye {
         float halfAngle = angle * 0.5f;
         float s = std::sin(halfAngle);
         return Quaternion(std::cos(halfAngle), axis.x * s, axis.y * s, axis.z * s);
+    }
+
+    Quaternion Quaternion::slerp(const Quaternion& x, const Quaternion& y, float a) {
+        Quaternion z = y;
+
+        float cosTheta = x.dot(y);
+
+        // If cosTheta < 0, the interpolation will take the long way around the sphere.
+        // To fix this, one quat must be negated.
+        if ( cosTheta < static_cast<float>(0) ) {
+            z = -y;
+            cosTheta = -cosTheta;
+        }
+
+        // Perform a linear interpolation when cosTheta is close to 1 to avoid side effect of sin(angle) becoming a zero denominator
+        if ( cosTheta > static_cast<float>(1) - std::numeric_limits<float>::epsilon() ) {
+            // Linear interpolation
+            return Quaternion(
+                (1 - a) * x[0] + a * z[0],
+                (1 - a) * x[1] + a * z[1],
+                (1 - a) * x[2] + a * z[2],
+                (1 - a) * x[3] + a * z[3]);
+        }
+        else {
+            // Essential Mathematics, page 467
+            float angle = acos(cosTheta);
+            return (sin((static_cast<float>(1) - a) * angle) * x + sin(a * angle) * z) / sin(angle);
+        }
     }
 
     std::ostream& operator<<(std::ostream& os, const Quaternion& q) {

@@ -21,8 +21,7 @@
 ///
 /// Supports variable template precision (float, double, etc.).
 template <typename T = double>
-class FramerateController
-{
+class FramerateController {
 public:
     // Singleton access
     static FramerateController<T>* getController();
@@ -93,10 +92,14 @@ private:
 #endif
 };
 
+template class FramerateController<float>;
+template class FramerateController<double>;
+
 /// \typedef FFramerateController
 /// \brief Alias for float-based framerate controller.
 /// Use this for most gameplay and rendering purposes.
 using FFramerateController = FramerateController<float>;
+using DFramerateController = FramerateController<double>;
 
 // Include template implementation
 #include "FramerateController.inl"
