@@ -39,6 +39,9 @@ namespace LaurelEye::Graphics {
         glDisable(GL_DEPTH_TEST);
         glEnable(GL_PROGRAM_POINT_SIZE);
 
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         glDrawArrays(GL_POINTS, 0, numParticles);
 
         glDisable(GL_PROGRAM_POINT_SIZE);

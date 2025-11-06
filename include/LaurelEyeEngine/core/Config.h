@@ -57,6 +57,11 @@ namespace LaurelEye {
         std::string backend = "FMOD"; // or "OpenAL", etc.
     };
 
+    struct DebugDrawConfig {
+        unsigned int MaxLines = 5000;
+        std::string HotKey = "Tilde";
+    };
+
     struct EngineConfig {
         std::string projectName;
         std::string assetRoot;
@@ -68,6 +73,7 @@ namespace LaurelEye {
         PhysicsConfig physics;
         ParticleConfig particles;
         AudioConfig audio;
+        DebugDrawConfig debugDraw;
     };
 
 } // namespace LaurelEye

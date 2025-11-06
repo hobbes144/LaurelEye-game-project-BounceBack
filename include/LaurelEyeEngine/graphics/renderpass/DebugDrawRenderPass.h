@@ -1,5 +1,5 @@
 ﻿///
-/// @file   ParticleRenderPass.h
+/// @file   DebugDrawRenderPass.h
 /// @author Nicholas Shaw (nick_shaw@me.com)
 /// @par    **DigiPen Email**
 ///    nick.shaw@digipen.edu
@@ -7,7 +7,7 @@
 ///    GAM541
 /// @date   11-04-2025
 /// @brief  @file   ParticleRenderPass.cpp
-/// 
+///
 
 #pragma once
 
@@ -18,10 +18,11 @@
 
 namespace LaurelEye::Graphics {
 
-    class ParticleRenderPass : public IRenderPass {
+    class DebugDrawRenderPass : public IRenderPass {
+
     public:
-        /// @brief Default constructor.
-        ParticleRenderPass()
+        /// @brief Default Constructor
+        DebugDrawRenderPass()
             : IRenderPass() {}
 
         /// \copydoc IRenderPass::setup
@@ -29,13 +30,16 @@ namespace LaurelEye::Graphics {
         /// \copydoc IRenderPass::execute
         void execute(const FrameContext& ctx) override;
 
-        void updateNumParticles(unsigned int np);
-        void updateParticleBuffer(std::shared_ptr<Graphics::GeometryBuffer> pb);
+        void updateNumLines(unsigned int nl);
+        void updateLineBuffer(std::shared_ptr<Graphics::GeometryBuffer> lb);
 
     private:
-        unsigned int numParticles;
-        std::shared_ptr<Graphics::GeometryBuffer> particleBuffer;
+        unsigned int numLines;
+        std::shared_ptr<Graphics::GeometryBuffer> lineBuffer;
+
+        float lineWidthRange[2];
 
     };
 
-} // namespace LaurelEye::Graphics
+}
+

@@ -43,14 +43,14 @@ namespace LaurelEye::Graphics {
         /// @brief Attribute types supported by the GeometryBuffer.
         /// These correspond to specific vertex attribute locations in the shader program.
         enum class AttributeType {
-            Position, ///< Vertex position attribute.
-            Normal,   ///< Vertex normal attribute.
-            TexCoord, ///< Texture coordinate attribute.
-            Color,    ///< Vertex color attribute.
-            Tangent,  ///< Tangent vector attribute.
-            Bitangent, ///< Bitangent vector attribute.
-            ParticleSize,
-            ParticleRotation
+            Position, ///< Vertex position attribute.       0
+            Normal,   ///< Vertex normal attribute.         1
+            TexCoord, ///< Texture coordinate attribute.    2
+            Color,    ///< Vertex color attribute.          3
+            Tangent,  ///< Tangent vector attribute.        4
+            Bitangent, ///< Bitangent vector attribute.     5
+            ParticleSize, ///< Particle Size                6
+            ParticleRotation ///< Particle Rotation         7
         };
 
         /// @enum AttributeInfo

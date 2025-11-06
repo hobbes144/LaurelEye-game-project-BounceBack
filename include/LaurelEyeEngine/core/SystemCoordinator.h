@@ -18,6 +18,7 @@
 #include "LaurelEyeEngine/physics/PhysicsSystem.h"
 #include "LaurelEyeEngine/audio/FModAudioManager.h"
 #include "LaurelEyeEngine/scripting/ScriptSystem.h"
+#include "LaurelEyeEngine/debugDraw/DebugDrawSystem.h"
 
 namespace LaurelEye {
     class SystemCoordinator {
@@ -37,5 +38,6 @@ namespace LaurelEye {
         std::unique_ptr<Physics::PhysicsSystem> physicsSystem;
         std::unique_ptr<Audio::FModAudioManager> audioSystem;
         std::unique_ptr<Scripting::ScriptSystem> scriptSystem;
+        std::unique_ptr<Debug::DebugDrawSystem> debugDrawSystem;
     };
 } // namespace LaurelEye

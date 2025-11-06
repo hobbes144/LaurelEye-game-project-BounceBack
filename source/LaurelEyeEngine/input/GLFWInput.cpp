@@ -188,6 +188,8 @@ namespace LaurelEye {
             return GLFW_KEY_RIGHT;
         case Key::Tab:
             return GLFW_KEY_TAB;
+        case Key::Tilde:
+            return GLFW_KEY_GRAVE_ACCENT;
         case Key::One:
             return GLFW_KEY_1;
         case Key::Two:

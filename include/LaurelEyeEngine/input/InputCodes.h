@@ -9,6 +9,7 @@ namespace LaurelEye {
         Escape,
         Enter,
         Tab,
+        Tilde,
         arrowUp,
         arrowDown,
         arrowRight,

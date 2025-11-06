@@ -28,6 +28,4 @@ void main()
     gl_PointSize = inSize;   // dynamic size per particle
     vColor = vertexColor;
     vRotation = inRotation;  // pass to fragment shader
-
-    vColor = vertexColor;
 }

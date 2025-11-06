@@ -80,7 +80,16 @@ namespace LaurelEye::Particles {
                 // Interpolate Color / Size
                 float t = p.lifetime / p.maxLifetime;
                 for ( int i = 0; i < 4; ++i ) {
-                    p.color[i] = emitter->GetEmitterData().startColor[i] * (1 - t) + emitter->GetEmitterData().endColor[i] * t;
+                    if ( i == 3 ) {
+                        float alphaT = pow(t, 2.0f); // Fade slower at start, faster at end
+                        float newAlpha = emitter->GetEmitterData().startColor[i] * (1 - alphaT) + emitter->GetEmitterData().endColor[i] * alphaT;
+                        p.color[i] = newAlpha;
+                    }
+                    else {
+                        p.color[i] = emitter->GetEmitterData().startColor[i] * (1 - t) + emitter->GetEmitterData().endColor[i] * t;
+                    }
+
+
                     p.size = emitter->GetEmitterData().startSize * (1 - t) + emitter->GetEmitterData().endSize * t;
                 }
             }
@@ -304,7 +313,6 @@ namespace LaurelEye::Particles {
     }
 
     void ParticleSystem::dispatchNumParticlesToRenderPass() {
-
         prp->updateNumParticles(activeParticles);
     }
 

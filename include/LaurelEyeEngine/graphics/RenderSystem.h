@@ -28,6 +28,7 @@
 #include "LaurelEyeEngine/graphics/renderpass/SinglePassShadow.h"
 #include "LaurelEyeEngine/graphics/renderpass/SkydomePass.h"
 #include "LaurelEyeEngine/graphics/renderpass/UIPass.h"
+#include "LaurelEyeEngine/graphics/renderpass/DebugDrawRenderPass.h"
 #include "LaurelEyeEngine/graphics/resources/Lights.h"
 #include "LaurelEyeEngine/graphics/resources/SizeRegistry.h"
 #include "LaurelEyeEngine/graphics/surface/IWindowSurfaceProvider.h"
@@ -128,6 +129,7 @@ namespace LaurelEye::Graphics {
         std::shared_ptr<SinglePassShadow> retrieveSinglePass();
         std::shared_ptr<ParticleRenderPass> retrieveParticlePass();
         std::shared_ptr<SkydomePass> retrieveSkydomePass();
+        std::shared_ptr<DebugDrawRenderPass> retrieveDebugDrawRenderPass();
 
         RenderResources* getRenderResources() {
             return tempRenderResources.get();
@@ -136,6 +138,11 @@ namespace LaurelEye::Graphics {
         void setClearColor(float x, float y, float z) {
             glClearColor(x, y, z, 1.0f);
         }
+
+        void setRunDebugDraw(bool r) {
+            runDebugDraw = r;
+        }
+
         bool testParticles = true;
 
         void registerResizeCallback(SurfaceHandle h, std::function<void(const SizeRegistry&)> callback);
@@ -145,6 +152,8 @@ namespace LaurelEye::Graphics {
         RenderSystemConfig config;
         /// @brief Rendering device interface responsible for low-level GPU communication.
         std::unique_ptr<IRenderDevice> device;
+
+        bool runDebugDraw = false;
 
         /// @brief List of window surfaces associated with each window instance.
         std::vector<std::unique_ptr<IWindowSurfaceProvider>> windowSurfaces;
@@ -177,6 +186,7 @@ namespace LaurelEye::Graphics {
         // std::shared_ptr<SingleBufferedDataPass> sp;
         std::shared_ptr<UIPass> uiPass;
         std::shared_ptr<ParticleRenderPass> prp;
+        std::shared_ptr<DebugDrawRenderPass> dbrp;
 
         // Temp pointers to support lights and camera updates
         std::unique_ptr<Entity> defaultCamera = nullptr;

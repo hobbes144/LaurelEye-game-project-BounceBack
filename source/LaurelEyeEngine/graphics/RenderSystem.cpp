@@ -107,6 +107,11 @@ namespace LaurelEye::Graphics {
             prp->setup(*tempRenderResources.get());
         }
 
+        if ( runDebugDraw ) {
+            dbrp = std::make_shared<DebugDrawRenderPass>();
+            dbrp->setup(*tempRenderResources.get());
+        }
+
         initDefaultCamera();
         initGlobalLightsBuffer();
 
@@ -203,6 +208,18 @@ namespace LaurelEye::Graphics {
         }
         sp->execute(ctx);
 
+        if ( runDebugDraw ) {
+            //Debug Draw Render Pass
+            if ( dbrp ) {
+                FrameContext dbCtx{
+                    0.1f,
+                    *device.get(),
+                    *tempRenderResources.get(),
+                    components};
+                dbrp->execute(dbCtx);
+            }
+        }
+
         if ( testParticles ) {
             FrameContext prpCtx{
                 0.1f,
@@ -232,6 +249,7 @@ namespace LaurelEye::Graphics {
         sp = nullptr;
         uiPass = nullptr;
         prp = nullptr;
+        dbrp = nullptr;
         ShaderManager::getInstance().unloadShaders();
     }
 
@@ -431,6 +449,9 @@ namespace LaurelEye::Graphics {
     }
     std::shared_ptr<SkydomePass> RenderSystem::retrieveSkydomePass() {
         return bp;
+    }
+    std::shared_ptr<DebugDrawRenderPass> RenderSystem::retrieveDebugDrawRenderPass() {
+        return dbrp;
     }
     // Camera interactons
 

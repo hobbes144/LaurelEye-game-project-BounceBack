@@ -246,7 +246,7 @@ namespace LaurelEye::Graphics {
             auto it = attributeData.begin();
             vertexCount = static_cast<GLsizei>(it->second.data.size() / it->second.elementSize);
 
-            glBufferData(GL_ARRAY_BUFFER, totalSize, nullptr, GL_STATIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, totalSize, nullptr, GL_DYNAMIC_DRAW);
 
             /**
              * We are storing the data as blocks of each attribute. We are not using the
@@ -280,6 +280,8 @@ namespace LaurelEye::Graphics {
     void GeometryBuffer::initializeElementBuffers(
         const std::vector<unsigned int>& indices) {
 
+        if ( indices.empty() ) return;
+
         indexCount = (unsigned int)indices.size();
 
         glGenBuffers(1, &ebo);
@@ -289,7 +291,7 @@ namespace LaurelEye::Graphics {
             GL_ELEMENT_ARRAY_BUFFER,
             indices.size() * sizeof(unsigned int),
             indices.data(),
-            GL_STATIC_DRAW);
+            GL_DYNAMIC_DRAW);
 
         this->indexData = indices;
     }
@@ -364,7 +366,7 @@ namespace LaurelEye::Graphics {
         if ( !hasAttribute(type) ) {
             throw std::runtime_error("Attribute not found in buffer");
         }
-        glBindVertexArray(vao);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
         glBufferSubData(
             GL_ARRAY_BUFFER,
@@ -372,7 +374,7 @@ namespace LaurelEye::Graphics {
             data.size() * sizeof(float),
             data.data());
 
-        glBindVertexArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
     /*!****************************************************************************
@@ -383,11 +385,11 @@ namespace LaurelEye::Graphics {
     void GeometryBuffer::updateIndices(const std::vector<unsigned int>& indices) {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
-        glBufferData(
+        glBufferSubData(
             GL_ELEMENT_ARRAY_BUFFER,
+            0,
             indices.size() * sizeof(unsigned int),
-            indices.data(),
-            GL_STATIC_DRAW);
+            indices.data());
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 

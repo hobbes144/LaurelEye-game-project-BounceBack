@@ -27,6 +27,7 @@ namespace LaurelEye {
             std::cerr << "Could not find WindowManager in SystemCoordinator - Renderer will likely not work!" << std::endl;
         }
         renderSystem->setConfig(renderConfig);
+        renderSystem->setRunDebugDraw(engineConfig.enableDebugMode);
 
         particleSystem = std::make_unique<Particles::ParticleSystem>();
         particleSystem->setEngineContext(ctx);
@@ -40,12 +41,20 @@ namespace LaurelEye {
         scriptSystem = std::make_unique<Scripting::ScriptSystem>();
         scriptSystem->setEngineContext(ctx);
 
+        //If Debug Drawing is enabled, create and register the system
+        if ( engineConfig.enableDebugMode ) {
+            debugDrawSystem = std::make_unique<Debug::DebugDrawSystem>();
+            debugDrawSystem->setEngineContext(ctx);
+            ctx.registerService<Debug::DebugDrawSystem>(debugDrawSystem.get());
+        }
+
         ctx.registerService<TransformSystem>(transformSystem.get());
         ctx.registerService<Graphics::RenderSystem>(renderSystem.get());
         ctx.registerService<Physics::PhysicsSystem>(physicsSystem.get());
         ctx.registerService<Particles::ParticleSystem>(particleSystem.get());
         ctx.registerService<Audio::FModAudioManager>(audioSystem.get());
         ctx.registerService<Scripting::ScriptSystem>(scriptSystem.get());
+        
     }
 
     void SystemCoordinator::initialize() {
@@ -55,11 +64,15 @@ namespace LaurelEye {
         physicsSystem->initialize();
         scriptSystem->initialize();
         particleSystem->initialize();
+        debugDrawSystem->initialize();
     }
     void SystemCoordinator::update(float deltaTime) {
         //std::cout << "SysCord Update\n";
         transformSystem->update(deltaTime);
         particleSystem->update(deltaTime);
+        if ( debugDrawSystem ) {
+            debugDrawSystem->update(deltaTime);
+        }
         renderSystem->update(deltaTime);
         audioSystem->update();
         scriptSystem->update(deltaTime);
@@ -75,6 +88,7 @@ namespace LaurelEye {
         physicsSystem->shutdown();
         renderSystem->shutdown();
         transformSystem->shutdown();
+        debugDrawSystem->shutdown();
 
         transformSystem.reset();
         renderSystem.reset();
@@ -82,5 +96,6 @@ namespace LaurelEye {
         particleSystem.reset();
         audioSystem.reset();
         scriptSystem.reset();
+        debugDrawSystem.reset();
     }
 } // namespace LaurelEye

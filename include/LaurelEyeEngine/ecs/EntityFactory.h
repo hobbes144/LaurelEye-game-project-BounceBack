@@ -57,6 +57,7 @@ namespace LaurelEye{
         void setupPhysicsComponent(Entity& entity, const rapidjson::Value& physicsData);
         void setupScriptComponent(Entity& entity, const rapidjson::Value& scriptData);
         void setupParticleEmitterComponent(Entity& entity, const rapidjson::Value& emitterData);
+        void setupDebugDrawComponent(Entity& entity, const rapidjson::Value& emitterData);
 
     };
 }

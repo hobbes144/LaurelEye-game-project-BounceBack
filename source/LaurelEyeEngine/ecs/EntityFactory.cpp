@@ -84,6 +84,9 @@ namespace LaurelEye {
             else if ( compName == "ParticleEmitter" ) {
                 setupParticleEmitterComponent(entity, compData);
             }
+            else if ( compName == "DebugDraw" ) {
+                setupDebugDrawComponent(entity, compData);
+            }
             else {
                 std::cerr << "Entity Factory: Unknown component type trying to be added to entity: " << entity.getName() << std::endl;
             }
@@ -465,6 +468,10 @@ namespace LaurelEye {
         if ( emitterData.HasMember("maxParticles") ) {
             emitter->SetMaxParticles(emitterData["maxParticles"].GetUint());
         }
+
+    }
+
+    void EntityFactory::setupDebugDrawComponent(Entity& entity, const rapidjson::Value& emitterData) {
 
     }
 

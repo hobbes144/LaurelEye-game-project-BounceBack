@@ -18,5 +18,5 @@ void main()
     if (dist > 0.5)
         discard;
 
-    FragColor = vColor;
+    FragColor = vec4(vColor.rgb, vColor.a);
 }
