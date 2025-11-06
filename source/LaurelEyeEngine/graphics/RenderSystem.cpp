@@ -12,21 +12,19 @@
 #include "LaurelEyeEngine/graphics/resources/DataBuffer.h"
 #include "LaurelEyeEngine/graphics/resources/Lights.h"
 #include "LaurelEyeEngine/graphics/resources/Shadow.h"
+#include "LaurelEyeEngine/graphics/resources/SizeRegistry.h"
 #include "LaurelEyeEngine/graphics/ShadowManager.h"
 #include "LaurelEyeEngine/graphics/surface/glfw/LGlfwOpenGLWindowSurface.h"
+#include "LaurelEyeEngine/graphics/surface/IWindowSurfaceProvider.h"
 
 #include "LaurelEyeEngine/graphics/device/glfw/LGLRenderDevice.h"
 
-#include "LaurelEyeEngine/graphics/graphics_components/CameraComponent.h"
-#include "LaurelEyeEngine/graphics/graphics_components/LightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/AmbientLightComponent.h"
+#include "LaurelEyeEngine/graphics/graphics_components/CameraComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/DirectionalLightComponent.h"
-#include "LaurelEyeEngine/graphics/graphics_components/DirectionalLightComponent.h"
-#include "LaurelEyeEngine/graphics/graphics_components/PointLightComponent.h"
-#include "LaurelEyeEngine/graphics/graphics_components/UIComponent.h"
+#include "LaurelEyeEngine/graphics/graphics_components/LightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/Renderable3DComponent.h"
-#include "LaurelEyeEngine/graphics/graphics_components/Renderable2DComponent.h"
-#include "LaurelEyeEngine/graphics/renderpass/SingleBufferedDataPass.h"
+// #include "LaurelEyeEngine/graphics/renderpass/SingleBufferedDataPass.h"
 #include "LaurelEyeEngine/graphics/renderpass/SinglePass.h"
 #include "LaurelEyeEngine/graphics/renderpass/SinglePassShadow.h"
 #include "LaurelEyeEngine/graphics/renderpass/UIPass.h"
@@ -61,9 +59,27 @@ namespace LaurelEye::Graphics {
             for ( int i = 0; i < config.windows.size(); ++i ) {
                 std::unique_ptr<LGlfwOpenGLWindowSurface> windowSurface = std::make_unique<LGlfwOpenGLWindowSurface>();
                 windowSurface->attachToWindow(*(config.windows[i]));
+                windowSurface->setRenderSystemResizeCallback([this](SurfaceHandle h, const SizeRegistry& size) {
+                    this->resize(h, size);
+                });
 
                 windowSurfaces.emplace_back(std::move(windowSurface));
             }
+        }
+    }
+
+    void RenderSystem::registerResizeCallback(SurfaceHandle h, std::function<void(const SizeRegistry&)> callback) {
+        resizeCallbacks[h].push_back(callback);
+    }
+
+    void RenderSystem::resize(SurfaceHandle h, const SizeRegistry& size) {
+        // Update cameras to use new window size
+        // When we add multiple cameras, we can change this to a `for` loop.
+        camera->updateAspectRatio((float)size.width / (float)size.height);
+
+        // Propogate the resize to resources that requested a callback.
+        for ( const auto& callback : resizeCallbacks[h] ) {
+            callback(size);
         }
     }
 
@@ -97,11 +113,12 @@ namespace LaurelEye::Graphics {
         tempShadowManager = std::make_unique<ShadowManager>(tempRenderResources.get());
     }
 
+    void RenderSystem::setCurrentCamera(CameraComponent* currCamera) {
+        camera = currCamera;
+    }
+
     void RenderSystem::update(float deltaTime) {
         // TODO: All the draw logic should run here.
-
-        windowSurfaces[0]->resizeSurfaceCallback();
-
         // Camera update
         updateCameraBuffer(camera);
         device->bindDataBufferBase(camera->getCameraBufferHandle());
@@ -167,7 +184,6 @@ namespace LaurelEye::Graphics {
 
         glViewport(0, 0, windowSurfaces[0]->getSize().width, windowSurfaces[0]->getSize().height);
 
-
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         // Bind camera and global lights buffer for use in shaders
@@ -180,16 +196,14 @@ namespace LaurelEye::Graphics {
             *device.get(),
             *tempRenderResources.get(),
             components,
-            tempShadowManager.get()
-        };
+            tempShadowManager.get()};
 
-        if (bp->getTexture() != InvalidTexture) {
+        if ( bp->getTexture() != InvalidTexture ) {
             bp->execute(ctx);
         }
         sp->execute(ctx);
 
         if ( testParticles ) {
-            // WARNING: PARTICLE PASS DOES NOT WORK IN RELEASE MODE
             FrameContext prpCtx{
                 0.1f,
                 *device.get(),
@@ -303,7 +317,7 @@ namespace LaurelEye::Graphics {
                 }
             }
 
-            if ( renderComponent->GetMesh()  && renderComponent->GetMeshPrimitiveType() == Mesh::Type::None) {
+            if ( renderComponent->GetMesh() && renderComponent->GetMeshPrimitiveType() == Mesh::Type::None ) {
                 if ( auto geo = renderComponent->GetMesh()->getGeometryBuffer() ) {
                     geo->destroy();
                 }

@@ -19,8 +19,8 @@ inline void warn_impl(std::string_view expr,
               << (msg.empty() ? "" : ": ") << msg << '\n';
 }
 
-#define WARN_IF(cond, ...)                                              \
-    do {                                                                \
+#define WARN_IF(cond, ...)                                             \
+    do {                                                               \
         if ( (cond) ) warn_impl(#cond, std::string_view{__VA_ARGS__}); \
     } while ( 0 )
 
@@ -77,7 +77,16 @@ namespace LaurelEye::Graphics {
         const float aspectRatio,
         const float near,
         const float far) {
+
+        projectionType = CameraProjectionType::Perspective;
+        this->aspectRatio = aspectRatio;
+        fixedRef = fov;
+        this->near = near;
+        this->far = far;
+
         cameraData.projectionMatrix = Matrix4::perspective(fov, aspectRatio, near, far);
+
+        std::cout << "Set Pers projection of vfov " << fixedRef << ", aspectRatio " << aspectRatio << std::endl;
 
         return;
     }
@@ -89,10 +98,36 @@ namespace LaurelEye::Graphics {
         const float top,
         const float near,
         const float far) {
+
+        projectionType = CameraProjectionType::Orthographic;
+        aspectRatio = (right - left) / (top - bottom);
+        // Assuming equal top and bottom for simplicity. Pray this never
+        // becomes a problem.
+        fixedRef = top;
+        this->near = near;
+        this->far = far;
+
         cameraData.projectionMatrix = Matrix4::orthographic(
             left, right, bottom, top, near, far);
 
+        std::cout << "Set Ortho projection of halfHeight " << fixedRef << ", aspectRatio " << aspectRatio << std::endl;
+
         return;
+    }
+
+    void CameraComponent::updateAspectRatio(float _aspectRatio) {
+        if ( projectionType == CameraProjectionType::Perspective ) {
+            // Using fixedRef as vfov.
+            setPerspectiveProjection(fixedRef, _aspectRatio, near, far);
+        }
+        else {
+            // Using fixedRef as halfHeight.
+            const float halfWidth = _aspectRatio * fixedRef;
+            setOrthographicProjection(
+                -halfWidth, halfWidth,
+                -fixedRef, fixedRef,
+                near, far);
+        }
     }
 
     const Matrix4& CameraComponent::getViewMatrix() {

@@ -6,12 +6,12 @@
 /// This class implements the IWindowSurfaceProvider interface to allow the
 /// engine to create and manage an OpenGL rendering context tied to a GLFW window.
 
-
 #pragma once
 
 #include "LaurelEyeEngine/graphics/surface/IWindowSurfaceProvider.h"
 #include "LaurelEyeEngine/window/IWindow.h"
 
+#include <functional>
 #include <glad/glad.h>
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
@@ -44,13 +44,17 @@ namespace LaurelEye::Graphics {
         /// This function should be called at the end of each render frame.
         void endFrame() override;
 
-        
-    private:
-        void resizeSurface(int w, int h) override;
-
         void resizeSurfaceCallback() override;
+
+        void setRenderSystemResizeCallback(
+            std::function<void(SurfaceHandle, const SizeRegistry&)> _rsResizeCallback) override;
+
+    private:
+
+        void resizeSurface(int w, int h) override;
         int pendingWidth = 0;
         int pendingHeight = 0;
         bool resizePending = false;
+        std::function<void(SurfaceHandle, const SizeRegistry&)> rsResizeCallback;
     };
-}
+} // namespace LaurelEye::Graphics

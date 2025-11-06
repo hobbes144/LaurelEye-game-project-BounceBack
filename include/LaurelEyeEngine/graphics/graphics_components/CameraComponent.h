@@ -15,6 +15,7 @@
 #include "LaurelEyeEngine/graphics/graphics_components/IRenderPropertyComponent.h"
 #include "LaurelEyeEngine/graphics/resources/Camera.h"
 #include "LaurelEyeEngine/graphics/resources/DataBuffer.h"
+#include "LaurelEyeEngine/graphics/resources/SizeRegistry.h"
 #include "LaurelEyeEngine/math/Matrix4.h"
 #include "LaurelEyeEngine/math/Quaternion.h"
 
@@ -53,7 +54,7 @@ namespace LaurelEye::Graphics {
 
         /* Component functions */
 
-        void setPositionRotation( const Vector3& _position, const Quaternion& _rotation);
+        void setPositionRotation(const Vector3& _position, const Quaternion& _rotation);
         void setPosition(const Vector3& _position);
         void setRotation(const Quaternion& _rotation);
 
@@ -147,6 +148,17 @@ namespace LaurelEye::Graphics {
             const float near,
             const float far);
 
+        /// @brief Change the aspect ratio of the camera.
+        ///
+        /// This gets called when the window gets resized to ensure the render
+        /// output remains correct.
+        ///
+        /// NOTE: Calling this before running a set projection function leads
+        /// to undefined behavior.
+        ///
+        /// @param _aspectRatio New aspect ratio.
+        void updateAspectRatio(float _aspectRatio);
+
     private:
         std::string name;
 
@@ -155,6 +167,14 @@ namespace LaurelEye::Graphics {
         Quaternion rotation = Quaternion();
 
         DataBufferHandle cameraBufferHandle;
+
+        CameraProjectionType projectionType = CameraProjectionType::Perspective;
+        float aspectRatio;
+        float near;
+        float far;
+        // fixedRef is either vfov for Perspective,
+        // or half-height for Orthographic.
+        float fixedRef;
 
         Vector3 forward;
         Vector3 right;

@@ -6,9 +6,11 @@
 /// @brief Implementation of GLFW Window
 
 #include "LaurelEyeEngine/window/glfw/LGlfwWindow.h"
-#include "LaurelEyeEngine/graphics/Graphics.h"
+// We should be using Graphics.h to define valid backends, and init accordingly.
+// #include "LaurelEyeEngine/graphics/Graphics.h"
 #include "LaurelEyeEngine/window/IWindow.h"
 
+#include <cassert>
 #include <GLFW/glfw3.h>
 
 namespace LaurelEye {
@@ -37,7 +39,7 @@ namespace LaurelEye {
             glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
             glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
             glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
-            glfwWindowHint(GLFW_DEPTH_BITS, 24);
+            glfwWindowHint(GLFW_DEPTH_BITS, 32);
         }
 
         nativeHandle = glfwCreateWindow(
@@ -82,18 +84,24 @@ namespace LaurelEye {
     void LGlfwWindow::setTitle(std::string _title) {
         // To be implemented here
     }
+
     void LGlfwWindow::setWidth(int _width) {
         attributes.width = _width;
     }
+
     void LGlfwWindow::setHeight(int _height) {
         attributes.height = _height;
     }
+
     void LGlfwWindow::setVsync(bool flag) {
         if ( this->attributes.vsync != flag )
             glfwSwapInterval(int(flag));
     }
+
     void LGlfwWindow::setFullscreen(bool flag) {
+        assert(false && "LAURELEYE::WINDOW::SETFULLSCREEN::UNIMPLEMENTED");
     }
+
     void LGlfwWindow::onResizeCallback(GLFWwindow* window, int width, int height) {
         auto* pWindow = static_cast<LGlfwWindow*>(glfwGetWindowUserPointer(window));
         if ( pWindow ) {

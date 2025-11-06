@@ -6,6 +6,7 @@
 /// @brief Implementation of OpenGL GLFW WindowSurface
 
 #include "LaurelEyeEngine/graphics/surface/glfw/LGlfwOpenGLWindowSurface.h"
+#include "LaurelEyeEngine/graphics/resources/SizeRegistry.h"
 
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
@@ -23,11 +24,11 @@ namespace LaurelEye::Graphics {
         // TODO: This is thread specific, we might need to change
         // this for multithreading/multiple windows.
         glfwMakeContextCurrent((GLFWwindow*)window.getNativeHandle());
-        window.surfaceResizeCallback = [this](NativeWindowHandle, int _width, int _height) {
+        window.setSurfaceResizeCallback([this](NativeWindowHandle, int _width, int _height) {
             this->pendingWidth = _width;
             this->pendingHeight = _height;
             this->resizeSurfaceCallback();
-        };
+        });
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glEnable(GL_MULTISAMPLE);
     }
@@ -48,10 +49,18 @@ namespace LaurelEye::Graphics {
         glfwSwapBuffers((GLFWwindow*)nativeWindow);
     }
 
+    void LGlfwOpenGLWindowSurface::setRenderSystemResizeCallback(
+        std::function<void(SurfaceHandle, const SizeRegistry&)> _rsResizeCallback) {
+        rsResizeCallback = _rsResizeCallback;
+    }
+
     void LGlfwOpenGLWindowSurface::resizeSurface(int _width, int _height) {
         this->windowSize.width = _width;
         this->windowSize.height = _height;
-        glViewport(0, 0, windowSize.width, windowSize.height);
+
+        if ( rsResizeCallback )
+            rsResizeCallback(id, SizeRegistry(windowSize.width, windowSize.height));
+
         resizePending = false;
     }
 

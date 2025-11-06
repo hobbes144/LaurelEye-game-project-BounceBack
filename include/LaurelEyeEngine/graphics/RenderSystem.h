@@ -14,24 +14,26 @@
 #pragma once
 
 #include "LaurelEyeEngine/ecs/ISystem.h"
-#include "LaurelEyeEngine/graphics/ShadowManager.h"
 #include "LaurelEyeEngine/graphics/graphics_components/IRenderComponent.h"
+#include "LaurelEyeEngine/graphics/ShadowManager.h"
 
 #include "LaurelEyeEngine/graphics/Graphics.h"
 
-
 // Temp
-#include "LaurelEyeEngine/graphics/renderpass/SingleBufferedDataPass.h"
-#include "LaurelEyeEngine/graphics/renderpass/ParticleRenderPass.h"
 #include "LaurelEyeEngine/graphics/graphics_components/CameraComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/LightComponent.h"
-#include "LaurelEyeEngine/graphics/renderpass/SingleBufferedDataPass.h"
+#include "LaurelEyeEngine/graphics/renderpass/ParticleRenderPass.h"
+// #include "LaurelEyeEngine/graphics/renderpass/SingleBufferedDataPass.h"
 #include "LaurelEyeEngine/graphics/renderpass/SinglePass.h"
 #include "LaurelEyeEngine/graphics/renderpass/SinglePassShadow.h"
 #include "LaurelEyeEngine/graphics/renderpass/SkydomePass.h"
 #include "LaurelEyeEngine/graphics/renderpass/UIPass.h"
 #include "LaurelEyeEngine/graphics/resources/Lights.h"
+#include "LaurelEyeEngine/graphics/resources/SizeRegistry.h"
+#include "LaurelEyeEngine/graphics/surface/IWindowSurfaceProvider.h"
 
+#include <functional>
+#include <map>
 #include <memory>
 #include <unordered_map>
 #include <vector>
@@ -121,6 +123,8 @@ namespace LaurelEye::Graphics {
         /// @return A vector containing pointers to all camera components.
         std::vector<CameraComponent*> GetCameraComponents() const;
 
+        void setCurrentCamera(CameraComponent* currCamera);
+
         std::shared_ptr<SinglePassShadow> retrieveSinglePass();
         std::shared_ptr<ParticleRenderPass> retrieveParticlePass();
         std::shared_ptr<SkydomePass> retrieveSkydomePass();
@@ -133,6 +137,8 @@ namespace LaurelEye::Graphics {
             glClearColor(x, y, z, 1.0f);
         }
         bool testParticles = true;
+
+        void registerResizeCallback(SurfaceHandle h, std::function<void(const SizeRegistry&)> callback);
 
     private:
         /// @brief Configuration data used to initialize the render system.
@@ -157,6 +163,10 @@ namespace LaurelEye::Graphics {
         /// @brief Creates surface providers for each configured window.
         void createWindowSurfaces();
 
+        void resize(SurfaceHandle h, const SizeRegistry& size);
+
+        std::map<SurfaceHandle, std::vector<std::function<void(const SizeRegistry&)>>> resizeCallbacks;
+
         /// @brief Temporary rendering resource storage used during frame execution.
         std::unique_ptr<RenderResources> tempRenderResources;
         std::unique_ptr<ShadowManager> tempShadowManager;
@@ -164,7 +174,7 @@ namespace LaurelEye::Graphics {
         // std::shared_ptr<SinglePass> sp;
         std::shared_ptr<SinglePassShadow> sp;
         std::shared_ptr<SkydomePass> bp;
-        //std::shared_ptr<SingleBufferedDataPass> sp;
+        // std::shared_ptr<SingleBufferedDataPass> sp;
         std::shared_ptr<UIPass> uiPass;
         std::shared_ptr<ParticleRenderPass> prp;
 

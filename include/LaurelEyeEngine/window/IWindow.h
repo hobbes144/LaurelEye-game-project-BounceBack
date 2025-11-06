@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include <string>
 #include <functional>
+#include <string>
 
 namespace LaurelEye {
 
@@ -76,7 +76,7 @@ namespace LaurelEye {
         /// @return GLFWwindow pointer.
         virtual NativeWindowHandle getNativeHandle() = 0;
         /// @brief Get the Time
-        /// @return Time as provided by the window 
+        /// @return Time as provided by the window
         virtual double getTime() = 0;
         // Other functions:
         // - show()
@@ -119,16 +119,23 @@ namespace LaurelEye {
             return float(attributes.width) / float(attributes.height);
         }
 
+        virtual void setSurfaceResizeCallback(
+            std::function<void(NativeWindowHandle, int, int)> callback) {
+            surfaceResizeCallback = callback;
+        }
+
         // TODO: For window resize callback, set up a single SizeRegistry
         // as single source of truth, and have it queried during update
         // (or use) of concerned entities. eg. FBOs will be updated via
         // RenderGraphBuilder, WSP will read it during beginFrame.
         // resizeCallback -> IWindowSurfaceProvider.resizeSurface ->
         //                   SizeRegistry.updateSwapchainSize
-        std::function<void(NativeWindowHandle, int, int)> surfaceResizeCallback;
+
     protected:
         /// Window attributes for this window
         WindowDescription attributes;
+
+        std::function<void(NativeWindowHandle, int, int)> surfaceResizeCallback;
     };
 
 } // namespace LaurelEye

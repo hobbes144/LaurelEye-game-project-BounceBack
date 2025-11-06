@@ -37,6 +37,16 @@ namespace LaurelEye::Graphics {
         // imageCount (1 for OpenGL, N=swapchain images for Vulkan)
     };
 
+    using SurfaceHandle = uint32_t;
+
+    namespace Surface {
+        static constexpr SurfaceHandle InvalidSurface = UINT32_MAX;
+    }
+
+    inline bool isValidSurface(SurfaceHandle h) noexcept {
+        return h != Surface::InvalidSurface;
+    }
+
     /// @brief Implements Surface and related functionalities for the
     /// GraphicsBackend.
     ///
@@ -47,6 +57,10 @@ namespace LaurelEye::Graphics {
     /// Vulkan: Surface, Swapchain are owned by this.
     class IWindowSurfaceProvider {
     public:
+        IWindowSurfaceProvider() {
+            id = numSurfaces;
+            ++numSurfaces;
+        };
         /// @brief Virtual destructor.
         virtual ~IWindowSurfaceProvider() = default;
 
@@ -71,16 +85,22 @@ namespace LaurelEye::Graphics {
 
         virtual SizeRegistry getSize() { return windowSize; };
         virtual const SizeRegistry* getSizePointer() { return &windowSize; };
-       virtual void resizeSurfaceCallback() = 0;
-       virtual void resizeSurface(int w, int h) = 0;
+
+        virtual void resizeSurfaceCallback() = 0;
+
+        virtual void setRenderSystemResizeCallback(
+            std::function<void(SurfaceHandle, const SizeRegistry&)> _rsResizeCallback) = 0;
 
     protected:
+        static inline uint32_t numSurfaces{0};
+
+        SurfaceHandle id = Surface::InvalidSurface;
+
         /// @brief Handle to the native window associated with this surface.
         NativeWindowHandle nativeWindow;
+        virtual void resizeSurface(int w, int h) = 0;
 
         // We would have SizeRegistry object here to manage viewport size.
         SizeRegistry windowSize;
     };
-}
-
-
+} // namespace LaurelEye::Graphics
