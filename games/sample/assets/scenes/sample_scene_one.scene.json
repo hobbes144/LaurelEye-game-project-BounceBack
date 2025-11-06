@@ -1,6 +1,6 @@
 ﻿{
     "settings": {
-        "resetOnLoad": true,
+        "resetOnLoad": false,
         "backgroundTexture": "textures/Tropical_Beach_8k.jpg"
     },
     "entities": [

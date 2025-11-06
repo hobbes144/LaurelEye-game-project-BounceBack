@@ -71,6 +71,7 @@ namespace LaurelEye {
         const std::vector<std::unique_ptr<Entity>>& getEntities() const { return entities; }
         std::vector<Entity*> getEntityPointers() const;
 
+        bool resetOnLoad() const { return settings.resetOnLoad; }
     private:
         std::vector<Entity*> spawnPendingEntities();
         void cleanupDestroyedEntities();

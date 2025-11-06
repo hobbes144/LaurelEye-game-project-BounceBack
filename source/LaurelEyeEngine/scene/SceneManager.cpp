@@ -143,8 +143,14 @@ namespace LaurelEye {
         // The scene is initialized and cached, bring it back up
         if ( targetSceneIt != scenes.end() && targetSceneIt->second ) {
             currentScene = targetSceneIt->second.get();
+            if ( currentScene->resetOnLoad() ) {
+                currentScene->shutdown();
+            }
+            if ( currentScene->resetOnLoad() ) {
+                currentScene->initialize();
+            }
         }
-        else { // scene is not cached, initialize it from io
+        else { // This *shouldn't* happen, but just in case
             loadScene(targetName);
             currentScene = scenes[targetName].get();
         }
