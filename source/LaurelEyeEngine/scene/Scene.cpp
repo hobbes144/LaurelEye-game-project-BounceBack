@@ -23,7 +23,7 @@ namespace LaurelEye {
 
     Scene::Scene(const std::string& name, EngineContext& context, std::shared_ptr<IO::JsonAsset> json, const std::string& assetPath)
         : name(name), active(false), paused(false),
-        ctx(context), sceneJson(json), assetRootPath(assetPath) {}
+          ctx(context), sceneJson(json), assetRootPath(assetPath) {}
     Scene::~Scene() {
         entities.clear();
         pendingAdditions.clear();
@@ -43,6 +43,23 @@ namespace LaurelEye {
     void Scene::registerScene() {
         if ( active ) return; // whole scene already registered
         // commit pending additions and register everything
+        if ( colorBackground ) {
+            ctx.getService<Graphics::RenderSystem>()->setClearColor(backgroundColor.x, backgroundColor.y, backgroundColor.z);
+            ctx.getService<Graphics::RenderSystem>()->retrieveSkydomePass()->setTexture(Graphics::InvalidTexture);
+        }
+        else if ( textureBackground ) {
+                Graphics::TextureDesc desc = Graphics::TextureDesc();
+                desc.width = static_cast<uint32_t>(backgroundTexture->width);
+                desc.height = static_cast<uint32_t>(backgroundTexture->height);
+                if ( backgroundTexture->format == IO::ImageAsset::RGB8 )
+                    desc.format = Graphics::TextureFormat::RGB8;
+                else if ( backgroundTexture->format == IO::ImageAsset::RGBA8 )
+                    desc.format = Graphics::TextureFormat::RGBA8;
+                else
+                    desc.format = Graphics::TextureFormat::RGBA8;
+                auto handle = ctx.getService<Graphics::RenderSystem>()->getRenderResources()->createTexture(backgroundTexture->getName(), desc, "ImageImporter", backgroundTexture->pixelData.data());
+                ctx.getService<Graphics::RenderSystem>()->retrieveSkydomePass()->addTexture(handle);
+            }
         auto committed = spawnPendingEntities();
         // Also register any existing entities (for activation we want whole scene)
         for ( auto& e : entities ) {
@@ -112,14 +129,18 @@ namespace LaurelEye {
         }
         if ( settingsValue.HasMember("backgroundColor") && settingsValue["backgroundColor"].IsArray() ) {
             const auto& color = settingsValue["backgroundColor"];
-            ctx.getService<Graphics::RenderSystem>()->setClearColor(color[0].GetFloat(), color[1].GetFloat(), color[2].GetFloat());
-            ctx.getService<Graphics::RenderSystem>()->retrieveSkydomePass()->setTexture(Graphics::InvalidTexture);
+            backgroundColor = Vector3(color[0].GetFloat(), color[1].GetFloat(), color[2].GetFloat());
+            colorBackground = true;
+            textureBackground = false;
         }
         else if ( settingsValue.HasMember("backgroundTexture") && settingsValue["backgroundTexture"].IsString() ) {
-            settings.backgroundTexturePath = settingsValue["backgroundTexture"].GetString();
-            auto texAsset = ctx.getService<IO::AssetManager>()->load(assetRoot + settings.backgroundTexturePath);
-            auto handle = ctx.getService<Graphics::RenderSystem>()->getRenderResources()->texture(texAsset->getName());
-            ctx.getService<Graphics::RenderSystem>()->retrieveSkydomePass()->addTexture(handle);
+            std::string backgroundTexturePath = settingsValue["backgroundTexture"].GetString();
+            assert(!backgroundTexturePath.empty() && "Background texture path is empty in scene settings.");
+            auto texAsset = ctx.getService<IO::AssetManager>()->load(assetRootPath + backgroundTexturePath);
+            assert(texAsset && "Failed to load background texture asset in scene settings.");
+            backgroundTexture = std::dynamic_pointer_cast<IO::ImageAsset>(texAsset);
+            textureBackground = true;
+            colorBackground = false;
         }
         
     }

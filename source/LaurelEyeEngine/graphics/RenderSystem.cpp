@@ -18,6 +18,8 @@
 #include "LaurelEyeEngine/graphics/graphics_components/CameraComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/LightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/UIComponent.h"
+#include "LaurelEyeEngine/graphics/graphics_components/Renderable3DComponent.h"
+#include "LaurelEyeEngine/graphics/graphics_components/Renderable2DComponent.h"
 #include "LaurelEyeEngine/graphics/renderpass/SingleBufferedDataPass.h"
 #include "LaurelEyeEngine/graphics/renderpass/SinglePass.h"
 #include "LaurelEyeEngine/graphics/renderpass/UIPass.h"
@@ -185,9 +187,33 @@ namespace LaurelEye::Graphics {
     void RenderSystem::registerComponent(const ComponentPtr component) {
 
         switch ( component->GetRenderCompType() ) {
-        case RenderComponentType::Renderable3D:
+        case RenderComponentType::Renderable3D: {
+            auto renderComponent = static_cast<Renderable3DComponent*>(component);
+            if ( std::shared_ptr<IO::ImageAsset> texAsset = renderComponent->GetImageAsset() ) {
+                // Make a texture and assign it to material
+                TextureDesc desc = TextureDesc();
+                desc.width = static_cast<uint32_t>(texAsset->width);
+                desc.height = static_cast<uint32_t>(texAsset->height);
+                if ( texAsset->format == IO::ImageAsset::RGB8 )
+                    desc.format = Graphics::TextureFormat::RGB8;
+                else if ( texAsset->format == IO::ImageAsset::RGBA8 )
+                    desc.format = Graphics::TextureFormat::RGBA8;
+                else
+                    desc.format = Graphics::TextureFormat::RGBA8;
+                TextureHandle handle = tempRenderResources->createTexture(texAsset->getName(), desc, "ImageImporter", texAsset->pixelData.data());
+                renderComponent->GetMaterial()->setTexture("mainTexture", handle);
+                renderComponent->GetMaterial()->setProperty<int>("useTexture", 1);
+            }
+            if ( std::shared_ptr<IO::MeshAsset> meshAsset = renderComponent->GetMeshAsset() ) {
+                auto meshObj = Graphics::Mesh::createMeshFromAsset(meshAsset);
+                renderComponent->SetMesh(meshObj);
+            }
+            else if ( renderComponent->GetMeshPrimitiveType() != Graphics::Mesh::Type::None ) {
+                renderComponent->SetMesh(Graphics::Mesh::getShapeMesh(renderComponent->GetMeshPrimitiveType()));
+            }
             ISystem::registerComponent(component);
             break;
+        }
         case RenderComponentType::Renderable2D:
             ISystem::registerComponent(component);
             break;
@@ -228,9 +254,28 @@ namespace LaurelEye::Graphics {
 
     void RenderSystem::deregisterComponent(const ComponentPtr component) {
         switch ( component->GetRenderCompType() ) {
-        case RenderComponentType::Renderable3D:
+        case RenderComponentType::Renderable3D: {
+            auto renderComponent = static_cast<Renderable3DComponent*>(component);
+            auto mat = renderComponent->GetMaterial();
+
+            // If the material has a texture, release it from GPU
+            if ( auto texAsset = renderComponent->GetImageAsset() ) {
+                const std::string& texName = texAsset->getName();
+                if ( tempRenderResources->texture(texName) != InvalidTexture ) {
+                    tempRenderResources->destroyTexture(texName);
+                }
+            }
+
+            if ( renderComponent->GetMesh()  && renderComponent->GetMeshPrimitiveType() == Mesh::Type::None) {
+                if ( auto geo = renderComponent->GetMesh()->getGeometryBuffer() ) {
+                    geo->destroy();
+                }
+                renderComponent->SetMesh(nullptr);
+            }
+
             ISystem::deregisterComponent(component);
             break;
+        }
         case RenderComponentType::Renderable2D:
             ISystem::deregisterComponent(component);
             break;

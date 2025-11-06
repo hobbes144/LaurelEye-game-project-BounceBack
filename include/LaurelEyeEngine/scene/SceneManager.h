@@ -16,6 +16,8 @@
 
 #include <memory>
 #include <string>
+#include <future>
+#include <atomic>
 #include <unordered_map>
 #include <rapidjson/document.h>
 
@@ -49,6 +51,9 @@ namespace LaurelEye {
         Scene* getCurrentScene() const { return currentScene; }
         bool hasScene(const std::string& name) const;
         Scene* getScene(const std::string& name);
+
+        //I believe this function can be deleted
+        //void preloadSceneAssetsAsync(const std::string& sceneName);
 
         /// @brief Called from script or other systems. Instantiates prefab into the current scene
         /// @param prefabPath 
@@ -87,6 +92,8 @@ namespace LaurelEye {
         bool switchingScene = false;
         bool pendingReload = false;
 
+        //Check if asset is loaded
+        std::atomic<bool> assetIsLoaded{false};
         /// @brief Called between frames. Searches the sceneFilePaths for the given name
         /// and calls AssetManager to load the scene json
         /// @param sceneName The name of the scene to load
@@ -97,5 +104,7 @@ namespace LaurelEye {
         /// @brief Using the stored sceneListPath, deserialize the scene list json
         /// in order to populate the sceneFilePaths for deferred loading
         void sceneListDeserialize();
+
+        std::future<void> deserializationFuture;
     };
 } // namespace LaurelEye

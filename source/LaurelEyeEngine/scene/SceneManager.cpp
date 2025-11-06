@@ -1,7 +1,9 @@
 ﻿#include "LaurelEyeEngine/scene/SceneManager.h"
 #include "LaurelEyeEngine/io/AssetManager.h"
 #include "LaurelEyeEngine/io/Assets.h"
+#include "LaurelEyeEngine/graphics/RenderSystem.h"
 #include <filesystem>
+#include <chrono>
 namespace fs = std::filesystem;
 
 namespace LaurelEye {
@@ -20,18 +22,29 @@ namespace LaurelEye {
     }
 
     void SceneManager::initialize() {
-        sceneListDeserialize();
-
-        if ( !initialSceneName.empty() && hasScene(initialSceneName) ) {
-            changeScene(initialSceneName);
-        }
-        else if ( !scenes.empty() ) {
-            // Fallback to first scene if default missing
-            changeScene(scenes.begin()->first);
-        }
+        // Run sceneListDeserialize on its own thread
+        deserializationFuture = std::async(std::launch::async, [this]() {
+            sceneListDeserialize();
+            assetIsLoaded.store(true, std::memory_order_release);
+            std::cout << "[SceneManager] Scene list deserialization complete\n";
+        });
+        auto* renderSystem = context->getService<Graphics::RenderSystem>();
+        auto* assetManager = context->getService<IO::AssetManager>();
+        renderSystem->setClearColor(0.208, 0.222, 0.236);
+        renderSystem->retrieveSkydomePass()->setTexture(Graphics::InvalidTexture);
+        renderSystem->retrieveSkydomePass()->addTexture(Graphics::InvalidTexture);
     }
 
     void SceneManager::update(float deltaTime) {
+        if ( assetIsLoaded.exchange(false) ) {
+            std::cout << "[SceneManager] Asset load flag detected, switching scene...\n";
+            if ( !initialSceneName.empty() && hasScene(initialSceneName) )
+                changeScene(initialSceneName);
+            else if ( !scenes.empty() )
+                changeScene(scenes.begin()->first);
+        }
+        
+
         if ( switchingScene && !nextSceneQueued.empty() ) {
             performSceneSwitch();
         }
@@ -169,15 +182,64 @@ namespace LaurelEye {
             std::string name = entry["name"].GetString();
             std::string path = entry["path"].GetString();
 
-            // deferred loading to optimize
-            scenes[name] = nullptr;
-            sceneFilePaths[name] = path;
+            fs::path sceneFilePath = fs::path(assetsRoot) / path;
+            auto sceneAsset = assetManager->load(sceneFilePath.string());
+            auto jsonAsset = std::dynamic_pointer_cast<IO::JsonAsset>(sceneAsset);
+            if ( !jsonAsset ) {
+                throw std::runtime_error("SceneManager: Scene JSON failed to load correctly for scene '" + name + "'");
+            }
+            auto scene = std::make_unique<Scene>(name, *context, jsonAsset, assetsRoot);
+            scene->initialize();
+            scenes[name] = std::move(scene);
+            /*scenes[name] = nullptr;
+            sceneFilePaths[name] = path;*/
         }
 
         if ( doc.HasMember("initialScene") && doc["initialScene"].IsString() ) {
             initialSceneName = doc["initialScene"].GetString();
         }
     }
+
+    // I believe this function can be deleted
+    //void SceneManager::preloadSceneAssetsAsync(const std::string& sceneName) {
+    //    auto assetManager = context->getService<IO::AssetManager>();
+    //    if ( !assetManager )
+    //        return;
+
+    //    fs::path sceneFilePath = fs::path(assetsRoot) / sceneFilePaths[sceneName];
+    //    auto sceneAsset = assetManager->load(sceneFilePath.string());
+    //    auto jsonAsset = std::dynamic_pointer_cast<IO::JsonAsset>(sceneAsset);
+    //    if ( !jsonAsset )
+    //        return;
+
+    //    const rapidjson::Document& doc = jsonAsset->jsonDocument;
+
+    //    std::vector<std::string> assetPaths;
+    //    if ( doc.HasMember("entities") && doc["entities"].IsArray() ) {
+    //        for ( auto& ent : doc["entities"].GetArray() ) {
+    //            if ( ent.HasMember("components") && ent["components"].IsObject() ) {
+    //                const auto& comps = ent["components"];
+    //                if ( comps.HasMember("Render3D") ) {
+    //                    const auto& render = comps["Render3D"];
+    //                    if ( render.HasMember("mesh") && render["mesh"].IsObject() ) {
+    //                        const auto& mesh = render["mesh"];
+    //                        if ( mesh.HasMember("file") && mesh["file"].IsString() )
+    //                            assetPaths.push_back(mesh["file"].GetString());
+    //                    }
+    //                    if ( render.HasMember("material") && render["material"].IsObject() ) {
+    //                        const auto& mat = render["material"];
+    //                        if ( mat.HasMember("texture") && mat["texture"].IsString() )
+    //                            assetPaths.push_back(mat["texture"].GetString());
+    //                    }
+    //                }
+    //            }
+    //        }
+    //    }
+
+    //    // Launch async loads
+    //    preloadingFutures = assetManager->loadBatchAsync(assetPaths);
+    //}
+
 #if !defined(NDEBUG)
     void SceneManager::injectSceneForTest(const std::string& name, std::unique_ptr<Scene> scene) {
         if ( !scene ) return;

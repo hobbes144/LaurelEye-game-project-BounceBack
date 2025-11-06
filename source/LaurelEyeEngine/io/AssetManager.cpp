@@ -4,25 +4,23 @@
 #include "LaurelEyeEngine/io/importers/MeshImporter.h"
 #include "LaurelEyeEngine/io/importers/ImageImporter.h"
 #include "LaurelEyeEngine/io/importers/JsonImporter.h"
-
 #include "LaurelEyeEngine/graphics/RenderSystem.h"
 
 namespace LaurelEye::IO {
     void AssetManager::initialize() {
+        auto meshImporter = std::make_shared<IO::MeshImporter>();
+        auto imgImporter = std::make_shared<IO::ImageImporter>();
+        auto jsonImporter = std::make_shared<IO::JsonImporter>();
+
         // 3D models
-        registerImporter("obj", std::make_unique<IO::MeshImporter>());
-        registerImporter("fbx", std::make_unique<IO::MeshImporter>());
+        registerImporter("obj", meshImporter);
+        registerImporter("fbx", meshImporter);
 
         assert(context && "AssetManager: No EngineContext provided. Cannot locate RenderSystem for texture importing.");
 
-        Graphics::RenderSystem* renderSystem = context->getService<Graphics::RenderSystem>();
-        if ( renderSystem ) {
-            auto imgImporter = std::make_shared<IO::ImageImporter>();
-            imgImporter->registerRenderResources(renderSystem->getRenderResources());
-            registerImporter("png", imgImporter);
-            registerImporter("jpg", imgImporter);
-            registerImporter("jpeg", imgImporter);
-        }
+        registerImporter("png", imgImporter);
+        registerImporter("jpg", imgImporter);
+        registerImporter("jpeg", imgImporter);
 
         // Json
         registerImporter("json", std::make_unique<IO::JsonImporter>());
@@ -34,6 +32,7 @@ namespace LaurelEye::IO {
     }
 
     std::shared_ptr<IAsset> AssetManager::load(const std::string& path) {
+
         // Check if the data file needed has been cached already by using its path
         if ( auto cached = assetCache.find(path); cached != assetCache.end() ) {
             return cached->second;
@@ -55,7 +54,23 @@ namespace LaurelEye::IO {
         return asset;
     }
 
+    std::future<std::shared_ptr<IAsset>> AssetManager::loadAsync(const std::string& path) {
+        return std::async(std::launch::async, [this, path]() {
+            return this->load(path);
+        });
+    }
+
+    std::vector<std::future<std::shared_ptr<IAsset>>> AssetManager::loadBatchAsync(const std::vector<std::string>& paths) {
+        std::vector<std::future<std::shared_ptr<IAsset>>> futures;
+        futures.reserve(paths.size());
+        for ( const auto& path : paths ) {
+            futures.emplace_back(loadAsync(path));
+        }
+        return futures;
+    }
+
     void AssetManager::unload(const std::string& path) {
+        std::unique_lock lock(cacheMutex);
         assetCache.erase(path);
     }
 

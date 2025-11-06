@@ -9,16 +9,6 @@
 
 namespace LaurelEye::IO {
     std::shared_ptr<IAsset> ImageImporter::import(const std::string& path) {
-        int w, h, c;
-        unsigned char* data = stbi_load(path.c_str(), &w, &h, &c, 0);
-        if ( !data ) return nullptr;
-
-        auto asset = std::make_shared<ImageAsset>(path);
-        asset->width = w;
-        asset->height = h;
-        asset->channels = c;
-        asset->pixelData.assign(data, data + (w * h * c));
-
         if ( stbi_is_hdr(path.c_str()) ) {
             return loadHDRFile(path);
         }
@@ -28,9 +18,6 @@ namespace LaurelEye::IO {
     }
 
     std::shared_ptr<IAsset> ImageImporter::loadHDRFile(const std::string& path) {
-        /*TextureParameters textureParameters = TextureParameters(10,
-                                                                TEXTURE_NEAREST, TEXTURE_LINEAR_MIPMAP_LINEAR,
-                                                                TEXTURE_REPEAT, TEXTURE_REPEAT);*/
         stbi_set_flip_vertically_on_load(true);
         int channels = 0;
         int w = 0, h = 0;
@@ -43,8 +30,6 @@ namespace LaurelEye::IO {
         desc.height = static_cast<uint32_t>(h);
         desc.format = Graphics::TextureFormat::RGBA32F;
 
-        Graphics::TextureHandle id = rs->createTexture(path, desc, "ImageImporter", data);
-
         auto asset = std::make_shared<ImageAsset>(path);
         asset->width = w;
         asset->height = h;
@@ -53,15 +38,10 @@ namespace LaurelEye::IO {
 
         stbi_image_free(data);
 
-        (void)id;
-
         return asset;
     }
 
     std::shared_ptr<IAsset> ImageImporter::loadSDRFile(const std::string& path) {
-        /*TextureParameters textureParameters = TextureParameters(10,
-                                                                TEXTURE_NEAREST, TEXTURE_LINEAR_MIPMAP_LINEAR,
-                                                                TEXTURE_REPEAT, TEXTURE_REPEAT);*/
         stbi_set_flip_vertically_on_load(true);
         int channels = 0;
         int w = 0, h = 0;
@@ -82,14 +62,12 @@ namespace LaurelEye::IO {
         asset->height = h;
         asset->channels = channels;
         asset->format = (channels == 3) ? ImageAsset::RGB8 : ImageAsset::RGBA8;
-        Graphics::TextureHandle id = rs->createTexture(asset->getName(), desc, "ImageImporter", data);
 
         // store raw pixels in case other systems need them
-        asset->pixelData.assign(data, data + (w * h * channels));
+        size_t size = static_cast<size_t>(w) * static_cast<size_t>(h) * static_cast<size_t>(channels);
+        asset->pixelData.assign(data, data + size);
 
         stbi_image_free(data);
-
-        (void)id; // created GPU texture handle is intentionally not stored on ImageAsset for now
 
         return asset;
     }

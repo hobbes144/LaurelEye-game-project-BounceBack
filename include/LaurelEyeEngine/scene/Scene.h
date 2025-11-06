@@ -96,5 +96,10 @@ namespace LaurelEye {
         const std::string& assetRootPath;
 
         SceneSettings settings;
+
+        Vector3 backgroundColor;
+        bool colorBackground = true;
+        std::shared_ptr<IO::ImageAsset> backgroundTexture;
+        bool textureBackground = false;
     };
 } // namespace LaurelEye

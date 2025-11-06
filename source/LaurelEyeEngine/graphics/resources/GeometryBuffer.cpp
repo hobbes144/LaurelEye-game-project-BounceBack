@@ -78,6 +78,19 @@ namespace LaurelEye::Graphics {
         return buffer;
     }
 
+    void GeometryBuffer::destroy() {
+        cleanupBuffers();
+
+        bufferAttributeData.clear();
+        indexData.clear();
+        attributeOffsets.clear();
+
+        vertexCount = 0;
+        indexCount = 0;
+        vao = vbo = ebo = 0;
+        name.clear();
+    }
+
     /*!****************************************************************************
      * \brief Destructor which runs cleanup
      *

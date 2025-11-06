@@ -79,4 +79,5 @@ namespace LaurelEye {
     void engineSystemCoordinatorWiringTest();
     void engineContextOverwriteTest();
     void collisionEventTest();
+    void ThreadingTest();
 }

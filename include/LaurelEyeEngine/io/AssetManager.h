@@ -16,6 +16,9 @@
 #include <memory>
 #include <typeindex>
 #include <unordered_map>
+#include <thread>
+#include <shared_mutex>
+#include <future>
 #include "LaurelEyeEngine/io/IAsset.h"
 #include "LaurelEyeEngine/io/IAssetImporter.h"
 #include "LaurelEyeEngine/core/EngineContext.h"
@@ -37,6 +40,11 @@ namespace LaurelEye::IO {
         /// @return The type of asset you would need dependent on the extension and importer used.
         /// I.e., if you asked to import a .obj you would get back a MeshAsset
         std::shared_ptr<IAsset> load(const std::string& path);
+
+        std::future<std::shared_ptr<IAsset>> loadAsync(const std::string& path);
+
+        std::vector<std::future<std::shared_ptr<IAsset>>> loadBatchAsync(const std::vector<std::string>& paths);
+    
         /// @brief Removes the cached IAsset from memory
         /// @param path The path used to load the asset
         void unload(const std::string& path); 
@@ -48,6 +56,7 @@ namespace LaurelEye::IO {
         // Registered importers. Specific for extension type. Maps extension string to the correlating importer
         std::unordered_map<std::string, std::shared_ptr<IAssetImporter>> importers;
 
+        mutable std::shared_mutex cacheMutex;
         // Uses string formatting to extract the extension out of a path. I.e.; ".obj"
         static std::string getExtension(const std::string& path);
         // normalizes the extension so that like extensions can be stored together

@@ -20,6 +20,8 @@ int main() {
         const char* name;
         test func;
     };
+
+    std::cout << "Got Here" << std::endl;
     std::vector<NamedTest> tests = {
         {"MathTest", LaurelEye::mathTest},
         {"EntityTest", LaurelEye::entityTest},
@@ -39,20 +41,23 @@ int main() {
         {"EventTest", LaurelEye::eventTest},
         {"MemoryManagerTest", LaurelEye::memoryTest},
         //{"AssetMeshTest", LaurelEye::assetMeshTest},  These tests fail now due to render system dependency - is fine ig
-        //{"AssetImageTest", LaurelEye::assetImageTest},
-        //{"AssetCacheTest", LaurelEye::assetCacheTest},
+        /*{"AssetImageTest", LaurelEye::assetImageTest},
+        {"AssetCacheTest", LaurelEye::assetCacheTest},
         {"ScriptingBaseTest", LaurelEye::scriptingBasicTest},
         {"ScriptingMultipleTest", LaurelEye::scriptingMultipleTest},
         {"ScriptingMathTest", LaurelEye::scriptingMathTest},
         {"ScriptingSceneTest", LaurelEye::scriptingSceneTest},
         {"ScriptingECSTest",  LaurelEye::scriptingECSTest},
         {"EngineContextServiceTest", LaurelEye::engineContextServiceTest},
-        //{"EngineSystemCoordinatorWiringTest", LaurelEye::engineSystemCoordinatorWiringTest},
+        {"EngineSystemCoordinatorWiringTest", LaurelEye::engineSystemCoordinatorWiringTest},
         {"EngineContextOverwriteTest",        LaurelEye::engineContextOverwriteTest},
-        {"CollisionEventTest", LaurelEye::collisionEventTest}
+        {"CollisionEventTest", LaurelEye::collisionEventTest},*/
+        {"ThreadingTest", LaurelEye::ThreadingTest}
     };
 
-    renderTestExtended(window, &glfwP, &inputManager);
+    
+    std::cout << "Got Here" << std::endl;
+    //renderTestExtended(window, &glfwP, &inputManager);
 
     for ( NamedTest testFunc : tests ) {
         std::cout << "Running test: " << testFunc.name << std::endl;

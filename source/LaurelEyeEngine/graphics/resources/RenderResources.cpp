@@ -26,6 +26,10 @@ namespace LaurelEye::Graphics {
 
     TextureHandle RenderResources::createTexture(const std::string& name, const TextureDesc& d,
                                                  const std::string& tag, const void* init) {
+        if ( textures.contains(name) ) {
+            // Destroy existing before recreating to avoid leaks or name collision
+            destroyTexture(name);
+        }
         TextureResource r{};
         r.handle = device.createTexture(d, init);
         r.desc = d;
@@ -88,9 +92,11 @@ namespace LaurelEye::Graphics {
     }
 
     void RenderResources::destroyTexture(const std::string& name) {
-        TextureResource& tex = textures[name];
-        device.destroyTexture(tex.handle);
-        textures.erase(name.data());
+        auto it = textures.find(name);
+        if ( it == textures.end() ) return;
+
+        device.destroyTexture(it->second.handle);
+        textures.erase(it);
     }
 
     void RenderResources::destroyFramebuffer(const std::string& name) {

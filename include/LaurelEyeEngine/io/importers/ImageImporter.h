@@ -24,15 +24,9 @@ namespace LaurelEye::IO {
         /// @return an ImageAsset loaded with the raw image data
         std::shared_ptr<IAsset> import(const std::string& path) override;
 
-        void registerRenderResources(LaurelEye::Graphics::RenderResources* _rs) {
-            rs = _rs;
-        }
-
     private:
         std::shared_ptr<IAsset> loadHDRFile(const std::string& path);
         std::shared_ptr<IAsset> loadSDRFile(const std::string& path);
-
-        LaurelEye::Graphics::RenderResources* rs = nullptr;
     };
 
 } // namespace LaurelEye::IO

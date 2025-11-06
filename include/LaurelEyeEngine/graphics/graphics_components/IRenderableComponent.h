@@ -87,12 +87,21 @@ namespace LaurelEye::Graphics {
         /// @return True if a material is assigned, false otherwise.
         bool HasMaterial() const { return static_cast<bool>(m_material); }
 
+        void SetMeshAsset(std::shared_ptr<IO::MeshAsset> asset) { meshAsset = asset; }
+        void SetImageAsset(std::shared_ptr<IO::ImageAsset> asset) { imageAsset = asset; }
+        void SetMeshPrimitiveType(Mesh::Type type) { primitiveType = type; }
+        const std::shared_ptr<IO::MeshAsset> GetMeshAsset() { return meshAsset; }
+        const std::shared_ptr<IO::ImageAsset> GetImageAsset() { return imageAsset; }
+        const Mesh::Type GetMeshPrimitiveType() const { return primitiveType;}
     protected:
         /// @brief Shared pointer to the mesh resource.
         std::shared_ptr<Mesh> m_mesh;
         /// @brief Shared pointer to the material resource.
         std::shared_ptr<Material> m_material;
 
+        Mesh::Type primitiveType = Mesh::Type::None;
+        std::shared_ptr<IO::MeshAsset> meshAsset;
+        std::shared_ptr<IO::ImageAsset> imageAsset; // [Needed for now] To send images as textures to gpu dynamically
     };
 
 } // namespace LaurelEye::Graphics

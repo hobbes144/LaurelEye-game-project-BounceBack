@@ -50,7 +50,8 @@ namespace LaurelEye::Graphics {
         enum Type {
             Square,
             Cube,
-            Sphere
+            Sphere,
+            None
         };
 
         /// @brief Constructs an empty Mesh with the given name.

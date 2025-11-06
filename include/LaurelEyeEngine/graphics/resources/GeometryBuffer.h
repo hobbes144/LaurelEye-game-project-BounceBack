@@ -124,6 +124,8 @@ namespace LaurelEye::Graphics {
             const std::string& name,
             bool bufferIsInterleaved = true);
 
+        void destroy();
+
         /// @brief Updates an existing vertex attribute's data.
         ///
         /// @param type Attribute type to update.

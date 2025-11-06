@@ -182,20 +182,20 @@ namespace LaurelEye {
                     throw((void)("EntityFactory::setupRender3DComponent - Asset '{}' is not a MeshAsset."), meshPath);
                     return;
                 }
-                auto meshObj = Graphics::Mesh::createMeshFromAsset(meshAsset);
-                renderComponent->SetMesh(meshObj);
+                renderComponent->SetMeshAsset(meshAsset);
+                
             }
 
             else if (mesh.HasMember("primitiveType") && mesh["primitiveType"].IsString()) {
                 std::string shapeType = mesh["primitiveType"].GetString();
                 if ( shapeType == "Square" ) {
-                    renderComponent->SetMesh(Graphics::Mesh::getShapeMesh(Graphics::Mesh::Square));
+                    renderComponent->SetMeshPrimitiveType(Graphics::Mesh::Square);
                 }
                 else if ( shapeType == "Cube" ) {
-                    renderComponent->SetMesh(Graphics::Mesh::getShapeMesh(Graphics::Mesh::Cube));
+                    renderComponent->SetMeshPrimitiveType(Graphics::Mesh::Cube);
                 }
                 else if (shapeType == "Sphere") {
-                    renderComponent->SetMesh(Graphics::Mesh::getShapeMesh(Graphics::Mesh::Sphere));
+                    renderComponent->SetMeshPrimitiveType(Graphics::Mesh::Sphere);
                 }
             }
         }
@@ -207,13 +207,11 @@ namespace LaurelEye {
             renderComponent->SetMaterial(pMat);
 
             // TODO: Make this a loop over all properties.
-
             if ( material.HasMember("texture") && material["texture"].IsString() ) {
                 std::string texturePath = material["texture"].GetString();
                 auto texAsset = context.getService<IO::AssetManager>()->load(assetPath + texturePath);
-                auto handle = context.getService<Graphics::RenderSystem>()->getRenderResources()->texture(texAsset->getName());
-
-                renderComponent->GetMaterial()->setTexture("mainTexture", handle);
+                auto imageAsset = std::dynamic_pointer_cast<IO::ImageAsset>(texAsset);
+                renderComponent->SetImageAsset(imageAsset);
                 renderComponent->GetMaterial()->setProperty<int>("useTexture", 1);
             }
             else {

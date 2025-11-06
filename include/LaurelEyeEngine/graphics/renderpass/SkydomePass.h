@@ -26,6 +26,5 @@ namespace LaurelEye::Graphics {
         TextureHandle skydomeTexture;
         std::shared_ptr<Mesh> sphereMesh;
         Matrix4 scale;
-
     };
 } // namespace LaurelEye
