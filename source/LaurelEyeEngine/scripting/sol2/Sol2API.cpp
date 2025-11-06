@@ -36,6 +36,7 @@ namespace LaurelEye::Scripting {
         /* Renderer*/
 
         /* Physics */
+        Sol2API_Physics::setup(lua, ctx);
     }
 
     void Sol2API::registerEnvironment(sol::environment& env, LaurelEye::Entity* owner) {

@@ -6,11 +6,6 @@ function onStart()
 end
 
 function onUpdate(dt)
-    if Input:isKeyPressed(Key.Space) then
-        log("Adding a player")
-        SceneManager:instantiate("prefabs/player.prefab.json")
-    end
-
     if Input:isKeyPressed(Key.One) then
         log("Loading Scene: Level1")
         SceneManager:changeScene("Level1")
