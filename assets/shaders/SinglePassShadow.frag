@@ -140,7 +140,7 @@ void main()
         shadowIndex.y >= 0.0f && shadowIndex.y < 1.0f) {
         float lightDepth = texture(ShadowMap, shadowIndex).x;
         float pixelDepth = shadowCoord.z/shadowCoord.w;
-        if ( pixelDepth > (lightDepth + 0.01f) )
+        if ( pixelDepth > (lightDepth + 0.0001f) )
           inShadow = true;
       }
     }
