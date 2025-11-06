@@ -29,7 +29,7 @@ namespace LaurelEye::Graphics {
             this->resizeSurfaceCallback();
         };
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-
+        glEnable(GL_MULTISAMPLE);
     }
 
     // WindowSurface has no shutdown for OpenGL
@@ -58,4 +58,4 @@ namespace LaurelEye::Graphics {
     void LGlfwOpenGLWindowSurface::resizeSurfaceCallback() {
         resizePending = true;
     }
-}
+} // namespace LaurelEye::Graphics
