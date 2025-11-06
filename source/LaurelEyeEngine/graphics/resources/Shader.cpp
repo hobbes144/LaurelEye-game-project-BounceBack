@@ -361,7 +361,10 @@ namespace LaurelEye::Graphics {
         // Validate texture unit against device limits to avoid GL_INVALID_ENUM.
         GLint maxUnits = 0;
         glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxUnits);
-
+        if ( static_cast<GLint>(textureUnit) >= maxUnits ) {
+            std::cout << "Poopoo Peepee" << std::endl;
+            return;
+        }
         glActiveTexture(GL_TEXTURE0 + textureUnit);
         // always 2D textures for now
         glBindTexture(GL_TEXTURE_2D, texHandle);

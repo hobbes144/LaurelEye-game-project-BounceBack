@@ -11,17 +11,24 @@
 
 #include "LaurelEyeEngine/graphics/resources/DataBuffer.h"
 #include "LaurelEyeEngine/graphics/resources/Lights.h"
+#include "LaurelEyeEngine/graphics/resources/Shadow.h"
+#include "LaurelEyeEngine/graphics/ShadowManager.h"
 #include "LaurelEyeEngine/graphics/surface/glfw/LGlfwOpenGLWindowSurface.h"
 
 #include "LaurelEyeEngine/graphics/device/glfw/LGLRenderDevice.h"
 
 #include "LaurelEyeEngine/graphics/graphics_components/CameraComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/LightComponent.h"
+#include "LaurelEyeEngine/graphics/graphics_components/AmbientLightComponent.h"
+#include "LaurelEyeEngine/graphics/graphics_components/DirectionalLightComponent.h"
+#include "LaurelEyeEngine/graphics/graphics_components/DirectionalLightComponent.h"
+#include "LaurelEyeEngine/graphics/graphics_components/PointLightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/UIComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/Renderable3DComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/Renderable2DComponent.h"
 #include "LaurelEyeEngine/graphics/renderpass/SingleBufferedDataPass.h"
 #include "LaurelEyeEngine/graphics/renderpass/SinglePass.h"
+#include "LaurelEyeEngine/graphics/renderpass/SinglePassShadow.h"
 #include "LaurelEyeEngine/graphics/renderpass/UIPass.h"
 #include "LaurelEyeEngine/graphics/RenderSystem.h"
 #include "LaurelEyeEngine/graphics/resources/FrameContext.h"
@@ -61,13 +68,16 @@ namespace LaurelEye::Graphics {
     }
 
     void RenderSystem::initialize() {
+        assert(CHAR_BIT * sizeof(float) == 32 && "How did we get here? FLOAT_NOT_32");
+
         graphicsBackendInit();
         createWindowSurfaces();
 
         // Temp code starts here:
         tempRenderResources = std::make_unique<RenderResources>(*device.get());
         // sp = std::make_shared<SinglePass>();
-        sp = std::make_shared<SingleBufferedDataPass>();
+        sp = std::make_shared<SinglePassShadow>();
+        // sp = std::make_shared<SingleBufferedDataPass>();
         sp->setup(*tempRenderResources.get());
 
         bp = std::make_shared<SkydomePass>();
@@ -83,6 +93,8 @@ namespace LaurelEye::Graphics {
 
         initDefaultCamera();
         initGlobalLightsBuffer();
+
+        tempShadowManager = std::make_unique<ShadowManager>(tempRenderResources.get());
     }
 
     void RenderSystem::update(float deltaTime) {
@@ -92,6 +104,7 @@ namespace LaurelEye::Graphics {
 
         // Camera update
         updateCameraBuffer(camera);
+        device->bindDataBufferBase(camera->getCameraBufferHandle());
         // for ( size_t i = 0; i < GetCameraComponents().size(); i++ ) {
         //     GetCameraComponents()[i]->updateViewMatrix();
         //     if ( GetCameraComponents()[i]->getInitStatus() == false ) {
@@ -106,6 +119,7 @@ namespace LaurelEye::Graphics {
         // TODO: Eventually remove this command from here. Ideally we don't
         // need to keep calling this. We just call it when there's a change.
         updateGlobalLights();
+        device->bindDataBufferBase(globalLightsBufferHandle);
 
         // TODO: Code for point lights: eventually move to local lights
         // interaction functions.
@@ -138,14 +152,36 @@ namespace LaurelEye::Graphics {
         // In future, this needs to be swapped to per window, but this is more than good enough for now.
         windowSurfaces[0]->beginFrame();
 
+        // FrameContext for all shadow casting objects in scene.
+        // Typically this should not include all the non-shadow casting
+        // component objects.
+        FrameContext shadowCtx{
+            0.1f,
+            *device.get(),
+            *tempRenderResources.get(),
+            components,
+        };
+
+        tempShadowManager->update(shadowCtx, &globalLights, &localLights);
+        tempShadowManager->bindShadowBuffer();
+
+        glViewport(0, 0, windowSurfaces[0]->getSize().width, windowSurfaces[0]->getSize().height);
+
+
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-        // tempShader->unuse();
+        // Bind camera and global lights buffer for use in shaders
+        device->bindDataBufferBase(camera->getCameraBufferHandle());
+        device->bindDataBufferBase(globalLightsBufferHandle);
+
+        // FrameContext for all objects in scene.
         FrameContext ctx{
             0.1f,
             *device.get(),
             *tempRenderResources.get(),
-            components};
+            components,
+            tempShadowManager.get()
+        };
 
         if (bp->getTexture() != InvalidTexture) {
             bp->execute(ctx);
@@ -164,6 +200,7 @@ namespace LaurelEye::Graphics {
         }
 
         // UI pass
+        // FrameContext for only the ui elements in the scene.
         FrameContext uiCtx{
             0.1f,
             *device.get(),
@@ -372,7 +409,7 @@ namespace LaurelEye::Graphics {
         return values;
     }
 
-    std::shared_ptr<SingleBufferedDataPass> RenderSystem::retrieveSinglePass() {
+    std::shared_ptr<SinglePassShadow> RenderSystem::retrieveSinglePass() {
         return sp;
     }
     std::shared_ptr<ParticleRenderPass> RenderSystem::retrieveParticlePass() {
@@ -403,7 +440,7 @@ namespace LaurelEye::Graphics {
         camera->setCameraBufferHandle(device->createDataBuffer(DataBufferDesc{
             DataBufferType::UBO, DataBufferUpdateMode::Dynamic,
             sizeof(Camera),
-            0}));
+            DataBuffer::CameraDataBinding}));
         camera->setInitStatus(true);
     }
 
@@ -426,10 +463,17 @@ namespace LaurelEye::Graphics {
             break;
         case LightType::Directional:
             globalLights.sunLight = static_cast<DirectionalLightComponent*>(light)->getLightData();
+            // Temporarily auto adding shadows.
+            globalLights.sunLight.shadowIndex = Shadow::ShadowPending;
+            if ( isShadowPending(globalLights.sunLight.shadowIndex) ) {
+                tempShadowManager->addShadow(0, globalLights.sunLight, ShadowDesc());
+            }
             updateGlobalLights();
             break;
         case LightType::Point:
             // registerLocalLight(light);
+            // NOTE: Currently unimplemented, just storing.
+            // localLights.pointLights.push_back(static_c1ast<PointLightComponent*>(light)->getLightData());
             break;
         case LightType::Default:
         default:
@@ -446,7 +490,7 @@ namespace LaurelEye::Graphics {
                 DataBufferType::UBO,
                 DataBufferUpdateMode::Dynamic,
                 sizeof(GlobalLights),
-                1},
+                DataBuffer::GlobalLightDataBinding},
             &globalLights);
     }
 

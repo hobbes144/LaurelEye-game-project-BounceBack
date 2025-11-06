@@ -13,6 +13,7 @@ namespace LaurelEye::Graphics {
     class IRenderDevice;
     class RenderResources;
     class IRenderComponent;
+    class ShadowManager;
 
     /// @struct FrameContext
     /// @brief Framecontext stores the data to be passed to the Render Passes.
@@ -25,5 +26,7 @@ namespace LaurelEye::Graphics {
         RenderResources& resources;
         /// @brief The IRenderComponents to be drawn to the screen
         std::vector<IRenderComponent*>& objects;
+        // shadows
+        ShadowManager* shadowManager;
     };
 } // namespace LaurelEye::Graphics

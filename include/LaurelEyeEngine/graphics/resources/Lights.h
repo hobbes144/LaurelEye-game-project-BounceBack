@@ -7,7 +7,9 @@
 
 #pragma once
 
+#include "LaurelEyeEngine/graphics/resources/Shadow.h"
 #include "LaurelEyeEngine/math/Vector3.h"
+#include <cstdint>
 
 namespace LaurelEye::Graphics {
     enum class LightType {
@@ -33,7 +35,7 @@ namespace LaurelEye::Graphics {
         Vector3 direction;
         float intensity;
         Vector3 color;
-        float padding = 0.0f; // Padding to align the data correctly for OpenGL.
+        uint32_t shadowIndex = Shadow::NoShadow;
     };
 
     /// @class PointLight
@@ -52,6 +54,10 @@ namespace LaurelEye::Graphics {
         float intensity;
         Vector3 color;
         float range;
+        uint32_t shadowIndex = Shadow::NoShadow;
+        // Struct size is 36, so we need to pad after to align next struct to 16 byte
+        // boundary.
+        int padding[3];
     };
 
     /// @class AmbientLight
@@ -89,20 +95,20 @@ namespace LaurelEye::Graphics {
     /// of them. Also add any future light types here.
     ///
     struct LocalLights {
-        DirectionalLight sunLight;
-        AmbientLight ambientLight;
         std::vector<PointLight> pointLights;
     };
 
     /// @class LocalLightsStatus
-    /// @brief Stores if a light's buffered data should be updated due to a
+    /// @brief Stores if a global light's buffered data should be updated due to a
     /// change in the light.
     ///
-    /// Directly maps to the corresponding LocalLights struct.
+    /// Directly maps to the corresponding GlobalLights struct.
     ///
-    struct LocalLightsStatus {
+    struct GlobalLightsStatus {
         bool sunDirty = false;
         bool ambientDirty = false;
+    };
+    struct LocalLightsStatus {
         std::vector<unsigned int> pointDirty = {};
     };
 } // namespace LaurelEye::Graphics

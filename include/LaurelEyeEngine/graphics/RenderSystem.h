@@ -14,6 +14,7 @@
 #pragma once
 
 #include "LaurelEyeEngine/ecs/ISystem.h"
+#include "LaurelEyeEngine/graphics/ShadowManager.h"
 #include "LaurelEyeEngine/graphics/graphics_components/IRenderComponent.h"
 
 #include "LaurelEyeEngine/graphics/Graphics.h"
@@ -22,14 +23,11 @@
 // Temp
 #include "LaurelEyeEngine/graphics/renderpass/SingleBufferedDataPass.h"
 #include "LaurelEyeEngine/graphics/renderpass/ParticleRenderPass.h"
-#include "LaurelEyeEngine/graphics/renderpass/SinglePass.h"
-#include "LaurelEyeEngine/graphics/graphics_components/AmbientLightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/CameraComponent.h"
-#include "LaurelEyeEngine/graphics/graphics_components/DirectionalLightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/LightComponent.h"
-#include "LaurelEyeEngine/graphics/graphics_components/PointLightComponent.h"
 #include "LaurelEyeEngine/graphics/renderpass/SingleBufferedDataPass.h"
 #include "LaurelEyeEngine/graphics/renderpass/SinglePass.h"
+#include "LaurelEyeEngine/graphics/renderpass/SinglePassShadow.h"
 #include "LaurelEyeEngine/graphics/renderpass/SkydomePass.h"
 #include "LaurelEyeEngine/graphics/renderpass/UIPass.h"
 #include "LaurelEyeEngine/graphics/resources/Lights.h"
@@ -123,7 +121,7 @@ namespace LaurelEye::Graphics {
         /// @return A vector containing pointers to all camera components.
         std::vector<CameraComponent*> GetCameraComponents() const;
 
-        std::shared_ptr<SingleBufferedDataPass> retrieveSinglePass();
+        std::shared_ptr<SinglePassShadow> retrieveSinglePass();
         std::shared_ptr<ParticleRenderPass> retrieveParticlePass();
         std::shared_ptr<SkydomePass> retrieveSkydomePass();
 
@@ -161,25 +159,28 @@ namespace LaurelEye::Graphics {
 
         /// @brief Temporary rendering resource storage used during frame execution.
         std::unique_ptr<RenderResources> tempRenderResources;
+        std::unique_ptr<ShadowManager> tempShadowManager;
         /// @brief A single-pass rendering pipeline used for simple frame rendering.
         // std::shared_ptr<SinglePass> sp;
+        std::shared_ptr<SinglePassShadow> sp;
         std::shared_ptr<SkydomePass> bp;
-        std::shared_ptr<SingleBufferedDataPass> sp;
+        //std::shared_ptr<SingleBufferedDataPass> sp;
         std::shared_ptr<UIPass> uiPass;
         std::shared_ptr<ParticleRenderPass> prp;
 
         // Temp pointers to support lights and camera updates
         std::unique_ptr<Entity> defaultCamera = nullptr;
-        PointLightComponent* pointLight = nullptr;
         CameraComponent* camera = nullptr;
-        DirectionalLightComponent* dirLight = nullptr;
-        AmbientLightComponent* ambLight = nullptr;
 
         // Lighting pass lights
-        DataBufferHandle globalLightsBufferHandle = InvalidDataBuffer;
+        DataBufferHandle globalLightsBufferHandle = DataBuffer::InvalidDataBuffer;
         // TODO: Update this to correctly handle global and local lights.
         GlobalLights globalLights;
         bool globalLightsInitStatus = false;
+        DataBufferHandle localLightsBufferHandle = DataBuffer::InvalidDataBuffer;
+        // TODO: Update this to correctly handle global and local lights.
+        LocalLights localLights;
+        bool localLightsInitStatus = false;
 
         // Camera interactions
         void initDefaultCamera();

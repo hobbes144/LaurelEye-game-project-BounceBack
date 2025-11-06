@@ -80,6 +80,7 @@ namespace LaurelEye::Graphics {
         /// @brief Constructs a RenderResources manager.
         /// @param dev Reference to the active render device.
         explicit RenderResources(IRenderDevice& dev) : device(dev) {}
+        ~RenderResources();
 
         /// @brief Creates a GPU data buffer resource.
         ///
@@ -88,11 +89,11 @@ namespace LaurelEye::Graphics {
         /// @param tag Optional tag used to group related resources.
         /// @return Handle to the created DataBuffer resource.
         [[nodiscard]] DataBufferHandle createDataBuffer(const std::string& name, const DataBufferDesc& d,
-                                          const std::string& tag);
+                                                        const std::string& tag);
         [[nodiscard]] TextureHandle createTexture(const std::string& name, const TextureDesc& d,
-                                    const std::string& tag, const void* init = nullptr);
+                                                  const std::string& tag, const void* init = nullptr);
         [[nodiscard]] FramebufferHandle createFramebuffer(const std::string& name, const FramebufferDesc& d,
-                                            const std::string& tag);
+                                                          const std::string& tag);
 
         // Add Textures create, get, resize and destroy here. Also add resizeTag.
 
@@ -116,12 +117,15 @@ namespace LaurelEye::Graphics {
         // void destroy(const std::string& name);
         // void destroyTag(const std::string& tag);
 
+        // NOTE: I'm unsure if this should be allowed
+        IRenderDevice& getRenderDevice();
+
     private:
         /// @brief Reference to the underlying render device responsible for actual GPU operations.
         IRenderDevice& device;
 
         /// @brief Map of data buffer names to their corresponding resource metadata.
-        std::unordered_map<std::string, DataBufferResource> databuffers;
+        std::unordered_map<std::string, DataBufferResource> dataBuffers;
         /// @brief Map of texture names to their corresponding resource metadata.
         std::unordered_map<std::string, TextureResource> textures;
         /// @brief Map of framebuffer names to their corresponding handles.

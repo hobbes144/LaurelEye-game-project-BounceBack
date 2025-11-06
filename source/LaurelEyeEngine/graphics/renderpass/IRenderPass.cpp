@@ -16,7 +16,7 @@
 namespace LaurelEye::Graphics {
 
     void IRenderPass::drawRenderables(const FrameContext& ctx, std::shared_ptr<Shader> shader) {
-        if ( isValidDataBuffer(properties) ) ctx.device.bindDataBufferBase(properties);
+        if ( isValidDataBuffer(propertiesHandle) ) ctx.device.bindDataBufferBase(propertiesHandle);
 
         for ( const auto& icomponent : ctx.objects ) {
             // Remove this when we fix FrameContext to send only renderables:

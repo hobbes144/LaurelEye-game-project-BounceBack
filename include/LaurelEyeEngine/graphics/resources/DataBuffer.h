@@ -23,13 +23,22 @@ namespace LaurelEye::Graphics {
     /// by the rendering backend. The value `InvalidDataBuffer` can be
     /// used to represent an uninitialized or invalid handle.
     using DataBufferHandle = uint32_t;
-    /// @brief Sentinel value representing an invalid buffer handle.
-    static constexpr DataBufferHandle InvalidDataBuffer = UINT32_MAX;
+
+    namespace DataBuffer {
+        /// @brief Sentinel value representing an invalid buffer handle.
+        static constexpr DataBufferHandle InvalidDataBuffer = UINT32_MAX;
+        static constexpr uint32_t CameraDataBinding = 0;
+        static constexpr uint32_t GlobalLightDataBinding = 1;
+        static constexpr uint32_t LocalLightDataBinding = 2;
+        static constexpr uint32_t ShaderDataBinding = 10;
+
+    } // namespace DataBuffer
+
     /// @brief Checks whether a given buffer handle is valid.
     /// @param h The handle to validate.
     /// @return `true` if the handle refers to a valid buffer, otherwise `false`.
     inline bool isValidDataBuffer(DataBufferHandle h) noexcept {
-        return h != InvalidDataBuffer;
+        return h != DataBuffer::InvalidDataBuffer;
     }
 
     /// @enum DataBufferType

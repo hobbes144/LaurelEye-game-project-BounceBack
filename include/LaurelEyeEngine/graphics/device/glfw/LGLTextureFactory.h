@@ -19,7 +19,7 @@ namespace LaurelEye::Graphics {
     ///
     /// @param f TextureFormat enum value.
     /// @return OpenGL Texture Format.
-    static GLint textureFormatToGLFormat(TextureFormat f);
+    GLint textureFormatToGLFormat(TextureFormat f);
 
     /// @brief Convert TextureFormat to OpenGL Base Texture Format.
     ///
@@ -27,32 +27,34 @@ namespace LaurelEye::Graphics {
     ///
     /// @param f TextureFormat enum value.
     /// @return OpenGL Texture Format.
-    static GLint textureFormatToGLBaseFormat(TextureFormat f);
+    GLint textureFormatToGLBaseFormat(TextureFormat f);
 
     /// @brief Convert TextureWrapMode to OpenGL Texture Wrap Mode.
     ///
     /// @param w TextureWrapMode enum value.
     /// @return OpenGL Texture Wrap Mode.
-    static GLint textureWrapToGLWrap(TextureWrapMode w);
+    GLint textureWrapToGLWrap(TextureWrapMode w);
 
     /// @brief Convert TextureFilterMode to OpenGL Texture Filter Mode.
     ///
     /// @param f TextureFilterMode enum value.
     /// @return OpenGL Texture Filter Mode.
-    static GLint textureFilterToGLFilter(TextureFilterMode f);
+    GLint textureFilterToGLFilter(TextureFilterMode f);
 
-    static GLint textureFormatToGLUploadFormat(TextureFormat f);
+    GLint textureFormatToGLUploadFormat(TextureFormat f);
 
     /// @brief Does the requested TextureFilterMode require Mipmaps
     ///
     /// @param f TextureFilterMode enum value.
     /// @return `true` if Mipmaps needed.
-    static bool textureFilterNeedsMip(TextureFilterMode f);
+    bool textureFilterNeedsMip(TextureFilterMode f);
 
-    static bool textureIsTextureStorage(TextureType t);
+    bool textureIsTextureStorage(TextureType t);
 
     class LGLTextureFactory {
     public:
+        ~LGLTextureFactory();
+
         /// \copydoc IRenderDevice::createTexture
         [[nodiscard]] TextureHandle create(const TextureDesc& d, const void* init = nullptr);
 
@@ -74,6 +76,8 @@ namespace LaurelEye::Graphics {
 
         /// \copydoc IRenderDevice::destroyAllTextures
         void destroyAll();
+
+        void bind(TextureHandle h, uint32_t textureUnit);
 
         /* Samplers */
         // New OpenGL prefers separated Texture and Sampler.

@@ -13,9 +13,11 @@
 
 #pragma once
 
+#include "LaurelEyeEngine/graphics/resources/SizeRegistry.h"
 #include "LaurelEyeEngine/graphics/resources/Texture.h"
-#include "LaurelEyeEngine/graphics/surface/IWindowSurfaceProvider.h"
+
 #include <cstdint>
+#include <vector>
 
 namespace LaurelEye::Graphics {
 
@@ -46,11 +48,13 @@ namespace LaurelEye::Graphics {
     /// This structure defines the attachment type and can optionally specify additional
     /// parameters such as texture format, mip level, and sample count for multisampling.
     struct FramebufferAttachmentDesc {
+        SizeRegistry size = SizeRegistry();
         FramebufferAttachmentType type = FramebufferAttachmentType::Color;
-        TextureHandle texture = 0;                   // optional: if nonzero, use existing texture
+        TextureHandle texture = InvalidTexture;                   // optional: if nonzero, use existing texture
         TextureFormat format = TextureFormat::RGBA8; // used if texture==0
+        TextureMipMode mipMode = TextureMipMode::AutoGenerate;
+        uint32_t mipLevels = 1;        // for texture arrays / mips
         // SampleCount samples = SampleCount::X1;
-        uint32_t mipLevel = 0;        // for texture arrays / mips
         // uint32_t layer = 0;           // for array/cubemap layers
     };
 
@@ -76,8 +80,8 @@ namespace LaurelEye::Graphics {
     /// unhandled and may lead to errors.
     struct FramebufferDesc {
         std::vector<FramebufferAttachmentDesc> attachments;
+        SizeRegistry size;
         uint32_t x = 0;
         uint32_t y = 0;
-        SizeRegistry size;
     };
 } // namespace LaurelEye::Graphics

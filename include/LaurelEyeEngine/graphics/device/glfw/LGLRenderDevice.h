@@ -63,6 +63,15 @@ namespace LaurelEye::Graphics {
         /// \copydoc IRenderDevice::shutdown
         void shutdown() override;
 
+        void clear() override;
+
+        void setViewport(const Viewport& viewport, bool force) override;
+        void setDepthState(const DepthState& depthState, bool force) override;
+        void setBlendState(const BlendState& blendState, bool force) override;
+
+        RenderState getCurrentState() override;
+        void setState(const RenderState& rs, bool force = false) override;
+
         /* DataBuffer operations (UBOs/SSBOs) */
 
         /// \copydoc IRenderDevice::createDataBuffer
@@ -99,10 +108,14 @@ namespace LaurelEye::Graphics {
         /// \copydoc IRenderDevice::destroyAllTextures
         void destroyAllTextures() override;
 
+        void bindTexture(TextureHandle h, uint32_t textureUnit) override;
+
         /* Texture operations */
 
         /// \copydoc IRenderDevice::createFramebuffer
         [[nodiscard]] FramebufferHandle createFramebuffer(const FramebufferDesc& d) override;
+
+        void finalizeFramebuffer(FramebufferHandle h) override;
 
         /// \copydoc IRenderDevice::destroyFramebuffer
         void destroyFramebuffer(FramebufferHandle h) override;
@@ -116,6 +129,8 @@ namespace LaurelEye::Graphics {
         std::unique_ptr<LGLDataBufferFactory> dataBufferFactory;
         std::unique_ptr<LGLTextureFactory> textureFactory;
         std::unique_ptr<LGLFramebufferFactory> framebufferFactory;
+
+        GLbitfield clearMask = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
     };
 
 } // namespace LaurelEye::Graphics

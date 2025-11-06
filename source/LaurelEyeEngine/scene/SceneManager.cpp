@@ -98,6 +98,8 @@ namespace LaurelEye {
         if ( currentScene ) {
             return currentScene->instantiate(prefabPath);
         }
+        assert(false && "ERROR::SCENEMANAGER::INSTANTIATE::CURRENTSCENE_UNINITIALIZED");
+        return nullptr;
     }
 
 

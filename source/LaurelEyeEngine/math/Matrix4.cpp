@@ -123,7 +123,7 @@ namespace LaurelEye {
     /// @brief * Operator overloader for Matrix4 multiplication
     /// @param other Matrix4 object to be multiplied with.
     /// @return The result of the multiplication.
-    Matrix4 Matrix4::operator*(const Matrix4& other) {
+    Matrix4 Matrix4::operator*(const Matrix4& other) const {
         Matrix4 result;
         for ( int i = 0; i < 4; i++ ) {
             for ( int j = 0; j < 4; j++ ) {

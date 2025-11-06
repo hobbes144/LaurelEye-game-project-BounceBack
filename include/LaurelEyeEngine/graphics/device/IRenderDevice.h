@@ -8,9 +8,13 @@
 
 #pragma once
 
+#include "LaurelEyeEngine/graphics/resources/RenderState.h"
 #include "LaurelEyeEngine/graphics/resources/DataBuffer.h"
 #include "LaurelEyeEngine/graphics/resources/Framebuffer.h"
 #include "LaurelEyeEngine/graphics/resources/Texture.h"
+#include "LaurelEyeEngine/math/Vector3.h"
+#include <cstdint>
+#include <string>
 
 namespace LaurelEye::Graphics {
 
@@ -31,6 +35,15 @@ namespace LaurelEye::Graphics {
         virtual void initialize() = 0;
         /// @brief Shutdown the Render Device.
         virtual void shutdown() = 0;
+
+        virtual void clear() = 0;
+
+        virtual void setViewport(const Viewport& viewport, bool force) = 0;
+        virtual void setDepthState(const DepthState& depthState, bool force) = 0;
+        virtual void setBlendState(const BlendState& blendState, bool force) = 0;
+
+        virtual RenderState getCurrentState() { return state; };
+        virtual void setState(const RenderState& rs, bool force = false) = 0;
 
         // These are to be uncommented as we implement each of these.
         // Under the API specific RenderDevices, we want to have the factories
@@ -132,6 +145,8 @@ namespace LaurelEye::Graphics {
         /// This is called by LGLRenderDevice::shutdown.
         virtual void destroyAllTextures() = 0;
 
+        virtual void bindTexture(TextureHandle h, uint32_t textureUnit) = 0;
+
         /* Frame buffer operations */
 
         /// @brief Create a Data Buffer.
@@ -145,6 +160,8 @@ namespace LaurelEye::Graphics {
         ///
         /// @return Handle of the Data Buffer.
         [[nodiscard]] virtual FramebufferHandle createFramebuffer(const FramebufferDesc& d) = 0;
+
+        virtual void finalizeFramebuffer(FramebufferHandle h) = 0;
 
         /// @brief Destroy a Data Buffer.
         ///
@@ -168,5 +185,8 @@ namespace LaurelEye::Graphics {
 
         // This is final step if or when we separate compile plan and execute plan.
         // void execute(RenderPlan plan);
+
+    protected:
+        RenderState state{};
     };
 } // namespace LaurelEye::Graphics

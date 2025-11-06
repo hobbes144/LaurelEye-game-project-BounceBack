@@ -9,8 +9,6 @@
 
 #include "LaurelEyeEngine/graphics/resources/Shader.h"
 #include "LaurelEyeEngine/graphics/ShaderManager.h"
-#include "LaurelEyeEngine/math/Vector3.h"
-#include "LaurelEyeEngine/math/Matrix4.h"
 
 namespace LaurelEye::Graphics {
 

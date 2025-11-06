@@ -9,6 +9,7 @@
 
 #include "LaurelEyeEngine/graphics/device/glfw/LGLDataBufferFactory.h"
 #include "LaurelEyeEngine/graphics/device/glfw/LGLFramebufferFactory.h"
+#include "LaurelEyeEngine/graphics/device/glfw/LGLRenderState.h"
 #include "LaurelEyeEngine/graphics/device/glfw/LGLTextureFactory.h"
 #include "LaurelEyeEngine/graphics/resources/DataBuffer.h"
 #include "LaurelEyeEngine/graphics/resources/Framebuffer.h"
@@ -126,8 +127,105 @@ namespace LaurelEye::Graphics {
     }
 
     void LGLRenderDevice::shutdown() {
-        // dataBufferFactory->destroyAll();
-        textureFactory->destroyAll();
+    }
+
+    void LGLRenderDevice::clear() {
+        glClear(clearMask);
+    }
+
+    /*!****************************************************************************
+     * \brief Set the Viewport size
+     *
+     * ## Usage:
+     *
+     * This is to be called during RenderGraph Passes that require a custom
+     * viewport size, such as for the ShadowPass.
+     *
+     * Ensure that viewport is correctly reset by using a RenderStateSaver.
+     *
+     * \param Viewport The Viewport struct storing the width and height.
+     * \return \b Renderer* Self
+     *****************************************************************************/
+    void LGLRenderDevice::setViewport(const Viewport& viewport, bool force) {
+        if ( !force && state.viewport == viewport ) return;
+
+        glViewport(0, 0, viewport.size.width, viewport.size.height);
+        state.viewport = viewport;
+    }
+
+    /*!****************************************************************************
+     * \brief Set the Depth State
+     *
+     * ## Usage:
+     *
+     * This is to be called in RenderGraph Passes that require the Depth test to be
+     * modified to a specific set of values.
+     *
+     * ## Note:
+     *
+     * clearMask is set here, which means that if depth testing is turned off
+     * before running a clear, The depth buffer might still have values that never
+     * get cleared until the next time depth testing is enabled and clear is
+     * called.
+     *
+     * \param depthState DepthState object that stores the enabled and func.
+     * \return \b Renderer* Self
+     *****************************************************************************/
+    void LGLRenderDevice::setDepthState(const DepthState& depthState, bool force) {
+        if ( !force && state.depthState == depthState ) return;
+
+        if ( depthState.testEnabled ) {
+            glEnable(GL_DEPTH_TEST);
+            clearMask = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
+            if ( depthState.writeEnabled )
+                glDepthMask(GL_TRUE);
+            else
+                glDepthMask(GL_FALSE);
+            glDepthFunc(depthFunctionToGLDepthFunction(depthState.func));
+        }
+        else {
+            glDisable(GL_DEPTH_TEST);
+            clearMask = GL_COLOR_BUFFER_BIT;
+        }
+
+        state.depthState = depthState;
+    }
+
+    /*!****************************************************************************
+     * \brief Set the Blending State
+     *
+     * ## Usage:
+     *
+     * This is called in RenderGraph Passes to enable effects like transparency and
+     * advanced lighting.
+     *
+     * \param blendState BlendState object that stores the enabled, equation and
+     * func.
+     * \return \b Renderer* Self
+     *****************************************************************************/
+    void LGLRenderDevice::setBlendState(const BlendState& blendState, bool force) {
+        if ( !force && state.blendState == blendState )
+            ;
+
+        if ( blendState.enabled ) {
+            glEnable(GL_BLEND);
+            glBlendEquation(blendEquationToGLBlendEquation(blendState.equation));
+            glBlendFunc(blendFactorToGLBlendFactor(blendState.srcFactor), blendFactorToGLBlendFactor(blendState.destFactor));
+        }
+        else
+            glDisable(GL_BLEND);
+
+        state.blendState = blendState;
+    }
+
+    RenderState LGLRenderDevice::getCurrentState() {
+        return state;
+    }
+
+    void LGLRenderDevice::setState(const RenderState& rs, bool force) {
+        setViewport(state.viewport, force);
+        setBlendState(state.blendState, force);
+        setDepthState(state.depthState, force);
     }
 
     /// @brief Create Data buffer
@@ -175,9 +273,16 @@ namespace LaurelEye::Graphics {
         textureFactory->destroyAll();
     }
 
+    void LGLRenderDevice::bindTexture(TextureHandle h, uint32_t textureUnit) {
+        textureFactory->bind(h, textureUnit);
+    }
+
     FramebufferHandle LGLRenderDevice::createFramebuffer(const FramebufferDesc& d) {
         assert((d.size.width != -1) && "Window size FB not supported yet.");
         return framebufferFactory->create(d);
+    }
+
+    void LGLRenderDevice::finalizeFramebuffer(FramebufferHandle h) {
     }
 
     void LGLRenderDevice::destroyFramebuffer(FramebufferHandle h) {

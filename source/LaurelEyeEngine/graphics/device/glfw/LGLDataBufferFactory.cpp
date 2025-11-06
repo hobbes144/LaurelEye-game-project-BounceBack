@@ -13,6 +13,10 @@
 
 namespace LaurelEye::Graphics {
 
+    LGLDataBufferFactory::~LGLDataBufferFactory() {
+        destroyAll();
+    }
+
     DataBufferHandle LGLDataBufferFactory::createBuffer(const DataBufferDesc& d, const void* initialData) {
         LGLDataBufferRecord r{};
         r.desc = d;
@@ -56,6 +60,14 @@ namespace LaurelEye::Graphics {
         glDeleteBuffers(1, &createdBuffers[h].id);
         createdBuffers.erase(h);
     }
+
+    void LGLDataBufferFactory::destroyAll() {
+        for ( auto& [h, d] : createdBuffers ) {
+            glDeleteBuffers(1, &createdBuffers[h].id);
+        }
+        createdBuffers.clear();
+    }
+
 
     void LGLDataBufferFactory::updateSubData(DataBufferHandle h, uint64_t offset, uint64_t size, const void* data) {
         glNamedBufferSubData(h, offset, size, data);

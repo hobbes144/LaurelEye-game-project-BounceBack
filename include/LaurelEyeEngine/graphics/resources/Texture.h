@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <cstdint>
+#include <string>
 
 namespace LaurelEye::Graphics {
 
@@ -70,7 +71,7 @@ namespace LaurelEye::Graphics {
     /// Used by the render device or resource manager to allocate GPU memory
     /// and define how the texture will be used in rendering.
     struct TextureDesc {
-        const char* debugName = nullptr;             ///< Optional debug name for identification.
+        std::string debugName;             ///< Optional debug name for identification.
         TextureType type = TextureType::Texture2D;   ///< Texture dimensionality.
         TextureFormat format = TextureFormat::RGBA8; ///< Pixel format.
         uint32_t width;                              ///< Width of the texture in pixels.

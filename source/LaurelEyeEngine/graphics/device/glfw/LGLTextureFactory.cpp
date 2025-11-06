@@ -56,8 +56,10 @@ namespace LaurelEye::Graphics {
             return GL_RGBA;
         default:
             // TODO: Replace this with proper warning logging.
-            std::cout << "WARNING::RENDERSYSTEM::TEXTUREFACTORY::CREATE::INVALIDFORMAT"
+#if !defined(NDEBUG)
+            std::cerr << "WARNING::RENDERSYSTEM::TEXTUREFACTORY::CREATE::INVALIDFORMAT"
                       << "::Defaulting to RGBA" << std::endl;
+#endif
             return GL_RGBA;
         }
     }
@@ -111,8 +113,10 @@ namespace LaurelEye::Graphics {
             return GL_FLOAT;
         default:
             // TODO: Replace this with proper warning logging.
-            std::cout << "WARNING::RENDERSYSTEM::TEXTUREFACTORY::CREATE::INVALIDFORMAT"
+#if !defined(NDEBUG)
+            std::cerr << "WARNING::RENDERSYSTEM::TEXTUREFACTORY::CREATE::INVALIDFORMAT"
                       << "::Defaulting to RGBA" << std::endl;
+#endif
             return GL_FLOAT;
         }
     }
@@ -136,6 +140,10 @@ namespace LaurelEye::Graphics {
         default:
             return false;
         }
+    }
+
+    LGLTextureFactory::~LGLTextureFactory() {
+        destroyAll();
     }
 
     TextureHandle LGLTextureFactory::create(const TextureDesc& d, const void* init) {
@@ -193,6 +201,14 @@ namespace LaurelEye::Graphics {
 
         if ( init != nullptr && d.mipMode == TextureMipMode::AutoGenerate )
             glGenerateMipmap(GL_TEXTURE_2D);
+        else {
+            // Reasonable defaults (you’ll likely use separate samplers anyway)
+            glTextureParameteri(h, GL_TEXTURE_COMPARE_MODE, GL_NONE); // Required for Shadows
+            glTextureParameteri(h, GL_TEXTURE_MIN_FILTER, d.mipLevels > 1 ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
+            glTextureParameteri(h, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTextureParameteri(h, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTextureParameteri(h, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        }
 
         glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -252,6 +268,19 @@ namespace LaurelEye::Graphics {
             glDeleteTextures(1, &h);
         }
         textures.clear();
+    }
+
+    void LGLTextureFactory::bind(TextureHandle h, uint32_t textureUnit) {
+        // Validate texture unit against device limits to avoid GL_INVALID_ENUM.
+        GLint maxUnits = 0;
+        glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxUnits);
+        if ( static_cast<GLint>(textureUnit) >= maxUnits ) {
+            std::cout << "WARNING::RENDERSYSTEM::TEXTUREFACTORY::BIND::INVALID_TEXTURE_UNIT" << std::endl;
+            return;
+        }
+        glActiveTexture(GL_TEXTURE0 + textureUnit);
+        // always 2D textures for now
+        glBindTexture(GL_TEXTURE_2D, h);
     }
 
 } // namespace LaurelEye::Graphics

@@ -1,0 +1,198 @@
+/////////////////////////////////////////////////////////////////////////
+// Pixel shader for lighting
+////////////////////////////////////////////////////////////////////////
+#version 430 core
+
+#define M_PI 3.1415926535897932384626433832795
+
+const uint UINT_MAX = 0xFFFFFFFFU; // or 4294967295U;
+
+const float pi = 3.14159265358979323846;
+
+//out vec4 FragColor;
+
+// These definitions agree with the ObjectIds enum in scene.h
+const int     nullId	= 0;
+const int     skyId	= 1;
+const int     seaId	= 2;
+const int     groundId	= 3;
+const int     roomId	= 4;
+const int     boxId	= 5;
+const int     frameId	= 6;
+const int     lPicId	= 7;
+const int     rPicId	= 8;
+const int     teapotId	= 9;
+const int     spheresId	= 10;
+const int     floorId	= 11;
+
+in vec3 normalVec, worldPos;
+in vec2 texCoord;
+in vec3 tanVec;
+
+layout (binding = 0) uniform camera
+{
+    mat4 projection;
+    mat4 view;
+    mat4 inverseView;
+    float exposure;
+};
+
+struct DirectionalLight {
+  vec3 direction;
+  float intensity;
+  vec3 color;
+  uint shadowIndex;
+};
+
+struct AmbientLight {
+  vec3 color;
+  float intensity;
+};
+
+layout (binding = 1) uniform lights
+{
+  DirectionalLight sunLight;
+  AmbientLight ambientLight;
+};
+
+struct ShadowResource {
+    mat4 shadowMatrix;
+    uint framebuffer;
+    uint shadowMap;
+    uint lightIndex;
+    uint type;
+};
+
+layout(std430, binding = 10) buffer shadows {
+    ShadowResource shadowResources[];
+};
+
+uniform vec3 diffuse;   // Kd
+uniform vec3 specular;  // Ks
+uniform float shininess; // alpha exponent
+
+uniform bool useTexture;
+uniform sampler2D mainTexture;
+uniform vec2 mainTextureScale;
+
+uniform bool useNormalMap;
+uniform sampler2D normalMap;
+uniform vec2 normalMapScale;
+
+uniform int HDR;
+
+uniform sampler2D ShadowMap;
+
+out vec4 FragColor;
+
+vec3 toLinear(vec3 color) {
+  return pow(color, vec3(2.2));
+}
+
+vec3 toSRGB(vec3 color) {
+  const float exposure = 1.0f;
+  return pow(
+      (
+        (exposure * color) /
+        (
+          (exposure * color) +
+          vec3(1.0)
+        )
+      ), vec3(1.0/2.2));
+}
+
+// L = Light vector
+// N = Normal vector
+// V = Eye vector
+// Ii = Light color at Light vector
+// Kd = Diffuse color of surface
+// Ks = Specular color of surface
+// alpha = Shininess
+vec3 specularBRDF(
+  const vec3 L, const vec3 N, const vec3 V,
+  const vec3 Ii,
+  const vec3 Kd, const vec3 Ks, const float alpha) {
+
+  const vec3 H = normalize(L+V);
+  const float LN = max(dot(L,N),0.0);
+  const float HN = max(dot(H,N),0.0);
+  const float VN = max(dot(V,N),0.0);
+  const float LH = max(dot(L,H),0.0);
+
+  // BRDF
+  const vec3 F = Ks + ((vec3(1.0,1.0,1.0)-Ks)*pow((1.0-LH),5.0));
+  const float D = ((alpha+2.0)/(2.0*M_PI))*(pow(HN,alpha));
+  const vec3 BRDF = (Kd/M_PI) + ((F*D)/(4*pow(max(LH,0.0000000001),2.0)));
+  return Ii*LN*BRDF;
+}
+
+void main()
+{
+
+    vec2 uv;
+
+    bool inShadow = false;
+    if (sunLight.shadowIndex < UINT_MAX - 1) {
+      const vec4 shadowCoord = shadowResources[sunLight.shadowIndex].shadowMatrix * vec4(worldPos, 1.0);
+      vec2 shadowIndex = shadowCoord.xy/shadowCoord.w;
+      if (shadowCoord.w > 0 &&
+        shadowIndex.x >= 0.0f && shadowIndex.x < 1.0f &&
+        shadowIndex.y >= 0.0f && shadowIndex.y < 1.0f) {
+        float lightDepth = texture(ShadowMap, shadowIndex).x;
+        float pixelDepth = shadowCoord.z/shadowCoord.w;
+        if ( pixelDepth > (lightDepth + 0.01f) )
+          inShadow = true;
+      }
+    }
+
+    vec3 eyeVec = (inverseView*vec4(0.0,0.0,0.0,1.0)).xyz-worldPos;
+
+    vec3 N = normalize(normalVec);
+    vec3 V = normalize(eyeVec);
+
+    vec3 Kd = diffuse;
+    vec3 Ks = specular;
+    float alpha = shininess;
+
+    vec3 Ia = ambientLight.color * ambientLight.intensity;
+
+    vec3 Ii = sunLight.color * sunLight.intensity;
+    vec3 L = -normalize(sunLight.direction);
+
+    uv = texCoord;
+
+    vec2 scaledTexCoord = uv * mainTextureScale;
+
+    if (useTexture) {
+      vec4 color = texture(mainTexture, scaledTexCoord);
+      Kd = color.xyz;
+    }
+
+    // The normal map calc ...
+    if (useNormalMap) {
+      vec2 scaledTexCoord = uv * normalMapScale;
+      vec3 delta = texture(normalMap, scaledTexCoord).xyz;
+      delta = delta*2.0 - vec3(1.0);
+      vec3 T = normalize(tanVec);
+      vec3 B = normalize(cross(T,N));
+      N = delta.x*T + delta.y*B + delta.z*N;
+    }
+
+    if (HDR < 1) {
+      Kd = toLinear(Kd);
+    }
+
+    vec3 ambientDiffuse;
+
+    if (!inShadow) {
+        FragColor = vec4(specularBRDF(L, N, V, Ii, Kd, Ks, alpha), 1.0);
+    }
+    else {
+        FragColor = vec4(0.0,0.0,0.0,1.0);
+    }
+    ambientDiffuse = Ia*Kd;
+
+    FragColor += vec4(ambientDiffuse, 1.0);
+
+    FragColor.xyz = toSRGB(FragColor.xyz);
+}

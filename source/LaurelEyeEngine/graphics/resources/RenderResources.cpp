@@ -7,10 +7,27 @@
 
 #include "LaurelEyeEngine/graphics/resources/RenderResources.h"
 #include "LaurelEyeEngine/graphics/resources/DataBuffer.h"
-#include "LaurelEyeEngine/graphics/resources/Texture.h"
 #include "LaurelEyeEngine/graphics/resources/Framebuffer.h"
+#include "LaurelEyeEngine/graphics/resources/Texture.h"
 
 namespace LaurelEye::Graphics {
+
+    RenderResources::~RenderResources() {
+        for ( auto& [name, desc] : dataBuffers ) {
+            device.destroyDataBuffer(desc.handle);
+        }
+        dataBuffers.clear();
+
+        for ( auto& [name, desc] : framebuffers ) {
+            device.destroyFramebuffer(desc.handle);
+        }
+        framebuffers.clear();
+
+        for ( auto& [name, desc] : textures ) {
+            device.destroyTexture(desc.handle);
+        }
+        textures.clear();
+    }
 
     DataBufferHandle RenderResources::createDataBuffer(
         const std::string& name, const DataBufferDesc& d, const std::string& tag) {
@@ -19,7 +36,7 @@ namespace LaurelEye::Graphics {
         r.desc = d;
         r.tag = tag;
         // r.lifetime = l;
-        databuffers[name] = r;
+        dataBuffers[name] = r;
 
         return r.handle;
     }
@@ -43,41 +60,38 @@ namespace LaurelEye::Graphics {
         FramebufferResource r{};
         r.desc = d;
         r.tag = tag;
-
-        // Using temp so we separate out texture creation.
-        // This allows textures to be created and managed by RenderResources
-        // instead of the TextureManager only.
-        FramebufferDesc temp = {{}, d.x, d.y, d.size};
-        r.handle = device.createFramebuffer(temp);
-        // r.lifetime = l;
-        framebuffers[name] = r;
         int attachmentNumber = 0;
         for ( auto& attachment : r.desc.attachments ) {
-            TextureDesc t{};
-            t.type = TextureType::Texture2D;
-            t.format = attachment.format;
-            t.width = d.size.width;
-            t.height = d.size.height;
-            t.mipLevels = attachment.mipLevel;
-            if ( attachment.type == FramebufferAttachmentType::Color ) {
+            if ( attachment.texture == InvalidTexture &&
+                 attachment.type == FramebufferAttachmentType::Color ) {
+                TextureDesc t{};
+                t.type = TextureType::Texture2D;
+                t.format = attachment.format;
+                t.width = d.size.width;
+                t.height = d.size.height;
+                t.mipMode = attachment.mipMode;
+                t.mipLevels = attachment.mipLevels;
                 attachment.texture = createTexture(name + "_" + std::to_string(attachmentNumber), t, tag);
                 attachmentNumber++;
             }
-            else {
-                attachment.texture = createTexture(name + "_depth", t, tag);
-            }
-            device.attachTexturetoFramebuffer(r.handle, attachment);
         }
+
+        // Separated out texture creation.
+        // This allows textures to be created and managed by RenderResources
+        // instead of the TextureManager only.
+        r.handle = device.createFramebuffer(r.desc);
+        // r.lifetime = l;
+        framebuffers[name] = r;
 
         return r.handle;
     }
 
     DataBufferHandle RenderResources::dataBuffer(const std::string& name) {
-        return databuffers[name].handle;
+        return dataBuffers[name].handle;
     }
 
     TextureHandle RenderResources::texture(const std::string& name) {
-        if (!textures.contains(name)) return InvalidTexture;
+        if ( !textures.contains(name) ) return InvalidTexture;
         return textures[name].handle;
     }
 
@@ -86,9 +100,9 @@ namespace LaurelEye::Graphics {
     }
 
     void RenderResources::destroyDataBuffer(const std::string& name) {
-        DataBufferResource& buf = databuffers[name];
+        DataBufferResource& buf = dataBuffers[name];
         device.destroyDataBuffer(buf.handle);
-        databuffers.erase(name);
+        dataBuffers.erase(name);
     }
 
     void RenderResources::destroyTexture(const std::string& name) {
@@ -103,6 +117,10 @@ namespace LaurelEye::Graphics {
         FramebufferResource& fbo = framebuffers[name];
         device.destroyFramebuffer(fbo.handle);
         framebuffers.erase(name);
+    }
+
+    IRenderDevice& RenderResources::getRenderDevice() {
+        return device;
     }
 
 } // namespace LaurelEye::Graphics

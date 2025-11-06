@@ -47,6 +47,7 @@ namespace LaurelEye::Graphics {
     class LGLFramebufferFactory {
     public:
         LGLFramebufferFactory(LGLTextureFactory* textureFactory);
+        ~LGLFramebufferFactory();
 
         /// \copydoc IRenderDevice::createFramebuffer
         [[nodiscard]] FramebufferHandle create(const FramebufferDesc& d);
@@ -54,17 +55,16 @@ namespace LaurelEye::Graphics {
         /// \copydoc IRenderDevice::destroyFramebuffer
         void destroy(FramebufferHandle h);
 
+        void destroyAll();
+
         /// \copydoc IRenderDevice::bindFramebufferBase
         void bindBase(FramebufferHandle h);
 
         uint32_t attachTexture(FramebufferHandle h, const FramebufferAttachmentDesc& d);
 
     private:
-        FramebufferAttachment createDepthAttachment(
-            GLuint framebufferID, const SizeRegistry& size, const FramebufferAttachmentDesc& d);
-
-        FramebufferAttachment createColorAttachment(
-            GLuint framebufferID, const SizeRegistry& size, const FramebufferAttachmentDesc& d);
+        [[nodiscard]] TextureHandle createColorAttachmentTexture(
+            GLuint framebufferID, const FramebufferAttachmentDesc& d);
 
         std::unordered_map<FramebufferHandle, LGLFramebufferRecord> createdBuffers;
         LGLTextureFactory* textureFactory;

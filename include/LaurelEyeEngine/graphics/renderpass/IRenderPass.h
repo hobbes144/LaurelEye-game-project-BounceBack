@@ -69,8 +69,10 @@ namespace LaurelEye::Graphics {
     protected:
         /// @brief Shader used by this render pass.
         std::shared_ptr<Shader> shader = nullptr;
+
         /// @brief Handle to the GPU data buffer containing pass-specific properties.
-        DataBufferHandle properties = InvalidDataBuffer;
+        DataBufferHandle propertiesHandle = DataBuffer::InvalidDataBuffer;
+        bool propertiesDirty = false;
 
         /// @brief Draws all renderable entities using the given shader.
         ///

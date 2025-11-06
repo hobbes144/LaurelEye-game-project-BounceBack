@@ -34,11 +34,15 @@ namespace LaurelEye::Graphics {
     /// operations and lifecycle.
     class LGLDataBufferFactory {
     public:
+        ~LGLDataBufferFactory();
+
         /// \copydoc IRenderDevice::createDataBuffer
         [[nodiscard]] DataBufferHandle createBuffer(const DataBufferDesc& d, const void* initialData = nullptr);
 
         /// \copydoc IRenderDevice::destroyDataBuffer
         void destroyBuffer(DataBufferHandle h);
+
+        void destroyAll();
 
         // For persistent buffer frames:
         // void allocRing(DataBufferHandle h, size_t size, size_t align, uint64_t* outOffset);

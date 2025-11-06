@@ -22,6 +22,7 @@ namespace LaurelEye {
 
         std::cout << "Created window" << std::endl;
 
+        std::cout << "\n\n\nHere\n\n\n";
         // === Initialize Systems ===
         TransformSystem transformSystem;
         transformSystem.initialize();
@@ -37,7 +38,7 @@ namespace LaurelEye {
         auto ground = std::make_unique<Entity>("Ground");
         auto groundT = ground->addComponent<TransformComponent>();
         Transform groundLocal;
-        groundLocal.setPosition(0.0f, -1.0f, 0.0f);
+        groundLocal.setPosition(0.0f, 0.0f, 0.0f);
         groundLocal.setScaling(50.0f, 1.0f, 50.0f);
         groundT->setLocalTransform(groundLocal);
         auto groundPB = ground->addComponent<Physics::PhysicsBodyComponent>(
@@ -50,7 +51,7 @@ namespace LaurelEye {
         LaurelEye::IO::AssetManager assetManager(context);
         assetManager.initialize();
 
-        const std::string importPath = "tests/LaurelEyeEngineUnitTests/TestMedia/textures/test.png";
+        const std::string importPath = "tests/LaurelEyeEngineUnitTests/TestMedia/variation-a.png";
         auto groundTextureAsset = assetManager.load(importPath);
 
         // retrieve the GPU handle (importer/register stores texture under the full path)
@@ -112,8 +113,8 @@ namespace LaurelEye {
         auto DLightData = Graphics::DirectionalLight{
             Vector3(0.75f, -1.0f, 0.75f).normalized(), // direction
             4.0f,                                      // intensity
-            Vector3(1.0f, 1.0f, 1.0f)                  // color (white)
-        };
+            Vector3(1.0f, 1.0f, 1.0f),                 // color (white)
+            1};
 
         auto DLight = std::make_unique<Entity>("DLight");
         auto DLightT = DLight->addComponent<TransformComponent>();
