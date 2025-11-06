@@ -22,6 +22,7 @@
 #include "LaurelEyeEngine/particles/ParticleSystem.h"
 #include "LaurelEyeEngine/io/AssetManager.h"
 #include "LaurelEyeEngine/graphics/resources/Texture.h"
+#include "LaurelEyeEngine/memory/MemoryManager.h"
 
 namespace LaurelEye {
 
@@ -68,7 +69,7 @@ namespace LaurelEye {
         // Also register any existing entities (for activation we want whole scene)
         for ( auto& e : entities ) {
             if ( !e->getRegistered() ) {
-                registerEntityComponents(e.get());
+                registerEntityComponents(e);
                 e->setRegistered(true);
             }
         }
@@ -81,7 +82,7 @@ namespace LaurelEye {
 
         for ( auto& e : entities ) {
             if ( e->getRegistered() ) {
-                deregisterEntityComponents(e.get());
+                deregisterEntityComponents(e);
                 e->setRegistered(false);
             }
         }
@@ -104,7 +105,9 @@ namespace LaurelEye {
             std::cerr << "Warning: Scene::shutdown called while still active. Force deactivating.\n";
             deregisterScene(); // attempt to make things safe
         }
-
+        for ( auto& e : entities ) {
+            ctx.getService<MemoryManager>()->deallocateMemory(e);
+        }
         entities.clear();
         pendingAdditions.clear();
         pendingRemovals.clear();
@@ -149,18 +152,17 @@ namespace LaurelEye {
         
     }
 
-    Entity* Scene::addEntity(std::unique_ptr<Entity> entityToAdd) {
+    Entity* Scene::addEntity(Entity* entityToAdd) {
         if ( entityToAdd ) {
-            Entity* entityToReturn = entityToAdd.get();
-            pendingAdditions.push_back(std::move(entityToAdd));
-            return entityToReturn;
+            pendingAdditions.push_back(entityToAdd);
+            return entityToAdd;
         }
         return nullptr;
     }
 
     Entity* Scene::addEntityFromRaw(Entity* entity) {
         if ( !entity ) return nullptr;
-        return addEntity(std::unique_ptr<Entity>(entity));
+        return addEntity(entity);
     }
 
     Entity* Scene::instantiate(const std::string& prefabPath) {
@@ -183,22 +185,22 @@ namespace LaurelEye {
     void Scene::removeEntity(const std::string& entityName) {
         auto it = std::find_if(
             entities.begin(), entities.end(),
-            [&entityName](const std::unique_ptr<Entity>& e) {
+            [&entityName](const Entity* e) {
                 return e->getName() == entityName;
             });
-        if ( it != entities.end() ) pendingRemovals.push_back(it->get());
+        if ( it != entities.end() ) pendingRemovals.push_back(*it);
     }
 
     Entity* Scene::findEntityByName(const std::string& name) const {
         for ( auto& e : entities ) {
-            if ( e->getName() == name ) return e.get();
+            if ( e->getName() == name ) return e;
         }
         return nullptr;
     }
 
     Entity* Scene::findEntityById(unsigned int id) const {
         for ( auto& e : entities ) {
-            if ( e->getId() == id ) return e.get();
+            if ( e->getId() == id ) return e;
         }
         return nullptr;
     }
@@ -206,14 +208,14 @@ namespace LaurelEye {
     std::vector<Entity*> Scene::findEntitiesWithTag(const std::string& tag) const {
         std::vector<Entity*> results;
         for ( auto& e : entities ) {
-            if ( e->compareTag(tag) ) results.push_back(e.get());
+            if ( e->compareTag(tag) ) results.push_back(e);
         }
         return results;
     }
     std::vector<Entity*> Scene::getEntityPointers() const {
         std::vector<Entity*> ptrs;
         ptrs.reserve(entities.size());
-        for ( auto& e : entities ) ptrs.push_back(e.get());
+        for ( auto& e : entities ) ptrs.push_back(e);
         return ptrs;
     }
 
@@ -230,7 +232,7 @@ namespace LaurelEye {
                 continue;
             }
             std::cout << "  + Adding entity: " << e->getName() << " (ID: " << e->getId() << ")" << std::endl;
-            newPtrs.push_back(e.get());
+            newPtrs.push_back(e);
             entities.push_back(std::move(e));
             count++;
         }
@@ -253,8 +255,8 @@ namespace LaurelEye {
             std::remove_if(
                 entities.begin(),
                 entities.end(),
-                [&](const std::unique_ptr<Entity>& e) {
-                    return std::find(pendingRemovals.begin(), pendingRemovals.end(), e.get()) != pendingRemovals.end();
+                [&](const Entity* e) {
+                    return std::find(pendingRemovals.begin(), pendingRemovals.end(), e) != pendingRemovals.end();
                 }),
             entities.end());
 

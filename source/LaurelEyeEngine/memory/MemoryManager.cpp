@@ -13,7 +13,7 @@ namespace LaurelEye {
         }
     }
 
-    Entity* MemoryManager::allocateMemory()
+    Entity* MemoryManager::allocateMemory(std::string name)
     {
         if (freeList.empty()) {
             reallocateMemory();
@@ -22,7 +22,7 @@ namespace LaurelEye {
         Entity* e = freeList.front();
         freeList.pop_front();
 
-        *e = Entity();
+        *e = Entity(name);
 
         return e;
     }

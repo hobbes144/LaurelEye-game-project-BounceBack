@@ -342,8 +342,8 @@ namespace LaurelEye {
         {
             auto player = std::make_unique<Entity>("Player");
             auto light = std::make_unique<Entity>("Light");
-            testScene->addEntity(std::move(player));
-            testScene->addEntity(std::move(light));
+            testScene->addEntity(player.get());
+            testScene->addEntity(light.get());
         }
 
         sceneManager->injectSceneForTest("TestScene", std::move(testScene));

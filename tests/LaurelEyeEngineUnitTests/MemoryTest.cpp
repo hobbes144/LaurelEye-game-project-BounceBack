@@ -12,19 +12,19 @@ namespace LaurelEye {
         assert(mem.getFreeSize() == 2);
 
         // Allocate one entity
-        LaurelEye::Entity* e1 = mem.allocateMemory();
+        LaurelEye::Entity* e1 = mem.allocateMemory("test");
         assert(e1 != nullptr);
         std::cout << "Allocated entity 1. Free=" << mem.getFreeSize() << std::endl;
         assert(mem.getFreeSize() == 1);
 
         // Allocate another entity
-        LaurelEye::Entity* e2 = mem.allocateMemory();
+        LaurelEye::Entity* e2 = mem.allocateMemory("test");
         assert(e2 != nullptr);
         std::cout << "Allocated entity 2. Free=" << mem.getFreeSize() << std::endl;
         assert(mem.getFreeSize() == 0);
 
         // Allocating one more should trigger pool growth
-        LaurelEye::Entity* e3 = mem.allocateMemory();
+        LaurelEye::Entity* e3 = mem.allocateMemory("test");
         assert(e3 != nullptr);
         std::cout << "Allocated entity 3 (after reallocation). Pool="
                   << mem.getPoolSize() << " Free=" << mem.getFreeSize() << std::endl;
@@ -37,7 +37,7 @@ namespace LaurelEye {
         assert(mem.getFreeSize() == 2);
 
         // Reuse freed slot
-        LaurelEye::Entity* e4 = mem.allocateMemory();
+        LaurelEye::Entity* e4 = mem.allocateMemory("test");
         assert(e4 != nullptr);
         std::cout << "Reallocated freed slot. Free=" << mem.getFreeSize() << std::endl;
 

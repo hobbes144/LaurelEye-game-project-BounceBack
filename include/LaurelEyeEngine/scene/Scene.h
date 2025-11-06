@@ -52,7 +52,7 @@ namespace LaurelEye {
         bool isPaused() const { return paused; }
 
         // --- Entity management (deferred) ---
-        Entity* addEntity(std::unique_ptr<Entity> entityToAdd);
+        Entity* addEntity(Entity* entityToAdd);
         /// @brief Allows for creating an entity as a raw pointer, then transferring ownership
         /// over to the scene
         /// @param entity The entity to be transferred
@@ -68,7 +68,7 @@ namespace LaurelEye {
         Entity* findEntityByName(const std::string& name) const;
         Entity* findEntityById(unsigned int id) const;
         std::vector<Entity*> findEntitiesWithTag(const std::string& tag) const; // Note - this is unoptimal for now - use with caution
-        const std::vector<std::unique_ptr<Entity>>& getEntities() const { return entities; }
+        const std::vector<Entity*>& getEntities() const { return entities; }
         std::vector<Entity*> getEntityPointers() const;
 
         bool resetOnLoad() const { return settings.resetOnLoad; }
@@ -86,8 +86,8 @@ namespace LaurelEye {
         EngineContext& ctx;
         std::string name;
 
-        std::vector<std::unique_ptr<Entity>> entities; // Flat list of entities for the scene
-        std::vector<std::unique_ptr<Entity>> pendingAdditions;
+        std::vector<Entity*> entities; // Flat list of entities for the scene
+        std::vector<Entity*> pendingAdditions;
         std::vector<Entity*> pendingRemovals;
 
         bool active; // Whether or not the scene is active

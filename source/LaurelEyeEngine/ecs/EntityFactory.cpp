@@ -13,6 +13,7 @@
 #include "LaurelEyeEngine/scripting/ScriptComponent.h"
 #include "LaurelEyeEngine/io/AssetManager.h"
 #include "LaurelEyeEngine/graphics/RenderSystem.h"
+#include "LaurelEyeEngine/memory/MemoryManager.h"
 #include <iostream>
 
 namespace LaurelEye {
@@ -32,12 +33,16 @@ namespace LaurelEye {
         resolveParentChildTransforms(scene, entities, entityMap);
     }
 
-    std::unique_ptr<Entity> EntityFactory::createEntityFromJson(const rapidjson::Value& entityJson) {
+    Entity* EntityFactory::createEntityFromJson(const rapidjson::Value& entityJson) {
         if ( !entityJson.HasMember("name") || !entityJson["name"].IsString() )
             throw std::runtime_error("EntityFactory: Entity missing 'name' field");
 
         std::string name = entityJson["name"].GetString();
-        auto entity = std::make_unique<Entity>(name);
+        auto* memManager = context.getService<MemoryManager>();
+        if (!memManager) {
+            throw std::runtime_error("EntityFactory: MemoryManager service not found in context");
+        }
+        auto entity = memManager->allocateMemory(name);
 
         // Add components if present
         if ( entityJson.HasMember("components") && entityJson["components"].IsObject() ) {
@@ -102,9 +107,8 @@ namespace LaurelEye {
             std::cerr << "EntityFactory: Could not parse prefab for entity";
         }
         auto entity = createEntityFromJson(jsonAsset->jsonDocument);
-        Entity* tempEntity = entity.get();
-        scene.addEntity(std::move(entity));
-        return tempEntity;
+        scene.addEntity(entity);
+        return entity;
     }
 
 
@@ -113,9 +117,8 @@ namespace LaurelEye {
                                                     std::unordered_map<std::string, Entity*>& entityMap) {
         for ( const auto& entityData : entities ) {
             auto entity = createEntityFromJson(entityData);
-            Entity* rawPtr = entity.get();
-            entityMap[rawPtr->getName()] = rawPtr;
-            scene.addEntity(std::move(entity));
+            entityMap[entity->getName()] = entity;
+            scene.addEntity(entity);
         }
     }
 

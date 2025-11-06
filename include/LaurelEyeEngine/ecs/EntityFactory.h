@@ -26,7 +26,7 @@ namespace LaurelEye{
         void populateSceneFromJson(Scene& scene, const rapidjson::Document& jsonDoc);
 
         ///@brief Deserialize one entity definition into a live entity
-        std::unique_ptr<Entity> createEntityFromJson(const rapidjson::Value& entityData);
+        Entity* createEntityFromJson(const rapidjson::Value& entityData);
 
         ///@brief Deserializes all components for a given entity, adding them to the entity
         void addComponentsFromJson(Entity& entity, const rapidjson::Value& componentsJson);

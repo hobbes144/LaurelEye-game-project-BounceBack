@@ -22,7 +22,7 @@ namespace LaurelEye {
 
         void initialize() {}
 
-        Entity* allocateMemory();
+        Entity* allocateMemory(std::string name);
         void deallocateMemory(Entity* entity);
 
         void shutdown();
