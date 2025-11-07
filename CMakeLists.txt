@@ -32,6 +32,12 @@ set(
     ${PROJECT_SOURCE_DIR}/build/output/${CMAKE_SYSTEM_NAME}_${CMAKE_SYSTEM_PROCESSOR}
 )
 
+set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_CLEAN_FILES
+  "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+  "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}"
+  "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}"
+)
+
 # Include sub-projects.
 add_subdirectory("source/LaurelEyeEngine")
 add_subdirectory("tests/LaurelEyeEngineUnitTests")
