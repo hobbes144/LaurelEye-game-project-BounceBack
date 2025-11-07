@@ -14,6 +14,7 @@
 #include "LaurelEyeEngine/particles/ParticleEmitterComponent.h"
 #include "LaurelEyeEngine/physics/PhysicsBodyComponent.h"
 #include "LaurelEyeEngine/scripting/ScriptComponent.h"
+#include "LaurelEyeEngine/audio/SpeakerComponent.h"
 
 #include "LaurelEyeEngine/transform/TransformSystem.h"
 #include "LaurelEyeEngine/physics/PhysicsSystem.h"
@@ -23,6 +24,7 @@
 #include "LaurelEyeEngine/io/AssetManager.h"
 #include "LaurelEyeEngine/graphics/resources/Texture.h"
 #include "LaurelEyeEngine/memory/MemoryManager.h"
+#include "LaurelEyeEngine/audio/FModAudioManager.h"
 
 namespace LaurelEye {
 
@@ -318,6 +320,9 @@ namespace LaurelEye {
                     particleSystem->registerComponent(emitterComp);
                 }
             }
+            else if ( auto* speakerComp = dynamic_cast<Audio::SpeakerComponent*>( comp.get() ) ) {
+                speakerComp->playSound(speakerComp->getAudioName());
+            }
             // add more as needed...
         }
     }
@@ -375,6 +380,9 @@ namespace LaurelEye {
                 if ( particleSystem ) {
                     particleSystem->deregisterComponent(emitterComp);
                 }
+            }
+            else if ( auto* speakerComp = dynamic_cast<Audio::SpeakerComponent*>(comp.get()) ) {
+                speakerComp->stopSound(speakerComp->getAudioName());
             }
             // add more as needed...
         }

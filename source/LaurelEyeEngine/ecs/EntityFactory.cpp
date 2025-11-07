@@ -12,6 +12,8 @@
 #include "LaurelEyeEngine/physics/interfaces/PhysicsTypes.h"
 #include "LaurelEyeEngine/scripting/ScriptComponent.h"
 #include "LaurelEyeEngine/io/AssetManager.h"
+#include "LaurelEyeEngine/audio/FModAudioManager.h"
+#include "LaurelEyeEngine/audio/SpeakerComponent.h"
 #include "LaurelEyeEngine/graphics/RenderSystem.h"
 #include "LaurelEyeEngine/memory/MemoryManager.h"
 #include <iostream>
@@ -88,6 +90,9 @@ namespace LaurelEye {
             }
             else if ( compName == "ParticleEmitter" ) {
                 setupParticleEmitterComponent(entity, compData);
+            }
+            else if ( compName == "Speaker" ) {
+                setupSpeakerComponent(entity, compData);
             }
             else if ( compName == "DebugDraw" ) {
                 setupDebugDrawComponent(entity, compData);
@@ -474,6 +479,41 @@ namespace LaurelEye {
 
     }
 
+    void EntityFactory::setupSpeakerComponent(Entity& entity, const rapidjson::Value& speakerData) {
+        auto am = context.getService<Audio::FModAudioManager>();
+        std::string audioName = "";
+        std::string audioPath = "";
+        float volume = 0.0f;
+        bool is3D = false;
+        bool isLooping = false;
+
+        if ( speakerData.HasMember("audioName") && speakerData["audioName"].IsString() ) {
+            audioName = speakerData["audioName"].GetString();
+        }
+        if ( speakerData.HasMember("audioPath") && speakerData["audioPath"].IsString() ) {
+            audioPath = speakerData["audioPath"].GetString();
+        }
+        else {
+            std::cerr << "Audio path invalid for entity: " << entity.getName() << std::endl;
+            return;
+        }
+        if ( speakerData.HasMember("volume") && speakerData["volume"].IsFloat() ) {
+            volume = speakerData["volume"].GetFloat();
+        }
+        if ( speakerData.HasMember("3D") && speakerData["3D"].IsBool() ) {
+            is3D = speakerData["3D"].GetBool();
+        }
+        if ( speakerData.HasMember("loop") && speakerData["loop"].IsBool() ) {
+            isLooping = speakerData["loop"].GetBool();
+        }
+        am->loadSound(audioName, assetPath + audioPath, is3D, isLooping);
+        Audio::SpeakerComponent* sp = entity.addComponent<Audio::SpeakerComponent>();
+        sp->setVolume(volume);
+        sp->setAudioManager(am);
+        sp->setAudioName(audioName);
+        assert(sp != nullptr);
+    }
+    
     void EntityFactory::setupDebugDrawComponent(Entity& entity, const rapidjson::Value& emitterData) {
 
     }

@@ -15,7 +15,10 @@ namespace LaurelEye {
         am->update();
         am->loadSound("music", std::string(TEST_MEDIA_DIR) + "/audio/testAudio.mp3", false, true);
         am->playSound("music", Vector3(0.0f, 0.0f, 0.0f), 0.15f);
-        am->update();
+        for ( size_t i = 0; i < 20; i++ ) {
+            am->update();
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
     }
 
     void audioStopTest() {
@@ -133,7 +136,7 @@ namespace LaurelEye {
 
         float angle = 0.0f;
 
-        for ( int i = 0; i < 5; i++ ) {
+        for ( int i = 0; i < 10; i++ ) {
             sp->playSound("slide2");
             // Increase angle over time
             angle += 1 * 0.016f; // assuming ~60 FPS (dt ≈ 16ms)

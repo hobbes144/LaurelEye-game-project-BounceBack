@@ -11,6 +11,9 @@
  *****************************************************************************/
 
 #include "LaurelEyeEngine/audio/FModAudioManager.h"
+#include "LaurelEyeEngine/io/FileSystem.h"
+
+//#define NDEBUG
 
 namespace LaurelEye::Audio {
     /*!****************************************************************************
@@ -77,6 +80,7 @@ namespace LaurelEye::Audio {
         // Initialize the system with a given number of channels
         result = fmodSystem_->init(maxChannels, FMOD_INIT_NORMAL, nullptr);
         assert(result == FMOD_OK && "FMOD system init failed");
+        fmodSystem_->setStreamBufferSize(1024 * 1024, FMOD_TIMEUNIT_RAWBYTES);
 
         // Example: Set 3D settings if you want realistic attenuation over distance
         fmodSystem_->set3DSettings(
@@ -84,8 +88,9 @@ namespace LaurelEye::Audio {
             1.0f, // Distance factor (1.0 = 1 meter)
             1.0f  // Rolloff scale
         );
-
+#if !defined(NDEBUG)
         std::cerr << "[AudioManager] FMOD initialized with " << maxChannels << " channels.\n";
+#endif
     }
 
     /*!****************************************************************************
@@ -106,6 +111,24 @@ namespace LaurelEye::Audio {
     void FModAudioManager::update() {
         if ( fmodSystem_ ) {
             fmodSystem_->update();
+            for ( const auto& pair : sounds_ ) {
+                sounds_[pair.first]->Update();
+            }
+            if ( awatingSounds.empty() == false ) {
+                for ( int i = 0; i < awatingSounds.size(); ++i ) {
+                    AudioAsset* sound = awatingSounds[i];
+                    if ( sound->IsReady() ) {
+                        sound->Play(fmodSystem_);
+                        awatingSounds.erase(awatingSounds.begin() + i);
+                        --i;
+                    }
+                    else {
+#if !defined(NDEBUG)
+                        std::cout << "[AudioManager] Sound in the awating queue is not ready to play yet.\n";
+#endif
+                    }
+                }
+            }
         }
     }
 
@@ -130,27 +153,16 @@ namespace LaurelEye::Audio {
      *****************************************************************************/
     void FModAudioManager::loadSound(const std::string& name, const std::string& path, bool is3D, bool loop) {
         assert(fmodSystem_ && "FMOD system not initialized");
+        auto fullPath = IO::resolve(path);
 
-        FMOD_MODE mode;
-        // Choose either 2D or 3D mode
-        if ( is3D ) {
-            mode = FMOD_3D;
-        }
-        else {
-            mode = FMOD_2D;
-        }
-
-        if ( loop ) {
-            mode |= FMOD_LOOP_NORMAL;
-        }
-
-        FMOD::Sound* newSound = nullptr;
-        FMOD_RESULT result = fmodSystem_->createSound(path.c_str(), mode, nullptr, &newSound);
-        assert(result == FMOD_OK && newSound && "Failed to load sound");
+        AudioAsset* newAsset = new AudioAsset(fullPath.string(), is3D, loop);
+        newAsset->LoadAsnyc(fmodSystem_);
 
         // Store the sound in the map
-        sounds_[name] = newSound;
+        sounds_[name] = newAsset;
+#if !defined(NDEBUG)
         std::cout << "[AudioManager] Loaded sound \"" << name << "\" from " << path << "\n";
+#endif
     }
 
     /*!****************************************************************************
@@ -176,55 +188,26 @@ namespace LaurelEye::Audio {
         // Retrieve the sound pointer from our stored sounds.
         auto it = sounds_.find(name);
         assert(it != sounds_.end() && "Sound not found");
-        FMOD::Sound* sound = it->second;
+        AudioAsset* sound = it->second;
         assert(fmodSystem_ && sound && "Cannot play sound: system or sound invalid");
 
-        // Obtain the master channel group so we can iterate over active channels.
-        FMOD::ChannelGroup* masterGroup = nullptr;
-        FMOD_RESULT result = fmodSystem_->getMasterChannelGroup(&masterGroup);
-        assert(result == FMOD_OK && masterGroup && "Failed to get master channel group");
-
-        int numChannels = 0;
-        result = masterGroup->getNumChannels(&numChannels);
-        assert(result == FMOD_OK && "Failed to get number of channels");
-
-        // Iterate over each active channel in the master group.
-        for ( int i = 0; i < numChannels; ++i ) {
-            FMOD::Channel* channel = nullptr;
-            result = masterGroup->getChannel(i, &channel);
-            assert(result == FMOD_OK && "Failed to get channel");
-            if ( channel ) {
-                FMOD::Sound* currentSound = nullptr;
-                // Retrieve the sound currently playing on this channel.
-                channel->getCurrentSound(&currentSound);
-                // Check if the channel is playing the same sound
-                if ( currentSound == sound ) {
-                    bool isPlaying = false;
-                    channel->isPlaying(&isPlaying);
-                    // if the same sound is still playing, do not start a new instance.
-                    if ( isPlaying ) {
-                        return;
-                    }
-                }
+        if ( sound->IsPlaying() ) {
+            return;
+        }
+        else {
+            if ( sound->IsReady() ) {
+                sound->SetVolume(volume);
+                sound->SetPosition(position);
+                sound->Play(fmodSystem_);
             }
-        }
-
-        // If no active channel is playing the sound, play the sound.
-        FMOD::Channel* channel = nullptr;
-        result = fmodSystem_->playSound(sound, nullptr, false, &channel);
-        assert(result == FMOD_OK && "Failed to play sound");
-
-        // If this is a 3D sound, set its position and attenuation attributes.
-        FMOD_MODE currentMode;
-        sound->getMode(&currentMode);
-        if ( (currentMode & FMOD_3D) == FMOD_3D && channel ) {
-            FMOD_VECTOR pos = {position.x, position.y, position.z};
-            FMOD_VECTOR vel = {0.0f, 0.0f, 0.0f};
-            channel->set3DAttributes(&pos, &vel);
-            channel->set3DMinMaxDistance(1.0f, 50.0f);
-        }
-        if ( channel ) {
-            channel->setVolume(volume);
+            else {
+                sound->SetPosition(position);
+                sound->SetVolume(volume);
+                awatingSounds.push_back(sound);
+#if !defined(NDEBUG)
+                std::cout << "[AudioManager] Sound \"" << name << "\" is not ready to play yet.\n";
+#endif
+            }
         }
     }
 
@@ -247,30 +230,12 @@ namespace LaurelEye::Audio {
     void FModAudioManager::stopSound(const std::string& name) {
         auto it = sounds_.find(name);
         assert(it != sounds_.end() && "Sound not found");
-        FMOD::Sound* targetSound = it->second;
+        AudioAsset* targetSound = it->second;
+        targetSound->Stop();
 
-        // Get the master channel group.
-        FMOD::ChannelGroup* masterGroup = nullptr;
-        FMOD_RESULT result = fmodSystem_->getMasterChannelGroup(&masterGroup);
-        assert(result == FMOD_OK && masterGroup && "Failed to get master channel group");
-
-        int numChannels = 0;
-        result = masterGroup->getNumChannels(&numChannels);
-        assert(result == FMOD_OK && "Failed to get number of channels");
-
-        for ( int i = 0; i < numChannels; ++i ) {
-            FMOD::Channel* channel = nullptr;
-            result = masterGroup->getChannel(i, &channel);
-            if ( result == FMOD_OK && channel ) {
-                FMOD::Sound* playingSound = nullptr;
-                channel->getCurrentSound(&playingSound);
-                if ( playingSound == targetSound ) {
-                    channel->stop();
-                }
-            }
-        }
-
+#if !defined(NDEBUG)
         std::cout << "[AudioManager] Stopped all instances of sound \"" << name << "\".\n";
+#endif
     }
 
     /*!****************************************************************************
@@ -319,23 +284,13 @@ namespace LaurelEye::Audio {
         assert(speed > 0.0f && "Playback speed must be a positive value");
         currentPlaybackSpeed_ = speed;
 
-        FMOD::ChannelGroup* masterGroup = nullptr;
-        FMOD_RESULT result = fmodSystem_->getMasterChannelGroup(&masterGroup);
-        assert(result == FMOD_OK && masterGroup && "Failed to get master channel group");
-
-        int numChannels = 0;
-        result = masterGroup->getNumChannels(&numChannels);
-        assert(result == FMOD_OK && "Failed to get number of channels");
-
-        // Iterate over all active channels and set their pitch.
-        for ( int i = 0; i < numChannels; ++i ) {
-            FMOD::Channel* channel = nullptr;
-            result = masterGroup->getChannel(i, &channel);
-            if ( result == FMOD_OK && channel ) {
-                result = channel->setPitch(currentPlaybackSpeed_);
-            }
+        for ( const auto& pair : sounds_ ) {
+            sounds_[pair.first]->SetVolume(currentPlaybackSpeed_);
         }
+
+#if !defined(NDEBUG)
         std::cout << "[AudioManager] Playback speed set to " << speed << "x.\n";
+#endif
     }
 
     /*!****************************************************************************
@@ -365,47 +320,17 @@ namespace LaurelEye::Audio {
     void FModAudioManager::setVolume(const std::string& name, float volume) {
         auto it = sounds_.find(name);
         assert(it != sounds_.end() && "Sound not found");
-        FMOD::Sound* targetSound = it->second;
+        AudioAsset* targetSound = it->second;
+        targetSound->SetVolume(volume);
 
-        FMOD::ChannelGroup* masterGroup = nullptr;
-        FMOD_RESULT result = fmodSystem_->getMasterChannelGroup(&masterGroup);
-        assert(result == FMOD_OK && masterGroup && "Failed to get master channel group");
-
-        int numChannels = 0;
-        result = masterGroup->getNumChannels(&numChannels);
-        assert(result == FMOD_OK && "Failed to get number of channels");
-
-        for ( int i = 0; i < numChannels; ++i ) {
-            FMOD::Channel* channel = nullptr;
-            result = masterGroup->getChannel(i, &channel);
-            if ( result == FMOD_OK && channel ) {
-                FMOD::Sound* playingSound = nullptr;
-                channel->getCurrentSound(&playingSound);
-                if ( playingSound == targetSound ) {
-                    result = channel->setVolume(volume);
-                    assert(result == FMOD_OK && "Failed to set volume on channel");
-                }
-            }
-        }
+#if !defined(NDEBUG)
         std::cout << "[AudioManager] Volume for sound \"" << name << "\" set to " << volume << ".\n";
+#endif
     }
 
     void FModAudioManager::setMasterVolume(float volume) {
-        FMOD::ChannelGroup* masterGroup = nullptr;
-        FMOD_RESULT result = fmodSystem_->getMasterChannelGroup(&masterGroup);
-        assert(result == FMOD_OK && masterGroup && "Failed to get master channel group");
-
-        int numChannels = 0;
-        result = masterGroup->getNumChannels(&numChannels);
-        assert(result == FMOD_OK && "Failed to get number of channels");
-
-        for ( int i = 0; i < numChannels; ++i ) {
-            FMOD::Channel* channel = nullptr;
-            result = masterGroup->getChannel(i, &channel);
-            if ( result == FMOD_OK && channel ) {
-                result = channel->setVolume(volume);
-                assert(result == FMOD_OK && "Failed to set volume on channel");
-            }
+        for ( const auto& pair : sounds_ ) {
+            sounds_[pair.first]->SetVolume(volume);
         }
     }
 
@@ -414,54 +339,44 @@ namespace LaurelEye::Audio {
         return;
     }
 
-    // to be implemented later if needed
     void FModAudioManager::pauseSound(const std::string& name) {
+        auto it = sounds_.find(name);
+        assert(it != sounds_.end() && "Sound not found");
+        AudioAsset* targetSound = it->second;
+        targetSound->Pause();
+#if !defined(NDEBUG)
+        std::cout << "[AudioManager] Paused sound \"" << name << "\" .\n";
+#endif
         return;
     }
 
-    // to be implemented later if needed
     void FModAudioManager::resumeSound(const std::string& name) {
+        auto it = sounds_.find(name);
+        assert(it != sounds_.end() && "Sound not found");
+        AudioAsset* targetSound = it->second;
+        targetSound->Resume();
+#if !defined(NDEBUG)
+        std::cout << "[AudioManager] Resumed sound \"" << name << "\" .\n";
+#endif
         return;
     }
 
     void FModAudioManager::pauseAllSound() {
-        FMOD::ChannelGroup* masterGroup = nullptr;
-        FMOD_RESULT result = fmodSystem_->getMasterChannelGroup(&masterGroup);
-        assert(result == FMOD_OK && masterGroup && "Failed to get master channel group");
-
-        int numChannels = 0;
-        result = masterGroup->getNumChannels(&numChannels);
-        assert(result == FMOD_OK && "Failed to get number of channels");
-
-        for ( int i = 0; i < numChannels; ++i ) {
-            FMOD::Channel* channel = nullptr;
-            result = masterGroup->getChannel(i, &channel);
-            if ( result == FMOD_OK && channel ) {
-                result = channel->setPaused(true);
-                assert(result == FMOD_OK && "Failed to pause sound");
-            }
+        for ( const auto& pair : sounds_ ) {
+            sounds_[pair.first]->Pause();
         }
+#if !defined(NDEBUG)
         std::cout << "[AudioManager] All sound paused.\n";
+#endif
     }
 
     void FModAudioManager::resumeAllSound() {
-        FMOD::ChannelGroup* masterGroup = nullptr;
-        FMOD_RESULT result = fmodSystem_->getMasterChannelGroup(&masterGroup);
-        assert(result == FMOD_OK && masterGroup && "Failed to get master channel group");
-
-        int numChannels = 0;
-        result = masterGroup->getNumChannels(&numChannels);
-        assert(result == FMOD_OK && "Failed to get number of channels");
-
-        for ( int i = 0; i < numChannels; ++i ) {
-            FMOD::Channel* channel = nullptr;
-            result = masterGroup->getChannel(i, &channel);
-            if ( result == FMOD_OK && channel ) {
-                result = channel->setPaused(false);
-                assert(result == FMOD_OK && "Failed to resume sound");
-            }
+        for ( const auto& pair : sounds_ ) {
+            sounds_[pair.first]->Resume();
         }
+#if !defined(NDEBUG)
         std::cout << "[AudioManager] All sound resumed.\n";
+#endif
     }
 
     /*!****************************************************************************
@@ -481,12 +396,6 @@ namespace LaurelEye::Audio {
      *****************************************************************************/
     void FModAudioManager::shutdown() {
         // Release all loaded sounds
-        for ( auto& pair : sounds_ ) {
-            if ( pair.second ) {
-                pair.second->release();
-                pair.second = nullptr;
-            }
-        }
         sounds_.clear();
 
         // Close and release the FMOD system
@@ -495,7 +404,8 @@ namespace LaurelEye::Audio {
             fmodSystem_->release();
             fmodSystem_ = nullptr;
         }
-
+#if !defined(NDEBUG)
         std::cout << "[AudioManager] FMOD system shut down.\n";
+#endif
     }
 } // namespace LaurelEye::Audio

@@ -1,4 +1,5 @@
-﻿#include "LaurelEyeEngine/core/ResourceCoordinator.h"
+﻿#include "LaurelEyeEngine/audio/FModAudioManager.h"
+#include "LaurelEyeEngine/core/ResourceCoordinator.h"
 #include "LaurelEyeEngine/platforms/glfw/GlfwPlatform.h"
 
 namespace LaurelEye {
@@ -18,6 +19,7 @@ namespace LaurelEye {
         assetManager = std::make_unique<IO::AssetManager>(ctx);
         sceneManager = std::make_unique<SceneManager>(ctx, engineConfig);
         eventManager = std::make_unique<EventManager>();
+        audioManager = std::make_unique<Audio::FModAudioManager>();
 
         ctx.registerService<InputManager>(inputManager.get());
         ctx.registerService<WindowManager>(windowManager.get());
@@ -25,6 +27,7 @@ namespace LaurelEye {
         ctx.registerService<IO::AssetManager>(assetManager.get());
         ctx.registerService<EventManager>(eventManager.get());
         ctx.registerService<SceneManager>(sceneManager.get());
+        ctx.registerService<Audio::FModAudioManager>(audioManager.get());
     }
 
     void ResourceCoordinator::initialize() {

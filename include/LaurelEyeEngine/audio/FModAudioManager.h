@@ -14,10 +14,11 @@
 #ifndef FMODAUDIOMANAGER_H
 #define FMODAUDIOMANAGER_H
 
-#include <fmod.hpp>
+#include "LaurelEyeEngine/audio/AudioAsset.h"
 #include "LaurelEyeEngine/audio/interfaces/IAudioManager.h"
-
+#include <fmod.hpp>
 #include <unordered_map>
+#include <vector>
 
 namespace LaurelEye::Audio {
     /*!****************************************************************************
@@ -110,10 +111,12 @@ namespace LaurelEye::Audio {
 
     private:
         FMOD::System* fmodSystem_ = nullptr;
-        std::unordered_map<std::string, FMOD::Sound*> sounds_;
+        std::unordered_map<std::string, AudioAsset*> sounds_;
 
         float currentPlaybackSpeed_ = 1.0f;
         Vector3 listenerPosition = Vector3();
+
+        std::vector<AudioAsset*> awatingSounds;
     };
 
 #endif // AUDIO_H

@@ -103,6 +103,13 @@
                 },
                 "Script": {
                     "path": "scripts/scene_manager.lua"
+                },
+                "Speaker": {
+                    "audioName": "music",
+                    "audioPath": "audio/testAudio.mp3",
+                    "volume": 0.15,
+                    "loop": true,
+                    "3D": true
                 }
             }
         },

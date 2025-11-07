@@ -9,11 +9,11 @@
 ///
 /// Copyright © 2025 DIGIPEN Institute of Technology. All rights reserved.
 #pragma once
-#include <string>
-#include <memory>
-#include <rapidjson/document.h>
 #include "LaurelEyeEngine/core/EngineContext.h"
 #include "LaurelEyeEngine/ecs/Entity.h"
+#include <memory>
+#include <rapidjson/document.h>
+#include <string>
 
 namespace LaurelEye{
     class Scene;
@@ -57,6 +57,7 @@ namespace LaurelEye{
         void setupPhysicsComponent(Entity& entity, const rapidjson::Value& physicsData);
         void setupScriptComponent(Entity& entity, const rapidjson::Value& scriptData);
         void setupParticleEmitterComponent(Entity& entity, const rapidjson::Value& emitterData);
+        void setupSpeakerComponent(Entity& entity, const rapidjson::Value& speakerData);
         void setupDebugDrawComponent(Entity& entity, const rapidjson::Value& emitterData);
 
     };

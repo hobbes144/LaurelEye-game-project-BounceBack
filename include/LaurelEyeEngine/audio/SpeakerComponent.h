@@ -16,9 +16,12 @@ namespace LaurelEye::Audio {
 
         void setAudioManager(IAudioManager* manager);
 
+        void setAudioName(std::string newAudioName) { audioName = newAudioName; }
+        const std::string& const getAudioName() { return audioName; }
     private:
         float volume;
         bool isPlaying;
+        std::string audioName;
 
         IAudioManager* audioManager; // Pointer to the AudioManager instance
     };
