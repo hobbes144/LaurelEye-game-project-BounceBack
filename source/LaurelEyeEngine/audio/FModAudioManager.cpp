@@ -151,17 +151,40 @@ namespace LaurelEye::Audio {
      * \param loop If true, the sound will loop over and over again.
      * \return void
      *****************************************************************************/
-    void FModAudioManager::loadSound(const std::string& name, const std::string& path, bool is3D, bool loop) {
+    void FModAudioManager::createSound(const std::string& name, const std::string& path, float volume, bool is3D, bool loop) {
         assert(fmodSystem_ && "FMOD system not initialized");
         auto fullPath = IO::resolve(path);
 
-        AudioAsset* newAsset = new AudioAsset(fullPath.string(), is3D, loop);
-        newAsset->LoadAsnyc(fmodSystem_);
+        AudioAsset* newAsset = new AudioAsset(fullPath.string(), volume, is3D, loop);
 
         // Store the sound in the map
         sounds_[name] = newAsset;
 #if !defined(NDEBUG)
-        std::cout << "[AudioManager] Loaded sound \"" << name << "\" from " << path << "\n";
+        std::cout << "[AudioManager] Created sound \"" << name << "\" from " << path << "\n";
+#endif
+    }
+
+    void FModAudioManager::loadSound(const std::string& name) {
+        auto it = sounds_.find(name);
+        assert(it != sounds_.end() && "Sound not found");
+        AudioAsset* sound = it->second;
+        assert(fmodSystem_ && sound && "Cannot play sound: system or sound invalid");
+
+        sound->LoadAsnyc(fmodSystem_);
+#if !defined(NDEBUG)
+        std::cout << "[AudioManager] Loaded sound \"" << name << "\n";
+#endif
+    }
+
+    void FModAudioManager::loadSoundImmidiate(const std::string& name) {
+        auto it = sounds_.find(name);
+        assert(it != sounds_.end() && "Sound not found");
+        AudioAsset* sound = it->second;
+        assert(fmodSystem_ && sound && "Cannot play sound: system or sound invalid");
+
+        sound->Load(fmodSystem_);
+#if !defined(NDEBUG)
+        std::cout << "[AudioManager] Loaded sound \"" << name << "\n";
 #endif
     }
 
@@ -184,7 +207,7 @@ namespace LaurelEye::Audio {
      * \param z The z-coordinate of the sound's position in 3D space.
      * \return void
      *****************************************************************************/
-    void FModAudioManager::playSound(const std::string& name, const Vector3& position, float volume) {
+    void FModAudioManager::playSound(const std::string& name) {
         // Retrieve the sound pointer from our stored sounds.
         auto it = sounds_.find(name);
         assert(it != sounds_.end() && "Sound not found");
@@ -196,13 +219,9 @@ namespace LaurelEye::Audio {
         }
         else {
             if ( sound->IsReady() ) {
-                sound->SetVolume(volume);
-                sound->SetPosition(position);
                 sound->Play(fmodSystem_);
             }
             else {
-                sound->SetPosition(position);
-                sound->SetVolume(volume);
                 awatingSounds.push_back(sound);
 #if !defined(NDEBUG)
                 std::cout << "[AudioManager] Sound \"" << name << "\" is not ready to play yet.\n";
@@ -256,15 +275,27 @@ namespace LaurelEye::Audio {
      * \return void
      *****************************************************************************/
     void FModAudioManager::setListenerPosition(const Vector3& position) {
-        assert(fmodSystem_ && "FMOD system not initialized in setListenerPosition");
+        assert(fmodSystem_ && "FMOD system not initialized");
 
         listenerPosition = position;
         // The orientation vectors can be adjusted based on camera property
-        FMOD_VECTOR pos = {position.x, position.y, position.z};
-        FMOD_VECTOR vel = {0.0f, 0.0f, 0.0f};
+        FMOD_VECTOR pos = {listenerPosition.x, listenerPosition.y, listenerPosition.z};
+        FMOD_VECTOR vel = {listenerVelocity.x, listenerVelocity.y, listenerVelocity.z};
         FMOD_VECTOR forward = {0.0f, 0.0f, 1.0f};
         FMOD_VECTOR up = {0.0f, 1.0f, 0.0f};
 
+        // Set the listener at index 0
+        fmodSystem_->set3DListenerAttributes(0, &pos, &vel, &forward, &up);
+    }
+
+    void FModAudioManager::setListenerVelocity(const Vector3& velocity) {
+        assert(fmodSystem_ && "FMOD system not initialized");
+        listenerVelocity = velocity;
+        // The orientation vectors can be adjusted based on camera property
+        FMOD_VECTOR pos = {listenerPosition.x, listenerPosition.y, listenerPosition.z};
+        FMOD_VECTOR vel = {listenerVelocity.x, listenerVelocity.y, listenerVelocity.z};
+        FMOD_VECTOR forward = {0.0f, 0.0f, 1.0f};
+        FMOD_VECTOR up = {0.0f, 1.0f, 0.0f};
         // Set the listener at index 0
         fmodSystem_->set3DListenerAttributes(0, &pos, &vel, &forward, &up);
     }
@@ -334,9 +365,25 @@ namespace LaurelEye::Audio {
         }
     }
 
-    // to be implemented later if needed
-    void FModAudioManager::playMovingSound(const std::string& name, const Vector3& position, const Vector3& velocity, float volume) {
-        return;
+    void FModAudioManager::setSoundPosition(const std::string& name, const Vector3& position) {
+        auto it = sounds_.find(name);
+        assert(it != sounds_.end() && "Sound not found");
+        AudioAsset* targetSound = it->second;
+        targetSound->SetPosition(position);
+    }
+
+    void FModAudioManager::setSoundVelocity(const std::string& name, const Vector3& velocity) {
+        auto it = sounds_.find(name);
+        assert(it != sounds_.end() && "Sound not found");
+        AudioAsset* targetSound = it->second;
+        targetSound->SetVelocity(velocity);
+    }
+
+    float FModAudioManager::getVolume(const std::string& name) const {
+        auto it = sounds_.find(name);
+        assert(it != sounds_.end() && "Sound not found");
+        AudioAsset* targetSound = it->second;
+        return targetSound->GetVolume();
     }
 
     void FModAudioManager::pauseSound(const std::string& name) {

@@ -321,7 +321,10 @@ namespace LaurelEye {
                 }
             }
             else if ( auto* speakerComp = dynamic_cast<Audio::SpeakerComponent*>( comp.get() ) ) {
-                speakerComp->playSound(speakerComp->getAudioName());
+                speakerComp->loadAudioAsset();
+                if ( speakerComp->getPlayOnLoad() ) {
+                    speakerComp->playSound();
+                }
             }
             // add more as needed...
         }

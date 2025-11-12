@@ -1,21 +1,22 @@
-﻿#include "LaurelEyeEngine/ecs/EntityFactory.h"
+﻿#include "LaurelEyeEngine/audio/AudioSystem.h"
+#include "LaurelEyeEngine/audio/FModAudioManager.h"
+#include "LaurelEyeEngine/audio/SpeakerComponent.h"
 #include "LaurelEyeEngine/core/EngineContext.h"
-#include "LaurelEyeEngine/scene/Scene.h"
-#include "LaurelEyeEngine/transform/TransformComponent.h"
-#include "LaurelEyeEngine/graphics/graphics_components/Renderable3DComponent.h"
+#include "LaurelEyeEngine/ecs/EntityFactory.h"
+#include "LaurelEyeEngine/graphics/graphics_components/AmbientLightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/CameraComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/DirectionalLightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/PointLightComponent.h"
-#include "LaurelEyeEngine/graphics/graphics_components/AmbientLightComponent.h"
-#include "LaurelEyeEngine/particles/ParticleEmitterComponent.h"
-#include "LaurelEyeEngine/physics/PhysicsBodyComponent.h"
-#include "LaurelEyeEngine/physics/interfaces/PhysicsTypes.h"
-#include "LaurelEyeEngine/scripting/ScriptComponent.h"
-#include "LaurelEyeEngine/io/AssetManager.h"
-#include "LaurelEyeEngine/audio/FModAudioManager.h"
-#include "LaurelEyeEngine/audio/SpeakerComponent.h"
+#include "LaurelEyeEngine/graphics/graphics_components/Renderable3DComponent.h"
 #include "LaurelEyeEngine/graphics/RenderSystem.h"
+#include "LaurelEyeEngine/io/AssetManager.h"
 #include "LaurelEyeEngine/memory/MemoryManager.h"
+#include "LaurelEyeEngine/particles/ParticleEmitterComponent.h"
+#include "LaurelEyeEngine/physics/interfaces/PhysicsTypes.h"
+#include "LaurelEyeEngine/physics/PhysicsBodyComponent.h"
+#include "LaurelEyeEngine/scene/Scene.h"
+#include "LaurelEyeEngine/scripting/ScriptComponent.h"
+#include "LaurelEyeEngine/transform/TransformComponent.h"
 #include <iostream>
 
 namespace LaurelEye {
@@ -480,12 +481,13 @@ namespace LaurelEye {
     }
 
     void EntityFactory::setupSpeakerComponent(Entity& entity, const rapidjson::Value& speakerData) {
-        auto am = context.getService<Audio::FModAudioManager>();
+        auto audioSystem = context.getService<Audio::AudioSystem>();
         std::string audioName = "";
         std::string audioPath = "";
         float volume = 0.0f;
         bool is3D = false;
         bool isLooping = false;
+        bool playOnLoad = false;
 
         if ( speakerData.HasMember("audioName") && speakerData["audioName"].IsString() ) {
             audioName = speakerData["audioName"].GetString();
@@ -506,11 +508,19 @@ namespace LaurelEye {
         if ( speakerData.HasMember("loop") && speakerData["loop"].IsBool() ) {
             isLooping = speakerData["loop"].GetBool();
         }
-        am->loadSound(audioName, assetPath + audioPath, is3D, isLooping);
+        if (speakerData.HasMember("playOnLoad") && speakerData["playOnLoad"].IsBool() ) {
+            playOnLoad = speakerData["playOnLoad"].GetBool();
+        }
+        auto am = audioSystem->getAudioManager();
         Audio::SpeakerComponent* sp = entity.addComponent<Audio::SpeakerComponent>();
-        sp->setVolume(volume);
         sp->setAudioManager(am);
         sp->setAudioName(audioName);
+        sp->setPlayOnLoad(playOnLoad);
+        audioSystem->registerComponent(sp);
+
+        sp->createAudioAsset(assetPath + audioPath, volume, is3D, isLooping);
+        sp->loadAudioAsset();
+
         assert(sp != nullptr);
     }
     

@@ -3,7 +3,7 @@
 /// @par    **DigiPen Email**
 ///     daoming.wang@digipen.edu
 /// @date    10-08-2025
-/// @brief
+/// @brief Implementation of Audio asset class for loading and managing audio files.
 
 #include "LaurelEyeEngine/audio/AudioAsset.h"
 
@@ -11,11 +11,11 @@
 
 namespace LaurelEye::Audio {
     AudioAsset::AudioAsset()
-        : path(""), is3D(false), loop(false), sound(nullptr), state(AudioState::Unloaded), isPlaying(false) {
+        : path(""), is3D(false), loop(false), volume(1.0f), sound(nullptr), state(AudioState::Unloaded), isPlaying(false) {
     }
 
-    AudioAsset::AudioAsset(const std::string& _path, bool _is3D, bool _loop)
-        : path(_path), is3D(_is3D), loop(false), sound(nullptr), state(AudioState::Unloaded), isPlaying(false) {
+    AudioAsset::AudioAsset(const std::string& _path, float _volume = 1.0f, bool _is3D = false, bool _loop = false)
+        : path(_path), is3D(_is3D), loop(_loop), volume(_volume), sound(nullptr), state(AudioState::Unloaded), isPlaying(false) {
     }
 
     AudioAsset::~AudioAsset() {
@@ -23,14 +23,6 @@ namespace LaurelEye::Audio {
             sound->release();
             sound = nullptr;
         }
-    }
-
-    void AudioAsset::Initialize(const std::string& _path, bool _is3D, bool _loop) {
-        path = _path;
-        is3D = _is3D;
-        loop = _loop;
-        state = AudioState::Unloaded;
-        isPlaying = false;
     }
 
     void AudioAsset::Stop() {
@@ -125,6 +117,10 @@ namespace LaurelEye::Audio {
     }
 
     void AudioAsset::Update() {
+        Set3DDistances(minDist3D, maxDist3D);
+        SetVolume(volume);
+        channel->set3DAttributes(&playPosition, &movingVelocity);
+
         if ( state != AudioState::Loading ) {
             return;
         }

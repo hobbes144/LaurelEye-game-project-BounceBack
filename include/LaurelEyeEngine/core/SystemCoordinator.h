@@ -9,16 +9,16 @@
 /// Copyright © 2025 DIGIPEN Institute of Technology. All rights reserved.
 
 #pragma once
-#include <memory>
-#include "LaurelEyeEngine/core/EngineContext.h"
+#include "LaurelEyeEngine/audio/AudioSystem.h"
 #include "LaurelEyeEngine/core/Config.h"
-#include "LaurelEyeEngine/transform/TransformSystem.h"
+#include "LaurelEyeEngine/core/EngineContext.h"
+#include "LaurelEyeEngine/debugDraw/DebugDrawSystem.h"
 #include "LaurelEyeEngine/graphics/RenderSystem.h"
 #include "LaurelEyeEngine/particles/ParticleSystem.h"
 #include "LaurelEyeEngine/physics/PhysicsSystem.h"
-#include "LaurelEyeEngine/audio/FModAudioManager.h"
 #include "LaurelEyeEngine/scripting/ScriptSystem.h"
-#include "LaurelEyeEngine/debugDraw/DebugDrawSystem.h"
+#include "LaurelEyeEngine/transform/TransformSystem.h"
+#include <memory>
 
 namespace LaurelEye {
     class SystemCoordinator {
@@ -36,7 +36,7 @@ namespace LaurelEye {
         std::unique_ptr<Graphics::RenderSystem> renderSystem;
         std::unique_ptr<Particles::ParticleSystem> particleSystem;
         std::unique_ptr<Physics::PhysicsSystem> physicsSystem;
-        std::unique_ptr<Audio::FModAudioManager> audioSystem;
+        std::unique_ptr<Audio::AudioSystem> audioSystem;
         std::unique_ptr<Scripting::ScriptSystem> scriptSystem;
         std::unique_ptr<Debug::DebugDrawSystem> debugDrawSystem;
     };

@@ -13,8 +13,8 @@ namespace LaurelEye {
         am = std::make_unique<Audio::FModAudioManager>();
 
         am->update();
-        am->loadSound("music", std::string(TEST_MEDIA_DIR) + "/audio/testAudio.mp3", false, true);
-        am->playSound("music", Vector3(0.0f, 0.0f, 0.0f), 0.15f);
+        am->loadSound("music");
+        am->playSound("music");
         for ( size_t i = 0; i < 20; i++ ) {
             am->update();
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -40,7 +40,7 @@ namespace LaurelEye {
     }
 
     void speakerTest() {
-        am->loadSound("slide", std::string(TEST_MEDIA_DIR) + "/audio/slide.mp3", true, true);
+        am->loadSound("slide");
 
         // Create entity
         auto root = std::make_unique<Entity>("RootEntity");
@@ -106,7 +106,7 @@ namespace LaurelEye {
     void speakerTest3() {
         am->stopSound("slide");
 
-        am->loadSound("slide2", std::string(TEST_MEDIA_DIR) + "/audio/slide.mp3", true, false);
+        am->loadSound("slide2");
 
         // Create entity
         auto root = std::make_unique<Entity>("RootEntity");

@@ -17,7 +17,8 @@ namespace LaurelEye::Audio {
     void SpeakerComponent::playSound(const std::string& soundName) {
         TransformComponent* tr = owner->LaurelEye::Entity::findComponent<LaurelEye::TransformComponent>();
         Transform position = tr->getWorldTransform();
-        audioManager->playSound(soundName, position.getPosition(), getVolume());
+        Vector3 velocity; // Currently not used
+        audioManager->playSound(soundName);
         isPlaying = true;
     }
 
@@ -26,16 +27,43 @@ namespace LaurelEye::Audio {
         isPlaying = false;
     }
 
-    float SpeakerComponent::getVolume() const {
-        return volume;
+    void SpeakerComponent::pauseSound(const std::string& soundName) {
+        audioManager->pauseSound(soundName);
     }
 
-    float SpeakerComponent::setVolume(float vol) {
-        volume = vol;
-        return volume;
+    void SpeakerComponent::resumeSound(const std::string& soundName) {
+        audioManager->resumeSound(soundName);
+    }
+
+    float SpeakerComponent::getVolume() const {
+        return audioManager->getVolume(audioName);
+    }
+
+    void SpeakerComponent::setVolume(float vol) {
+        audioManager->setVolume(audioName, vol);
+    }
+
+    void SpeakerComponent::update() {
+        TransformComponent* tr = owner->LaurelEye::Entity::findComponent<LaurelEye::TransformComponent>();
+        Transform position = tr->getWorldTransform();
+        Vector3 velocity; // Currently not used
+        audioManager->setSoundPosition(audioName, position.getPosition());
+        //audioManager->setSoundVelocity(audioName, velocity);
     }
 
     void SpeakerComponent::setAudioManager(IAudioManager* manager) {
         audioManager = manager;
+    }
+
+    void SpeakerComponent::createAudioAsset(const std::string& path, float vol, bool is3D, bool loop) {
+        audioManager->createSound(audioName, path, vol, is3D, loop);
+    }
+
+    void SpeakerComponent::loadAudioAsset() {
+        audioManager->loadSound(audioName);
+    }
+
+    void SpeakerComponent::loadAudioAssetImmidiate() {
+        audioManager->loadSoundImmidiate(audioName);
     }
 } // namespace LaurelEye::Audio

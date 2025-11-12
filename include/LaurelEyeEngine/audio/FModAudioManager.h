@@ -1,12 +1,12 @@
 ﻿/*!****************************************************************************
- * \file   AudioManager.h
+ * \file   FModAudioManager.h
  * \author Daoming Wang (KeitherJinn@outlook.com)
  * \par    **DigiPen Email**
  *    daoming.wang@digipen.edu
  * \par    **Course**
  *    GAM541
  * \date   10-01-2025
- * \brief  Audio class using FMOD to implement all audio functionality.
+ * \brief  Audio class using FMOD to implement all audio functionality with AudioAsset class.
  *
  *****************************************************************************/
 
@@ -90,16 +90,24 @@ namespace LaurelEye::Audio {
         void update() override;
         void shutdown() override;
 
-        void loadSound(const std::string& name, const std::string& path, bool is3D = false, bool loop = false) override;
-        void playSound(const std::string& name, const Vector3& position = Vector3(), float volume = 1.0f) override;
-        void playMovingSound(const std::string& name, const Vector3& position = Vector3(), const Vector3& velocity = Vector3(), float volume = 1.0f) override;
+        void createSound(const std::string& name, const std::string& path, float volume = 1.0f, bool is3D = false, bool loop = false) override;
+        void loadSound(const std::string& name) override;
+        void loadSoundImmidiate(const std::string& name);
+        void playSound(const std::string& name) override;
         void stopSound(const std::string& name) override;
+
         void setListenerPosition(const Vector3& position) override;
+        Vector3 getListenerPosition() const override { return listenerPosition; }
+        void setListenerVelocity(const Vector3& velocity) override;
+        Vector3 getListenerVelocity() const override { return listenerVelocity; }
+
         void setPlaybackSpeed(float speed) override;
         void togglePlaybackSpeed(float speed = 1) override;
         void setVolume(const std::string& name, float volume) override;
         void setMasterVolume(float volume) override;
-
+        float getVolume(const std::string& name) const override;
+        void setSoundPosition(const std::string& name, const Vector3& position) override;
+        void setSoundVelocity(const std::string& name, const Vector3& velocity) override;
         void pauseSound(const std::string& name) override;
         void resumeSound(const std::string& name) override;
         void pauseAllSound() override;
@@ -107,14 +115,13 @@ namespace LaurelEye::Audio {
 
         std::string readAudioConfig(const std::string& configFilePath) override;
 
-        Vector3 getListenerPosition() const override { return listenerPosition; }
-
     private:
         FMOD::System* fmodSystem_ = nullptr;
         std::unordered_map<std::string, AudioAsset*> sounds_;
 
         float currentPlaybackSpeed_ = 1.0f;
         Vector3 listenerPosition = Vector3();
+        Vector3 listenerVelocity = Vector3();
 
         std::vector<AudioAsset*> awatingSounds;
     };

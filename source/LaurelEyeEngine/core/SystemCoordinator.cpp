@@ -36,7 +36,8 @@ namespace LaurelEye {
         physicsSystem = std::make_unique<Physics::PhysicsSystem>();
         physicsSystem->setEngineContext(ctx);
         // Calls its own initialize and shutdown methods - in future will get reworked
-        audioSystem = std::make_unique<Audio::FModAudioManager>();
+        audioSystem = std::make_unique<Audio::AudioSystem>();
+        audioSystem->setEngineContext(ctx);
 
         scriptSystem = std::make_unique<Scripting::ScriptSystem>();
         scriptSystem->setEngineContext(ctx);
@@ -52,7 +53,7 @@ namespace LaurelEye {
         ctx.registerService<Graphics::RenderSystem>(renderSystem.get());
         ctx.registerService<Physics::PhysicsSystem>(physicsSystem.get());
         ctx.registerService<Particles::ParticleSystem>(particleSystem.get());
-        ctx.registerService<Audio::FModAudioManager>(audioSystem.get());
+        ctx.registerService<Audio::AudioSystem>(audioSystem.get());
         ctx.registerService<Scripting::ScriptSystem>(scriptSystem.get());
         
     }
@@ -65,6 +66,7 @@ namespace LaurelEye {
         scriptSystem->initialize();
         particleSystem->initialize();
         debugDrawSystem->initialize();
+        audioSystem->initialize();
     }
     void SystemCoordinator::update(float deltaTime) {
         //std::cout << "SysCord Update\n";
@@ -74,7 +76,7 @@ namespace LaurelEye {
             debugDrawSystem->update(deltaTime);
         }
         renderSystem->update(deltaTime);
-        audioSystem->update();
+        audioSystem->update(deltaTime);
         scriptSystem->update(deltaTime);
     }
     void SystemCoordinator::updateFixed(float deltaTimeFixed) {
@@ -89,6 +91,7 @@ namespace LaurelEye {
         renderSystem->shutdown();
         transformSystem->shutdown();
         debugDrawSystem->shutdown();
+        audioSystem->shutdown();
 
         transformSystem.reset();
         renderSystem.reset();

@@ -106,10 +106,11 @@
                 },
                 "Speaker": {
                     "audioName": "music",
-                    "audioPath": "audio/testAudio.mp3",
-                    "volume": 0.15,
+                    "audioPath": "audio/slide.mp3",
+                    "volume": 1.0,
                     "loop": true,
-                    "3D": true
+                    "3D": true,
+                    "playOnLoad": true
                 }
             }
         },

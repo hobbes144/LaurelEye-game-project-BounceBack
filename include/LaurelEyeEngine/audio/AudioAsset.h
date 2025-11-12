@@ -25,10 +25,8 @@ namespace LaurelEye::Audio {
     class AudioAsset {
     public:
         AudioAsset();
-        AudioAsset(const std::string& _path, bool _is3D, bool _loop);
+        AudioAsset(const std::string& _path, float _volume, bool _is3D, bool _loop);
         ~AudioAsset();
-
-        void Initialize(const std::string& path, bool is3D = false, bool loop = false);
 
         void SetPath(const std::string& newPath) { path = newPath; }
         const std::string& GetPath() const { return path; }
@@ -49,6 +47,7 @@ namespace LaurelEye::Audio {
         void SetVelocity(const Vector3& velocity) { movingVelocity = {velocity.x, velocity.y, velocity.z}; }
         void SetPosition(const Vector3& position) { playPosition = {position.x, position.y, position.z}; }
         void SetVolume(float vol);
+        float GetVolume() const { return volume; }
         void SetPlayBackSpeed(float speed);
 
         // check if ready

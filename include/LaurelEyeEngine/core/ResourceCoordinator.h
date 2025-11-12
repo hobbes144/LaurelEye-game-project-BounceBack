@@ -44,6 +44,5 @@ namespace LaurelEye {
         std::unique_ptr<SceneManager> sceneManager;
         std::unique_ptr<EventManager> eventManager;
         std::unique_ptr<IPlatform> platformManager;
-        std::unique_ptr<Audio::FModAudioManager> audioManager;
     };
 } // namespace LaurelEye
