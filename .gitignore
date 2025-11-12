@@ -84,3 +84,12 @@ doc/Doxyfile.doc
 
 # Temporarily added until I track down why cmake is still creating this
 out/
+
+# Visual Studio user and workspace files
+*.vcxproj.user
+*.user
+*.suo
+.vs/
+
+# Code analysis folders
+/user-contributions/
