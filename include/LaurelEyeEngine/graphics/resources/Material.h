@@ -21,7 +21,7 @@
 #include <variant>
 
 namespace LaurelEye::IO {
-    class ImageAsset;
+    struct ImageAsset;
 }
 
 namespace LaurelEye::Graphics {
@@ -46,7 +46,7 @@ namespace LaurelEye::Graphics {
         using PropertyMap = std::unordered_map<
             std::string,
             std::variant<
-                unsigned int, int, float, Vector2, Vector3, DVector4, Matrix4>>;
+                unsigned int, int, float, Vector2, Vector3, Vector4, Matrix4>>;
 
         /// @brief Default constructor for Material.
         Material() = default;

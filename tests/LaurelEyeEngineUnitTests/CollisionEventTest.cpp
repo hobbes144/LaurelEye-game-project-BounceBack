@@ -44,7 +44,7 @@ namespace LaurelEye {
         transformSystem.registerComponent(cubeT);
         physicsSystem.registerComponent(cubePB);
 
-        transformSystem.update(0.016);
+        transformSystem.update(0.016f);
 
         // After your update loop setup
         bool enterCalled = false;

@@ -70,10 +70,10 @@ void FramerateController<T>::endFrame() {
 template <typename T>
 T FramerateController<T>::getFPS() {
     T lastQuery = timeOfLastFPSQuery;
-    long int numFrames = framesSinceLastFPSQuery;
+    long long numFrames = framesSinceLastFPSQuery;
     timeOfLastFPSQuery = getTime();
     framesSinceLastFPSQuery = 0;
-    return numFrames / (timeOfLastFPSQuery - lastQuery);
+    return static_cast<T>(numFrames / (timeOfLastFPSQuery - lastQuery));
 }
 
 template <typename T>

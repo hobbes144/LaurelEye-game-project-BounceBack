@@ -236,7 +236,7 @@ namespace LaurelEye {
                 renderSystem.update(dt);
             }
 #ifdef _WIN32
-            Sleep(dt * 1000.f);
+            Sleep(static_cast<DWORD>(dt * 1000.f));
 #else
             sleep(dt);
 #endif

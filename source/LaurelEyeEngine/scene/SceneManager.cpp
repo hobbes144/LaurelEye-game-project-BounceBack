@@ -30,7 +30,7 @@ namespace LaurelEye {
         });
         auto* renderSystem = context->getService<Graphics::RenderSystem>();
         auto* assetManager = context->getService<IO::AssetManager>();
-        renderSystem->setClearColor(0.208, 0.222, 0.236);
+        renderSystem->setClearColor(0.208f, 0.222f, 0.236f);
         renderSystem->retrieveSkydomePass()->setTexture(Graphics::InvalidTexture);
         renderSystem->retrieveSkydomePass()->addTexture(Graphics::InvalidTexture);
     }

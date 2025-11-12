@@ -129,9 +129,9 @@ namespace LaurelEye {
         }
 
         T magnitudeSquared() const {
-            T result = 0;
+            T result = static_cast<T>(0);
             for ( int i = 0; i < N; i++ ) {
-                result += pow(data[i], 2);
+                result += static_cast<T>(pow(data[i], 2.0));
             }
             return result;
         }
@@ -140,15 +140,15 @@ namespace LaurelEye {
         T magnitude() const {
             T result = 0;
             for ( int i = 0; i < N; i++ ) {
-                result += static_cast<T>(pow(data[i], 2));
+                result += static_cast<T>(pow(data[i], 2.0));
             }
-            return sqrt(result);
+            return static_cast<T>(sqrt(result));
         }
 
         // Formula: v / |v|, where |v| is the magnitude
         void normalize() {
             T magnitude_val = magnitude();
-            if ( magnitude_val == 0 ) throw std::runtime_error("Cannot normalize zero vector");
+            if ( magnitude_val == static_cast<T>(0) ) throw std::runtime_error("Cannot normalize zero vector");
 
             for ( int i = 0; i < N; i++ ) {
                 data[i] /= magnitude_val;

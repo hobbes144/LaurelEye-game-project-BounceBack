@@ -28,7 +28,7 @@ namespace LaurelEye::IO {
         // --- Handle parse errors with details ---
         if ( asset->jsonDocument.HasParseError() ) {
             std::cerr << "[JsonImporter] Parse error in: " << path << "\n"
-                      << "  → " << rapidjson::GetParseError_En(asset->jsonDocument.GetParseError())
+                      << " -> " << rapidjson::GetParseError_En(asset->jsonDocument.GetParseError())
                       << " (offset " << asset->jsonDocument.GetErrorOffset() << ")\n";
             return nullptr;
         }

@@ -17,7 +17,7 @@ namespace LaurelEye::Audio {
         void setAudioManager(IAudioManager* manager);
 
         void setAudioName(std::string newAudioName) { audioName = newAudioName; }
-        const std::string& const getAudioName() { return audioName; }
+        const std::string& getAudioName() const { return audioName; }
     private:
         float volume;
         bool isPlaying;

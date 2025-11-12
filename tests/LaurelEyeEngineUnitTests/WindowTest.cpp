@@ -15,7 +15,7 @@ namespace LaurelEye {
 
         for ( int i = 0; i < 120; ++i ) {
 #ifdef _WIN32
-            Sleep(1000.0f);
+            Sleep(static_cast<DWORD>(1000.0f));
 #else
             sleep(1.f);
 #endif

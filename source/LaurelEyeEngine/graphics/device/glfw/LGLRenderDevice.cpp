@@ -144,7 +144,6 @@ namespace LaurelEye::Graphics {
      * Ensure that viewport is correctly reset by using a RenderStateSaver.
      *
      * \param Viewport The Viewport struct storing the width and height.
-     * \return \b Renderer* Self
      *****************************************************************************/
     void LGLRenderDevice::setViewport(const Viewport& viewport, bool force) {
         if ( !force && state.viewport == viewport ) return;
@@ -169,7 +168,6 @@ namespace LaurelEye::Graphics {
      * called.
      *
      * \param depthState DepthState object that stores the enabled and func.
-     * \return \b Renderer* Self
      *****************************************************************************/
     void LGLRenderDevice::setDepthState(const DepthState& depthState, bool force) {
         if ( !force && state.depthState == depthState ) return;
@@ -201,11 +199,9 @@ namespace LaurelEye::Graphics {
      *
      * \param blendState BlendState object that stores the enabled, equation and
      * func.
-     * \return \b Renderer* Self
      *****************************************************************************/
     void LGLRenderDevice::setBlendState(const BlendState& blendState, bool force) {
-        if ( !force && state.blendState == blendState )
-            ;
+        if ( !force && state.blendState == blendState ) return;
 
         if ( blendState.enabled ) {
             glEnable(GL_BLEND);

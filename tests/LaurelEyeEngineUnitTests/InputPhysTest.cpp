@@ -82,7 +82,7 @@ namespace LaurelEye {
         float expectedRestY = 0.0f; // ground top surface
         assert(std::fabs(finalPos.y - expectedRestY) < 0.05f);
 
-        std::cout << "Cube final Y = " << finalPos.y << " (expected ≈ " << expectedRestY << ")\n";
+        std::cout << "Cube final Y = " << finalPos.y << " (expected (approx) = " << expectedRestY << ")\n";
         std::cout << "Physics + Transform integration passed!\n";
 
         physicsSystem.shutdown();

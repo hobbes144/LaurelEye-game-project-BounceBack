@@ -16,7 +16,7 @@
 
 namespace LaurelEye::Graphics {
 
-    class FrameContext;
+    struct FrameContext;
     class RenderResources;
 
     /// @class SinglePass

@@ -139,9 +139,9 @@ namespace LaurelEye {
         for ( int i = 0; i < 10; i++ ) {
             sp->playSound("slide2");
             // Increase angle over time
-            angle += 1 * 0.016f; // assuming ~60 FPS (dt ≈ 16ms)
+            angle += 1.0f * 0.016f; // assuming ~60 FPS (dt ≈ 16ms)
 
-            if ( angle > 2 * 3.14159 ) angle -= 2 * 3.14159;
+            if ( angle > 2.0f * 3.14159f ) angle -= 2.0f * 3.14159f;
 
             x = 10 * std::cos(angle);
             y = 0;

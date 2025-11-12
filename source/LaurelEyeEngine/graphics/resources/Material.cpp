@@ -66,7 +66,7 @@ namespace LaurelEye::Graphics {
             else if ( auto item = std::get_if<Vector3>(&value) ) {
                 shader->setVec3(name, *item);
             }
-            else if ( auto item = std::get_if<DVector4>(&value) ) {
+            else if ( auto item = std::get_if<Vector4>(&value) ) {
                 shader->setVec4(name, (*item)[0], (*item)[1], (*item)[2], (*item)[3]);
             }
             else if ( auto item = std::get_if<Matrix4>(&value) ) {
@@ -91,7 +91,7 @@ namespace LaurelEye::Graphics {
             else if ( auto item = std::get_if<Vector3>(&value) ) {
                 shader->setVec3(name, *item);
             }
-            else if ( auto item = std::get_if<DVector4>(&value) ) {
+            else if ( auto item = std::get_if<Vector4>(&value) ) {
                 shader->setVec4(name, (*item)[0], (*item)[1], (*item)[2], (*item)[3]);
             }
             else if ( auto item = std::get_if<Matrix4>(&value) ) {

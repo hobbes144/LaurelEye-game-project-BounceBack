@@ -26,7 +26,7 @@ namespace LaurelEye {
         transformSystem.registerComponent(groundT);
         physicsSystem.registerComponent(groundPB);
 
-        transformSystem.update(0.016);
+        transformSystem.update(0.016f);
 
         // === Create Cube Entity ===
         auto cube = std::make_unique<Entity>("Cube");
@@ -41,7 +41,7 @@ namespace LaurelEye {
         transformSystem.registerComponent(cubeT);
         physicsSystem.registerComponent(cubePB);
 
-        transformSystem.update(0.016);
+        transformSystem.update(0.016f);
 
         // === Simulation ===
         float dt = 1.0f / 60.0f; // 60Hz
@@ -86,7 +86,7 @@ namespace LaurelEye {
         float expectedRestY = 0.0f; // ground top surface
         assert(std::fabs(finalPos.y - expectedRestY) < 0.05f);
 
-        std::cout << "Cube final Y = " << finalPos.y << " (expected ≈ " << expectedRestY << ")\n";
+        std::cout << "Cube final Y = " << finalPos.y << " (expected (approx) = " << expectedRestY << ")\n";
         std::cout << "Physics + Transform integration passed!\n";
 
         physicsSystem.shutdown();
