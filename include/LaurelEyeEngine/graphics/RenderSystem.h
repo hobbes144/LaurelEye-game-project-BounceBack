@@ -20,15 +20,6 @@
 #include "LaurelEyeEngine/graphics/Graphics.h"
 
 // Temp
-#include "LaurelEyeEngine/graphics/graphics_components/CameraComponent.h"
-#include "LaurelEyeEngine/graphics/graphics_components/LightComponent.h"
-#include "LaurelEyeEngine/graphics/renderpass/ParticleRenderPass.h"
-// #include "LaurelEyeEngine/graphics/renderpass/SingleBufferedDataPass.h"
-#include "LaurelEyeEngine/graphics/renderpass/SinglePass.h"
-#include "LaurelEyeEngine/graphics/renderpass/SinglePassShadow.h"
-#include "LaurelEyeEngine/graphics/renderpass/SkydomePass.h"
-#include "LaurelEyeEngine/graphics/renderpass/UIPass.h"
-#include "LaurelEyeEngine/graphics/renderpass/DebugDrawRenderPass.h"
 #include "LaurelEyeEngine/graphics/resources/Lights.h"
 #include "LaurelEyeEngine/graphics/resources/SizeRegistry.h"
 #include "LaurelEyeEngine/graphics/surface/IWindowSurfaceProvider.h"
@@ -46,11 +37,19 @@ namespace LaurelEye {
 namespace LaurelEye::Graphics {
 
     class IRenderDevice;
-    class IWindowSurfaceProvider;
 
     // temp
     class LightComponent;
     class CameraComponent;
+    class GBufferPass;
+    class DeferredRenderPass;
+    class SinglePass;
+    class SingleBufferedDataPass;
+    class SinglePassShadow;
+    class ParticleRenderPass;
+    class DebugDrawRenderPass;
+    class SkydomePass;
+    class UIPass;
 
     /// @struct RenderSystemConfig
     /// @brief Configuration data for the Render System
@@ -60,6 +59,7 @@ namespace LaurelEye::Graphics {
     struct RenderSystemConfig {
         GraphicsBackend backend = GraphicsBackend::OpenGL;
         std::vector<IWindow*> windows;
+        Vector4 clearColor = Vector4(0.2f, 0.3f, 0.3f, 1.0f);
     };
 
     /// @class RenderSystem
@@ -129,14 +129,15 @@ namespace LaurelEye::Graphics {
         std::shared_ptr<SinglePassShadow> retrieveSinglePass();
         std::shared_ptr<ParticleRenderPass> retrieveParticlePass();
         std::shared_ptr<SkydomePass> retrieveSkydomePass();
+        std::shared_ptr<GBufferPass> retrieveGBufferPass();
         std::shared_ptr<DebugDrawRenderPass> retrieveDebugDrawRenderPass();
 
         RenderResources* getRenderResources() {
             return tempRenderResources.get();
         }
 
-        void setClearColor(float x, float y, float z) {
-            glClearColor(x, y, z, 1.0f);
+        void setClearColor(float r, float g, float b, float a = 1.0f) {
+            config.clearColor = Vector4(r, g, b, a);
         }
 
         void setRunDebugDraw(bool r) {
@@ -181,6 +182,8 @@ namespace LaurelEye::Graphics {
         std::unique_ptr<ShadowManager> tempShadowManager;
         /// @brief A single-pass rendering pipeline used for simple frame rendering.
         // std::shared_ptr<SinglePass> sp;
+        std::shared_ptr<GBufferPass> gbufferPass;
+        std::shared_ptr<DeferredRenderPass> deferredRenderPass;
         std::shared_ptr<SinglePassShadow> sp;
         std::shared_ptr<SkydomePass> bp;
         // std::shared_ptr<SingleBufferedDataPass> sp;

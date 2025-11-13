@@ -11,6 +11,7 @@
 #include "LaurelEyeEngine/graphics/resources/Framebuffer.h"
 #include "LaurelEyeEngine/graphics/resources/Texture.h"
 
+#include <cstdint>
 #include <glad/glad.h>
 
 #include <unordered_map>
@@ -62,14 +63,17 @@ namespace LaurelEye::Graphics {
 
         uint32_t attachTexture(FramebufferHandle h, const FramebufferAttachmentDesc& d);
 
+        void resize(FramebufferHandle h, uint32_t width, uint32_t height);
+
+        void blit(FramebufferHandle source, FramebufferHandle dest);
+
     private:
         [[nodiscard]] TextureHandle createColorAttachmentTexture(
             GLuint framebufferID, const FramebufferAttachmentDesc& d);
 
         std::unordered_map<FramebufferHandle, LGLFramebufferRecord> createdBuffers;
+        GLuint rbo;
         LGLTextureFactory* textureFactory;
-
-        int colorAttachmentIndex = 0;
     };
 
 } // namespace LaurelEye::Graphics

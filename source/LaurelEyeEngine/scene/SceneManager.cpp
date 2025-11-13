@@ -1,14 +1,15 @@
 ﻿#include "LaurelEyeEngine/scene/SceneManager.h"
+#include "LaurelEyeEngine/graphics/renderpass/GBufferPass.h"
+#include "LaurelEyeEngine/graphics/renderpass/SkydomePass.h"
+#include "LaurelEyeEngine/graphics/RenderSystem.h"
 #include "LaurelEyeEngine/io/AssetManager.h"
 #include "LaurelEyeEngine/io/Assets.h"
-#include "LaurelEyeEngine/graphics/RenderSystem.h"
-#include <filesystem>
 #include <chrono>
+#include <filesystem>
 namespace fs = std::filesystem;
 
 namespace LaurelEye {
-    SceneManager::SceneManager(EngineContext& ctx, const EngineConfig& config) :
-        context(&ctx), sceneListPath(""), currentScene(nullptr) {
+    SceneManager::SceneManager(EngineContext& ctx, const EngineConfig& config) : context(&ctx), sceneListPath(""), currentScene(nullptr) {
         sceneListPath = config.initialSceneList;
         assetsRoot = config.assetRoot;
     }
@@ -32,7 +33,7 @@ namespace LaurelEye {
         auto* assetManager = context->getService<IO::AssetManager>();
         renderSystem->setClearColor(0.208f, 0.222f, 0.236f);
         renderSystem->retrieveSkydomePass()->setTexture(Graphics::InvalidTexture);
-        renderSystem->retrieveSkydomePass()->addTexture(Graphics::InvalidTexture);
+        renderSystem->retrieveGBufferPass()->addSkydome(Graphics::InvalidTexture);
     }
 
     void SceneManager::update(float deltaTime) {
@@ -43,7 +44,6 @@ namespace LaurelEye {
             else if ( !scenes.empty() )
                 changeScene(scenes.begin()->first);
         }
-        
 
         if ( switchingScene && !nextSceneQueued.empty() ) {
             performSceneSwitch();
@@ -61,7 +61,6 @@ namespace LaurelEye {
         if ( currentScene ) {
             currentScene->update(deltaTime);
         }
-
     }
 
     void SceneManager::changeScene(const std::string& nextScene) {
@@ -101,7 +100,6 @@ namespace LaurelEye {
         assert(false && "ERROR::SCENEMANAGER::INSTANTIATE::CURRENTSCENE_UNINITIALIZED");
         return nullptr;
     }
-
 
     void SceneManager::loadScene(const std::string& sceneName) {
         auto* assetManager = context->getService<IO::AssetManager>();
@@ -209,7 +207,7 @@ namespace LaurelEye {
     }
 
     // I believe this function can be deleted
-    //void SceneManager::preloadSceneAssetsAsync(const std::string& sceneName) {
+    // void SceneManager::preloadSceneAssetsAsync(const std::string& sceneName) {
     //    auto assetManager = context->getService<IO::AssetManager>();
     //    if ( !assetManager )
     //        return;
@@ -259,5 +257,4 @@ namespace LaurelEye {
         currentScene = scene;
     }
 #endif
-}
-
+} // namespace LaurelEye

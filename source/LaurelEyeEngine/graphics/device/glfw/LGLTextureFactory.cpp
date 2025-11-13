@@ -34,6 +34,8 @@ namespace LaurelEye::Graphics {
             return GL_R32F;
         case TextureFormat::DEPTH32F:
             return GL_DEPTH_COMPONENT32F;
+        case TextureFormat::DEPTH24:
+            return GL_DEPTH_COMPONENT24;
         }
 
         assert(false && "ERROR::RENDERSYSTEM::INVALIDFORMAT");
@@ -190,27 +192,37 @@ namespace LaurelEye::Graphics {
 
         textures[h] = d;
 
-        glBindTexture(GL_TEXTURE_2D, h);
+        if ( d.samples == SampleCount::X1 ) {
+            glBindTexture(GL_TEXTURE_2D, h);
+            glTexImage2D(
+                GL_TEXTURE_2D, 0,
+                textureFormatToGLFormat(d.format),
+                d.width, d.height, 0,
+                textureFormatToGLBaseFormat(d.format),
+                textureFormatToGLUploadFormat(d.format), init);
 
-        glTexImage2D(
-            GL_TEXTURE_2D, 0,
-            textureFormatToGLFormat(d.format),
-            d.width, d.height, 0,
-            textureFormatToGLBaseFormat(d.format),
-            textureFormatToGLUploadFormat(d.format), init);
-
-        if ( init != nullptr && d.mipMode == TextureMipMode::AutoGenerate )
-            glGenerateMipmap(GL_TEXTURE_2D);
-        else {
-            // Reasonable defaults (you’ll likely use separate samplers anyway)
-            glTextureParameteri(h, GL_TEXTURE_COMPARE_MODE, GL_NONE); // Required for Shadows
-            glTextureParameteri(h, GL_TEXTURE_MIN_FILTER, d.mipLevels > 1 ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
-            glTextureParameteri(h, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glTextureParameteri(h, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTextureParameteri(h, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            if ( init != nullptr && d.mipMode == TextureMipMode::AutoGenerate )
+                glGenerateMipmap(GL_TEXTURE_2D);
+            else {
+                // Reasonable defaults (you’ll likely use separate samplers anyway)
+                glTextureParameteri(h, GL_TEXTURE_COMPARE_MODE, GL_NONE); // Required for Shadows
+                glTextureParameteri(h, GL_TEXTURE_MIN_FILTER, d.mipLevels > 1 ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
+                glTextureParameteri(h, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                glTextureParameteri(h, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                glTextureParameteri(h, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            }
         }
-
-        glBindTexture(GL_TEXTURE_2D, 0);
+        else {
+            glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, h);
+            glTexImage2DMultisample(
+                GL_TEXTURE_2D_MULTISAMPLE,
+                (GLsizei)getSampleIntFromSampleCount(d.samples),
+                textureFormatToGLFormat(d.format),
+                d.width, d.height,
+                GL_TRUE // or GL_FALSE for variable sample locations
+            );
+            glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+        }
 
         return h;
     }
@@ -222,21 +234,37 @@ namespace LaurelEye::Graphics {
     }
 
     void LGLTextureFactory::resize(TextureHandle h, uint32_t newW, uint32_t newH, uint32_t newD) {
+        // NOTE: OpenGL textures are no longer mutable in DSA, so resize will
+        // require creating a new texture in the future.
         assert((textures.find(h) != textures.end()) && "ERROR::RENDERSYSTEM::TEXTUREFACTORY::RESIZE::INVALID_TEXTURE_HANDLE");
+        assert(textures[h].type != TextureType::TextureStorage2D && "ERROR::RENDERSYSTEM::TEXTUREFACTORY::RESIZE::UNSUPPORTED::TextureStorage2D resize not implemented.");
         TextureDesc& d = textures[h];
         d.width = newW;
         d.height = newH;
 
-        glBindTexture(GL_TEXTURE_2D, h);
+        if ( d.samples == SampleCount::X1 ) {
+            glBindTexture(GL_TEXTURE_2D, h);
 
-        glTexImage2D(
-            GL_TEXTURE_2D, 0,
-            textureFormatToGLFormat(d.format),
-            newW, newH, 0,
-            textureFormatToGLBaseFormat(d.format),
-            textureFormatToGLUploadFormat(d.format), nullptr);
+            glTexImage2D(
+                GL_TEXTURE_2D, 0,
+                textureFormatToGLFormat(d.format),
+                newW, newH, 0,
+                textureFormatToGLBaseFormat(d.format),
+                textureFormatToGLUploadFormat(d.format), nullptr);
 
-        glBindTexture(GL_TEXTURE_2D, 0);
+            glBindTexture(GL_TEXTURE_2D, 0);
+        }
+        else {
+            glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, h);
+            glTexImage2DMultisample(
+                GL_TEXTURE_2D_MULTISAMPLE,
+                (GLsizei)getSampleIntFromSampleCount(d.samples),
+                textureFormatToGLFormat(d.format),
+                newW, newH,
+                GL_TRUE // or GL_FALSE for variable sample locations
+            );
+            glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+        }
     }
 
     void LGLTextureFactory::setSampler(TextureHandle h, const SamplerDesc& sDesc) {

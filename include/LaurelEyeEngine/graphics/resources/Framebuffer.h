@@ -27,9 +27,14 @@ namespace LaurelEye::Graphics {
     /// A `FramebufferHandle` acts as a lightweight reference to a GPU-side framebuffer.
     /// Invalid or uninitialized handles should be represented as InvalidFramebuffer or UINT32_MAX.
     using FramebufferHandle = uint32_t;
-    static constexpr FramebufferHandle InvalidFramebuffer = UINT32_MAX;
+    using FramebufferAttachmentIndex = uint32_t;
+
+    namespace Framebuffer {
+        static constexpr FramebufferHandle InvalidFramebuffer = UINT32_MAX;
+    }
+
     inline bool isValidFramebuffer(FramebufferHandle h) noexcept {
-        return h != InvalidFramebuffer;
+        return h != Framebuffer::InvalidFramebuffer;
     }
 
     /// @enum FramebufferAttachmentType
@@ -48,13 +53,15 @@ namespace LaurelEye::Graphics {
     /// This structure defines the attachment type and can optionally specify additional
     /// parameters such as texture format, mip level, and sample count for multisampling.
     struct FramebufferAttachmentDesc {
-        SizeRegistry size = SizeRegistry();
+        SizeRegistry size = SizeRegistry();                  // used if texture==0
+        FramebufferAttachmentIndex colorAttachmentIndex = 0; // Only relevant if Color attachment.
+                                                             // Note that repeated numbers leads to undefined behaviour.
         FramebufferAttachmentType type = FramebufferAttachmentType::Color;
-        TextureHandle texture = InvalidTexture;                   // optional: if nonzero, use existing texture
-        TextureFormat format = TextureFormat::RGBA8; // used if texture==0
-        TextureMipMode mipMode = TextureMipMode::AutoGenerate;
-        uint32_t mipLevels = 1;        // for texture arrays / mips
-        // SampleCount samples = SampleCount::X1;
+        TextureHandle texture = InvalidTexture;                // optional: if nonzero, use existing texture
+        TextureFormat format = TextureFormat::RGBA8;           // used if texture==0
+        TextureMipMode mipMode = TextureMipMode::AutoGenerate; // used if texture==0
+        uint32_t mipLevels = 1;                                // used if texture==0
+        SampleCount samples = SampleCount::X1;
         // uint32_t layer = 0;           // for array/cubemap layers
     };
 

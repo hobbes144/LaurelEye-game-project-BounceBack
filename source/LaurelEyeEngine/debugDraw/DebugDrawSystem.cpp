@@ -10,6 +10,7 @@
 ///
 
 #include "LaurelEyeEngine/debugDraw/DebugDrawSystem.h"
+#include "LaurelEyeEngine/graphics/renderpass/DebugDrawRenderPass.h"
 
 namespace LaurelEye::Debug {
 

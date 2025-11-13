@@ -11,7 +11,7 @@
 
 #include "LaurelEyeEngine/graphics/resources/DataBuffer.h"
 #include "LaurelEyeEngine/graphics/resources/Framebuffer.h"
-#include "LaurelEyeEngine/graphics/resources/Lights.h"
+#include "LaurelEyeEngine/graphics/resources/FrameContext.h"
 #include "LaurelEyeEngine/graphics/resources/Texture.h"
 #include "LaurelEyeEngine/math/Matrix4.h"
 #include "LaurelEyeEngine/math/Vector3.h"
@@ -22,10 +22,11 @@
 
 namespace LaurelEye::Graphics {
 
-    struct PointLight;
-    struct LocalLights;
-    struct GlobalLights;
     class RenderResources;
+    class PointLight;
+    class DirectionalLight;
+    class GlobalLights;
+    class LocalLights;
 
     class ShadowManager {
     public:
@@ -48,7 +49,7 @@ namespace LaurelEye::Graphics {
 
         struct ShadowResource {
             Matrix4 shadowMatrix;
-            FramebufferHandle framebuffer = InvalidFramebuffer;
+            FramebufferHandle framebuffer = Framebuffer::InvalidFramebuffer;
             TextureHandle texture = InvalidTexture;
             uint32_t lightIndex;
             uint32_t type = (uint32_t)ShadowType::Simple;
@@ -67,9 +68,9 @@ namespace LaurelEye::Graphics {
         void update(const FrameContext& ctx, GlobalLights* globalLights, LocalLights* lights);
 
         ShadowHandle addShadow(
-            uint32_t lightIndex, PointLight& light, const ShadowDesc& d);
+            uint32_t lightIndex, PointLight* light, const ShadowDesc& d);
         ShadowHandle addShadow(
-            uint32_t lightIndex, DirectionalLight& light, const ShadowDesc& d);
+            uint32_t lightIndex, DirectionalLight* light, const ShadowDesc& d);
 
         void updateShadow(const FrameContext& ctx, ShadowHandle h, const Vector3& posDir);
 

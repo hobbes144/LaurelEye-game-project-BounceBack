@@ -125,6 +125,10 @@ namespace LaurelEye::Graphics {
 
         uint32_t attachTexturetoFramebuffer(FramebufferHandle h, const FramebufferAttachmentDesc& d) override;
 
+        void resizeFramebuffer(FramebufferHandle h, uint32_t width, uint32_t height) override;
+
+        void blitFramebuffers(FramebufferHandle source, FramebufferHandle dest) override;
+
     private:
         std::unique_ptr<LGLDataBufferFactory> dataBufferFactory;
         std::unique_ptr<LGLTextureFactory> textureFactory;

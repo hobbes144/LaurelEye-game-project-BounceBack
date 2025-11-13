@@ -178,6 +178,10 @@ namespace LaurelEye::Graphics {
 
         virtual uint32_t attachTexturetoFramebuffer(FramebufferHandle h, const FramebufferAttachmentDesc& d) = 0;
 
+        virtual void resizeFramebuffer(FramebufferHandle h, uint32_t width, uint32_t height) = 0;
+
+        virtual void blitFramebuffers(FramebufferHandle source, FramebufferHandle dest) = 0;
+
         // TODO: virtual void destroyAllFrameBufffers() = 0;
 
         // virtual SamplerHandle createSampler(const SamplerDesc&) = 0;

@@ -39,7 +39,13 @@ namespace LaurelEye {
             glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
             glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
             glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
-            glfwWindowHint(GLFW_DEPTH_BITS, 32);
+            glfwWindowHint(GLFW_DEPTH_BITS, 24);
+            // glfwWindowHint(GLFW_DEPTH_BITS, 32);
+
+            // Enabling debug output
+#if !defined(NDEBUG)
+            glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+#endif
         }
 
         nativeHandle = glfwCreateWindow(

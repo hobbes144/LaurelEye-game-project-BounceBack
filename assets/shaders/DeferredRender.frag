@@ -1,17 +1,15 @@
-/////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 // Pixel shader for lighting
-////////////////////////////////////////////////////////////////////////
-#version 430 core
+//
+// Copyright ? 2025 DIGIPEN Institute of Technology. All rights reserved.
+//
+///////////////////////////////////////////////////////////////////////////////
+#version 440
 
 #define M_PI 3.1415926535897932384626433832795
 
 const uint UINT_MAX = 0xFFFFFFFFU; // or 4294967295U;
-
 const float pi = 3.14159265358979323846;
-
-in vec3 normalVec, worldPos;
-in vec2 texCoord;
-in vec3 tanVec;
 
 layout (binding = 0) uniform camera
 {
@@ -51,27 +49,18 @@ layout(std430, binding = 10) buffer shadows {
     ShadowResource shadowResources[];
 };
 
-uniform vec3 diffuse;   // Kd
-uniform vec3 specular;  // Ks
-uniform float shininess; // alpha exponent
-
-uniform bool useTexture;
-uniform sampler2D mainTexture;
-uniform vec2 mainTextureScale;
-
-uniform bool useNormalMap;
-uniform sampler2D normalMap;
-uniform vec2 normalMapScale;
-
-uniform int HDR;
-
 uniform sampler2D ShadowMap;
 
-out vec4 FragColor;
+uniform bool HDR;
 
-vec3 toLinear(vec3 color) {
-  return pow(color, vec3(2.2));
-}
+uniform uint height, width;
+
+uniform sampler2D gbuffer_position;
+uniform sampler2D gbuffer_normal;
+uniform sampler2D gbuffer_diffuse;
+uniform sampler2D gbuffer_specular;
+
+out vec3 FragColor;
 
 vec3 toSRGB(vec3 color) {
   const float exposure = 1.0f;
@@ -112,8 +101,9 @@ vec3 specularBRDF(
 
 void main()
 {
+    vec2 gBufferPosition = gl_FragCoord.xy/vec2(width,height);
 
-    vec2 uv;
+    vec3 worldPos = texture(gbuffer_position, gBufferPosition).xyz;
 
     bool inShadow = false;
     if (sunLight.shadowIndex < UINT_MAX - 1) {
@@ -131,52 +121,31 @@ void main()
 
     vec3 eyeVec = (inverseView*vec4(0.0,0.0,0.0,1.0)).xyz-worldPos;
 
-    vec3 N = normalize(normalVec);
+    vec3 N = texture(gbuffer_normal, gBufferPosition).xyz;
     vec3 V = normalize(eyeVec);
 
-    vec3 Kd = diffuse;
-    vec3 Ks = specular;
-    float alpha = shininess;
+    vec3 Kd = texture(gbuffer_diffuse, gBufferPosition).xyz;
+    vec3 Ks = texture(gbuffer_specular, gBufferPosition).xyz;
+    float alpha = texture(gbuffer_specular, gBufferPosition).w;
+    // Retaining transparency value.
 
     vec3 Ia = ambientLight.color * ambientLight.intensity;
 
     vec3 Ii = sunLight.color * sunLight.intensity;
     vec3 L = -normalize(sunLight.direction);
 
-    uv = texCoord;
-
-    vec2 scaledTexCoord = uv * mainTextureScale;
-
-    if (useTexture) {
-      vec4 color = texture(mainTexture, scaledTexCoord);
-      Kd = color.xyz;
-    }
-
-    // The normal map calc ...
-    if (useNormalMap) {
-      vec2 scaledTexCoord = uv * normalMapScale;
-      vec3 delta = texture(normalMap, scaledTexCoord).xyz;
-      delta = delta*2.0 - vec3(1.0);
-      vec3 T = normalize(tanVec);
-      vec3 B = normalize(cross(T,N));
-      N = delta.x*T + delta.y*B + delta.z*N;
-    }
-
-    if (HDR < 1) {
-      Kd = toLinear(Kd);
-    }
-
-    vec3 ambientDiffuse;
-
     if (!inShadow) {
-        FragColor = vec4(specularBRDF(L, N, V, Ii, Kd, Ks, alpha), 1.0);
+        FragColor = specularBRDF(L, N, V, Ii, Kd, Ks, alpha);
     }
-    else {
-        FragColor = vec4(0.0,0.0,0.0,1.0);
+
+    if (texture(gbuffer_diffuse, gBufferPosition).w == 0.0f) {
+      FragColor = toSRGB(Kd);
+      return;
     }
-    ambientDiffuse = Ia*Kd;
 
-    FragColor += vec4(ambientDiffuse, 1.0);
 
-    FragColor.xyz = toSRGB(FragColor.xyz);
+    vec3 ambientDiffuse = Ia*Kd;
+    FragColor += ambientDiffuse;
+
+    FragColor = toSRGB(FragColor);
 }

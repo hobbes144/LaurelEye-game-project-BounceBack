@@ -7,6 +7,7 @@
  *
  *****************************************************************************/
 #include "LaurelEyeEngine/graphics/ShadowManager.h"
+
 #include "LaurelEyeEngine/graphics/device/IRenderDevice.h"
 #include "LaurelEyeEngine/graphics/RenderStateSaver.h"
 #include "LaurelEyeEngine/graphics/resources/DataBuffer.h"
@@ -55,7 +56,7 @@ namespace LaurelEye::Graphics {
             if ( !isNoShadow(light.shadowIndex) ) {
                 // Init lights if they don't already exist.
                 if ( isShadowPending(light.shadowIndex) ) {
-                    const uint32_t shadowIndex = addShadow(i, lights->pointLights[i], ShadowDesc());
+                    const uint32_t shadowIndex = addShadow(i, &lights->pointLights[i], ShadowDesc());
 
                     updateShadow(ctx, light.shadowIndex, light.position);
                     // updateMomentShadowMap(shadows[shadowIndex]);
@@ -71,9 +72,9 @@ namespace LaurelEye::Graphics {
     }
 
     ShadowHandle ShadowManager::addShadow(
-        uint32_t lightIndex, PointLight& light, const ShadowDesc& d) {
+        uint32_t lightIndex, PointLight* light, const ShadowDesc& d) {
         ShadowHandle handle = static_cast<int>(shadows.size());
-        light.shadowIndex = handle;
+        light->shadowIndex = handle;
 
         ShadowInfo shadow{d, Vector3(), handle, ShadowSourceType::Point, "shadow_point"};
 
@@ -98,7 +99,8 @@ namespace LaurelEye::Graphics {
 
         FramebufferAttachmentDesc shadowDepthAttachment;
         shadowDepthAttachment.type = FramebufferAttachmentType::Depth;
-        shadowDepthAttachment.format = TextureFormat::DEPTH32F;
+        // shadowDepthAttachment.format = TextureFormat::DEPTH32F;
+        shadowDepthAttachment.format = TextureFormat::DEPTH24;
 
         FramebufferDesc shadowFramebuffer;
         shadowFramebuffer.attachments.push_back(shadowTexAttachment);
@@ -119,9 +121,9 @@ namespace LaurelEye::Graphics {
     }
 
     ShadowHandle ShadowManager::addShadow(
-        uint32_t lightIndex, DirectionalLight& light, const ShadowDesc& d) {
+        uint32_t lightIndex, DirectionalLight* light, const ShadowDesc& d) {
         ShadowHandle handle = static_cast<int>(shadows.size());
-        light.shadowIndex = handle;
+        light->shadowIndex = handle;
 
         ShadowInfo shadow{d, Vector3(), handle, ShadowSourceType::Directional, "shadow_sun"};
 
@@ -147,7 +149,8 @@ namespace LaurelEye::Graphics {
 
         FramebufferAttachmentDesc shadowDepthAttachment;
         shadowDepthAttachment.type = FramebufferAttachmentType::Depth;
-        shadowDepthAttachment.format = TextureFormat::DEPTH32F;
+        // shadowDepthAttachment.format = TextureFormat::DEPTH32F;
+        shadowDepthAttachment.format = TextureFormat::DEPTH24;
 
         FramebufferDesc shadowFramebuffer;
         shadowFramebuffer.attachments.push_back(shadowTexAttachment);

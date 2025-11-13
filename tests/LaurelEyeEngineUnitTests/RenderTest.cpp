@@ -1,10 +1,12 @@
 ﻿#include "LaurelEyeEngine/graphics/graphics_components/AmbientLightComponent.h"
+#include "LaurelEyeEngine/graphics/graphics_components/CameraComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/DirectionalLightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/Renderable3DComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/UIComponent.h"
 #include "LaurelEyeEngine/graphics/RenderSystem.h"
 #include "LaurelEyeEngine/graphics/resources/Material.h"
 #include "LaurelEyeEngine/graphics/resources/Mesh.h"
+#include "LaurelEyeEngine/graphics/resources/RenderResources.h"
 #include "LaurelEyeEngine/io/importers/ImageImporter.h"
 #include "TestDefinitions.h"
 #include <memory>

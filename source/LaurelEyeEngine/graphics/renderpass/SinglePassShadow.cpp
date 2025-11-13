@@ -32,7 +32,7 @@ namespace LaurelEye::Graphics {
             }
         }
 
-        shader->bindTexture(10, "ShadowMap", sunShadowTex);
+        if (isValidTexture(sunShadowTex)) shader->bindTexture(10, "ShadowMap", sunShadowTex);
 
         // Cameras
         // shader->setMat4("WorldView", Matrix4::lookAt(Vector3(-50.f, 15.f, 0.f), Vector3(0.f)));

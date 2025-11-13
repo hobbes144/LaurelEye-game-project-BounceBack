@@ -83,8 +83,8 @@ namespace LaurelEye::Graphics {
         /// This function should be called at the end of each frame.
         virtual void endFrame() = 0;
 
-        virtual SizeRegistry getSize() { return windowSize; };
-        virtual const SizeRegistry* getSizePointer() { return &windowSize; };
+        virtual const SizeRegistry& getSize() const { return windowSize; };
+        virtual const SizeRegistry* getSizePointer() const { return &windowSize; };
 
         virtual void resizeSurfaceCallback() = 0;
 

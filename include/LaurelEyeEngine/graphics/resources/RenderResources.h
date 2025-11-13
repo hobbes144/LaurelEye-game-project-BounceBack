@@ -14,7 +14,9 @@
 #include "LaurelEyeEngine/graphics/device/IRenderDevice.h"
 #include "LaurelEyeEngine/graphics/resources/DataBuffer.h"
 #include "LaurelEyeEngine/graphics/resources/Framebuffer.h"
+#include "LaurelEyeEngine/graphics/resources/SizeRegistry.h"
 #include "LaurelEyeEngine/graphics/resources/Texture.h"
+#include "LaurelEyeEngine/graphics/surface/IWindowSurfaceProvider.h"
 
 #include <string>
 #include <unordered_map>
@@ -22,16 +24,19 @@
 namespace LaurelEye::Graphics {
 
     class IRenderDevice;
+    class RenderSystem;
 
     /// @struct DataBufferResource
     /// @brief Structure containing information about a data buffer resource.
     ///
     /// This structure holds a handle to a GPU data buffer, its descriptor, and
-    /// an optional tag used to organize or group related resources.
+    /// optional tags used to organize or group related resources.
+    /// Tags follow snake_case.
     struct DataBufferResource {
         DataBufferHandle handle{};
         DataBufferDesc desc{};
-        std::string tag;
+        std::vector<std::string> tags;
+
         // Lifetime life{Lifetime::Persistent};
     };
 
@@ -39,11 +44,13 @@ namespace LaurelEye::Graphics {
     /// @brief Structure containing information about a texture resource.
     ///
     /// This structure holds a handle to a GPU texture, its descriptor, and
-    /// an optional tag for categorization.
+    /// optional tags for categorization.
+    /// Tags follow snake_case.
     struct TextureResource {
         TextureHandle handle{};
         TextureDesc desc{};
-        std::string tag;
+        std::vector<std::string> tags;
+
         // Lifetime life{Lifetime::Persistent};
     };
 
@@ -51,11 +58,12 @@ namespace LaurelEye::Graphics {
     /// @brief Structure containing information about a frame buffer resource.
     ///
     /// This structure holds a handle to a GPU texture, its descriptor, and
-    /// an optional tag for categorization.
+    /// optional tags for categorization.
+    /// Tags follow snake_case.
     struct FramebufferResource {
         FramebufferHandle handle{};
         FramebufferDesc desc{};
-        std::string tag;
+        std::vector<std::string> tags;
         // Lifetime life{Lifetime::Persistent};
     };
 
@@ -79,7 +87,7 @@ namespace LaurelEye::Graphics {
     public:
         /// @brief Constructs a RenderResources manager.
         /// @param dev Reference to the active render device.
-        explicit RenderResources(IRenderDevice& dev) : device(dev) {}
+        explicit RenderResources(IRenderDevice& dev, RenderSystem* rs);
         ~RenderResources();
 
         /// @brief Creates a GPU data buffer resource.
@@ -89,30 +97,47 @@ namespace LaurelEye::Graphics {
         /// @param tag Optional tag used to group related resources.
         /// @return Handle to the created DataBuffer resource.
         [[nodiscard]] DataBufferHandle createDataBuffer(const std::string& name, const DataBufferDesc& d,
+                                                        const std::vector<std::string>& tags);
+        [[nodiscard]] DataBufferHandle createDataBuffer(const std::string& name, const DataBufferDesc& d,
                                                         const std::string& tag);
-        [[nodiscard]] TextureHandle createTexture(const std::string& name, const TextureDesc& d,
-                                                  const std::string& tag, const void* init = nullptr);
-        [[nodiscard]] FramebufferHandle createFramebuffer(const std::string& name, const FramebufferDesc& d,
-                                                          const std::string& tag);
-
-        // Add Textures create, get, resize and destroy here. Also add resizeTag.
-
         /// @brief Retrieves a handle to an existing data buffer.
         ///
         /// @param name Name of the buffer to retrieve.
         /// @return Handle to the DataBuffer resource, or an invalid handle if not found.
         DataBufferHandle dataBuffer(const std::string& name);
-        TextureHandle texture(const std::string& name);
-        FramebufferHandle framebuffer(const std::string& name);
-
-        // void rebuildFramebuffer(const std::string& name, const FramebufferDesc& d);
-
         /// @brief Destroys a data buffer resource by name.
         ///
         /// @param name Name of the buffer to destroy.
         void destroyDataBuffer(const std::string& name);
+        // void resizeDataBuffer(const std::string& name, uint32_t size);
+
+        [[nodiscard]] TextureHandle createTexture(const std::string& name, const TextureDesc& d,
+                                                  const std::vector<std::string>& tags, const void* init = nullptr);
+        [[nodiscard]] TextureHandle createTexture(const std::string& name, const TextureDesc& d,
+                                                  const std::string& tag, const void* init = nullptr);
+        [[nodiscard]] TextureHandle createScreenSizeTexture(const std::string& name,
+                                                            const std::vector<std::string>& tags,
+                                                            const SampleCount& samples = SampleCount::X1);
+        TextureHandle texture(const std::string& name);
         void destroyTexture(const std::string& name);
+        void resizeTexture(const std::string& name, const SizeRegistry& size);
+
+        [[nodiscard]] FramebufferHandle createFramebuffer(const std::string& name, const FramebufferDesc& d,
+                                                          const std::vector<std::string>& tags);
+        [[nodiscard]] FramebufferHandle createFramebuffer(const std::string& name, const FramebufferDesc& d,
+                                                          const std::string& tag);
+        [[nodiscard]] TextureHandle createScreenSizeFramebuffer(const std::string& name,
+                                                                const std::vector<std::string>& textureNames,
+                                                                const std::vector<std::string>& tags,
+                                                                const SampleCount& samples = SampleCount::X1);
+        FramebufferHandle framebuffer(const std::string& name);
         void destroyFramebuffer(const std::string& name);
+        void resizeFramebuffer(const std::string& name, const SizeRegistry& size);
+        // void rebuildFramebuffer(const std::string& name, const FramebufferDesc& d);
+
+        // Add resizeTag somewhere that resizes all resources with a specific tag.
+        void resizeTag(const std::string& tag, const SizeRegistry& size);
+        void resizeScreenSize(SurfaceHandle h, const SizeRegistry& size);
 
         // void destroy(const std::string& name);
         // void destroyTag(const std::string& tag);
@@ -120,9 +145,15 @@ namespace LaurelEye::Graphics {
         // NOTE: I'm unsure if this should be allowed
         IRenderDevice& getRenderDevice();
 
+        void setSurfaceSize(SurfaceHandle h, const SizeRegistry& size);
+        const SizeRegistry& getSurfaceSize(SurfaceHandle h = 0) const;
+
     private:
         /// @brief Reference to the underlying render device responsible for actual GPU operations.
         IRenderDevice& device;
+
+        // Window size, later make a better system to handle more windows.
+        SizeRegistry size;
 
         /// @brief Map of data buffer names to their corresponding resource metadata.
         std::unordered_map<std::string, DataBufferResource> dataBuffers;

@@ -1,9 +1,18 @@
-﻿#include "LaurelEyeEngine/graphics/device/glfw/LGLFramebufferFactory.h"
+﻿/// @file   LGLFramebufferFactory.cpp
+/// @author Anish Murthy (anish.murthy.dev@gmail.com)
+/// @par    **DigiPen Email**
+///     anish.murthy@digipen.edu
+/// @date    11-06-2025
+/// @brief Framebuffer Factory for OpenGL rendering
+
+#include "LaurelEyeEngine/graphics/device/glfw/LGLFramebufferFactory.h"
+
 #include "LaurelEyeEngine/graphics/device/glfw/LGLRenderDevice.h"
 #include "LaurelEyeEngine/graphics/device/glfw/LGLTextureFactory.h"
 #include "LaurelEyeEngine/graphics/resources/Framebuffer.h"
 #include "LaurelEyeEngine/graphics/resources/SizeRegistry.h"
 #include "LaurelEyeEngine/graphics/resources/Texture.h"
+#include <vector>
 
 namespace LaurelEye::Graphics {
 
@@ -23,10 +32,17 @@ namespace LaurelEye::Graphics {
         glCreateFramebuffers(1, &r.id);
         createdBuffers[r.id] = r;
 
+        std::vector<GLenum> bufferAttachments;
         for ( auto& attachment : r.desc.attachments ) {
             if ( attachment.size.width == 0 ) attachment.size = r.desc.size;
             attachTexture(r.id, attachment);
+            if ( attachment.type == FramebufferAttachmentType::Color )
+                bufferAttachments.push_back(GL_COLOR_ATTACHMENT0 + attachment.colorAttachmentIndex);
         }
+
+        glBindFramebuffer(GL_FRAMEBUFFER, r.id);
+        glDrawBuffers(bufferAttachments.size(), bufferAttachments.data());
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         GLenum status = glCheckNamedFramebufferStatus(r.id, GL_FRAMEBUFFER);
         assert((status == GL_FRAMEBUFFER_COMPLETE) && "ERROR::RENDER_SYSTEM::FRAMEBUFFER_FACTORY::CREATE::FAILED");
@@ -75,18 +91,21 @@ namespace LaurelEye::Graphics {
                 glNamedFramebufferTexture(h, a.glAttachment, a.texture, 0);
             }
 
-            GLuint rbo;
             glCreateRenderbuffers(1, &rbo);
-            // TODO: Add stricter checking for format being a Depth type.
-            glNamedRenderbufferStorage(rbo, textureFormatToGLFormat(a.d.format), d.size.width, d.size.height); // Configure renderbuffer storage
+            if ( a.d.samples == SampleCount::X1 ) {
+                // TODO: Add stricter checking for format being a Depth type.
+                glNamedRenderbufferStorage(rbo, textureFormatToGLFormat(a.d.format), d.size.width, d.size.height); // Configure renderbuffer storage
+            }
+            else {
+                glNamedRenderbufferStorageMultisample(rbo, (GLsizei)getSampleIntFromSampleCount(a.d.samples), textureFormatToGLFormat(a.d.format), d.size.width, d.size.height);
+            }
             glNamedFramebufferRenderbuffer(h, a.glAttachment, GL_RENDERBUFFER, rbo);
 
             createdBuffers[h].attachments.push_back(a);
             return 0;
         }
         case FramebufferAttachmentType::Color: {
-            a.glAttachment = GL_COLOR_ATTACHMENT0 + colorAttachmentIndex;
-            ++colorAttachmentIndex;
+            a.glAttachment = GL_COLOR_ATTACHMENT0 + a.d.colorAttachmentIndex;
 
             if ( !isValidTexture(a.texture) ) {
                 a.texture = createColorAttachmentTexture(h, d);
@@ -96,7 +115,7 @@ namespace LaurelEye::Graphics {
             glNamedFramebufferTexture(h, a.glAttachment, a.texture, 0);
 
             createdBuffers[h].attachments.push_back(a);
-            return colorAttachmentIndex - 1;
+            return a.d.colorAttachmentIndex;
         }
         case LaurelEye::Graphics::FramebufferAttachmentType::DepthStencil:
         case LaurelEye::Graphics::FramebufferAttachmentType::Stencil:
@@ -105,13 +124,12 @@ namespace LaurelEye::Graphics {
         }
 
         // This should never happen, but is here as fallback
-        a.glAttachment = GL_COLOR_ATTACHMENT0 + colorAttachmentIndex;
-        ++colorAttachmentIndex;
+        a.glAttachment = GL_COLOR_ATTACHMENT0 + a.d.colorAttachmentIndex;
 
         glNamedFramebufferTexture(createdBuffers[h].id, a.glAttachment, a.texture, 0);
 
         createdBuffers[h].attachments.push_back(a);
-        return colorAttachmentIndex - 1;
+        return a.d.colorAttachmentIndex;
     }
 
     TextureHandle LGLFramebufferFactory::createColorAttachmentTexture(
@@ -126,9 +144,59 @@ namespace LaurelEye::Graphics {
         t.width = d.size.width;
         t.height = d.size.height;
         t.mipLevels = d.mipLevels;
+        t.samples = d.samples;
         TextureHandle texture = textureFactory->create(t);
 
         return texture;
+    }
+
+    void LGLFramebufferFactory::resize(FramebufferHandle h, uint32_t width, uint32_t height) {
+        LGLFramebufferRecord& framebuffer = createdBuffers[h];
+        framebuffer.desc.size.width = width;
+        framebuffer.desc.size.height = height;
+
+        for ( auto& attachment : framebuffer.attachments ) {
+            attachment.d.size = framebuffer.desc.size;
+            if ( isValidTexture(attachment.texture) )
+                textureFactory->resize(attachment.texture, framebuffer.desc.size.width, framebuffer.desc.size.height);
+            if ( attachment.d.type == FramebufferAttachmentType::Depth ) {
+                if ( rbo ) glDeleteRenderbuffers(1, &rbo);
+                glCreateRenderbuffers(1, &rbo);
+                if ( attachment.d.samples == SampleCount::X1 ) {
+                    glNamedRenderbufferStorage(rbo, textureFormatToGLFormat(attachment.d.format), width, height);
+                }
+                else {
+                    glNamedRenderbufferStorageMultisample(rbo, (GLsizei)getSampleIntFromSampleCount(attachment.d.samples), textureFormatToGLFormat(attachment.d.format), attachment.d.size.width, attachment.d.size.height);
+                }
+                glNamedFramebufferRenderbuffer(h, attachment.glAttachment, GL_RENDERBUFFER, rbo);
+            }
+        }
+    }
+
+    void LGLFramebufferFactory::blit(FramebufferHandle source, FramebufferHandle dest) {
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, source);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dest);
+
+        for ( const auto& attachment : createdBuffers[source].attachments ) {
+            GLenum att = attachment.glAttachment;
+
+            GLbitfield mask = GL_COLOR_BUFFER_BIT;
+            if ( attachment.d.type == FramebufferAttachmentType::Depth ) {
+                glReadBuffer(GL_NONE);
+                glDrawBuffer(GL_NONE);
+                mask = GL_DEPTH_BUFFER_BIT;
+            }
+            else {
+                glReadBuffer(att);
+                glDrawBuffer(att);
+            }
+            glBlitFramebuffer(
+                0, 0, attachment.d.size.width, attachment.d.size.height,
+                0, 0, attachment.d.size.width, attachment.d.size.height,
+                mask,
+                GL_NEAREST // required for MSAA resolve
+            );
+        }
     }
 
 } // namespace LaurelEye::Graphics

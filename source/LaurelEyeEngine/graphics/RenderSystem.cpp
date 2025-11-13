@@ -9,6 +9,10 @@
 #include "LaurelEyeEngine/ecs/ISystem.h"
 #include "LaurelEyeEngine/graphics/Graphics.h"
 
+#include "LaurelEyeEngine/graphics/renderpass/DeferredRenderPass.h"
+#include "LaurelEyeEngine/graphics/renderpass/ParticleRenderPass.h"
+#include "LaurelEyeEngine/graphics/renderpass/SkydomePass.h"
+#include "LaurelEyeEngine/graphics/RenderStateSaver.h"
 #include "LaurelEyeEngine/graphics/resources/DataBuffer.h"
 #include "LaurelEyeEngine/graphics/resources/Lights.h"
 #include "LaurelEyeEngine/graphics/resources/Shadow.h"
@@ -25,6 +29,8 @@
 #include "LaurelEyeEngine/graphics/graphics_components/LightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/Renderable3DComponent.h"
 // #include "LaurelEyeEngine/graphics/renderpass/SingleBufferedDataPass.h"
+#include "LaurelEyeEngine/graphics/renderpass/DebugDrawRenderPass.h"
+#include "LaurelEyeEngine/graphics/renderpass/GBufferPass.h"
 #include "LaurelEyeEngine/graphics/renderpass/SinglePass.h"
 #include "LaurelEyeEngine/graphics/renderpass/SinglePassShadow.h"
 #include "LaurelEyeEngine/graphics/renderpass/UIPass.h"
@@ -90,11 +96,22 @@ namespace LaurelEye::Graphics {
         createWindowSurfaces();
 
         // Temp code starts here:
-        tempRenderResources = std::make_unique<RenderResources>(*device.get());
+        tempRenderResources = std::make_unique<RenderResources>(*device.get(), this);
+        for ( const auto& windowSurface : windowSurfaces ) {
+            // NOTE: This logic has not at all been set up, so hardcoding.
+            tempRenderResources->setSurfaceSize(0, windowSurface->getSize());
+        }
+
+        gbufferPass = std::make_shared<GBufferPass>();
+        gbufferPass->setup(*tempRenderResources.get());
+
+        deferredRenderPass = std::make_shared<DeferredRenderPass>();
+        deferredRenderPass->setup(*tempRenderResources.get());
+
         // sp = std::make_shared<SinglePass>();
-        sp = std::make_shared<SinglePassShadow>();
+        // sp = std::make_shared<SinglePassShadow>();
         // sp = std::make_shared<SingleBufferedDataPass>();
-        sp->setup(*tempRenderResources.get());
+        // sp->setup(*tempRenderResources.get());
 
         bp = std::make_shared<SkydomePass>();
         bp->setup(*tempRenderResources.get());
@@ -183,17 +200,11 @@ namespace LaurelEye::Graphics {
             *tempRenderResources.get(),
             components,
         };
-
-        tempShadowManager->update(shadowCtx, &globalLights, &localLights);
-        tempShadowManager->bindShadowBuffer();
-
-        glViewport(0, 0, windowSurfaces[0]->getSize().width, windowSurfaces[0]->getSize().height);
-
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-        // Bind camera and global lights buffer for use in shaders
-        device->bindDataBufferBase(camera->getCameraBufferHandle());
-        device->bindDataBufferBase(globalLightsBufferHandle);
+        {
+            RenderStateSaver test = RenderStateSaver(device.get());
+            tempShadowManager->update(shadowCtx, &globalLights, &localLights);
+            tempShadowManager->bindShadowBuffer();
+        }
 
         // FrameContext for all objects in scene.
         FrameContext ctx{
@@ -203,20 +214,46 @@ namespace LaurelEye::Graphics {
             components,
             tempShadowManager.get()};
 
-        if ( bp->getTexture() != InvalidTexture ) {
-            bp->execute(ctx);
+        // GBuffer only needs the Camera.
+        device->bindDataBufferBase(camera->getCameraBufferHandle());
+        {
+            RenderStateSaver test = RenderStateSaver(device.get());
+            gbufferPass->execute(ctx);
         }
-        sp->execute(ctx);
 
+        // Change draw target to the main window and clear screen.
+        // TODO: Move these to the device.
+        device->bindFramebufferBase(0);
+        glViewport(0, 0, windowSurfaces[0]->getSize().width, windowSurfaces[0]->getSize().height);
+        glClearColor(config.clearColor[0], config.clearColor[1], config.clearColor[2], config.clearColor[3]);
+        // By default, this clears color and depth.
+        device->clear();
+
+        // We are repeating it in case the binding points were overwritten by
+        // any render pass before this.
+        //
+        // Bind camera and global lights buffer for use in shaders
+        device->bindDataBufferBase(camera->getCameraBufferHandle());
+        device->bindDataBufferBase(globalLightsBufferHandle);
+
+        {
+            RenderStateSaver savedState = RenderStateSaver(device.get());
+            deferredRenderPass->execute(ctx);
+        }
+
+        // Draw the particles.
         if ( runDebugDraw ) {
-            //Debug Draw Render Pass
+            // Debug Draw Render Pass
             if ( dbrp ) {
                 FrameContext dbCtx{
                     0.1f,
                     *device.get(),
                     *tempRenderResources.get(),
                     components};
-                dbrp->execute(dbCtx);
+                {
+                    RenderStateSaver test = RenderStateSaver(device.get());
+                    dbrp->execute(dbCtx);
+                }
             }
         }
 
@@ -227,7 +264,10 @@ namespace LaurelEye::Graphics {
                 *tempRenderResources.get(),
                 components};
 
-            prp->execute(prpCtx);
+            {
+                RenderStateSaver test = RenderStateSaver(device.get());
+                prp->execute(prpCtx);
+            }
         }
 
         // UI pass
@@ -237,8 +277,10 @@ namespace LaurelEye::Graphics {
             *device.get(),
             *tempRenderResources.get(),
             uiComponents};
-
-        uiPass->execute(uiCtx);
+        {
+            RenderStateSaver savedState = RenderStateSaver(device.get());
+            uiPass->execute(uiCtx);
+        }
 
         windowSurfaces[0]->endFrame();
     }
@@ -450,6 +492,9 @@ namespace LaurelEye::Graphics {
     std::shared_ptr<SkydomePass> RenderSystem::retrieveSkydomePass() {
         return bp;
     }
+    std::shared_ptr<GBufferPass> RenderSystem::retrieveGBufferPass() {
+        return gbufferPass;
+    }
     std::shared_ptr<DebugDrawRenderPass> RenderSystem::retrieveDebugDrawRenderPass() {
         return dbrp;
     }
@@ -501,7 +546,7 @@ namespace LaurelEye::Graphics {
             // Temporarily auto adding shadows.
             globalLights.sunLight.shadowIndex = Shadow::ShadowPending;
             if ( isShadowPending(globalLights.sunLight.shadowIndex) ) {
-                tempShadowManager->addShadow(0, globalLights.sunLight, ShadowDesc());
+                tempShadowManager->addShadow(0, &globalLights.sunLight, ShadowDesc());
             }
             updateGlobalLights();
             break;

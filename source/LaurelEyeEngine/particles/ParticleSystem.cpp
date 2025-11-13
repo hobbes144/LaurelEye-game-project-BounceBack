@@ -9,6 +9,7 @@
 ///
 
 #include "LaurelEyeEngine/particles/ParticleSystem.h"
+#include "LaurelEyeEngine/graphics/renderpass/ParticleRenderPass.h"
 
 // #include <cmath>
 

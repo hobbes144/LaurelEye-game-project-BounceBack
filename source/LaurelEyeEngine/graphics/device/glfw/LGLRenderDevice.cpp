@@ -112,10 +112,11 @@ namespace LaurelEye::Graphics {
             throw std::runtime_error("ERROR::RENDERSYSTEM::INIT::GLADINIT");
         }
 
-        // Enabling debug output for now
-#if !defined (NDEBUG)
+        // Enabling debug output
+#if !defined(NDEBUG)
         glDebugMessageCallback(openglCallbackFunction, nullptr);
         glEnable(GL_DEBUG_OUTPUT);
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 #endif
 
         glEnable(GL_DEPTH_TEST);
@@ -274,7 +275,6 @@ namespace LaurelEye::Graphics {
     }
 
     FramebufferHandle LGLRenderDevice::createFramebuffer(const FramebufferDesc& d) {
-        assert((d.size.width != -1) && "Window size FB not supported yet.");
         return framebufferFactory->create(d);
     }
 
@@ -291,6 +291,14 @@ namespace LaurelEye::Graphics {
 
     uint32_t LGLRenderDevice::attachTexturetoFramebuffer(FramebufferHandle h, const FramebufferAttachmentDesc& d) {
         return framebufferFactory->attachTexture(h, d);
+    }
+
+    void LGLRenderDevice::resizeFramebuffer(FramebufferHandle h, uint32_t width, uint32_t height) {
+        framebufferFactory->resize(h, width, height);
+    }
+
+    void LGLRenderDevice::blitFramebuffers(FramebufferHandle source, FramebufferHandle dest) {
+        framebufferFactory->blit(source, dest);
     }
 
 } // namespace LaurelEye::Graphics

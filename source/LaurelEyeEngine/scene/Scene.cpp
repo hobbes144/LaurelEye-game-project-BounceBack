@@ -3,6 +3,8 @@
 #include "LaurelEyeEngine/ecs/EntityFactory.h"
 
 // For system initializing
+#include "LaurelEyeEngine/graphics/renderpass/GBufferPass.h"
+#include "LaurelEyeEngine/graphics/renderpass/SkydomePass.h"
 #include "LaurelEyeEngine/transform/TransformComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/Renderable3DComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/CameraComponent.h"
@@ -53,6 +55,7 @@ namespace LaurelEye {
         if ( colorBackground ) {
             ctx.getService<Graphics::RenderSystem>()->setClearColor(backgroundColor.x, backgroundColor.y, backgroundColor.z);
             ctx.getService<Graphics::RenderSystem>()->retrieveSkydomePass()->setTexture(Graphics::InvalidTexture);
+                ctx.getService<Graphics::RenderSystem>()->retrieveGBufferPass()->addSkydome(Graphics::InvalidTexture);
         }
         else if ( textureBackground ) {
                 Graphics::TextureDesc desc = Graphics::TextureDesc();
@@ -66,6 +69,7 @@ namespace LaurelEye {
                     desc.format = Graphics::TextureFormat::RGBA8;
                 auto handle = ctx.getService<Graphics::RenderSystem>()->getRenderResources()->createTexture(backgroundTexture->getName(), desc, "ImageImporter", backgroundTexture->pixelData.data());
                 ctx.getService<Graphics::RenderSystem>()->retrieveSkydomePass()->addTexture(handle);
+                ctx.getService<Graphics::RenderSystem>()->retrieveGBufferPass()->addSkydome(handle);
             }
         auto committed = spawnPendingEntities();
         // Also register any existing entities (for activation we want whole scene)
@@ -88,7 +92,7 @@ namespace LaurelEye {
                 e->setRegistered(false);
             }
         }
-            
+
         active = false;
     }
 
@@ -151,7 +155,7 @@ namespace LaurelEye {
             textureBackground = true;
             colorBackground = false;
         }
-        
+
     }
 
     Entity* Scene::addEntity(Entity* entityToAdd) {
