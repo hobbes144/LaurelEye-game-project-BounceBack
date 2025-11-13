@@ -49,6 +49,9 @@ namespace LaurelEye::Physics {
 
         void registerComponent(const ComponentPtr component) override;
         void deregisterComponent(const ComponentPtr component) override;
+
+        void registerCollisionEnterListeners();
+        void deregisterCollisionEnterListeners();
         /// @brief Create a physics body and add it to the world
         /// @param type The body type (dynamic, static, kinematic)
         /// @param shapeDesc The collision shape descriptor for the body

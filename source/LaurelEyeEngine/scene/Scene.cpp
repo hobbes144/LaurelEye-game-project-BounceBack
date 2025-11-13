@@ -81,11 +81,14 @@ namespace LaurelEye {
             }
         }
         if ( auto* t = ctx.getService<TransformSystem>() ) t->update(0.016f);
+        if ( auto* p = ctx.getService<Physics::PhysicsSystem>() ) p->registerCollisionEnterListeners();
         active = true;
     }
 
     void Scene::deregisterScene() {
         if ( !active ) return;
+
+        if ( auto* p = ctx.getService<Physics::PhysicsSystem>() ) p->deregisterCollisionEnterListeners();
 
         for ( auto& e : entities ) {
             if ( e->getRegistered() ) {

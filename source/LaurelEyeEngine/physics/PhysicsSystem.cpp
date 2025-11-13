@@ -17,52 +17,6 @@ namespace LaurelEye::Physics {
             break;
             // Add more backends here
         }
-
-        auto* eventManager = context->getService<EventManager>();
-        assert(eventManager && "PhysicsSystem: No EventManager in EngineContext");
-
-        // Add the scripting event bindings
-        enterListener = eventManager->addListener<CollisionEnterEvent>(
-            [&](const CollisionEnterEvent& event) {
-                const auto& data = event.GetData();
-                assert(data.entityARef && data.entityBRef);
-
-                // Forward to Lua if either entity has a script
-                if ( auto* scriptA = data.entityARef->findComponent<Scripting::ScriptComponent>() )
-                    scriptA->getScriptInstance()->onCollisionEnter(data);
-
-                if ( auto* scriptB = data.entityBRef->findComponent<Scripting::ScriptComponent>() )
-                    scriptB->getScriptInstance()->onCollisionEnter(data);
-
-                std::cout << "[Enter] " << data << std::endl;
-            });
-
-        stayListener = eventManager->addListener<CollisionStayEvent>(
-            [&](const CollisionStayEvent& event) {
-                const auto& data = event.GetData();
-                assert(data.entityARef && data.entityBRef);
-
-                if ( auto* scriptA = data.entityARef->findComponent<Scripting::ScriptComponent>() )
-                    scriptA->getScriptInstance()->onCollisionStay(data);
-
-                if ( auto* scriptB = data.entityBRef->findComponent<Scripting::ScriptComponent>() )
-                    scriptB->getScriptInstance()->onCollisionStay(data);
-
-            });
-
-        exitListener = eventManager->addListener<CollisionExitEvent>(
-            [&](const CollisionExitEvent& event) {
-                const auto& data = event.GetData();
-                assert(data.entityARef && data.entityBRef);
-
-                if ( auto* scriptA = data.entityARef->findComponent<Scripting::ScriptComponent>() )
-                    scriptA->getScriptInstance()->onCollisionExit(data);
-
-                if ( auto* scriptB = data.entityBRef->findComponent<Scripting::ScriptComponent>() )
-                    scriptB->getScriptInstance()->onCollisionExit(data);
-
-                std::cout << "[Exit] " << data << std::endl;
-            });
     }
 
     void PhysicsSystem::update(float dt) {
@@ -123,6 +77,78 @@ namespace LaurelEye::Physics {
 
         // Finally remove from active list
         ISystem<PhysicsBodyComponent>::deregisterComponent(component);
+    }
+
+    void PhysicsSystem::registerCollisionEnterListeners() {
+        auto* eventManager = context->getService<EventManager>();
+        assert(eventManager && "PhysicsSystem: No EventManager in EngineContext");
+        // Add the scripting event bindings
+        enterListener = eventManager->addListener<CollisionEnterEvent>(
+            [&](const CollisionEnterEvent& event) {
+                const auto& data = event.GetData();
+                assert(data.entityARef && data.entityBRef);
+
+                // Forward to Lua if either entity has a script
+                if ( auto* scriptA = data.entityARef->findComponent<Scripting::ScriptComponent>() ) {
+                    if ( auto* instance = scriptA->getScriptInstance() ) {
+                        instance->onCollisionEnter(data);
+                    }
+                }
+
+                if ( auto* scriptB = data.entityBRef->findComponent<Scripting::ScriptComponent>() ) {
+                    if ( auto* instance = scriptB->getScriptInstance() ) {
+                        instance->onCollisionEnter(data);
+                    }
+                }
+
+                std::cout << "[Enter] " << data << std::endl;
+            });
+
+        stayListener = eventManager->addListener<CollisionStayEvent>(
+            [&](const CollisionStayEvent& event) {
+                const auto& data = event.GetData();
+                assert(data.entityARef && data.entityBRef);
+
+                if ( auto* scriptA = data.entityARef->findComponent<Scripting::ScriptComponent>() ) {
+                    if ( auto* instance = scriptA->getScriptInstance() ) {
+                        instance->onCollisionStay(data);
+                    }
+                }
+
+                if ( auto* scriptB = data.entityBRef->findComponent<Scripting::ScriptComponent>() ) {
+                    if ( auto* instance = scriptB->getScriptInstance() ) {
+                        instance->onCollisionStay(data);
+                    }
+                }
+            });
+
+        exitListener = eventManager->addListener<CollisionExitEvent>(
+            [&](const CollisionExitEvent& event) {
+                const auto& data = event.GetData();
+                assert(data.entityARef && data.entityBRef);
+
+                if ( auto* scriptA = data.entityARef->findComponent<Scripting::ScriptComponent>() ) {
+                    if ( auto* instance = scriptA->getScriptInstance() ) {
+                        instance->onCollisionExit(data);
+                    }
+                };
+
+                if ( auto* scriptB = data.entityBRef->findComponent<Scripting::ScriptComponent>() ) {
+                    if ( auto* instance = scriptB->getScriptInstance() ) {
+                        instance->onCollisionExit(data);
+                    }
+                }
+
+                std::cout << "[Exit] " << data << std::endl;
+            });
+    }
+
+    void PhysicsSystem::deregisterCollisionEnterListeners() {
+        auto* eventManager = context->getService<EventManager>();
+        assert(eventManager && "PhysicsSystem: No EventManager in EngineContext");
+        eventManager->removeListener<CollisionEnterEvent>(enterListener);
+        eventManager->removeListener<CollisionStayEvent>(stayListener);
+        eventManager->removeListener<CollisionExitEvent>(exitListener);
     }
 
     std::shared_ptr<IBody> PhysicsSystem::CreateBody(const PhysicsBodyData& data) {
