@@ -15,11 +15,10 @@
 
 namespace LaurelEye::Audio {
     void SpeakerComponent::playSound(const std::string& soundName) {
-        TransformComponent* tr = owner->LaurelEye::Entity::findComponent<LaurelEye::TransformComponent>();
-        Transform position = tr->getWorldTransform();
-        Vector3 velocity; // Currently not used
-        audioManager->playSound(soundName);
-        isPlaying = true;
+        if ( owner ) {
+            audioManager->playSound(soundName);
+            isPlaying = true;
+        }
     }
 
     void SpeakerComponent::stopSound(const std::string& soundName) {
@@ -41,14 +40,6 @@ namespace LaurelEye::Audio {
 
     void SpeakerComponent::setVolume(float vol) {
         audioManager->setVolume(audioName, vol);
-    }
-
-    void SpeakerComponent::update() {
-        TransformComponent* tr = owner->LaurelEye::Entity::findComponent<LaurelEye::TransformComponent>();
-        Transform position = tr->getWorldTransform();
-        Vector3 velocity; // Currently not used
-        audioManager->setSoundPosition(audioName, position.getPosition());
-        //audioManager->setSoundVelocity(audioName, velocity);
     }
 
     void SpeakerComponent::setAudioManager(IAudioManager* manager) {

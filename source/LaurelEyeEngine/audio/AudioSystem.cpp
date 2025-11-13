@@ -6,6 +6,7 @@
 /// @brief  Implementation of AudioSystem that manages audio components and interfaces with audio backends.
 
 #include "LaurelEyeEngine/audio/AudioSystem.h"
+#include "LaurelEyeEngine/transform/TransformComponent.h"
 
 namespace LaurelEye::Audio {
     AudioSystem::AudioSystem(AudioSystemType type) {
@@ -43,12 +44,25 @@ namespace LaurelEye::Audio {
 
     void AudioSystem::update(float dt) {
         for ( size_t i = 0; i < components.size(); i++ ) {
-            components[i]->update();
+            updateComponent(components[i]);
         }
         audioManager->update();
     }
 
+    void AudioSystem::updateComponent(SpeakerComponent* comp) {
+        if ( comp->getOwner() ) {
+            TransformComponent* tr = comp->getOwner()->LaurelEye::Entity::findComponent<LaurelEye::TransformComponent>();
+            if ( tr ) {
+                Transform position = tr->getWorldTransform();
+                Vector3 velocity; // Currently not used
+                audioManager->setSoundPosition(comp->getAudioName(), position.getPosition());
+                // audioManager->setSoundVelocity(audioName, velocity);
+            }
+        }
+    }
+
     void AudioSystem::shutdown() {
         audioManager->shutdown();
+        components.clear();
     }
 }

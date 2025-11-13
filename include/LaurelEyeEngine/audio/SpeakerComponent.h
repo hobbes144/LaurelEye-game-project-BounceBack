@@ -29,9 +29,11 @@ namespace LaurelEye::Audio {
         float getVolume() const;
         void setVolume(float vol);
 
+        std::string getAudioName() const { return audioName; }
+        void setAudioName(const std::string& name) { audioName = name; }
+
         void setAudioManager(IAudioManager* manager);
 
-        void setAudioName(std::string newAudioName) { audioName = newAudioName; }
         const std::string& getAudioName() { return audioName; }
 
         void setPlayOnLoad(bool play) { playOnLoad = play; }
@@ -43,9 +45,6 @@ namespace LaurelEye::Audio {
         // Load audio asset in the audio manager, only when used after created is valid
         void loadAudioAsset();
         void loadAudioAssetImmidiate();
-
-        // Update speaker component each frame, automatically called by AudioSystem, update sound position, volume and so on.
-        void update();
 
     private:
         bool isPlaying;

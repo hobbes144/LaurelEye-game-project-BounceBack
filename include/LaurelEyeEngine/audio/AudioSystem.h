@@ -32,6 +32,7 @@ namespace LaurelEye::Audio {
         Vector3 getListenerPosition() const;
         void setListenerVelocity(const Vector3& velocity);
         Vector3 getListenerVelocity() const;
+        void updateComponent(SpeakerComponent* comp);
 
         IAudioManager* getAudioManager() { return audioManager; }
 
