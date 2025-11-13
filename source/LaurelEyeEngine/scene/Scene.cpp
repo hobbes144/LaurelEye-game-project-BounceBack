@@ -23,6 +23,7 @@
 #include "LaurelEyeEngine/graphics/RenderSystem.h"
 #include "LaurelEyeEngine/scripting/ScriptSystem.h"
 #include "LaurelEyeEngine/particles/ParticleSystem.h"
+#include "LaurelEyeEngine/audio/AudioSystem.h"
 #include "LaurelEyeEngine/io/AssetManager.h"
 #include "LaurelEyeEngine/graphics/resources/Texture.h"
 #include "LaurelEyeEngine/memory/MemoryManager.h"
@@ -276,6 +277,7 @@ namespace LaurelEye {
         auto* renderSystem = ctx.getService<Graphics::RenderSystem>();
         auto* scriptingSystem = ctx.getService<Scripting::ScriptSystem>();
         auto* particleSystem = ctx.getService<Particles::ParticleSystem>();
+        auto* audioSystem = ctx.getService<Audio::AudioSystem>();
 
         for (auto& comp : entity->getComponents()) {
             if ( auto* transformComp = dynamic_cast<TransformComponent*>(comp.get()) ) {
@@ -325,9 +327,12 @@ namespace LaurelEye {
                 }
             }
             else if ( auto* speakerComp = dynamic_cast<Audio::SpeakerComponent*>( comp.get() ) ) {
-                speakerComp->loadAudioAsset();
-                if ( speakerComp->getPlayOnLoad() ) {
-                    speakerComp->playSound();
+                if ( audioSystem ) {
+                    audioSystem->registerComponent(speakerComp);
+                    //speakerComp->loadAudioAsset();
+                    if ( speakerComp->getPlayOnLoad() ) {
+                        speakerComp->playSound();
+                    }
                 }
             }
             // add more as needed...
@@ -341,6 +346,7 @@ namespace LaurelEye {
         auto* renderSystem = ctx.getService<Graphics::RenderSystem>();
         auto* scriptingSystem = ctx.getService<Scripting::ScriptSystem>();
         auto* particleSystem = ctx.getService<Particles::ParticleSystem>();
+        auto* audioSystem = ctx.getService<Audio::AudioSystem>();
 
         for ( auto& comp : entity->getComponents() ) {
             if ( auto* transformComp = dynamic_cast<TransformComponent*>(comp.get()) ) {
@@ -389,6 +395,9 @@ namespace LaurelEye {
                 }
             }
             else if ( auto* speakerComp = dynamic_cast<Audio::SpeakerComponent*>(comp.get()) ) {
+                if ( audioSystem ) {
+                    audioSystem->deregisterComponent(speakerComp);
+                }
                 speakerComp->stopSound(speakerComp->getAudioName());
             }
             // add more as needed...

@@ -516,7 +516,6 @@ namespace LaurelEye {
         sp->setAudioManager(am);
         sp->setAudioName(audioName);
         sp->setPlayOnLoad(playOnLoad);
-        audioSystem->registerComponent(sp);
 
         sp->createAudioAsset(assetPath + audioPath, volume, is3D, isLooping);
         sp->loadAudioAsset();
