@@ -54,3 +54,17 @@ end
 function onShutdown()
     log("Player controller stopped")
 end
+
+
+function onCollisionEnter(data)
+    log("[Lua] Collision enter with " .. data.entityB:getName())
+    log("Contact point:", data.contactPoint.x, data.contactPoint.y, data.contactPoint.z)
+end
+
+function onCollisionStay(data)
+    -- log("[Lua] Still colliding with " .. data.entityB:getName())
+end
+
+function onCollisionExit(data)
+    log("[Lua] Collision exit with " .. data.entityB:getName())
+end

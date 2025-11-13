@@ -21,6 +21,10 @@ namespace LaurelEye::Scripting{
         void onUpdate(float dt) override;
         void onShutdown() override;
 
+        void onCollisionEnter(const Physics::CollisionEventData& data) override;
+        void onCollisionStay(const Physics::CollisionEventData& data) override;
+        void onCollisionExit(const Physics::CollisionEventData& data) override;
+
         /// @brief Gets an active lua variable state from the sol2 environment.
         /// For example, if an int "count" is set from script, this lets us reach
         /// into the lua state and find that value.
@@ -41,7 +45,7 @@ namespace LaurelEye::Scripting{
     private:
         sol::state& lua;
         sol::environment env;
-        sol::function startFunc, updateFunc, shutdownFunc;
+        sol::function startFunc, updateFunc, shutdownFunc, collisionEnterFunc, collisionStayFunc, collisionExitFunc;
         LaurelEye::Entity* owner;
 
         void invalidate();

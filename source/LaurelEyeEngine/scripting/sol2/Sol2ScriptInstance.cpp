@@ -1,6 +1,7 @@
 ﻿#include "LaurelEyeEngine/scripting/sol2/Sol2ScriptInstance.h"
 #include "LaurelEyeEngine/scripting/sol2/Sol2API.h"
 #include "LaurelEyeEngine/io/FileSystem.h"
+#include "LaurelEyeEngine/physics/CollisionManager.h"
 
 namespace LaurelEye::Scripting {
 
@@ -20,6 +21,10 @@ namespace LaurelEye::Scripting {
         startFunc = env["onStart"];
         updateFunc = env["onUpdate"];
         shutdownFunc = env["onShutdown"];
+
+        collisionEnterFunc = env["onCollisionEnter"];
+        collisionStayFunc = env["onCollisionStay"];
+        collisionExitFunc = env["onCollisionExit"];
     }
 
     Sol2ScriptInstance::~Sol2ScriptInstance() {
@@ -57,10 +62,44 @@ namespace LaurelEye::Scripting {
         }
         invalidate();
     }
+
+    void Sol2ScriptInstance::onCollisionEnter(const Physics::CollisionEventData& data) {
+        if ( collisionEnterFunc.valid() ) {
+            auto result = collisionEnterFunc(data);
+            if ( !result.valid() ) {
+                sol::error err = result;
+                std::cerr << "[Lua onCollisionEnter Error] " << err.what() << std::endl;
+            }
+        }
+    }
+
+    void Sol2ScriptInstance::onCollisionStay(const Physics::CollisionEventData& data) {
+        if ( collisionStayFunc.valid() ) {
+            auto result = collisionStayFunc(data);
+            if ( !result.valid() ) {
+                sol::error err = result;
+                std::cerr << "[Lua onCollisionStay Error] " << err.what() << std::endl;
+            }
+        }
+    }
+
+    void Sol2ScriptInstance::onCollisionExit(const Physics::CollisionEventData& data) {
+        if ( collisionExitFunc.valid() ) {
+            auto result = collisionExitFunc(data);
+            if ( !result.valid() ) {
+                sol::error err = result;
+                std::cerr << "[Lua onCollisionExit Error] " << err.what() << std::endl;
+            }
+        }
+    }
+
     void Sol2ScriptInstance::invalidate() {
         startFunc = sol::nil;
         updateFunc = sol::nil;
         shutdownFunc = sol::nil;
+        collisionEnterFunc = sol::nil;
+        collisionStayFunc = sol::nil;
+        collisionExitFunc = sol::nil;
         env = sol::nil;
         owner = nullptr;
     }

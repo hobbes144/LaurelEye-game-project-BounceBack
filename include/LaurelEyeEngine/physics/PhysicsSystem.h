@@ -78,6 +78,10 @@ namespace LaurelEye::Physics {
         std::unique_ptr<IPhysicsWorld> world;
         CollisionManager collisionManager;
 
+        uint32_t enterListener;
+        uint32_t stayListener;
+        uint32_t exitListener;
+
         void dispatchCollisionEvents();
 
     };

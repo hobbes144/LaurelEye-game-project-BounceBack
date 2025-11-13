@@ -80,5 +80,13 @@ namespace LaurelEye::Scripting {
                     return Physics::PhysicsBodyData::Capsule(radius, height, mass); },
                     [](float radius, float height) {
                         return Physics::PhysicsBodyData::Capsule(radius, height); }));
+
+        // Bind collision event data
+        lua.new_usertype<Physics::CollisionEventData>("CollisionEventData",
+                                                      "type", &Physics::CollisionEventData::type,
+                                                      "entityA", &Physics::CollisionEventData::entityARef,
+                                                      "entityB", &Physics::CollisionEventData::entityBRef,
+                                                      "contactPoint", &Physics::CollisionEventData::contactPoint,
+                                                      "contactNormal", &Physics::CollisionEventData::contactNormal);
     }
 } // namespace LaurelEye::Scripting
