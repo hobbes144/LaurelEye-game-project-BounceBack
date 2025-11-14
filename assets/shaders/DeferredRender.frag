@@ -134,6 +134,8 @@ void main()
     vec3 Ii = sunLight.color * sunLight.intensity;
     vec3 L = -normalize(sunLight.direction);
 
+    FragColor = vec3(0.0,0.0,0.0);
+
     if (!inShadow) {
         FragColor = specularBRDF(L, N, V, Ii, Kd, Ks, alpha);
     }
