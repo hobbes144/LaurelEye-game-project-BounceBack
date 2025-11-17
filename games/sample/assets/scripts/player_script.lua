@@ -23,16 +23,16 @@ function onUpdate(dt)
     -- This is wrong due to our axes being off.
     -- fix when axes are corrected
     if Input:isKeyHeld(Key.A) then
-        moveZ = moveZ - 1.0
-    end
-    if Input:isKeyHeld(Key.D) then
-        moveZ = moveZ + 1.0
-    end
-    if Input:isKeyHeld(Key.S) then
         moveX = moveX - 1.0
     end
-    if Input:isKeyHeld(Key.W) then
+    if Input:isKeyHeld(Key.D) then
         moveX = moveX + 1.0
+    end
+    if Input:isKeyHeld(Key.S) then
+        moveZ = moveZ + 1.0
+    end
+    if Input:isKeyHeld(Key.W) then
+        moveZ = moveZ - 1.0
     end
     if Input:isKeyPressed(Key.Space) then
         body:applyImpulse(0.0, 15.0, 0.0)

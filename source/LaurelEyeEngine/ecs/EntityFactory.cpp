@@ -260,9 +260,9 @@ namespace LaurelEye {
     void EntityFactory::setupCameraComponent(Entity& entity, const rapidjson::Value& cameraData) {
         std::unique_ptr<Graphics::CameraComponent> cameraComponent = std::make_unique<Graphics::CameraComponent>();
 
-        cameraComponent->setPositionRotation(
-            Vector3(-35.f, 15.f, 0.f),
-            Matrix4::lookAt(Vector3(-50.f, 15.f, 0.f), Vector3(0.f)).toQuaternion());
+        //cameraComponent->setPositionRotation(
+        //    Vector3(-35.f, 15.f, 0.f),
+        //    Matrix4::lookAt(Vector3(-50.f, 15.f, 0.f), Vector3(0.f)).toQuaternion());
         cameraComponent->setPerspectiveProjection(45.0f * 3.14159f / 180.0f, 1280.f / 720.f, 0.1f, 1000.0f);
         entity.addComponent<Graphics::CameraComponent>(std::move(cameraComponent));
     }

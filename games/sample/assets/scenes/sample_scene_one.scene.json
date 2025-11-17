@@ -49,12 +49,15 @@
             "name": "Camera",
             "components": {
                 "Transform": {
-                    "position": [ 0.0, -1.0, 0.0 ],
-                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "position": [ 0.0, 15.0, 40.0 ],
+                    "rotation": [ -50.0, 10.0, 0.0, 0.0 ],
                     "scale": [ 50.0, 1.0, 50.0 ]
                 },
                 "Camera": {
 
+                },
+                "Script": {
+                    "path": "scripts/camera_movement.lua"
                 }
             }
         },

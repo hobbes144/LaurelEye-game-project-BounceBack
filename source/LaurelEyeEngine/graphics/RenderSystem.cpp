@@ -142,8 +142,13 @@ namespace LaurelEye::Graphics {
     void RenderSystem::update(float deltaTime) {
         // TODO: All the draw logic should run here.
         // Camera update
-        updateCameraBuffer(camera);
-        device->bindDataBufferBase(camera->getCameraBufferHandle());
+        if ( camera ) {
+            if ( TransformComponent* bound = camera->GetBoundTransform() ) {
+                camera->updateFromTransform(bound);
+            }
+            updateCameraBuffer(camera);
+            device->bindDataBufferBase(camera->getCameraBufferHandle());
+        }
         // for ( size_t i = 0; i < GetCameraComponents().size(); i++ ) {
         //     GetCameraComponents()[i]->updateViewMatrix();
         //     if ( GetCameraComponents()[i]->getInitStatus() == false ) {
