@@ -1,9 +1,9 @@
 ﻿{
-    "name": "PlayerPrefab",
+    "name": "FollowingEnemyPrefab",
     "components": {
         "Transform": {
-            "position": [ 0.0, 0.0, 0.0 ],
-            "rotation": [ 0.0, 0.0, 180.0, 1.0 ],
+            "position": [ 20.0, 0.0, 20.0 ],
+            "rotation": [ 180.0, 0.0, 180.0, 1.0 ],
             "scale": [ 0.08, 0.08, 0.08 ]
         },
         "Render3D": {
@@ -11,7 +11,7 @@
                 "file": "models/roman_D.fbx"
             },
             "material": {
-                "texture": "textures/roman_blue_D_texture.jpg",
+                "texture": "textures/viking_blue_C_texture.jpg",
                 "diffuse": [ 10.0, 1.0, 1.0 ],
                 "specular": [ 0.2, 0.2, 0.2 ],
                 "shininess": 32.0
@@ -62,7 +62,7 @@
             "gravityScale": 8.0
         },
         "Script": {
-            "path": "scripts/player_script.lua"
+            "path": "scripts/following_enemy.lua"
         }
     }
 }

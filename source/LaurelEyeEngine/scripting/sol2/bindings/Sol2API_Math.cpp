@@ -166,7 +166,8 @@ namespace LaurelEye::Scripting {
                 static_cast<Quaternion(*)(const Vector3&)>(&Quaternion::fromEuler),
                 static_cast<Quaternion(*)(float,float,float)>(&Quaternion::fromEuler)
             ),
-            "axisAngleToQuaternion", &Quaternion::axisAngleToQuaternion
+            "axisAngleToQuaternion", &Quaternion::axisAngleToQuaternion,
+            "slerp", &Quaternion::slerp
         );
     }
 

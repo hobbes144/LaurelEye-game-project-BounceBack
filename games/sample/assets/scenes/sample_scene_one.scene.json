@@ -10,7 +10,7 @@
                 "Transform": {
                     "position": [ 0.0, -1.0, 0.0 ],
                     "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
-                    "scale": [ 50.0, 1.0, 50.0 ]
+                    "scale": [ 50.0, 2.0, 50.0 ]
                 },
                 "Render3D": {
                     "mesh": {
@@ -93,7 +93,7 @@
             }
         },
         {
-            "name": "Level1Player",
+            "name": "Player",
             "prefab": "prefabs/player.prefab.json"
         },
         {
@@ -120,6 +120,10 @@
         {
             "name": "FigureEight",
             "prefab": "prefabs/figure_eight_cube.prefab.json"
+        },
+        {
+            "name": "Enemy",
+            "prefab": "prefabs/following_enemy.prefab.json"
         }
     ]
 }

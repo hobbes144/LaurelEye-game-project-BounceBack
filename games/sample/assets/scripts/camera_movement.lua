@@ -1,45 +1,74 @@
 ﻿transform = nil
-speed = 20.0
+target = nil
+
+-- Camera offsets
+distanceBack = 35.0
+height = 20.0
+rotationSpeed = 1.0  -- radians per second
+lerpSpeed = 8.0      -- smooth follow speed
+
+yaw = 0.0 -- camera rotation around player
 
 function onStart()
     transform = self:findTransform()
+    target = findPlayer()
     if transform == nil then
         logerr("Camera Transform Not Found")
-     end
+    end
 end
 
 function onUpdate(dt)
-    local moveX = 0.0
-    local moveZ = 0.0
+    if target == nil then
+        target = findPlayer()
+        if target == nil then return end
+    end
 
+    local playerPos = target:getWorldPosition()
+    local camPos = transform:getWorldPosition()
+
+    -- Camera controlling input
     if Input:isKeyHeld(Key.ArrowLeft) then
-        moveX = moveX - 1.0
+        yaw = yaw + rotationSpeed * dt  
     end
     if Input:isKeyHeld(Key.ArrowRight) then
-        moveX = moveX + 1.0
-    end
-    if Input:isKeyHeld(Key.ArrowDown) then
-        moveZ = moveZ + 1.0
-    end
-    if Input:isKeyHeld(Key.ArrowUp) then
-        moveZ = moveZ - 1.0
-    end
-    
-    local mag = math.sqrt(moveX * moveX + moveZ * moveZ)
-    if mag > 0 then
-        moveX = moveX / mag
-        moveZ = moveZ / mag
+        yaw = yaw - rotationSpeed * dt
     end
 
-    -- Apply delta movement
-    if moveX ~= 0 or moveZ ~= 0 then
-        local pos = transform:getWorldPosition()
-        pos.x = pos.x + moveX * speed * dt
-        pos.z = pos.z + moveZ * speed * dt
-        transform:setWorldPosition(pos)
-    end
+    -- Compute desired camera position
+    local offsetX = math.sin(yaw) * distanceBack
+    local offsetZ = math.cos(yaw) * distanceBack
+    local desiredPos = Vector3.new(playerPos.x + offsetX, playerPos.y + height, playerPos.z - offsetZ)
+
+    --interpolate to desired position
+    camPos.x = camPos.x + (desiredPos.x - camPos.x) * lerpSpeed * dt
+    camPos.y = camPos.y + (desiredPos.y - camPos.y) * lerpSpeed * dt
+    camPos.z = camPos.z + (desiredPos.z - camPos.z) * lerpSpeed * dt
+    transform:setWorldPosition(camPos)
+
+    -- Look at player
+    local dir = playerPos - camPos
+    dir = dir:Normalized()
+
+    local yawAngle = math.atan(-dir.x, -dir.z)
+    local pitchAngle = math.asin(dir.y)
+
+    local targetQuat = Quaternion.fromEuler(pitchAngle, yawAngle, 0)
+
+    -- Smoothly interpolate rotation to remove jitter
+    local currentRot = transform:getWorldRotation()
+    local newRot = Quaternion.slerp(currentRot, targetQuat, dt * lerpSpeed)
+    transform:setWorldRotation(newRot)
 end
 
 function onShutdown()
     log("Camera controller stopped")
+end
+
+-- Helper to find player (same as enemy)
+function findPlayer()
+    local scene = SceneManager:getCurrentScene()
+    if scene == nil then return nil end
+    local playerEntity = scene:findEntityByName("PlayerPrefab")
+    if playerEntity == nil then return nil end
+    return playerEntity:findTransform()
 end
