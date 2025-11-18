@@ -18,6 +18,15 @@ namespace LaurelEye::Scripting {
                 self.ApplyImpulse(Vector3(x, y, z));
             }),
 
+            "getLinearVelocity", &Physics::PhysicsBodyComponent::GetLinearVelocity,
+            "setLinearVelocity", sol::overload(static_cast<void (Physics::PhysicsBodyComponent::*)(Vector3)>(&Physics::PhysicsBodyComponent::SetLinearVeloctiy), [](Physics::PhysicsBodyComponent& self, float x, float y, float z) {
+                self.SetLinearVeloctiy(Vector3(x, y, z));
+            }),
+            "getAngularVelocity", &Physics::PhysicsBodyComponent::GetAngularVelocity,
+            "setAngularVelocity", sol::overload(static_cast<void (Physics::PhysicsBodyComponent::*)(Vector3)>(&Physics::PhysicsBodyComponent::SetAngularVelocity), [](Physics::PhysicsBodyComponent& self, float x, float y, float z) {
+                self.SetAngularVelocity(Vector3(x, y, z));
+            }),
+
             // --- Data Access ---
             "getBodyData", &Physics::PhysicsBodyComponent::GetBodyData,
             "setBodyData", &Physics::PhysicsBodyComponent::SetBodyData,

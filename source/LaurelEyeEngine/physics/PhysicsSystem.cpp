@@ -172,7 +172,7 @@ namespace LaurelEye::Physics {
             LaurelEye::TransformComponent* transform = body->GetBoundTransform();
             if ( !transform ) continue;
 
-            const Vector3 pos = transform->getWorldPosition();
+            const Vector3 pos = transform->getWorldPosition() + pbc->GetBodyData().centerOfMass;
             const Quaternion rot = transform->getWorldRotation();
             const Vector3 scale = transform->getWorldScale();
 

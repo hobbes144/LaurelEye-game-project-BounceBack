@@ -18,6 +18,10 @@ namespace LaurelEye::Physics {
     /// @brief PhysicsId is shorthand for std::uint32_t
     using PhysicsId = std::uint32_t;
 
+    enum class Axis {
+        X,Y,Z
+    };
+
     /// @brief The type of body
     enum class BodyType {
         Static, Dynamic, Kinematic
@@ -39,12 +43,19 @@ namespace LaurelEye::Physics {
         //Transform
         LaurelEye::TransformComponent* transformRef = nullptr;
         // Physical properties
-        Vector3 inertia = {0, 0, 0};
         Vector3 centerOfMass = {0, 0, 0};
+        Vector3 linearVelocity = {0, 0, 0};
+        Vector3 angularVelocity = {0, 0, 0};
+        Vector3 inertia = {0, 0, 0};
         float linearDamping = 0.0f;
         float angularDamping = 0.0f;
         float friction = 0.5f;
         float restitution = 0.0f;
+        //Translation Freezing
+        Vector3 freezeTranslation = {false, false, false};
+        //Rotation Freezing
+        Vector3 freezeRotation = {false, false, false};
+
         // Collision filtering
         uint32_t collisionGroup = 1;
         uint32_t collisionMask = 0xFFFFFFFF;

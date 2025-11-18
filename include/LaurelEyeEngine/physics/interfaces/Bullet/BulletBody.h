@@ -20,8 +20,11 @@ namespace LaurelEye::Physics {
 
         void BindPhysicsBodyComponent(PhysicsBodyComponent* pbc) override;
 
-        void SetVelocity(const Vector3& v) override;
-        Vector3 GetVelocity() const override;
+        void SetLinearVelocity(const Vector3& v) override;
+        Vector3 GetLinearVelocity() const override;
+
+        void SetAngularVelocity(const Vector3& v) override;
+        Vector3 GetAngularVelocity() const override;
 
         void SetMass(float m) override;
         float GetMass() const override;

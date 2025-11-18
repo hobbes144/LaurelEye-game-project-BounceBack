@@ -48,10 +48,17 @@ namespace LaurelEye::Physics {
 
         /// @brief Set the linear velocity of this body.
         /// @param v The velocity vector.
-        virtual void SetVelocity(const Vector3& v) = 0;
+        virtual void SetLinearVelocity(const Vector3& v) = 0;
         /// @brief Get the current linear velocity of this body.
         /// @return The velocity vector.
-        virtual Vector3 GetVelocity() const = 0;
+        virtual Vector3 GetLinearVelocity() const = 0;
+
+        /// @brief Set the linear velocity of this body.
+        /// @param v The velocity vector.
+        virtual void SetAngularVelocity(const Vector3& v) = 0;
+        /// @brief Get the current linear velocity of this body.
+        /// @return The velocity vector.
+        virtual Vector3 GetAngularVelocity() const = 0;
 
         /// @brief Set the mass of this body.
         /// @param m The mass value.

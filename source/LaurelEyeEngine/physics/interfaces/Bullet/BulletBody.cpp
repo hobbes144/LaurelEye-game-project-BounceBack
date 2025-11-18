@@ -43,12 +43,22 @@ namespace LaurelEye::Physics {
         btRB->setUserPointer(pbc);
     }
 
-    void BulletBody::SetVelocity(const Vector3& v) {
+    void BulletBody::SetLinearVelocity(const Vector3& v) {
+        btRB->activate(true);
         btRB->setLinearVelocity(ToBt(v));
     }
 
-    Vector3 BulletBody::GetVelocity() const {
+    Vector3 BulletBody::GetLinearVelocity() const {
         return FromBt(btRB->getLinearVelocity());
+    }
+
+    void BulletBody::SetAngularVelocity(const Vector3& v) {
+        btRB->activate(true);
+        btRB->setAngularVelocity(ToBt(v));
+    }
+
+    Vector3 BulletBody::GetAngularVelocity() const {
+        return FromBt(btRB->getAngularVelocity());
     }
 
     void BulletBody::SetMass(float m) {

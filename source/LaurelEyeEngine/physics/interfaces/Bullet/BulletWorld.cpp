@@ -64,6 +64,30 @@ namespace LaurelEye::Physics {
 
         //Mass & Inertia
         float mass = (data.type == BodyType::Dynamic) ? data.mass : 0.0f;
+
+        //Center of Mass
+        btCollisionShape* shape = bulletShape->GetInternal();
+        if ( !(data.centerOfMass == Vector3(0, 0, 0)) ) {
+            btCompoundShape* compound = new btCompoundShape();
+
+            btTransform offset;
+            offset.setIdentity();
+            offset.setOrigin(btVector3(
+                data.centerOfMass.x,
+                data.centerOfMass.y,
+                data.centerOfMass.z));
+
+            compound->addChildShape(offset, shape);
+
+            // Replace internal shape
+            bulletShape->SetInternal(compound);
+            shape = compound;
+        }
+
+
+        btVector3 linearVelocity(data.linearVelocity.x, data.linearVelocity.y, data.linearVelocity.z);
+        btVector3 angularVelocity(data.angularVelocity.x, data.angularVelocity.y, data.angularVelocity.z);
+
         btVector3 inertia(0, 0, 0);
         if ( mass > 0.0f ) bulletShape->GetInternal()->calculateLocalInertia(mass, inertia);
         if ( !(data.inertia == Vector3(0, 0, 0)) ) {
@@ -87,6 +111,8 @@ namespace LaurelEye::Physics {
 
         //Create and Add Rigidbody
         auto body = std::make_shared<btRigidBody>(rbInfo);
+        body->setLinearVelocity(btVector3(data.linearVelocity.x, data.linearVelocity.y, data.linearVelocity.z));
+        body->setAngularVelocity(btVector3(data.angularVelocity.x, data.angularVelocity.y, data.angularVelocity.z));
         body->setFriction(data.friction);
         body->setRestitution(data.restitution);
         world->addRigidBody(body.get(), data.collisionGroup, data.collisionMask);

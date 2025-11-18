@@ -22,14 +22,24 @@
             "shapeDefinition": {
                 "type": "Box",
                 "size": {
-                    "x": 20.0,
-                    "y": 1.0,
-                    "z": 20.0
+                    "x": 30.0,
+                    "y": 40.0,
+                    "z": 30.0
                 },
                 "radius": 0.5,
                 "height": 1.0
             },
             "mass": 1.0,
+            "linearVelocity": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "angularVelocity": {
+                "x": 0.0,
+                "y": 5.0,
+                "z": 0.0
+            },
             "inertia": {
                 "x": 0.0,
                 "y": 0.0,
@@ -37,7 +47,7 @@
             },
             "centerOfMass": {
                 "x": 0.0,
-                "y": 0.0,
+                "y": 1.5,
                 "z": 0.0
             },
             "linearDamping": 0.05,

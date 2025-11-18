@@ -30,6 +30,12 @@ namespace LaurelEye::Physics {
 
         void setOwner(Entity* entity) override;
 
+        void SetLinearVeloctiy(Vector3 newVelocity);
+        Vector3 GetLinearVelocity();
+
+        void SetAngularVelocity(Vector3 newVelocity);
+        Vector3 GetAngularVelocity();
+
         void ApplyForce(Vector3 f);
         void ApplyImpulse(Vector3 i);
 

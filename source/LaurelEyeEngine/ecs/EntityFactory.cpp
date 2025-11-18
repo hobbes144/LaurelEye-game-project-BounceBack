@@ -390,6 +390,18 @@ namespace LaurelEye {
 
         // --- Mass and physical properties ---
         if ( physicsData.HasMember("mass") ) data.mass = physicsData["mass"].GetFloat();
+        if ( physicsData.HasMember("linearVelocity") && physicsData["linearVelocity"].IsObject() ) {
+            const auto& i = physicsData["linearVelocity"];
+            data.linearVelocity.x = i.HasMember("x") ? i["x"].GetFloat() : 0.0f;
+            data.linearVelocity.y = i.HasMember("y") ? i["y"].GetFloat() : 0.0f;
+            data.linearVelocity.z = i.HasMember("z") ? i["z"].GetFloat() : 0.0f;
+        }
+        if ( physicsData.HasMember("angularVelocity") && physicsData["angularVelocity"].IsObject() ) {
+            const auto& i = physicsData["angularVelocity"];
+            data.angularVelocity.x = i.HasMember("x") ? i["x"].GetFloat() : 0.0f;
+            data.angularVelocity.y = i.HasMember("y") ? i["y"].GetFloat() : 0.0f;
+            data.angularVelocity.z = i.HasMember("z") ? i["z"].GetFloat() : 0.0f;
+        }
         if ( physicsData.HasMember("inertia") && physicsData["inertia"].IsObject() ) {
             const auto& i = physicsData["inertia"];
             data.inertia.x = i.HasMember("x") ? i["x"].GetFloat() : 0.0f;
@@ -407,6 +419,19 @@ namespace LaurelEye {
         if ( physicsData.HasMember("angularDamping") ) data.angularDamping = physicsData["angularDamping"].GetFloat();
         if ( physicsData.HasMember("friction") ) data.friction = physicsData["friction"].GetFloat();
         if ( physicsData.HasMember("restitution") ) data.restitution = physicsData["restitution"].GetFloat();
+
+        if ( physicsData.HasMember("frozenTranslations") && physicsData["frozenTranslations"].IsObject() ) {
+            const auto& f = physicsData["frozenTranslations"];
+            data.freezeTranslation.x = f.HasMember("x") ? f["x"].GetBool() : false;
+            data.freezeTranslation.y = f.HasMember("y") ? f["y"].GetBool() : false;
+            data.freezeTranslation.z = f.HasMember("z") ? f["z"].GetBool() : false;
+        }
+        if ( physicsData.HasMember("frozenRotations") && physicsData["frozenRotations"].IsObject() ) {
+            const auto& f = physicsData["frozenRotations"];
+            data.freezeRotation.x = f.HasMember("x") ? f["x"].GetBool() : false;
+            data.freezeRotation.y = f.HasMember("y") ? f["y"].GetBool() : false;
+            data.freezeRotation.z = f.HasMember("z") ? f["z"].GetBool() : false;
+        }
 
         if ( physicsData.HasMember("collisionGroup") ) data.collisionGroup = physicsData["collisionGroup"].GetUint();
         if ( physicsData.HasMember("collisionMask") ) data.collisionMask = physicsData["collisionMask"].GetUint();

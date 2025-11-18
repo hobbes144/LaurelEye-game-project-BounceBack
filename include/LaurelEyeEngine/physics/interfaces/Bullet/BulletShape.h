@@ -20,7 +20,12 @@ namespace LaurelEye::Physics {
         ~BulletShape();
 
         CollisionShapePhys GetDescription() const override;
+        void SetInternal(btCollisionShape* newShape) {
+            shape = newShape;
+        }
         btCollisionShape* GetInternal() { return shape; }
+
+
 
     private:
         CollisionShapePhys collisionShapePhys;

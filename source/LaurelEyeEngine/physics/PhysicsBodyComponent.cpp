@@ -38,6 +38,21 @@ namespace LaurelEye::Physics {
         }
     }
 
+    void PhysicsBodyComponent::SetLinearVeloctiy(Vector3 newVelocity) {
+        body->SetLinearVelocity(newVelocity);
+    }
+
+    Vector3 PhysicsBodyComponent::GetLinearVelocity() {
+        return body->GetLinearVelocity();
+    }
+
+    void PhysicsBodyComponent::SetAngularVelocity(Vector3 newVelocity) {
+        body->SetAngularVelocity(newVelocity);
+    }
+    Vector3 PhysicsBodyComponent::GetAngularVelocity() {
+        return body->GetAngularVelocity();
+    }
+
     void PhysicsBodyComponent::ApplyForce(Vector3 f) {
         body->ApplyForce(f);
     }
