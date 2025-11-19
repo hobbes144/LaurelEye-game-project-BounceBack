@@ -1,25 +1,53 @@
 ﻿
 namespace LaurelEye {
     enum class Key {
-        W,
-        A,
-        S,
-        D,
         Space,
         Escape,
-        Enter,
+
+        arrowDown,
+        arrowUp,
+        arrowLeft,
+        arrowRight,
+
         Tab,
         Tilde,
-        arrowUp,
-        arrowDown,
-        arrowRight,
-        arrowLeft,
+
         One,
         Two,
         Three,
         Four,
         Five,
-        Six
+        Six,
+        Seven,
+        Eight,
+        Nine,
+
+        A,
+        B,
+        C,
+        D,
+        E,
+        F,
+        G,
+        H,
+        I,
+        J,
+        K,
+        L,
+        M,
+        N,
+        O,
+        P,
+        Q,
+        R,
+        S,
+        T,
+        U,
+        V,
+        W,
+        X,
+        Y,
+        Z
     };
 
     enum class MouseButton {

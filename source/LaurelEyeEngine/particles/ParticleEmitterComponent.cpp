@@ -13,6 +13,31 @@
 
 namespace LaurelEye::Particles {
 
+    void ParticleEmitterComponent::Play() {
+        isPlaying = true;
+        timer = -1.0f;
+    }
+
+    void ParticleEmitterComponent::Pause() {
+        isPlaying = false;
+        timer = -1.0f;
+    }
+
+    void ParticleEmitterComponent::Toggle() {
+        std::cout << "--- Particles Toggled ---" << std::endl;
+        isPlaying = !isPlaying;
+        timer = -1.0;
+    }
+
+    void ParticleEmitterComponent::PlayFor(float t) {
+        isPlaying = true;
+        timer = t;
+    }
+
+    void ParticleEmitterComponent::PauseIn(float t) {
+        timer = t;
+    }
+
     //--- Getters ---
     ParticleEmitterData& ParticleEmitterComponent::GetEmitterData() {
         return emitterData;
@@ -28,6 +53,10 @@ namespace LaurelEye::Particles {
 
     const std::vector<ParticleData>& ParticleEmitterComponent::GetParticles() const {
         return particles;
+    }
+
+    bool ParticleEmitterComponent::GetIsPlaying() const {
+        return isPlaying;
     }
 
     float ParticleEmitterComponent::GetEmissionAccumulator() const {
@@ -65,7 +94,15 @@ namespace LaurelEye::Particles {
         particles.resize(maxParticles);
         emissionAccumulator = 0.0f;
     }
-
+    void ParticleEmitterComponent::UpdateTimer(float dt) {
+        if ( timer >= 0.0f ) {
+            timer -= dt;
+            if ( timer < 0.0f ) {
+                Toggle();
+            }
+        }
+    }
+    
     void ParticleEmitterComponent::BindTransform(LaurelEye::TransformComponent* t) {
         boundTransform = t;
     }

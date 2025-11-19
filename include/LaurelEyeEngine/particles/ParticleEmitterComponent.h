@@ -56,6 +56,21 @@ namespace LaurelEye::Particles {
 
     public:
 
+        //--- Interface ---
+        /// @brief Begins Emission of Particles
+        void Play();
+        /// @brief Ends Emission of Particles
+        void Pause();
+        /// @brief Toggles Emission of Particles
+        void Toggle();
+        /// @brief Will Play (or continue Playing) for @tparam seconds
+        /// @param t time in seconds
+        void PlayFor(float t);
+        /// @brief Will Pause in @tparam seconds (Will not begin emission if 
+        /// already paused)
+        /// @param t time in seconds
+        void PauseIn(float t);
+
         //--- Getters ---
         ParticleEmitterData& GetEmitterData();
         const ParticleEmitterData& GetEmitterData() const;
@@ -63,6 +78,7 @@ namespace LaurelEye::Particles {
         std::vector<ParticleData>& GetParticles();
         const std::vector<ParticleData>& GetParticles() const;
 
+        bool GetIsPlaying() const;
         float GetEmissionAccumulator() const;
         size_t GetMaxParticles() const;
 
@@ -75,6 +91,7 @@ namespace LaurelEye::Particles {
         //--- Utilities ---
         void PopulateParticles();
         void ClearParticles();
+        void UpdateTimer(float dt);
 
         void BindTransform(LaurelEye::TransformComponent* t);
         LaurelEye::TransformComponent* GetBoundTransform() const;
@@ -83,6 +100,9 @@ namespace LaurelEye::Particles {
         std::uniform_real_distribution<float> randomSpread{-1.0f, 1.0f};
 
     private:
+        bool isPlaying = true;
+        float timer = -1.0f;
+
         ParticleEmitterData emitterData;
         size_t maxParticles = 500;
 

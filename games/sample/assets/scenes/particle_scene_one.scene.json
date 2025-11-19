@@ -127,6 +127,9 @@
 
                     "usePhysics": false,
                     "maxParticles": 600
+                },
+                "Script": {
+                    "path": "scripts/particle_toggle.lua"
                 }
             }
         },
@@ -155,6 +158,9 @@
 
                     "usePhysics": true,
                     "maxParticles": 800
+                },
+                "Script": {
+                    "path": "scripts/particle_toggle.lua"
                 }
             }
         },
@@ -183,6 +189,9 @@
 
                     "usePhysics": false,
                     "maxParticles": 600
+                },
+                "Script": {
+                    "path": "scripts/particle_toggle.lua"
                 }
             }
         }

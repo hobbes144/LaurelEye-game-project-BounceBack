@@ -15,24 +15,54 @@ namespace LaurelEye::Scripting {
     void Sol2API_Input::setupInputManager(sol::state& lua, InputManager* input) {
         // --- Key Enum ---
         lua.new_enum("Key",
-                     "W", Key::W,
-                     "A", Key::A,
-                     "S", Key::S,
-                     "D", Key::D,
                      "Space", Key::Space,
                      "Escape", Key::Escape,
-                     "Enter", Key::Enter,
-                     "Tab", Key::Tab,
-                     "ArrowUp", Key::arrowUp,
+
                      "ArrowDown", Key::arrowDown,
-                     "ArrowRight", Key::arrowRight,
+                     "ArrowUp", Key::arrowUp,
                      "ArrowLeft", Key::arrowLeft,
+                     "ArrowRight", Key::arrowRight,
+
+                     "Tab", Key::Tab,
+                     "Tilde", Key::Tilde,
+
                      "One", Key::One,
                      "Two", Key::Two,
                      "Three", Key::Three,
                      "Four", Key::Four,
                      "Five", Key::Five,
-                     "Six", Key::Six);
+                     "Six", Key::Six,
+                     "Seven", Key::Seven,
+                     "Eight", Key::Eight,
+                     "Nine", Key::Nine,
+
+                     "A", Key::A,
+                     "B", Key::B,
+                     "C", Key::C,
+                     "D", Key::D,
+                     "E", Key::E,
+                     "F", Key::F,
+                     "G", Key::G,
+                     "H", Key::H,
+                     "I", Key::I,
+                     "J", Key::J,
+                     "K", Key::K,
+                     "L", Key::L,
+                     "M", Key::M,
+                     "N", Key::N,
+                     "O", Key::O,
+                     "P", Key::P,
+                     "Q", Key::Q,
+                     "R", Key::R,
+                     "S", Key::S,
+                     "T", Key::T,
+                     "U", Key::U,
+                     "V", Key::V,
+                     "W", Key::W,
+                     "X", Key::X,
+                     "Y", Key::Y,
+                     "Z", Key::Z);
+
 
         // --- MouseButton Enum ---
         lua.new_enum("MouseButton",

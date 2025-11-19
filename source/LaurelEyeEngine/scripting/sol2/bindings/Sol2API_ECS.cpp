@@ -10,6 +10,7 @@
 #include "LaurelEyeEngine/physics/PhysicsBodyComponent.h"
 #include "LaurelEyeEngine/scripting/ScriptComponent.h"
 #include "LaurelEyeEngine/audio/SpeakerComponent.h"
+#include "LaurelEyeEngine/particles/ParticleEmitterComponent.h"
 
 namespace LaurelEye::Scripting {
     void Sol2API_ECS::setup(sol::state& lua, EngineContext* ctx) {
@@ -46,6 +47,7 @@ namespace LaurelEye::Scripting {
         entityType.set_function("findPhysics", &safeFindComponent<Physics::PhysicsBodyComponent>);
         entityType.set_function("findScript", &safeFindComponent<ScriptComponent>);
         entityType.set_function("findSpeaker", &safeFindComponent<Audio::SpeakerComponent>);
+        entityType.set_function("findParticleEmitter", &safeFindComponent<Particles::ParticleEmitterComponent>);
     }
 
     sol::object Sol2API_ECS::dynamicFindComponent(Entity& e, const std::string& type, sol::this_state s) {
@@ -77,6 +79,10 @@ namespace LaurelEye::Scripting {
         }
         else if ( type == "PhysicsBodyComponent" ) {
             if ( auto* c = e.findComponent<Physics::PhysicsBodyComponent>() )
+                return sol::make_object(lua, c);
+        }
+        else if ( type == "ParticleEmitterComponent" ) {
+            if ( auto* c = e.findComponent<Particles::ParticleEmitterComponent>() )
                 return sol::make_object(lua, c);
         }
         else if ( type == "ScriptComponent" ) {

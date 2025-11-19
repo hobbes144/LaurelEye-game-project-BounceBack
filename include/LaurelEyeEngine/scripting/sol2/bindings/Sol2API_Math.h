@@ -8,6 +8,7 @@
 
 #pragma once
 #include "LaurelEyeEngine/math/Vector3.h"
+#include "LaurelEyeEngine/math/VectorTemplated.h"
 #include "LaurelEyeEngine/math/Matrix4.h"
 #include "LaurelEyeEngine/math/Transform.h"
 #include <cmath>
@@ -24,6 +25,7 @@ namespace LaurelEye::Scripting {
     private:
         // Setting up individual math structures
         static void setupVec3(sol::state& lua);
+        static void setupVec4(sol::state& lua);
         static void setupMatrix4(sol::state& lua);
         static void setupQuaternion(sol::state& lua);
         static void setupTransform(sol::state& lua);

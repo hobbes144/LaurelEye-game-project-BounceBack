@@ -51,14 +51,17 @@ namespace LaurelEye::Particles {
         //---For Each Emitter Component---
         for ( auto* emitter : components ) {
 
-            emitter->IncrementEmittedParticles(dt);
+            emitter->UpdateTimer(dt);
 
             //---Spawn New Particles---
-            // While the Emitter is still poised to emit
-            while ( emitter->GetEmissionAccumulator() >= 1.0f ) {
-                emitter->DecrementEmissionAccumulator();
-                // Spawn a new Particle
-                spawnParticle(*emitter);
+            if (emitter->GetIsPlaying()) {
+                emitter->IncrementEmittedParticles(dt);
+                // While the Emitter is still poised to emit
+                while ( emitter->GetEmissionAccumulator() >= 1.0f ) {
+                    emitter->DecrementEmissionAccumulator();
+                    // Spawn a new Particle
+                    spawnParticle(*emitter);
+                }
             }
 
             //---Update Particles---

@@ -7,6 +7,7 @@
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Time.h"
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Physics.h"
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Scene.h"
+#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Particles.h"
 
 namespace LaurelEye::Scripting {
 
@@ -37,6 +38,10 @@ namespace LaurelEye::Scripting {
 
         /* Physics */
         Sol2API_Physics::setup(lua, ctx);
+
+        /* Particles*/
+        Sol2API_Particles::setup(lua, ctx);
+
     }
 
     void Sol2API::registerEnvironment(sol::environment& env, LaurelEye::Entity* owner) {
