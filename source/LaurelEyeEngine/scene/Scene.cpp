@@ -3,31 +3,33 @@
 #include "LaurelEyeEngine/ecs/EntityFactory.h"
 
 // For system initializing
-#include "LaurelEyeEngine/graphics/renderpass/GBufferPass.h"
-#include "LaurelEyeEngine/graphics/renderpass/SkydomePass.h"
-#include "LaurelEyeEngine/transform/TransformComponent.h"
-#include "LaurelEyeEngine/graphics/graphics_components/Renderable3DComponent.h"
-#include "LaurelEyeEngine/graphics/graphics_components/CameraComponent.h"
-#include "LaurelEyeEngine/graphics/graphics_components/LightComponent.h"
+#include "LaurelEyeEngine/audio/SpeakerComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/AmbientLightComponent.h"
+#include "LaurelEyeEngine/graphics/graphics_components/CameraComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/DirectionalLightComponent.h"
+#include "LaurelEyeEngine/graphics/graphics_components/LightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/PointLightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/Renderable3DComponent.h"
+#include "LaurelEyeEngine/graphics/graphics_components/UIButtonComponent.h"
+#include "LaurelEyeEngine/graphics/graphics_components/UIComponent.h"
+#include "LaurelEyeEngine/graphics/renderpass/GBufferPass.h"
+#include "LaurelEyeEngine/graphics/renderpass/SkydomePass.h"
 #include "LaurelEyeEngine/particles/ParticleEmitterComponent.h"
 #include "LaurelEyeEngine/physics/PhysicsBodyComponent.h"
 #include "LaurelEyeEngine/scripting/ScriptComponent.h"
-#include "LaurelEyeEngine/audio/SpeakerComponent.h"
+#include "LaurelEyeEngine/transform/TransformComponent.h"
+#include "LaurelEyeEngine/UI/UIElementManager.h"
 
-#include "LaurelEyeEngine/transform/TransformSystem.h"
-#include "LaurelEyeEngine/physics/PhysicsSystem.h"
-#include "LaurelEyeEngine/graphics/RenderSystem.h"
-#include "LaurelEyeEngine/scripting/ScriptSystem.h"
-#include "LaurelEyeEngine/particles/ParticleSystem.h"
 #include "LaurelEyeEngine/audio/AudioSystem.h"
-#include "LaurelEyeEngine/io/AssetManager.h"
-#include "LaurelEyeEngine/graphics/resources/Texture.h"
-#include "LaurelEyeEngine/memory/MemoryManager.h"
 #include "LaurelEyeEngine/audio/FModAudioManager.h"
+#include "LaurelEyeEngine/graphics/RenderSystem.h"
+#include "LaurelEyeEngine/graphics/resources/Texture.h"
+#include "LaurelEyeEngine/io/AssetManager.h"
+#include "LaurelEyeEngine/memory/MemoryManager.h"
+#include "LaurelEyeEngine/particles/ParticleSystem.h"
+#include "LaurelEyeEngine/physics/PhysicsSystem.h"
+#include "LaurelEyeEngine/scripting/ScriptSystem.h"
+#include "LaurelEyeEngine/transform/TransformSystem.h"
 
 namespace LaurelEye {
 
@@ -41,8 +43,7 @@ namespace LaurelEye {
         sceneJson.reset();
     }
 
-    void Scene::initialize()
-    {
+    void Scene::initialize() {
         std::cout << "Initializing scene: " << name << std::endl;
         assert(sceneJson && "No valid scene asset for scene.");
         assert(!assetRootPath.empty() && "No valid asset root path for scene.");
@@ -56,22 +57,22 @@ namespace LaurelEye {
         if ( colorBackground ) {
             ctx.getService<Graphics::RenderSystem>()->setClearColor(backgroundColor.x, backgroundColor.y, backgroundColor.z);
             ctx.getService<Graphics::RenderSystem>()->retrieveSkydomePass()->setTexture(Graphics::InvalidTexture);
-                ctx.getService<Graphics::RenderSystem>()->retrieveGBufferPass()->addSkydome(Graphics::InvalidTexture);
+            ctx.getService<Graphics::RenderSystem>()->retrieveGBufferPass()->addSkydome(Graphics::InvalidTexture);
         }
         else if ( textureBackground ) {
-                Graphics::TextureDesc desc = Graphics::TextureDesc();
-                desc.width = static_cast<uint32_t>(backgroundTexture->width);
-                desc.height = static_cast<uint32_t>(backgroundTexture->height);
-                if ( backgroundTexture->format == IO::ImageAsset::RGB8 )
-                    desc.format = Graphics::TextureFormat::RGB8;
-                else if ( backgroundTexture->format == IO::ImageAsset::RGBA8 )
-                    desc.format = Graphics::TextureFormat::RGBA8;
-                else
-                    desc.format = Graphics::TextureFormat::RGBA8;
-                auto handle = ctx.getService<Graphics::RenderSystem>()->getRenderResources()->createTexture(backgroundTexture->getName(), desc, "ImageImporter", backgroundTexture->pixelData.data());
-                ctx.getService<Graphics::RenderSystem>()->retrieveSkydomePass()->addTexture(handle);
-                ctx.getService<Graphics::RenderSystem>()->retrieveGBufferPass()->addSkydome(handle);
-            }
+            Graphics::TextureDesc desc = Graphics::TextureDesc();
+            desc.width = static_cast<uint32_t>(backgroundTexture->width);
+            desc.height = static_cast<uint32_t>(backgroundTexture->height);
+            if ( backgroundTexture->format == IO::ImageAsset::RGB8 )
+                desc.format = Graphics::TextureFormat::RGB8;
+            else if ( backgroundTexture->format == IO::ImageAsset::RGBA8 )
+                desc.format = Graphics::TextureFormat::RGBA8;
+            else
+                desc.format = Graphics::TextureFormat::RGBA8;
+            auto handle = ctx.getService<Graphics::RenderSystem>()->getRenderResources()->createTexture(backgroundTexture->getName(), desc, "ImageImporter", backgroundTexture->pixelData.data());
+            ctx.getService<Graphics::RenderSystem>()->retrieveSkydomePass()->addTexture(handle);
+            ctx.getService<Graphics::RenderSystem>()->retrieveGBufferPass()->addSkydome(handle);
+        }
         auto committed = spawnPendingEntities();
         // Also register any existing entities (for activation we want whole scene)
         for ( auto& e : entities ) {
@@ -82,6 +83,9 @@ namespace LaurelEye {
         }
         if ( auto* t = ctx.getService<TransformSystem>() ) t->update(0.016f);
         if ( auto* p = ctx.getService<Physics::PhysicsSystem>() ) p->registerCollisionEnterListeners();
+        if ( auto* uiM = ctx.getService<UIElementManager>() ) {
+            uiM->registerListener();
+        }
         active = true;
     }
 
@@ -89,6 +93,10 @@ namespace LaurelEye {
         if ( !active ) return;
 
         if ( auto* p = ctx.getService<Physics::PhysicsSystem>() ) p->deregisterCollisionEnterListeners();
+
+        if ( auto* uiM = ctx.getService<UIElementManager>() ) {
+            uiM->deregisterListener();
+        }
 
         for ( auto& e : entities ) {
             if ( e->getRegistered() ) {
@@ -100,10 +108,9 @@ namespace LaurelEye {
         active = false;
     }
 
-
     void Scene::update(float deltaTime) {
-        //std::cout << "Updating scene: " << name << std::endl;
-        // Handle any pending add/remove
+        // std::cout << "Updating scene: " << name << std::endl;
+        //  Handle any pending add/remove
         spawnPendingEntities();
         cleanupDestroyedEntities();
     }
@@ -121,7 +128,6 @@ namespace LaurelEye {
         entities.clear();
         pendingAdditions.clear();
         pendingRemovals.clear();
-
 
         // TODO - for scene saving
         // if (serializeScene){
@@ -159,7 +165,56 @@ namespace LaurelEye {
             textureBackground = true;
             colorBackground = false;
         }
+        if ( settingsValue.HasMember("UILayout") && settingsValue["UILayout"].IsArray() ) {
+            const auto& uiLayout = settingsValue["UILayout"];
+            loadUISettings(uiLayout.GetArray());
+        }
+    }
 
+    void Scene::loadUISettings(const rapidjson::GenericArray<true, rapidjson::Value>& uiDatas) {
+        for ( const auto& data : uiDatas ) {
+            auto layout = loadUILayout(data);
+            ctx.getService<UIElementManager>()->registerInputMap(layout);
+        }
+    }
+
+    UILayout* Scene::loadUILayout(const rapidjson::Value& uiJson) {
+        if ( !uiJson.HasMember("name") || !uiJson["name"].IsString() ) {
+            throw std::runtime_error("EntityFactory: UILayout missing 'name' field");
+        }
+
+        std::string name = uiJson["name"].GetString();
+        UILayout* layout = new UILayout();
+        layout->setName(name);
+
+        if (uiJson.HasMember("mappings") && uiJson["mappings"].IsArray()) {
+            const auto& mappings = uiJson["mappings"].GetArray();
+            for ( const auto& mappingJson : mappings ) {
+                if ( !mappingJson.IsObject() ) continue;
+                auto* mapping = new SingleUIMapping();
+                if ( mappingJson.HasMember("name") && mappingJson["name"].IsString() ) {
+                    mapping->setCurrent(mappingJson["name"].GetString());
+                }
+                if ( mappingJson.HasMember("current") && mappingJson["current"].IsString() ) {
+                    mapping->setCurrent(mappingJson["current"].GetString());
+                }
+                if ( mappingJson.HasMember("left") && mappingJson["left"].IsString() ) {
+                    mapping->setLeft(mappingJson["left"].GetString());
+                }
+                if ( mappingJson.HasMember("right") && mappingJson["right"].IsString() ) {
+                    mapping->setRight(mappingJson["right"].GetString());
+                }
+                if ( mappingJson.HasMember("up") && mappingJson["up"].IsString() ) {
+                    mapping->setUp(mappingJson["up"].GetString());
+                }
+                if ( mappingJson.HasMember("down") && mappingJson["down"].IsString() ) {
+                    mapping->setDown(mappingJson["down"].GetString());
+                }
+                layout->addMappingUnit(mapping);
+            }
+        }
+
+        return layout;
     }
 
     Entity* Scene::addEntity(Entity* entityToAdd) {
@@ -281,8 +336,9 @@ namespace LaurelEye {
         auto* scriptingSystem = ctx.getService<Scripting::ScriptSystem>();
         auto* particleSystem = ctx.getService<Particles::ParticleSystem>();
         auto* audioSystem = ctx.getService<Audio::AudioSystem>();
+        auto* uiManager = ctx.getService<UIElementManager>();
 
-        for (auto& comp : entity->getComponents()) {
+        for ( auto& comp : entity->getComponents() ) {
             if ( auto* transformComp = dynamic_cast<TransformComponent*>(comp.get()) ) {
                 if ( transformSystem ) {
                     transformSystem->registerComponent(transformComp);
@@ -329,13 +385,22 @@ namespace LaurelEye {
                     particleSystem->registerComponent(emitterComp);
                 }
             }
-            else if ( auto* speakerComp = dynamic_cast<Audio::SpeakerComponent*>( comp.get() ) ) {
+            else if ( auto* speakerComp = dynamic_cast<Audio::SpeakerComponent*>(comp.get()) ) {
                 if ( audioSystem ) {
                     audioSystem->registerComponent(speakerComp);
-                    //speakerComp->loadAudioAsset();
+                    // speakerComp->loadAudioAsset();
                     if ( speakerComp->getPlayOnLoad() ) {
                         speakerComp->playSound();
                     }
+                }
+            }
+            else if ( auto* uiComp = dynamic_cast<Graphics::UIComponent*>(comp.get()) ) {
+                if ( renderSystem ) {
+                    renderSystem->registerUIComponent(uiComp);
+                }
+                if ( uiManager ) {
+                    std::cout << "[Scene] Registering UI Element: " << uiComp->GetUIName() << std::endl;
+                    uiManager->registerUIElement(uiComp);
                 }
             }
             // add more as needed...
@@ -350,6 +415,7 @@ namespace LaurelEye {
         auto* scriptingSystem = ctx.getService<Scripting::ScriptSystem>();
         auto* particleSystem = ctx.getService<Particles::ParticleSystem>();
         auto* audioSystem = ctx.getService<Audio::AudioSystem>();
+        auto* uiManager = ctx.getService<UIElementManager>();
 
         for ( auto& comp : entity->getComponents() ) {
             if ( auto* transformComp = dynamic_cast<TransformComponent*>(comp.get()) ) {
@@ -402,6 +468,12 @@ namespace LaurelEye {
                     audioSystem->deregisterComponent(speakerComp);
                 }
                 speakerComp->stopSound(speakerComp->getAudioName());
+            }
+            else if ( auto* uiComponent = dynamic_cast<Graphics::UIComponent*>(comp.get()) ) {
+                if ( uiManager ) {
+                    uiManager->deregisterUIElement(uiComponent);
+                    renderSystem->deregisterUIComponent(uiComponent);
+                }
             }
             // add more as needed...
         }

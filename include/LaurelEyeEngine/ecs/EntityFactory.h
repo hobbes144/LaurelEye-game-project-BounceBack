@@ -11,6 +11,9 @@
 #pragma once
 #include "LaurelEyeEngine/core/EngineContext.h"
 #include "LaurelEyeEngine/ecs/Entity.h"
+#include "LaurelEyeEngine/graphics/graphics_components/UIButtonComponent.h"
+#include "LaurelEyeEngine/graphics/graphics_components/UIComponent.h"
+
 #include <memory>
 #include <rapidjson/document.h>
 #include <string>
@@ -59,7 +62,9 @@ namespace LaurelEye{
         void setupParticleEmitterComponent(Entity& entity, const rapidjson::Value& emitterData);
         void setupSpeakerComponent(Entity& entity, const rapidjson::Value& speakerData);
         void setupDebugDrawComponent(Entity& entity, const rapidjson::Value& emitterData);
-
+        void setupUIComponent(Entity& entity, const rapidjson::Value& uiData);
+        void setupUIButtonComponent(Entity& entity, const rapidjson::Value& buttonData);
+        void setupUISliderComponent(Entity& entity, const rapidjson::Value& textData);
     };
 }
 

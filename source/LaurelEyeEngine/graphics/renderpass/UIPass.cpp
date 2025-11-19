@@ -19,13 +19,18 @@ namespace LaurelEye::Graphics {
     }
 
     void UIPass::execute(const FrameContext& ctx) {
-
-        glClear(GL_DEPTH_BUFFER_BIT);
+        // glClear(GL_DEPTH_BUFFER_BIT);
         glDisable(GL_DEPTH_TEST);
 
+        glEnable(GL_BLEND);
+
+        glBlendEquation(blendFactor.equation);
+        glBlendFunc(blendFactor.srcFactor, blendFactor.destFactor);
+
         drawRenderables(ctx, shader);
-        
+
         glEnable(GL_DEPTH_TEST);
+        glDisable(GL_BLEND);
     }
 
 } // namespace LaurelEye::Graphics

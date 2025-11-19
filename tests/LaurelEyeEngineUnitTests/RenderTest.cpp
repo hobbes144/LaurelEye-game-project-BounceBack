@@ -2,12 +2,13 @@
 #include "LaurelEyeEngine/graphics/graphics_components/CameraComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/DirectionalLightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/Renderable3DComponent.h"
+#include "LaurelEyeEngine/graphics/graphics_components/UIButtonComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/UIComponent.h"
 #include "LaurelEyeEngine/graphics/RenderSystem.h"
 #include "LaurelEyeEngine/graphics/resources/Material.h"
 #include "LaurelEyeEngine/graphics/resources/Mesh.h"
-#include "LaurelEyeEngine/graphics/resources/RenderResources.h"
 #include "LaurelEyeEngine/io/importers/ImageImporter.h"
+#include "LaurelEyeEngine/UI/UIElementManager.h"
 #include "TestDefinitions.h"
 #include <memory>
 
@@ -31,6 +32,12 @@ namespace LaurelEye {
 
         Physics::PhysicsSystem physicsSystem;
         physicsSystem.initialize();
+
+        // UI Manager Setup
+        UIElementManager uiManager;
+        uiManager.setActivateKey(LaurelEye::Key::Tab);
+        uiManager.setInputManager(pInputManager);
+        uiManager.setUIWindow(window);
 
         // // === Load player mesh ===
         // auto asset = assetManager.load(std::string(TEST_MEDIA_DIR) + "/item-box.fbx");
@@ -57,14 +64,10 @@ namespace LaurelEye {
         auto groundTextureAsset = assetManager.load(importPath);
 
         // retrieve the GPU handle (importer/register stores texture under the full path)
-        auto handle = renderSystem.getRenderResources()->texture(groundTextureAsset->getName());
+        groundRC->SetImageAsset(std::static_pointer_cast<IO::ImageAsset>(groundTextureAsset));
         // Set shader flags / scale via PropertyMap (uniforms)
         groundRC->GetMaterial()->setProperty<int>("useTexture", 1);
         groundRC->GetMaterial()->setProperty<Vector2>("mainTextureScale", Vector2(1.0f));
-
-        // Bind the texture by name (generic). Name must match the sampler name in the shader.
-        // In your fragment shader the sampler is `mainTexture`, so use that name here.
-        groundRC->GetMaterial()->setTexture("mainTexture", handle);
         // End Texture Addition
 
         groundRC->GetMaterial()->setProperty<Vector3>("diffuse", Vector3(62.0 / 255.0, 102.0 / 255.0, 38.0 / 255.0));
@@ -97,9 +100,8 @@ namespace LaurelEye {
         // cubeRC->GetMaterial()->setTexture("mainTexture", vikingTexHandle);
         const std::string romanTexPath = std::string(TEST_MEDIA_DIR) + "/textures/roman_blue_D_texture.jpg";
         auto romanTex = assetManager.load(romanTexPath);
-        auto romanTexHandle = renderSystem.getRenderResources()->texture(romanTex->getName());
 
-        cubeRC->GetMaterial()->setTexture("mainTexture", romanTexHandle);
+        cubeRC->SetImageAsset(std::static_pointer_cast<IO::ImageAsset>(romanTex));
         // Set shader flags / scale via PropertyMap (uniforms)
         cubeRC->GetMaterial()->setProperty<int>("useTexture", 1);
         cubeRC->GetMaterial()->setProperty<Vector2>("mainTextureScale", Vector2(1.0f));
@@ -173,36 +175,70 @@ namespace LaurelEye {
 
         transformSystem.update(0.016f);
 
-        // === Create Sprite Entity ===
+        // === Create UI Entity ===
         auto sprite = std::make_unique<Entity>("Ground");
         auto spriteT = sprite->addComponent<TransformComponent>();
         Transform spriteLocal;
         spriteLocal.setPosition(-0.5f, 0.5f, 0.0f);
         spriteLocal.setScaling(0.25f, 0.25f, 0.0f);
-        spriteT->setLocalTransform(spriteLocal);
+        spriteT->setWorldTransform(spriteLocal);
 
-        auto spriteRC = sprite->addComponent<Graphics::UIComponent>();
+        auto spriteRC = sprite->addComponent<Graphics::UIButtonComponent>();
         spriteRC->SetMaterial(std::make_shared<Graphics::Material>());
 
         // Texture Addition for testing
-        const std::string importPath1 = "tests/LaurelEyeEngineUnitTests/TestMedia/textures/test.png";
+        const std::string importPath1 = "tests/LaurelEyeEngineUnitTests/TestMedia/textures/roman_blue_D_texture.jpg";
         auto spriteTextureAsset = assetManager.load(importPath1);
 
+        spriteRC->SetImageAsset(std::static_pointer_cast<IO::ImageAsset>(spriteTextureAsset));
         // retrieve the GPU handle (importer/register stores texture under the full path)
-        auto handle1 = renderSystem.getRenderResources()->texture(groundTextureAsset->getName());
         // Set shader flags / scale via PropertyMap (uniforms)
         spriteRC->GetMaterial()->setProperty<int>("useTexture", 1);
         spriteRC->GetMaterial()->setProperty<Vector2>("mainTextureScale", Vector2(1.0f));
 
         // Bind the texture by name (generic). Name must match the sampler name in the shader.
         // In your fragment shader the sampler is `mainTexture`, so use that name here.
-        spriteRC->GetMaterial()->setTexture("mainTexture", handle1);
         // End Texture Addition
 
         spriteRC->GetMaterial()->setProperty<float>("transparency", 1.0f);
+        spriteRC->SetUIName("TestButton1");
 
         transformSystem.registerComponent(spriteT);
         renderSystem.registerUIComponent(spriteRC);
+        uiManager.registerUIElement(spriteRC);
+
+        // === Create UI Entity ===
+        auto sprite1 = std::make_unique<Entity>("Ground");
+        auto spriteT1 = sprite1->addComponent<TransformComponent>();
+        Transform spriteLocal1;
+        spriteLocal1.setPosition(0.5f, 0.5f, 0.0f);
+        spriteLocal1.setScaling(0.25f, 0.25f, 0.0f);
+        spriteT1->setWorldTransform(spriteLocal1);
+
+        auto spriteRC1 = sprite1->addComponent<Graphics::UIButtonComponent>();
+        spriteRC1->SetMaterial(std::make_shared<Graphics::Material>());
+
+        // Texture Addition for testing
+        const std::string importPath2 = "tests/LaurelEyeEngineUnitTests/TestMedia/textures/roman_blue_D_texture.jpg";
+        auto spriteTextureAsset1 = assetManager.load(importPath2);
+
+        spriteRC1->SetImageAsset(std::static_pointer_cast<IO::ImageAsset>(spriteTextureAsset1));
+        // retrieve the GPU handle (importer/register stores texture under the full path)
+        // Set shader flags / scale via PropertyMap (uniforms)
+        spriteRC1->GetMaterial()->setProperty<int>("useTexture", 1);
+        spriteRC1->GetMaterial()->setProperty<Vector2>("mainTextureScale", Vector2(1.0f));
+
+        // Bind the texture by name (generic). Name must match the sampler name in the shader.
+        // In your fragment shader the sampler is `mainTexture`, so use that name here.
+        // End Texture Addition
+
+        spriteRC1->GetMaterial()->setProperty<float>("transparency", 1.0f);
+        spriteRC1->SetUIName("TestButton2");
+
+        transformSystem.registerComponent(spriteT1);
+        renderSystem.registerUIComponent(spriteRC1);
+        uiManager.registerUIElement(spriteRC1);
+        uiManager.setCurrentUIComponent(spriteRC);
 
         // Simulation loop
         float dt = 1.0f / 60.0f; // 60 Hz
@@ -210,6 +246,10 @@ namespace LaurelEye {
         while ( true ) {
             glfwP->update();
             pInputManager->update();
+            uiManager.update(dt);
+
+            std::cout << pInputManager->getMousePosition().first << std::endl
+                      << pInputManager->getMousePosition().second << std::endl;
 
             if ( pInputManager->isKeyPressed(LaurelEye::Key::Space) || pInputManager->isKeyPressed(LaurelEye::Key::Escape) || window->shouldClose() ) {
                 groundRC->SetMaterial(nullptr);
@@ -238,7 +278,7 @@ namespace LaurelEye {
                 renderSystem.update(dt);
             }
 #ifdef _WIN32
-            Sleep(static_cast<DWORD>(dt * 1000.f));
+            Sleep(dt * 1000.f);
 #else
             sleep(dt);
 #endif

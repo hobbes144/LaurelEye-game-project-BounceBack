@@ -57,7 +57,7 @@ int main() {
 
     
     std::cout << "Got Here" << std::endl;
-    //renderTestExtended(window, &glfwP, &inputManager);
+    renderTestExtended(window, &glfwP, &inputManager);
 
     for ( NamedTest testFunc : tests ) {
         std::cout << "Running test: " << testFunc.name << std::endl;

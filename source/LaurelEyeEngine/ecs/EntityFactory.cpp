@@ -1,8 +1,8 @@
-﻿#include "LaurelEyeEngine/audio/AudioSystem.h"
+﻿#include "LaurelEyeEngine/ecs/EntityFactory.h"
+#include "LaurelEyeEngine/audio/AudioSystem.h"
 #include "LaurelEyeEngine/audio/FModAudioManager.h"
 #include "LaurelEyeEngine/audio/SpeakerComponent.h"
 #include "LaurelEyeEngine/core/EngineContext.h"
-#include "LaurelEyeEngine/ecs/EntityFactory.h"
 #include "LaurelEyeEngine/graphics/graphics_components/AmbientLightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/CameraComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/DirectionalLightComponent.h"
@@ -17,6 +17,7 @@
 #include "LaurelEyeEngine/scene/Scene.h"
 #include "LaurelEyeEngine/scripting/ScriptComponent.h"
 #include "LaurelEyeEngine/transform/TransformComponent.h"
+#include "LaurelEyeEngine/UI/UIElementManager.h"
 #include <iostream>
 
 namespace LaurelEye {
@@ -42,7 +43,7 @@ namespace LaurelEye {
 
         std::string name = entityJson["name"].GetString();
         auto* memManager = context.getService<MemoryManager>();
-        if (!memManager) {
+        if ( !memManager ) {
             throw std::runtime_error("EntityFactory: MemoryManager service not found in context");
         }
         auto entity = memManager->allocateMemory(name);
@@ -98,6 +99,15 @@ namespace LaurelEye {
             else if ( compName == "DebugDraw" ) {
                 setupDebugDrawComponent(entity, compData);
             }
+            else if ( compName == "UIButton" ) {
+                setupUIButtonComponent(entity, compData);
+            }
+            else if ( compName == "UISlider" ) {
+                setupUISliderComponent(entity, compData);
+            }
+            else if ( compName == "UI" ) {
+                setupUIComponent(entity, compData);
+            }
             else {
                 std::cerr << "Entity Factory: Unknown component type trying to be added to entity: " << entity.getName() << std::endl;
             }
@@ -116,7 +126,6 @@ namespace LaurelEye {
         scene.addEntity(entity);
         return entity;
     }
-
 
     void EntityFactory::createAndAddEntitiesToScene(Scene& scene,
                                                     const rapidjson::GenericArray<true, rapidjson::Value>& entities,
@@ -156,9 +165,9 @@ namespace LaurelEye {
         }
     }
 
-/// This region defines component setups for the entity
-/// Ideally this is done by the systems I think, but this is okay for now.
-    #pragma region Setup
+    /// This region defines component setups for the entity
+    /// Ideally this is done by the systems I think, but this is okay for now.
+#pragma region Setup
 
     void EntityFactory::setupTransformComponent(Entity& entity, const rapidjson::Value& transformData) {
         TransformComponent transform;
@@ -180,11 +189,11 @@ namespace LaurelEye {
     void EntityFactory::setupRender3DComponent(Entity& entity, const rapidjson::Value& render3DData) {
         // Register renderer component
 
-        //Make the Renderable Component
+        // Make the Renderable Component
         std::unique_ptr<Graphics::Renderable3DComponent> renderComponent = std::make_unique<Graphics::Renderable3DComponent>();
-       //---Mesh---
-        //If a Mesh member is identified as a string
-        if (render3DData.HasMember("mesh") && render3DData["mesh"].IsObject()) {
+        //---Mesh---
+        // If a Mesh member is identified as a string
+        if ( render3DData.HasMember("mesh") && render3DData["mesh"].IsObject() ) {
             const auto& mesh = render3DData["mesh"];
             if ( mesh.HasMember("file") && mesh["file"].IsString() ) {
                 std::string meshPath = mesh["file"].GetString();
@@ -195,10 +204,9 @@ namespace LaurelEye {
                     return;
                 }
                 renderComponent->SetMeshAsset(meshAsset);
-
             }
 
-            else if (mesh.HasMember("primitiveType") && mesh["primitiveType"].IsString()) {
+            else if ( mesh.HasMember("primitiveType") && mesh["primitiveType"].IsString() ) {
                 std::string shapeType = mesh["primitiveType"].GetString();
                 if ( shapeType == "Square" ) {
                     renderComponent->SetMeshPrimitiveType(Graphics::Mesh::Square);
@@ -206,7 +214,7 @@ namespace LaurelEye {
                 else if ( shapeType == "Cube" ) {
                     renderComponent->SetMeshPrimitiveType(Graphics::Mesh::Cube);
                 }
-                else if (shapeType == "Sphere") {
+                else if ( shapeType == "Sphere" ) {
                     renderComponent->SetMeshPrimitiveType(Graphics::Mesh::Sphere);
                 }
             }
@@ -502,7 +510,6 @@ namespace LaurelEye {
         if ( emitterData.HasMember("maxParticles") ) {
             emitter->SetMaxParticles(emitterData["maxParticles"].GetUint());
         }
-
     }
 
     void EntityFactory::setupSpeakerComponent(Entity& entity, const rapidjson::Value& speakerData) {
@@ -533,7 +540,7 @@ namespace LaurelEye {
         if ( speakerData.HasMember("loop") && speakerData["loop"].IsBool() ) {
             isLooping = speakerData["loop"].GetBool();
         }
-        if (speakerData.HasMember("playOnLoad") && speakerData["playOnLoad"].IsBool() ) {
+        if ( speakerData.HasMember("playOnLoad") && speakerData["playOnLoad"].IsBool() ) {
             playOnLoad = speakerData["playOnLoad"].GetBool();
         }
         auto am = audioSystem->getAudioManager();
@@ -547,12 +554,114 @@ namespace LaurelEye {
 
         assert(sp != nullptr);
     }
-    
-    void EntityFactory::setupDebugDrawComponent(Entity& entity, const rapidjson::Value& emitterData) {
 
+    void EntityFactory::setupUIComponent(Entity& entity, const rapidjson::Value& uiData) {
+        std::unique_ptr<Graphics::UIComponent> renderComponent = std::make_unique<Graphics::UIComponent>();
+
+        // Since name is the mapping tag, we need to grab it first
+        if ( uiData.HasMember("name") && uiData["name"].IsString() ) {
+            auto uiName = uiData["name"].GetString();
+            renderComponent->SetUIName(uiName);
+        }
+
+        auto uiManager = context.getService<UIElementManager>();
+
+        //---Material---
+        if ( uiData.HasMember("material") && uiData["material"].IsObject() ) {
+            const auto& material = uiData["material"];
+            auto pMat = std::make_shared<Graphics::Material>();
+            renderComponent->SetMaterial(pMat);
+
+            std::cout << "Creating UI Material for Entity: " << entity.getName() << std::endl;
+
+            // TODO: Make this a loop over all properties.
+            if ( material.HasMember("texture") && material["texture"].IsString() ) {
+                std::string texturePath = material["texture"].GetString();
+                auto texAsset = context.getService<IO::AssetManager>()->load(assetPath + texturePath);
+                auto imageAsset = std::dynamic_pointer_cast<IO::ImageAsset>(texAsset);
+                renderComponent->SetImageAsset(imageAsset);
+                renderComponent->GetMaterial()->setProperty<int>("useTexture", 1);
+            }
+            else {
+                renderComponent->GetMaterial()->setProperty<int>("useTexture", 0);
+            }
+
+            if ( material.HasMember("mainTextureScale") && material["mainTextureScale"].IsArray() ) {
+                const auto& scale = material["mainTextureScale"].GetArray();
+                renderComponent->GetMaterial()->setProperty<Vector2>(
+                    "mainTextureScale",
+                    Vector2(scale[0].GetFloat(), scale[1].GetFloat()));
+            }
+            else {
+                renderComponent->GetMaterial()->setProperty<Vector2>("mainTextureScale", Vector2(1.0f));
+            }
+
+            if ( material.HasMember("transparency") ) {
+                float transparency = material["transparency"].GetFloat();
+                renderComponent->GetMaterial()->setProperty<float>("transparency", transparency);
+            }
+        }
+
+        entity.addComponent<Graphics::UIComponent>(std::move(renderComponent));
     }
 
-    #pragma endregion
+    void EntityFactory::setupUIButtonComponent(Entity& entity, const rapidjson::Value& uiData) {
+        std::unique_ptr<Graphics::UIButtonComponent> renderComponent = std::make_unique<Graphics::UIButtonComponent>();
 
+        // Since name is the mapping tag, we need to grab it first
+        if ( uiData.HasMember("name") && uiData["name"].IsString() ) {
+            auto uiName = uiData["name"].GetString();
+            renderComponent->SetUIName(uiName);
+        }
+
+        auto uiManager = context.getService<UIElementManager>();
+
+        //---Material---
+        if ( uiData.HasMember("material") && uiData["material"].IsObject() ) {
+            const auto& material = uiData["material"];
+            auto pMat = std::make_shared<Graphics::Material>();
+            renderComponent->SetMaterial(pMat);
+
+            std::cout << "Creating UI Material for Entity: " << entity.getName() << std::endl;
+
+            // TODO: Make this a loop over all properties.
+            if ( material.HasMember("texture") && material["texture"].IsString() ) {
+                std::string texturePath = material["texture"].GetString();
+                auto texAsset = context.getService<IO::AssetManager>()->load(assetPath + texturePath);
+                auto imageAsset = std::dynamic_pointer_cast<IO::ImageAsset>(texAsset);
+                renderComponent->SetImageAsset(imageAsset);
+                renderComponent->GetMaterial()->setProperty<int>("useTexture", 1);
+            }
+            else {
+                renderComponent->GetMaterial()->setProperty<int>("useTexture", 0);
+            }
+
+            if ( material.HasMember("mainTextureScale") && material["mainTextureScale"].IsArray() ) {
+                const auto& scale = material["mainTextureScale"].GetArray();
+                renderComponent->GetMaterial()->setProperty<Vector2>(
+                    "mainTextureScale",
+                    Vector2(scale[0].GetFloat(), scale[1].GetFloat()));
+            }
+            else {
+                renderComponent->GetMaterial()->setProperty<Vector2>("mainTextureScale", Vector2(1.0f));
+            }
+
+            if ( material.HasMember("transparency") ) {
+                float transparency = material["transparency"].GetFloat();
+                renderComponent->GetMaterial()->setProperty<float>("transparency", transparency);
+            }
+        }
+
+        entity.addComponent<Graphics::UIButtonComponent>(std::move(renderComponent));
+    }
+
+    void EntityFactory::setupUISliderComponent(Entity& entity, const rapidjson::Value& textData) {
+        setupUIComponent(entity, textData);
+    }
+
+    void EntityFactory::setupDebugDrawComponent(Entity& entity, const rapidjson::Value& emitterData) {
+    }
+
+#pragma endregion
 
 } // namespace LaurelEye

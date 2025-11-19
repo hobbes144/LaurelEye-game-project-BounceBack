@@ -1,7 +1,34 @@
 ﻿{
     "settings": {
         "resetOnLoad": false,
-        "backgroundTexture": "textures/Tropical_Beach_8k.jpg"
+        "backgroundTexture": "textures/Tropical_Beach_8k.jpg",
+        "UILayout": [
+            {
+                "name": "baseMapping",
+                "mappings": [
+                    {
+                        "name": "B1",
+                        "right": "B2",
+                        "down": "B3"
+                    },
+                    {
+                        "name": "B2",
+                        "left": "B1",
+                        "down": "B4"
+                    },
+                    {
+                        "name": "B3",
+                        "up": "B1",
+                        "right": "B4"
+                    },
+                    {
+                        "name": "B4",
+                        "left": "B3",
+                        "up": "B2"
+                    }
+                ]
+            }
+        ]
     },
     "entities": [
         {
@@ -95,6 +122,74 @@
         {
             "name": "Player",
             "prefab": "prefabs/player.prefab.json"
+        },
+        {
+            "name": "Button1",
+            "components": {
+                "Transform": {
+                    "position": [ -0.5, 0.5, 0.0 ],
+                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "scale": [ 0.2, 0.2, 0.2 ]
+                },
+                "UIButton": {
+                    "name": "B1",
+                    "material": {
+                        "texture": "textures/texture_01_red.png",
+                        "transparency": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "name": "Button2",
+            "components": {
+                "Transform": {
+                    "position": [ 0.5, 0.5, 0.0 ],
+                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "scale": [ 0.2, 0.2, 0.2 ]
+                },
+                "UIButton": {
+                    "name": "B2",
+                    "material": {
+                        "texture": "textures/texture_01_dark.png",
+                        "transparency": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "name": "Button3",
+            "components": {
+                "Transform": {
+                    "position": [ -0.5, -0.5, 0.0 ],
+                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "scale": [ 0.2, 0.2, 0.2 ]
+                },
+                "UIButton": {
+                    "name": "B3",
+                    "material": {
+                        "texture": "textures/texture_01_orange.png",
+                        "transparency": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "name": "Button4",
+            "components": {
+                "Transform": {
+                    "position": [ 0.5, -0.5, 0.0 ],
+                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "scale": [ 0.2, 0.2, 0.2 ]
+                },
+                "UIButton": {
+                    "name": "B4",
+                    "material": {
+                        "texture": "textures/texture_01_purple.png",
+                        "transparency": 1.0
+                    }
+                }
+            }
         },
         {
             "name": "SceneManager",

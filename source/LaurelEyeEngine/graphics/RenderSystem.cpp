@@ -9,6 +9,7 @@
 #include "LaurelEyeEngine/ecs/ISystem.h"
 #include "LaurelEyeEngine/graphics/Graphics.h"
 
+#include "LaurelEyeEngine/graphics/graphics_components/UIComponent.h"
 #include "LaurelEyeEngine/graphics/renderpass/DeferredRenderPass.h"
 #include "LaurelEyeEngine/graphics/renderpass/ParticleRenderPass.h"
 #include "LaurelEyeEngine/graphics/renderpass/SkydomePass.h"
@@ -364,8 +365,33 @@ namespace LaurelEye::Graphics {
     }
 
     void RenderSystem::registerUIComponent(const ComponentPtr component) {
+        auto uiComponent = static_cast<UIComponent*>(component);
+        if ( std::shared_ptr<IO::ImageAsset> texAsset = uiComponent->GetImageAsset() ) {
+            // Make a texture and assign it to material
+            TextureDesc desc = TextureDesc();
+            desc.width = static_cast<uint32_t>(texAsset->width);
+            desc.height = static_cast<uint32_t>(texAsset->height);
+            if ( texAsset->format == IO::ImageAsset::RGB8 )
+                desc.format = Graphics::TextureFormat::RGB8;
+            else if ( texAsset->format == IO::ImageAsset::RGBA8 )
+                desc.format = Graphics::TextureFormat::RGBA8;
+            else
+                desc.format = Graphics::TextureFormat::RGBA8;
+            TextureHandle handle = tempRenderResources->createTexture(texAsset->getName(), desc, "ImageImporter", texAsset->pixelData.data());
+            uiComponent->GetMaterial()->setTexture("mainTexture", handle);
+            uiComponent->GetMaterial()->setProperty<int>("useTexture", 1);
+        }
+        if ( std::shared_ptr<IO::MeshAsset> meshAsset = uiComponent->GetMeshAsset() ) {
+            auto meshObj = Graphics::Mesh::createMeshFromAsset(meshAsset);
+            uiComponent->SetMesh(meshObj);
+        }
+        else if ( uiComponent->GetMeshPrimitiveType() != Graphics::Mesh::Type::None ) {
+            uiComponent->SetMesh(Graphics::Mesh::getShapeMesh(uiComponent->GetMeshPrimitiveType()));
+        }
+        uiComponents.push_back(uiComponent);
 
-        uiComponents.push_back(component);
+        component->BindTransform();
+        component->rs = this;
     }
 
     void RenderSystem::deregisterComponent(const ComponentPtr component) {
@@ -417,6 +443,24 @@ namespace LaurelEye::Graphics {
     }
 
     void RenderSystem::deregisterUIComponent(const ComponentPtr component) {
+        auto renderComponent = static_cast<UIComponent*>(component);
+        auto mat = renderComponent->GetMaterial();
+
+        // If the material has a texture, release it from GPU
+        if ( auto texAsset = renderComponent->GetImageAsset() ) {
+            const std::string& texName = texAsset->getName();
+            if ( tempRenderResources->texture(texName) != InvalidTexture ) {
+                tempRenderResources->destroyTexture(texName);
+            }
+        }
+
+        if ( renderComponent->GetMesh() && renderComponent->GetMeshPrimitiveType() == Mesh::Type::None ) {
+            if ( auto geo = renderComponent->GetMesh()->getGeometryBuffer() ) {
+                geo->destroy();
+            }
+            renderComponent->SetMesh(nullptr);
+        }
+
         uiComponents.erase(
             std::remove(uiComponents.begin(), uiComponents.end(), component),
             uiComponents.end());

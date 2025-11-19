@@ -65,7 +65,7 @@ namespace LaurelEye::Graphics {
         ///
         /// This method looks up the owning entity’s `TransformComponent`
         /// and stores a pointer for later use in rendering.
-        void BindTransform() {
+        virtual void BindTransform() {
             transComp = owner->findComponent<TransformComponent>();
         }
 

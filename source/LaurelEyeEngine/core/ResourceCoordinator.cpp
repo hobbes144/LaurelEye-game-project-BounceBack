@@ -19,6 +19,7 @@ namespace LaurelEye {
         assetManager = std::make_unique<IO::AssetManager>(ctx);
         sceneManager = std::make_unique<SceneManager>(ctx, engineConfig);
         eventManager = std::make_unique<EventManager>();
+        uiElementManager = std::make_unique<UIElementManager>();
 
         ctx.registerService<InputManager>(inputManager.get());
         ctx.registerService<WindowManager>(windowManager.get());
@@ -26,18 +27,25 @@ namespace LaurelEye {
         ctx.registerService<IO::AssetManager>(assetManager.get());
         ctx.registerService<EventManager>(eventManager.get());
         ctx.registerService<SceneManager>(sceneManager.get());
+        ctx.registerService<UIElementManager>(uiElementManager.get());
+
+        uiElementManager->setEngineContext(ctx);
     }
 
     void ResourceCoordinator::initialize() {
         std::cout << "Resources Initializing" << std::endl;
         assetManager->initialize(); // sets extensions to assets
         sceneManager->initialize(); // Sets initial scene
+
+        // set up UI Manager, get the main window
+        uiElementManager->setInputAndWindow(inputManager.get(), windowManager->getWindow(0));
     }
 
     void ResourceCoordinator::update(float deltaTime) {
         platformManager->update();
         inputManager->update();
         sceneManager->update(deltaTime);
+        uiElementManager->update(deltaTime);
     }
 
     void ResourceCoordinator::shutdown() {
@@ -47,5 +55,6 @@ namespace LaurelEye {
         windowManager.reset();
         memoryManager.reset();
         assetManager.reset();
+        uiElementManager.reset();
     }
 } // namespace LaurelEye

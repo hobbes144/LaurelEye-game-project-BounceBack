@@ -12,18 +12,18 @@
 /// Copyright © 2025 DIGIPEN Institute of Technology. All rights reserved.
 
 #pragma once
-#include <vector>
-#include <memory>
-#include "LaurelEyeEngine/core/EngineContext.h"
 #include "LaurelEyeEngine/core/Config.h"
-#include "LaurelEyeEngine/input/InputManager.h"
-#include "LaurelEyeEngine/window/WindowManager.h"
-#include "LaurelEyeEngine/memory/MemoryManager.h"
-#include "LaurelEyeEngine/io/AssetManager.h"
-#include "LaurelEyeEngine/scene/SceneManager.h"
+#include "LaurelEyeEngine/core/EngineContext.h"
 #include "LaurelEyeEngine/events/EventManager.h"
+#include "LaurelEyeEngine/input/InputManager.h"
+#include "LaurelEyeEngine/io/AssetManager.h"
+#include "LaurelEyeEngine/memory/MemoryManager.h"
 #include "LaurelEyeEngine/platforms/IPlatform.h"
-#include "LaurelEyeEngine/audio/FModAudioManager.h"
+#include "LaurelEyeEngine/scene/SceneManager.h"
+#include "LaurelEyeEngine/UI/UIElementManager.h"
+#include "LaurelEyeEngine/window/WindowManager.h"
+#include <memory>
+#include <vector>
 
 namespace LaurelEye {
     class ResourceCoordinator {
@@ -44,5 +44,6 @@ namespace LaurelEye {
         std::unique_ptr<SceneManager> sceneManager;
         std::unique_ptr<EventManager> eventManager;
         std::unique_ptr<IPlatform> platformManager;
+        std::unique_ptr<UIElementManager> uiElementManager;
     };
 } // namespace LaurelEye

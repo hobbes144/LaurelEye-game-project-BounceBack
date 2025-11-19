@@ -14,10 +14,9 @@
 #pragma once
 
 #include "LaurelEyeEngine/ecs/ISystem.h"
+#include "LaurelEyeEngine/graphics/Graphics.h"
 #include "LaurelEyeEngine/graphics/graphics_components/IRenderComponent.h"
 #include "LaurelEyeEngine/graphics/ShadowManager.h"
-
-#include "LaurelEyeEngine/graphics/Graphics.h"
 
 // Temp
 #include "LaurelEyeEngine/graphics/resources/Lights.h"
