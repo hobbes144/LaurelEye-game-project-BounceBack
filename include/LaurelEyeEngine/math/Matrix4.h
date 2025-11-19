@@ -95,15 +95,11 @@ namespace LaurelEye {
         Quaternion toQuaternion() const;
 
         Vector3 toEulerAngles() const {
-            float R00 = data[0][0];
-            float R10 = data[1][0];
-            float R20 = data[2][0];
-            float R01 = data[0][1];
-            float R11 = data[1][1];
-            float R21 = data[2][1];
-            float R02 = data[0][2];
-            float R12 = data[1][2];
-            float R22 = data[2][2];
+            const float R00 = data[0][0];
+            const float R10 = data[1][0];
+            const float R20 = data[2][0];
+            const float R21 = data[2][1];
+            const float R22 = data[2][2];
 
             // Calculate Yaw (around Y-axis)
             float yaw = std::atan2(R10, R00);

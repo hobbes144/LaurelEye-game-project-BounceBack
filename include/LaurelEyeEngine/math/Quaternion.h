@@ -8,109 +8,131 @@
 /// Copyright © 2025 DIGIPEN Institute of Technology. All rights reserved.
 #pragma once
 
-#include "LaurelEyeEngine/math/Vector3.h"
 #include "LaurelEyeEngine/math/VectorTemplated.h"
+
+#include <iostream>
 
 namespace LaurelEye {
 
-    class Quaternion : public Vector4 {
+    class Vector3;
+
+    template <typename T = float>
+    class QuaternionBase : public VectorTemplated<T, 4>{
     private:
         bool isNormalized = false;
         bool isEulerVector = false;
 
-        Vector3 eulerVector;
+        VectorTemplated<T, 3> eulerVector;
 
         void setDirty();
 
     public:
-        Quaternion(float w = 1.0f, float x = .0f,
-                   float y = .0f, float z = .0f) : VectorTemplated(w, x, y, z),
-                                                   eulerVector(Vector3()) {}
+        QuaternionBase(T w = T(1.0), T x = T(.0),
+                   T y = T(.0), T z = T(.0)) : VectorTemplated<T, 4>(w, x, y, z),
+                                                   eulerVector(VectorTemplated<T, 3>()) {}
 
-        Quaternion(Vector4 vec) : VectorTemplated(vec),
-                                  eulerVector(Vector3()) {
+        QuaternionBase(VectorTemplated<T, 4> vec) : VectorTemplated<T, 4>(vec),
+                                  eulerVector(VectorTemplated<T, 3>()) {
         }
 
         // Getter functions for w, x, y, z
-        inline float w() const { return data[0]; }
-        inline float x() const { return data[1]; }
-        inline float y() const { return data[2]; }
-        inline float z() const { return data[3]; }
+        inline T w() const { return this->data[0]; }
+        inline T x() const { return this->data[1]; }
+        inline T y() const { return this->data[2]; }
+        inline T z() const { return this->data[3]; }
 
         // Setter functions for w, x, y, z
-        inline void setW(float w) {
+        inline void setW(T w) {
             setDirty();
-            data[0] = w;
+            this->data[0] = w;
         }
-        inline void setX(float x) {
+        inline void setX(T x) {
             setDirty();
-            data[1] = x;
+            this->data[1] = x;
         }
-        inline void setY(float y) {
+        inline void setY(T y) {
             setDirty();
-            data[2] = y;
+            this->data[2] = y;
         }
-        inline void setZ(float z) { data[3] = z; }
+        inline void setZ(T z) { this->data[3] = z; }
 
-        Vector3 forward();
+        // Computes the forward vector
+        VectorTemplated<T, 3> forward();
 
         // Computes the right vector
-        Vector3 right();
+        VectorTemplated<T, 3> right();
 
         // Computes the up vector
-        Vector3 up();
+        VectorTemplated<T, 3> up();
 
-        Quaternion operator-() const;
+        QuaternionBase operator-() const;
 
-        friend Quaternion operator+(Quaternion q, const Quaternion& other) {
+        friend QuaternionBase operator+(QuaternionBase q, const QuaternionBase& other) {
             return q += other;
         }
 
-        Quaternion operator+=(const Quaternion& other) {
+        QuaternionBase operator+=(const QuaternionBase& other) {
             setDirty();
-            VectorTemplated::operator+=(other);
+            VectorTemplated<T, 4>::operator+=(other);
             return *this;
         }
 
-        friend Quaternion operator*(Quaternion q, const Quaternion& other) {
+        friend QuaternionBase operator*(QuaternionBase q, const QuaternionBase& other) {
             return q *= other;
         }
 
-        Quaternion operator*=(const Quaternion& other) {
+        friend QuaternionBase operator*(QuaternionBase q, float other) {
+            return q *= other;
+        }
+
+        QuaternionBase operator*=(const QuaternionBase& other) {
             setDirty();
-            const Quaternion p(*this);
-            data[0] = p.data[0] * other.data[0] - p.data[1] * other.data[1] - p.data[2] * other.data[2] - p.data[3] * other.data[3]; // w
-            data[1] = p.data[0] * other.data[1] + p.data[1] * other.data[0] + p.data[2] * other.data[3] - p.data[3] * other.data[2]; // x
-            data[2] = p.data[0] * other.data[2] - p.data[1] * other.data[3] + p.data[2] * other.data[0] + p.data[3] * other.data[1]; // y
-            data[3] = p.data[0] * other.data[3] + p.data[1] * other.data[2] - p.data[2] * other.data[1] + p.data[3] * other.data[0]; // z
+            const QuaternionBase p(*this);
+            this->data[0] = p.data[0] * other.data[0] - p.data[1] * other.data[1] - p.data[2] * other.data[2] - p.data[3] * other.data[3]; // w
+            this->data[1] = p.data[0] * other.data[1] + p.data[1] * other.data[0] + p.data[2] * other.data[3] - p.data[3] * other.data[2]; // x
+            this->data[2] = p.data[0] * other.data[2] - p.data[1] * other.data[3] + p.data[2] * other.data[0] + p.data[3] * other.data[1]; // y
+            this->data[3] = p.data[0] * other.data[3] + p.data[1] * other.data[2] - p.data[2] * other.data[1] + p.data[3] * other.data[0]; // z
             return *this;
         }
 
-        Vector3 operator*(const Vector3& v) const {
-            const Vector3 quatVec(data[1], data[2], data[3]);
+        VectorTemplated<T, 3> operator*(const VectorTemplated<T, 3>& v) const;
+        Vector3 operator*(const Vector3& v) const;
 
-            const Vector3 uv = quatVec.cross(v);
-            const Vector3 uuv = quatVec.cross(uv);
-            return v + ((uv * data[0]) + uuv) * 2.0f;
-        }
+        QuaternionBase operator/(const T& b) const;
 
-        Quaternion operator/(const float& b) const;
-
-        Quaternion inverse();
-        Quaternion conjugate() const;
+        QuaternionBase inverse();
+        QuaternionBase conjugate() const;
         void normalize();
-        Quaternion normalized();
+        QuaternionBase normalized();
 
         // Euler utilities
         // Axis 0 = x, 1 = y, 2 = z
-        Vector3 getAxis(const int axis) const;
-        Vector3 toEuler();
-        static Quaternion fromEuler(const Vector3& euler);
-        static Quaternion fromEuler(const float pitch, const float yaw, const float roll);
-        static Quaternion axisAngleToQuaternion(const Vector3& axis, float angle);
+        VectorTemplated<T, 3> getAxis(const int axis) const;
 
-        static Quaternion slerp(const Quaternion& start, const Quaternion& end, float time);
+        Vector3 toEuler();
+        static QuaternionBase fromEuler(const VectorTemplated<T, 3>& euler);
+        static QuaternionBase fromEuler(const Vector3& euler);
+        static QuaternionBase fromEuler(const T pitch, const T yaw, const T roll);
+        static QuaternionBase axisAngleToQuaternion(const VectorTemplated<T, 3>& axis, T angle);
+
+        static QuaternionBase slerp(const QuaternionBase& start, const QuaternionBase& end, T t);
+        static QuaternionBase lerp(const QuaternionBase& start, const QuaternionBase& end, T t);
+        static QuaternionBase elerp(const QuaternionBase& start, const QuaternionBase& end, T t) = delete;
     };
 
-    std::ostream& operator<<(std::ostream& os, const Quaternion& q);
+    template <typename T>
+    std::ostream& operator<<(std::ostream& os, const QuaternionBase<T>& q) {
+
+        os << "[ ";
+        os << q.w() << " " << q.x() << " " << q.y() << " " << q.z();
+        os << " ]";
+
+        return os;
+    }
+
+    extern template class QuaternionBase<float>;
+    extern template class QuaternionBase<double>;
+    using Quaternion = QuaternionBase<float>;
+    using QuaternionD = QuaternionBase<double>;
+
 } // namespace LaurelEye

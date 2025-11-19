@@ -13,9 +13,7 @@
 #pragma once
 
 #include <array>
-#include <cmath>
 #include <cstddef>
-#include <stdexcept>
 
 namespace LaurelEye {
 
@@ -26,161 +24,89 @@ namespace LaurelEye {
         std::array<T, N> data;
 
     public:
-        VectorTemplated() : data{} {}
-        VectorTemplated(const T* arr) : data{} {
-            for ( int i = 0; i < N; ++i ) {
-                data[i] = arr[i];
-            }
-        }
-
-        VectorTemplated(const T val) : data{} {
-            for ( int i = 0; i < N; ++i ) {
-                data[i] = val;
-            }
-        }
-
+        VectorTemplated();
+        VectorTemplated(const T* arr);
+        VectorTemplated(const T val);
         VectorTemplated(const T val1, const T val2)
-            requires(N == 2)
-            : data{val1, val2} {}
+            requires(N == 2);
         VectorTemplated(const T val1, const T val2, const T val3)
-            requires(N == 3)
-            : data{val1, val2, val3} {}
+            requires(N == 3);
         VectorTemplated(const T val1, const T val2, const T val3, const T val4)
-            requires(N == 4)
-            : data{val1, val2, val3, val4} {}
+            requires(N == 4);
+        explicit VectorTemplated(const std::array<T, N>& values);
 
-        VectorTemplated& operator=(const VectorTemplated& other) {
-            if ( *this == other ) {
-                return *this;
-            }
-            data = other.data;
-            return *this;
-        }
+        VectorTemplated(const VectorTemplated&) = default;
+        VectorTemplated& operator=(const VectorTemplated& other) = default;
 
-        explicit VectorTemplated(const std::array<T, N>& values) : data(values) {}
+        T& operator[](size_t index);
+        const T& operator[](size_t index) const;
 
-        T& operator[](size_t index) { return data[index]; }
-        const T& operator[](size_t index) const { return data[index]; }
+        bool operator==(const VectorTemplated& other) const;
 
-        bool operator==(const VectorTemplated& other) const {
-            for ( int i = 0; i < N; ++i ) {
-                if ( data[i] != other[i] ) return false;
-            }
-            return true;
-        }
-
-        bool operator!=(const VectorTemplated& other) const {
-            return (!(*this == other));
-        }
+        bool operator!=(const VectorTemplated& other) const;
 
         // Formula: [v1 + u1, v2 + u2, ..., vn + un]
+        VectorTemplated& operator+=(const VectorTemplated& other);
         friend VectorTemplated operator+(VectorTemplated vector, const VectorTemplated& other) {
             return vector += other;
         }
 
-        VectorTemplated& operator+=(const VectorTemplated& other) {
-            for ( int i = 0; i < N; i++ ) {
-                data[i] += other.data[i];
-            }
-
-            return *this;
-        }
-
         // Formula: [v1 - u1, v2 - u2, ..., vn - un]
-        VectorTemplated operator-(const VectorTemplated& other) const {
-            VectorTemplated result;
-            for ( int i = 0; i < N; i++ ) {
-                result.data[i] = data[i] - other.data[i];
-            }
-
-            return result;
-        }
+        VectorTemplated operator-(const VectorTemplated& other) const;
 
         // Formula: [v1 * s, v2 * s, ..., vn * s]
-        VectorTemplated operator*(T scalar) const {
-            VectorTemplated result;
-            for ( int i = 0; i < N; i++ ) {
-                result.data[i] = data[i] * scalar;
-            }
-
-            return result;
-        }
-
+        VectorTemplated operator*=(T scalar) const;
         friend VectorTemplated operator*(VectorTemplated vector, const VectorTemplated& other) {
             return vector *= other;
         }
 
-        VectorTemplated& operator*=(const VectorTemplated& other) {
-            for ( int i = 0; i < N; i++ ) {
-                data[i] *= other.data[i];
-            }
-
-            return *this;
-        }
+        VectorTemplated& operator*=(const VectorTemplated& other);
 
         // Formula: v1*u1 + v2*u2 + ... + vn*un
-        T dot(const VectorTemplated& other) const {
-            T result = 0;
-            for ( int i = 0; i < N; i++ ) {
-                result += data[i] * other.data[i];
-            }
+        T dot(const VectorTemplated& other) const;
 
-            return result;
-        }
-
-        T magnitudeSquared() const {
-            T result = static_cast<T>(0);
-            for ( int i = 0; i < N; i++ ) {
-                result += static_cast<T>(pow(data[i], 2.0));
-            }
-            return result;
-        }
+        // Formula: v1*u1 + v2*u2 + ... + vn*un
+        VectorTemplated cross(const VectorTemplated& other) const
+            requires(N == 3);
 
         // Formula: sqrt(v1^2 + v2^2 + ... + vn^2)
-        T magnitude() const {
-            T result = 0;
-            for ( int i = 0; i < N; i++ ) {
-                result += static_cast<T>(pow(data[i], 2.0));
-            }
-            return static_cast<T>(sqrt(result));
-        }
+        T magnitudeSquared() const;
+        T magnitude() const;
 
         // Formula: v / |v|, where |v| is the magnitude
-        void normalize() {
-            T magnitude_val = magnitude();
-            if ( magnitude_val == static_cast<T>(0) ) throw std::runtime_error("Cannot normalize zero vector");
-
-            for ( int i = 0; i < N; i++ ) {
-                data[i] /= magnitude_val;
-            }
-        }
+        void normalize();
 
         // Formula: v / |v|, where |v| is the magnitude
-        VectorTemplated normalized() const {
-            VectorTemplated result = *this;
-            result.normalize();
-            return result;
-        }
+        VectorTemplated normalized() const;
+
+        static VectorTemplated lerp(const VectorTemplated& start, const VectorTemplated& end, T t);
+
+        static VectorTemplated elerp(const VectorTemplated& start, const VectorTemplated& end, T t)
+            requires std::floating_point<T>;
+        static VectorTemplated elerp(const VectorTemplated& start, const VectorTemplated& end, T t)
+            requires std::integral<T>;
     };
 
     // Using extern to force only one instantiation.
     // Reduces header compile size and time a tiny bit.
-    extern template class VectorTemplated<int, 2>;
-    extern template class VectorTemplated<float, 2>;
-    extern template class VectorTemplated<double, 2>;
-    extern template class VectorTemplated<int, 3>;
-    extern template class VectorTemplated<double, 3>;
-    extern template class VectorTemplated<int, 4>;
-    extern template class VectorTemplated<float, 4>;
-    extern template class VectorTemplated<double, 4>;
-    using IVector2 = VectorTemplated<int, 2>;
-    using Vector2 = VectorTemplated<float, 2>;
-    using FVector2 = VectorTemplated<float, 2>;
-    using DVector2 = VectorTemplated<double, 2>;
-    using IVector3 = VectorTemplated<int, 3>;
-    using DVector3 = VectorTemplated<double, 3>;
-    using IVector4 = VectorTemplated<int, 4>;
-    using Vector4 = VectorTemplated<float, 4>;
-    using FVector4 = VectorTemplated<float, 4>;
-    using DVector4 = VectorTemplated<double, 4>;
+    extern template class VectorTemplated<int, 2ul>;
+    extern template class VectorTemplated<float, 2ul>;
+    extern template class VectorTemplated<double, 2ul>;
+    extern template class VectorTemplated<int, 3ul>;
+    extern template class VectorTemplated<float, 3ul>;
+    extern template class VectorTemplated<double, 3ul>;
+    extern template class VectorTemplated<int, 4ul>;
+    extern template class VectorTemplated<float, 4ul>;
+    extern template class VectorTemplated<double, 4ul>;
+    using IVector2 = VectorTemplated<int, 2ul>;
+    using Vector2 = VectorTemplated<float, 2ul>;
+    using FVector2 = VectorTemplated<float, 2ul>;
+    using DVector2 = VectorTemplated<double, 2ul>;
+    using IVector3 = VectorTemplated<int, 3ul>;
+    using FVector3 = VectorTemplated<float, 3ul>;
+    using DVector3 = VectorTemplated<double, 3ul>;
+    using IVector4 = VectorTemplated<int, 4ul>;
+    using Vector4 = VectorTemplated<float, 4ul>;
+    using FVector4 = VectorTemplated<float, 4ul>;
+    using DVector4 = VectorTemplated<double, 4ul>;
 } // namespace LaurelEye

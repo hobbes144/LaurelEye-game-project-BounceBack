@@ -17,6 +17,13 @@ project ("GAM55X-Laurel" VERSION 0.0.1 DESCRIPTION "Team Laurel GAM55x Project")
 set( CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS True )
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
+# if (MSVC)
+#     add_compile_options(/W4 /WX)
+# else()
+#     add_compile_options(-Wall -Wextra -pedantic -Werror)
+# endif()
+
+
 # Output directories
 set(OUTPUT_ROOT "${CMAKE_SOURCE_DIR}/build/output")
 set(

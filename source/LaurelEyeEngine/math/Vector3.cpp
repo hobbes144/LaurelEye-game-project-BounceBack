@@ -179,6 +179,17 @@ namespace LaurelEye {
         return !(first < other);
     }
 
+    Vector3 Vector3::lerp(const Vector3& start, const Vector3& end, float t) {
+        return Vector3((1.0f - t) * start + t * end);
+    }
+
+    Vector3 Vector3::elerp(const Vector3& start, const Vector3& end, float t) {
+        return Vector3(
+            start.x*pow(end.x/start.x, t),
+            start.y*pow(end.y/start.y, t),
+            start.z*pow(end.z/start.z, t));
+    }
+
     std::ostream& operator<<(std::ostream& os, const Vector3& v) {
         os << std::fixed << std::setprecision(2) << "(" << v.x << ", " << v.y << ", " << v.z << ")";
         return os;
