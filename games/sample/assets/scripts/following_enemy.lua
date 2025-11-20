@@ -1,7 +1,7 @@
 ﻿maxSpeed    = 25.0       -- max units per second
 accel       = 20.0      -- acceleration toward target
 decel       = 10.0      -- deceleration when stopping
-chaseRange  = 20.0      -- distance to start chasing
+chaseRange  = 100.0      -- distance to start chasing
 stopRange   = 0.2       -- distance to stop
 
 turnSpeed   = 8.0       -- how fast the enemy rotates toward movement
