@@ -79,6 +79,14 @@
             "usePhysics": false,
             "maxParticles": 200
         },
+        "Speaker": {
+            "audioName": "footsteps",
+            "audioPath": "audio/footstep.mp3",
+            "volume": 0.5,
+            "loop": false,
+            "3D": false,
+            "playOnLoad": false
+        },
         "Script": {
             "path": "scripts/player_script.lua"
         }

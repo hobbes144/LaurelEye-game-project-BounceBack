@@ -8,6 +8,7 @@
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Physics.h"
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Scene.h"
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Particles.h"
+#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Audio.h"
 
 namespace LaurelEye::Scripting {
 
@@ -41,6 +42,9 @@ namespace LaurelEye::Scripting {
 
         /* Particles*/
         Sol2API_Particles::setup(lua, ctx);
+
+        /* Audio */
+        Sol2API_Audio::setup(lua, ctx);
 
     }
 

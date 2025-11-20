@@ -15,6 +15,7 @@ transform = nil
 body = nil
 cameraTransform = nil
 smokeEmitter = nil
+speaker = nil
 
 isGrounded = true
 jumping = false
@@ -27,6 +28,13 @@ defaultEmissionRate = 150.0
 defaultSpreadAngle = 60.0
 defaultStartSize = 20.0
 defaultEndSize = 10.0
+
+walkSoundMinSpeed = 5.0
+isWalkSoundPlaying = false
+
+footstepTimer = 0.0
+stepInterval = 0.35   -- seconds between steps
+speedThreshold = 2.0  -- when footsteps should begin
 
 function onStart()
     transform = self:findTransform()
@@ -50,6 +58,8 @@ function onStart()
         defaultEndSize      = data.endSize
         defaultSpreadAngle  = data.spreadAngle
     end
+
+    speaker = self:findAudioSpeaker()
 end
 
 function onUpdate(dt)
@@ -158,6 +168,25 @@ function onUpdate(dt)
             data.endSize = defaultEndSize
             data.spreadAngle = defaultSpreadAngle
             inLandingBurst = false
+        end
+    end
+
+    if speaker ~= nil then
+        local horizontalSpeed = math.sqrt(v.x*v.x + v.z*v.z)
+
+        if isGrounded and horizontalSpeed > walkSoundMinSpeed then
+            footstepTimer = footstepTimer + dt
+            if footstepTimer >= stepInterval then
+                footstepTimer = 0.0
+
+                if speaker then
+                    speaker:stop()
+                    speaker:play()
+                end
+            end
+        else
+            -- stopped or slow: reset timer
+            footstepTimer = 0.0
         end
     end
 end
