@@ -47,7 +47,9 @@ namespace LaurelEye::Scripting {
             "pauseIn", &Particles::ParticleEmitterComponent::PauseIn,
             //Queries
             "isPlaying", &Particles::ParticleEmitterComponent::GetIsPlaying,
-            //"getEmitterData", &Particles::ParticleEmitterComponent::GetEmitterData,
+            "getEmitterData", [](Particles::ParticleEmitterComponent& self) -> Particles::ParticleEmitterData& {
+                return self.GetEmitterData();
+            },
             "getMaxParticles", &Particles::ParticleEmitterComponent::GetMaxParticles,
             "getEmissionAccumulator", &Particles::ParticleEmitterComponent::GetEmissionAccumulator,
             "setMaxParticles", &Particles::ParticleEmitterComponent::SetMaxParticles

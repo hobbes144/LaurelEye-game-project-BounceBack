@@ -28,11 +28,9 @@ namespace LaurelEye::Scripting {
             LaurelEye::Vector3(float)>(),
 
         // Fields
-        "x", &LaurelEye::Vector3::x,
-        "y", &LaurelEye::Vector3::y,
-        "z", &LaurelEye::Vector3::z,
-
-        // Methods
+        "x", sol::property([](LaurelEye::Vector3& v) { return v[0]; }, [](LaurelEye::Vector3& v, float val) { v[0] = val; }),
+        "y", sol::property([](LaurelEye::Vector3& v) { return v[1]; }, [](LaurelEye::Vector3& v, float val) { v[1] = val; }),
+        "z", sol::property([](LaurelEye::Vector3& v) { return v[2]; }, [](LaurelEye::Vector3& v, float val) { v[2] = val; }),        // Methods
         "Dot", &LaurelEye::Vector3::dot,
         "Magnitude", &LaurelEye::Vector3::magnitude,
         "MagnitudeSquared", &LaurelEye::Vector3::magnitudSquared,
@@ -166,9 +164,18 @@ namespace LaurelEye::Scripting {
             "z", sol::property(&Quaternion::z, &Quaternion::setZ),
 
             // Directional vectors
-            "forward", &Quaternion::forward,
-            "right", &Quaternion::right,
-            "up", &Quaternion::up,
+            "forward", [](LaurelEye::Quaternion& q) {
+                auto v = q.forward(); // returns VectorTemplated<float, 3>
+                return LaurelEye::Vector3(v);
+            },
+            "right", [](LaurelEye::Quaternion& q) {
+                auto v = q.right(); // returns VectorTemplated<float, 3>
+                return LaurelEye::Vector3(v);
+            },
+            "up", [](LaurelEye::Quaternion& q) {
+                auto v = q.up(); // returns VectorTemplated<float, 3>
+                return LaurelEye::Vector3(v);
+            },
 
             // Operator overloads
             sol::meta_function::multiplication, sol::overload(

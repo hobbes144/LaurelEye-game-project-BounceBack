@@ -127,7 +127,7 @@ namespace LaurelEye::Graphics {
 
         void resizeFramebuffer(FramebufferHandle h, uint32_t width, uint32_t height) override;
 
-        void blitFramebuffers(FramebufferHandle source, FramebufferHandle dest) override;
+        void blitFramebuffers(FramebufferHandle source, FramebufferHandle dest, bool depthOnly = false) override;
 
     private:
         std::unique_ptr<LGLDataBufferFactory> dataBufferFactory;

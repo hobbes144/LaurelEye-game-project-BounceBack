@@ -297,8 +297,8 @@ namespace LaurelEye::Graphics {
         framebufferFactory->resize(h, width, height);
     }
 
-    void LGLRenderDevice::blitFramebuffers(FramebufferHandle source, FramebufferHandle dest) {
-        framebufferFactory->blit(source, dest);
+    void LGLRenderDevice::blitFramebuffers(FramebufferHandle source, FramebufferHandle dest, bool depthOnly) {
+        framebufferFactory->blit(source, dest, depthOnly);
     }
 
 } // namespace LaurelEye::Graphics

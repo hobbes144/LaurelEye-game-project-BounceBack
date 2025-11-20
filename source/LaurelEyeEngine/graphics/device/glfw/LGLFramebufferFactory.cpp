@@ -173,29 +173,35 @@ namespace LaurelEye::Graphics {
         }
     }
 
-    void LGLFramebufferFactory::blit(FramebufferHandle source, FramebufferHandle dest) {
+    void LGLFramebufferFactory::blit(FramebufferHandle source, FramebufferHandle dest, bool depthOnly) {
         glBindFramebuffer(GL_READ_FRAMEBUFFER, source);
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dest);
 
         for ( const auto& attachment : createdBuffers[source].attachments ) {
             GLenum att = attachment.glAttachment;
 
-            GLbitfield mask = GL_COLOR_BUFFER_BIT;
             if ( attachment.d.type == FramebufferAttachmentType::Depth ) {
-                glReadBuffer(GL_NONE);
-                glDrawBuffer(GL_NONE);
-                mask = GL_DEPTH_BUFFER_BIT;
+                if ( !depthOnly ) {
+                    glReadBuffer(GL_NONE);
+                    glDrawBuffer(GL_NONE);
+                }
+                glBlitFramebuffer(
+                    0, 0, attachment.d.size.width, attachment.d.size.height,
+                    0, 0, attachment.d.size.width, attachment.d.size.height,
+                    GL_DEPTH_BUFFER_BIT,
+                    GL_NEAREST // required for MSAA resolve
+                );
             }
-            else {
+            else if ( !depthOnly ) {
                 glReadBuffer(att);
                 glDrawBuffer(att);
+                glBlitFramebuffer(
+                    0, 0, attachment.d.size.width, attachment.d.size.height,
+                    0, 0, attachment.d.size.width, attachment.d.size.height,
+                    GL_COLOR_BUFFER_BIT,
+                    GL_NEAREST // required for MSAA resolve
+                );
             }
-            glBlitFramebuffer(
-                0, 0, attachment.d.size.width, attachment.d.size.height,
-                0, 0, attachment.d.size.width, attachment.d.size.height,
-                mask,
-                GL_NEAREST // required for MSAA resolve
-            );
         }
     }
 

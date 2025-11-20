@@ -65,7 +65,7 @@ namespace LaurelEye::Graphics {
 
         void resize(FramebufferHandle h, uint32_t width, uint32_t height);
 
-        void blit(FramebufferHandle source, FramebufferHandle dest);
+        void blit(FramebufferHandle source, FramebufferHandle dest, bool depthOnly = false);
 
     private:
         [[nodiscard]] TextureHandle createColorAttachmentTexture(

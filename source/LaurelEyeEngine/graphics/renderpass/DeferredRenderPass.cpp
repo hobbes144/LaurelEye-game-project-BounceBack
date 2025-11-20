@@ -6,7 +6,8 @@
 /// @brief  Deferred Render Pass
 
 #include "LaurelEyeEngine/graphics/renderpass/DeferredRenderPass.h"
-#include "LaurelEyeEngine/graphics/resources/GeometryBuffer.h"
+#include "LaurelEyeEngine/graphics/device/glfw/LGLRenderDevice.h"
+#include "LaurelEyeEngine/graphics/RenderStateSaver.h"
 #include "LaurelEyeEngine/graphics/resources/Mesh.h"
 #include "LaurelEyeEngine/graphics/resources/Shader.h"
 #include "LaurelEyeEngine/graphics/resources/SizeRegistry.h"
@@ -22,8 +23,10 @@ namespace LaurelEye::Graphics {
     }
 
     void DeferredRenderPass::execute(const FrameContext& ctx) {
+        RenderStateSaver rs{&ctx.device};
         const SizeRegistry& size = ctx.resources.getSurfaceSize(0);
         glViewport(0, 0, size.width, size.height);
+        glDisable(GL_DEPTH_TEST);
         glDepthMask(GL_FALSE);
 
         shader->use();
@@ -71,5 +74,22 @@ namespace LaurelEye::Graphics {
         shader->unuse();
 
         glDepthMask(GL_TRUE);
+        glEnable(GL_DEPTH_TEST);
+        ctx.device.blitFramebuffers(ctx.resources.framebuffer("gbuffer"), 0, true);
+        ctx.device.bindFramebufferBase(0);
+
+        // glBindFramebuffer(GL_READ_FRAMEBUFFER, ctx.resources.framebuffer("gbuffer"));
+        // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // or your post-FBO if you have one
+        //
+        // // 2. Blit only depth
+        // glBlitFramebuffer(
+        //     0, 0, 1280, 720, // src rect
+        //     0, 0, 1280, 720, // dst rect
+        //     GL_DEPTH_BUFFER_BIT, // what to copy
+        //     GL_NEAREST           // filter (must be NEAREST for depth)
+        // );
+        //
+        // // 3. Go back to your main draw target if needed
+        // glBindFramebuffer(GL_FRAMEBUFFER, 0); // or your forward FBO
     }
 } // namespace LaurelEye::Graphics

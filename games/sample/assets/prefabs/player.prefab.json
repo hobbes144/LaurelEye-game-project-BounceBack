@@ -61,6 +61,24 @@
             "ccdSweptSphereRadius": 1.0,
             "gravityScale": 8.0
         },
+        "ParticleEmitter": {
+            "emissionRate": 60.0,
+            "spreadAngle": 65.0,
+            "particleLifetime": 0.6,
+            "lifetimeVariation": 0.2,
+            "initialSpeed": 2.0,
+            "speedVariation": 1.0,
+
+            "startSize": 15.0,
+            "endSize": 5.0,
+            "sizeVariation": 0.4,
+
+            "startColor": [ 0.3, 0.25, 0.2, 0.6 ],
+            "endColor": [ 0.3, 0.25, 0.2, 0.0 ],
+
+            "usePhysics": false,
+            "maxParticles": 200
+        },
         "Script": {
             "path": "scripts/player_script.lua"
         }

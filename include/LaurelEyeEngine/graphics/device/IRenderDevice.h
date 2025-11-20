@@ -180,7 +180,7 @@ namespace LaurelEye::Graphics {
 
         virtual void resizeFramebuffer(FramebufferHandle h, uint32_t width, uint32_t height) = 0;
 
-        virtual void blitFramebuffers(FramebufferHandle source, FramebufferHandle dest) = 0;
+        virtual void blitFramebuffers(FramebufferHandle source, FramebufferHandle dest, bool depthOnly = false) = 0;
 
         // TODO: virtual void destroyAllFrameBufffers() = 0;
 
