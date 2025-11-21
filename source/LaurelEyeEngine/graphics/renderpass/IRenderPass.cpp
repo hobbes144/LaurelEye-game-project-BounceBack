@@ -19,6 +19,7 @@ namespace LaurelEye::Graphics {
         if ( isValidDataBuffer(propertiesHandle) ) ctx.device.bindDataBufferBase(propertiesHandle);
 
         for ( const auto& icomponent : ctx.objects ) {
+            if ( !icomponent->isActive() ) continue;
             // Remove this when we fix FrameContext to send only renderables:
             auto component = (IRenderableComponent*)icomponent;
             component->GetMaterial()->setProperty(

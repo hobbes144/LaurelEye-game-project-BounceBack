@@ -19,6 +19,22 @@ namespace LaurelEye {
             return;
         }
 
+        hoverDelay += deltaTime;
+        if ( hoverDelay >= hoverCooldown ) {
+            if ( inputManager->isKeyPressed(escapeKey) || inputManager->isButtonPressed(escapeButton) ) {
+                isUIActive = !isUIActive;
+                hoverDelay = 0.0f;
+            }
+        }
+
+        if ( isUIActive ) {
+            enableCurrentUI();
+        }
+        else {
+            disableAllUI();
+            return;
+        }
+
         for ( const auto& it : elements ) {
             auto [mouseX, mouseY] = mouseToUICoordinate();
             if ( it.second->MouseInRange(mouseX, mouseY) && it.second->isActive() ) {
@@ -29,29 +45,30 @@ namespace LaurelEye {
             }
         }
 
-        hoverDelay += deltaTime;
-        if ( hoverDelay >= hoverCooldown ) {
-            if ( inputManager->isKeyHeld(leftKey) || inputManager->getGamepadAxis(GamepadAxes::gamepadLStickX) < -0.2 ) {
-                toLeft();
-                hoverDelay = 0.0f;
-            }
-            else if ( inputManager->isKeyHeld(rightKey) || inputManager->getGamepadAxis(GamepadAxes::gamepadLStickX) > 0.2 ) {
-                toRight();
-                hoverDelay = 0.0f;
-            }
-            else if ( inputManager->isKeyHeld(upKey) || inputManager->getGamepadAxis(GamepadAxes::gamepadLStickY) > 0.2 ) {
-                toUp();
-                hoverDelay = 0.0f;
-            }
-            else if ( inputManager->isKeyHeld(downKey) || inputManager->getGamepadAxis(GamepadAxes::gamepadLStickY) < -0.2 ) {
-                toDown();
-                hoverDelay = 0.0f;
-            }
+        if ( currentComponent->isActive() ) {
+            if ( hoverDelay >= hoverCooldown ) {
+                if ( inputManager->isKeyHeld(leftKey) || inputManager->getGamepadAxis(GamepadAxes::gamepadLStickX) < -0.2 ) {
+                    toLeft();
+                    hoverDelay = 0.0f;
+                }
+                else if ( inputManager->isKeyHeld(rightKey) || inputManager->getGamepadAxis(GamepadAxes::gamepadLStickX) > 0.2 ) {
+                    toRight();
+                    hoverDelay = 0.0f;
+                }
+                else if ( inputManager->isKeyHeld(upKey) || inputManager->getGamepadAxis(GamepadAxes::gamepadLStickY) > 0.2 ) {
+                    toUp();
+                    hoverDelay = 0.0f;
+                }
+                else if ( inputManager->isKeyHeld(downKey) || inputManager->getGamepadAxis(GamepadAxes::gamepadLStickY) < -0.2 ) {
+                    toDown();
+                    hoverDelay = 0.0f;
+                }
 
-            // Handle input for current focused element
-            if ( currentComponent && (inputManager->isKeyHeld(activateKey) || inputManager->isButtonHeld(activateButton)) ) {
-                dispatchActivateEvent();
-                hoverDelay = 0.0f;
+                // Handle input for current focused element
+                if ( currentComponent && (inputManager->isKeyHeld(activateKey) || inputManager->isButtonHeld(activateButton)) ) {
+                    dispatchActivateEvent();
+                    hoverDelay = 0.0f;
+                }
             }
         }
     }
@@ -98,53 +115,34 @@ namespace LaurelEye {
         if ( inputMaps.empty() ) {
             if ( it != inputMapStorage.end() ) {
                 inputMaps.push(it->second);
-                std::unordered_map<std::string, SingleUIMapping*> map = inputMaps.top()->getInputMap();
-                for ( auto& [key, val] : map ) {
-                    if ( elements[key] != nullptr ) {
-                        elements[key]->setIsActive(true);
-                    }
-                }
+                enableCurrentUI();
             }
             else {
                 std::cerr << "UIElementManager: InputMap " << inputMapName << " not found!" << std::endl;
             }
+            disableAllUI();
             return;
         }
         if ( it != inputMapStorage.end() ) {
-            std::unordered_map<std::string, SingleUIMapping*> map = inputMaps.top()->getInputMap();
-            for ( auto& [key, val] : map ) {
-                if ( elements[key] != nullptr ) {
-                    elements[key]->setIsActive(false);
-                }
-            }
-
+            disableCurrentUI();
             inputMaps.push(it->second);
-            map = inputMaps.top()->getInputMap();
-            for ( auto& [key, val] : map ) {
-                if ( elements[key] != nullptr ) {
-                    elements[key]->setIsActive(true);
-                }
-            }
+            enableCurrentUI();
         }
         else {
             std::cerr << "UIElementManager: InputMap " << inputMapName << " not found!" << std::endl;
         }
+
+        disableAllUI();
     }
 
     void UIElementManager::popInputMap() {
         if ( inputMaps.size() > 1 ) {
-            std::unordered_map<std::string, SingleUIMapping*> map = inputMaps.top()->getInputMap();
-            for ( auto& [key, val] : map ) {
-                elements[key]->setIsActive(false);
-            }
+            disableCurrentUI();
             inputMaps.pop();
 
             if ( !inputMaps.empty() ) {
                 currentComponent = elements[inputMaps.top()->getCurrent()];
-                map = inputMaps.top()->getInputMap();
-                for ( auto& [key, val] : map ) {
-                    elements[key]->setIsActive(true);
-                }
+                enableCurrentUI();
             }
             else {
                 std::cerr << "UIElementManager: No InputMap after pop!" << std::endl;
@@ -167,6 +165,42 @@ namespace LaurelEye {
         auto it = inputMapStorage.find(inputMap->getName());
         if ( it != inputMapStorage.end() ) {
             inputMapStorage.erase(it);
+        }
+    }
+
+    void UIElementManager::disableCurrentUI() {
+        if ( !inputMaps.empty() ) {
+            std::unordered_map<std::string, SingleUIMapping*> map = inputMaps.top()->getInputMap();
+            for ( auto& [key, val] : map ) {
+                if ( elements[key] != nullptr ) {
+                    elements[key]->setIsActive(false);
+                }
+            }
+        }
+    }
+
+    void UIElementManager::enableCurrentUI() {
+        if ( !inputMaps.empty() ) {
+            std::unordered_map<std::string, SingleUIMapping*> map = inputMaps.top()->getInputMap();
+            for ( auto& [key, val] : map ) {
+                if ( elements[key] != nullptr ) {
+                    elements[key]->setIsActive(true);
+                }
+            }
+        }
+    }
+
+    void UIElementManager::disableAllUI() {
+        if ( !inputMaps.empty() ) {
+            while ( inputMaps.size() > 1 ) {
+                popInputMap();
+            }
+            std::unordered_map<std::string, SingleUIMapping*> map = inputMaps.top()->getInputMap();
+            for ( auto& [key, val] : map ) {
+                if ( elements[key] != nullptr ) {
+                    elements[key]->setIsActive(false);
+                }
+            }
         }
     }
 
@@ -279,7 +313,7 @@ namespace LaurelEye {
         currentComponent = component;
         if ( currentComponent ) {
             currentComponent->SetIsFocused(true);
-            if (inputMaps.empty()) {
+            if ( inputMaps.empty() ) {
                 return;
             }
             else {

@@ -17,7 +17,7 @@ namespace LaurelEye {
     class UIElementManager {
     public:
         UIElementManager()
-            : currentComponent(nullptr) {}
+            : currentComponent(nullptr), listener(0) {}
         ~UIElementManager();
 
         void setCurrentUIComponent(Graphics::UIComponent* component);
@@ -50,6 +50,10 @@ namespace LaurelEye {
             window = _window;
         }
 
+        void enableCurrentUI();
+        void disableCurrentUI();
+        void disableAllUI();
+
         void toLeft();
         void toRight();
         void toUp();
@@ -64,6 +68,8 @@ namespace LaurelEye {
         void setLeftKey(Key key) { leftKey = key; }
         void setRightKey(Key key) { rightKey = key; }
         void setEscapeKey(Key key) { escapeKey = key; }
+        void setIsUIActive(bool isActive) { isUIActive = isActive; }
+        bool getIsUIActive() const { return isUIActive; }
 
         void dispatchActivateEvent();
 
@@ -84,6 +90,8 @@ namespace LaurelEye {
         float hoverDelay = 0.0f;
         const float hoverCooldown = 0.1f;
 
+        bool isUIActive = true;
+
         Graphics::UIComponent* currentComponent = nullptr;
 
         std::unordered_map<std::string, Graphics::UIComponent*> elements = std::unordered_map<std::string, Graphics::UIComponent*>(); // All available UI elements
@@ -97,7 +105,7 @@ namespace LaurelEye {
         Key downKey = Key::arrowDown;
         Key leftKey = Key::arrowLeft;
         Key rightKey = Key::arrowRight;
-        Key escapeKey = Key::Escape;
+        Key escapeKey = Key::M;
 
         GamepadButton activateButton = GamepadButton::gamepadA;
         GamepadButton escapeButton = GamepadButton::gamepadB;
