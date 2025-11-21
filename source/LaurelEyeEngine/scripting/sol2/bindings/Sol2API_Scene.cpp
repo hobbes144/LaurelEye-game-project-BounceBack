@@ -48,7 +48,10 @@ void Sol2API_Scene::setupSceneManager(sol::state& lua, SceneManager* manager) {
         "getScene", &SceneManager::getScene,
         "changeScene", &SceneManager::changeScene,
         "reloadCurrentScene", &SceneManager::reloadCurrentScene,
-        "instantiate", &SceneManager::instantiate
+        "instantiate", &SceneManager::instantiate,
+        "destroy", sol::overload(
+            static_cast<void (SceneManager::*)(Entity*)>(&SceneManager::destroy),
+            static_cast<void (SceneManager::*)(const std::string&)>(&SceneManager::destroy))
     );
 
     // Expose the instance globally

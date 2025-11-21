@@ -101,6 +101,18 @@ namespace LaurelEye {
         return nullptr;
     }
 
+    void SceneManager::destroy(Entity* entity) {
+        if ( currentScene && entity ) {
+            currentScene->removeEntity(entity);
+        }
+    }
+
+    void SceneManager::destroy(const std::string& entityName) {
+        if ( currentScene ) {
+            currentScene->removeEntity(entityName);
+        }
+    }
+
     void SceneManager::loadScene(const std::string& sceneName) {
         auto* assetManager = context->getService<IO::AssetManager>();
         if ( !assetManager ) {

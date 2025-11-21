@@ -400,20 +400,8 @@ namespace LaurelEye::Graphics {
             auto renderComponent = static_cast<Renderable3DComponent*>(component);
             auto mat = renderComponent->GetMaterial();
 
-            // If the material has a texture, release it from GPU
-            if ( auto texAsset = renderComponent->GetImageAsset() ) {
-                const std::string& texName = texAsset->getName();
-                if ( tempRenderResources->texture(texName) != InvalidTexture ) {
-                    tempRenderResources->destroyTexture(texName);
-                }
-            }
-
-            if ( renderComponent->GetMesh() && renderComponent->GetMeshPrimitiveType() == Mesh::Type::None ) {
-                if ( auto geo = renderComponent->GetMesh()->getGeometryBuffer() ) {
-                    geo->destroy();
-                }
-                renderComponent->SetMesh(nullptr);
-            }
+            renderComponent->GetMaterial()->setProperty<int>("useTexture", 1);
+            renderComponent->SetMesh(nullptr);
 
             ISystem::deregisterComponent(component);
             break;

@@ -151,7 +151,7 @@
                 "UIButton": {
                     "name": "B2",
                     "material": {
-                        "texture": "textures/texture_01_dark.png",
+                        "texture": "textures/texture_01_light.png",
                         "transparency": 1.0
                     }
                 }

@@ -70,6 +70,10 @@ function onUpdate(dt)
     local inputZ = (Input:isKeyHeld(Key.S) and 1 or 0) +
                    (Input:isKeyHeld(Key.W) and -1 or 0)
 
+    if Input:isMouseButtonPressed(MouseButton.Left) then
+        shootProjectile()
+    end
+
     local mag = math.sqrt(inputX*inputX + inputZ*inputZ)
     if mag > 0 then
         inputX = inputX / mag
@@ -236,6 +240,40 @@ function rotateTo(angle, dt)
     local current = transform:getWorldRotation()
     local rot = Quaternion.slerp(current, target, dt * turnSpeed)
     transform:setWorldRotation(rot)
+end
+
+function shootProjectile()
+    local proj = SceneManager:instantiate("prefabs/projectile.prefab.json")
+    if proj == nil or self == nil then return end
+
+    local selfTransform = self:findTransform()
+    local projTransform = proj:findTransform()
+    if selfTransform == nil or projTransform == nil then return end
+
+    local pos = selfTransform:getWorldPosition()
+    local selfRotation = selfTransform:getWorldRotation()
+
+    -- forward direction (flattened so spawn is horizontally in front)
+    local forward = selfRotation:forward()
+    forward.y = 0
+    if forward:Magnitude() > 0 then
+        forward = forward:Normalized()
+    end
+
+    local spawnDistance = -3.5    -- adjust: how far in front of the player
+    local verticalOffset = 8.0   -- adjust: height to spawn from player origin
+    local spawnPos = pos + forward * spawnDistance
+    spawnPos.y = spawnPos.y + verticalOffset
+
+    projTransform:setWorldPosition(spawnPos.x, spawnPos.y, spawnPos.z)
+    projTransform:setWorldRotation(selfRotation)
+
+    -- optional: give the projectile an initial velocity in facing direction
+    local projBody = proj:findPhysics()
+    if projBody ~= nil then
+        local projectileSpeed = -100.0 -- adjust as needed
+        projBody:setLinearVelocity(forward * projectileSpeed)
+    end
 end
 
 function onCollisionEnter(data)

@@ -492,6 +492,10 @@ namespace LaurelEye::Graphics {
             return nullptr;
         }
 
+        // Reuse loaded mesh if already present.
+        if ( loadedMeshes.contains(meshAsset->getPath()) )
+            return loadedMeshes[meshAsset->getPath()];
+
         Mesh::Attributes attributes;
 
         const size_t vertexCount = meshAsset->vertices.size();
@@ -523,6 +527,7 @@ namespace LaurelEye::Graphics {
         else
             mesh = std::make_shared<Mesh>(meshAsset->getName(), attributes);
 
+        loadedMeshes[meshAsset->getPath()] = mesh;
         return mesh;
     }
 

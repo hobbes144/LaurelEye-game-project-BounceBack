@@ -59,6 +59,9 @@ namespace LaurelEye {
         /// @param prefabPath 
         Entity* instantiate(const std::string& prefabPath);
 
+        void destroy(Entity* entity);
+        void destroy(const std::string& entityName);
+
         // --- Test and manual setup utilities ---
 #if !defined(NDEBUG)
         /// @brief Allows tests or debug tools to directly insert a scene into the manager

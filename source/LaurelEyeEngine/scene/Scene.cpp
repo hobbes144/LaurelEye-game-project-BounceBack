@@ -311,8 +311,10 @@ namespace LaurelEye {
     void Scene::cleanupDestroyedEntities() {
         if ( pendingRemovals.empty() ) return;
         for ( auto* entity : pendingRemovals ) {
-            deregisterEntityComponents(entity);
-            entity->setRegistered(false);
+            if ( entity->getRegistered() ) {
+                deregisterEntityComponents(entity);
+                entity->setRegistered(false);
+            }
         }
 
         // Then erase all in one pass
