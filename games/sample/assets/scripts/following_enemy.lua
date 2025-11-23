@@ -8,6 +8,7 @@ turnSpeed   = 8.0       -- how fast the enemy rotates toward movement
 
 transform = nil
 body = nil
+destroyed = false
 
 function onStart()
     transform = self:findTransform()
@@ -66,7 +67,29 @@ function rotateTo(angle, dt)
     transform:setWorldRotation(newRot)
 end
 
-function onCollisionEnter(data) end
+function onCollisionEnter(data)
+    local tagsA = data.entityA:getTags()
+    for _, tag in pairs(tagsA) do
+        if tag == "bullet" then
+            print("Collided with Bullet!")
+            if destroyed then return end
+            destroyed = true    
+            SceneManager:destroy(self)
+        end
+    end
+
+    local tagsB = data.entityB:getTags()
+    for _, tag in pairs(tagsB) do
+        if tag == "bullet" then
+            print("Collided with Bullet!")
+            if destroyed then return end
+            destroyed = true    
+            SceneManager:destroy(self)
+        end
+    end
+    
+    
+end
 function onCollisionStay(data) end
 function onCollisionExit(data) end
 

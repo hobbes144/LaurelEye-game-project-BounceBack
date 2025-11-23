@@ -48,6 +48,14 @@ namespace LaurelEye {
         }
         auto entity = memManager->allocateMemory(name);
 
+        if ( entityJson.HasMember("tags") && entityJson["tags"].IsArray() ) {
+            const auto& tags = entityJson["tags"].GetArray();
+            for ( const auto& tag : tags ) {
+                if ( tag.IsString() ) {
+                    entity->addTag(tag.GetString());
+                }
+            }
+        }
         // Add components if present
         if ( entityJson.HasMember("components") && entityJson["components"].IsObject() ) {
             const auto& comps = entityJson["components"];
@@ -63,6 +71,7 @@ namespace LaurelEye {
             }
             entity = createEntityFromJson(jsonAsset->jsonDocument);
         }
+
 
         return entity;
     }

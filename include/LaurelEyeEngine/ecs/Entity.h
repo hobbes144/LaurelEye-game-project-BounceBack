@@ -103,7 +103,6 @@ namespace LaurelEye {
 
         std::unordered_set<std::string> tags; // Tags are strings and not constrained. Up to designers to coordinate
         unsigned int layer;                   // identifies the layer the entity is assigned to
-
     };
 } // namespace LaurelEye
 

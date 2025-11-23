@@ -37,7 +37,7 @@
                 "Transform": {
                     "position": [ 0.0, -1.0, 0.0 ],
                     "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
-                    "scale": [ 100.0, 2.0, 100.0 ]
+                    "scale": [ 200.0, 2.0, 200.0 ]
                 },
                 "Render3D": {
                     "mesh": {
@@ -56,9 +56,9 @@
                     "shapeDefinition": {
                         "type": "Box",
                         "size": {
-                            "x": 50.0,
+                            "x": 1.0,
                             "y": 1.0,
-                            "z": 50.0
+                            "z": 1.0
                         }
                     },
                     "mass": 0.0,

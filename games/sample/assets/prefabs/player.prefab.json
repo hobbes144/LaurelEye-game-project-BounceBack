@@ -1,5 +1,6 @@
 ﻿{
     "name": "PlayerPrefab",
+    "tags": [ "player" ],
     "components": {
         "Transform": {
             "position": [ 0.0, 0.0, 0.0 ],

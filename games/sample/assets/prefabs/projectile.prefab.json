@@ -1,5 +1,6 @@
 ﻿{
     "name": "Bullet",
+    "tags": ["bullet"],
     "components": {
         "Transform": {
             "position": [ 0, 0.0, 0 ],
