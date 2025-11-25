@@ -36,6 +36,9 @@ footstepTimer = 0.0
 stepInterval = 0.35   -- seconds between steps
 speedThreshold = 2.0  -- when footsteps should begin
 
+--auto shooting timer
+shotTimer = 0.0
+
 function onStart()
     transform = self:findTransform()
     body = self:findPhysics()
@@ -73,6 +76,8 @@ function onUpdate(dt)
     if Input:isMouseButtonPressed(MouseButton.Left) then
         shootProjectile()
     end
+
+    autoShootProjectile(dt)
 
     local mag = math.sqrt(inputX*inputX + inputZ*inputZ)
     if mag > 0 then
@@ -273,6 +278,95 @@ function shootProjectile()
     if projBody ~= nil then
         local projectileSpeed = -100.0 -- adjust as needed
         projBody:setLinearVelocity(forward * projectileSpeed)
+    end
+end
+
+function autoShootProjectile(dt)
+    -- Optional timer behavior: pass dt from onUpdate to auto-fire at a fixed rate.
+    local autoShotInterval = 2.0 -- seconds between automatic shots (adjustable)
+    if dt ~= nil then
+        shotTimer = shotTimer + dt
+        if shotTimer < autoShotInterval then return end
+        shotTimer = shotTimer - autoShotInterval
+    end
+
+    if self == nil then return end
+    local scene = SceneManager:getCurrentScene()
+    if scene == nil then return end
+
+    -- Find enemies by tag (prefabs use "enemy" tag)
+    local enemies = scene:findEntitiesWithTag("enemy")
+    if enemies == nil or #enemies == 0 then return end
+
+    -- Player transform + spawn offset (match `shootProjectile` behaviour)
+    local selfTransform = self:findTransform()
+    if selfTransform == nil then return end
+
+    local pos = selfTransform:getWorldPosition()
+    local selfRotation = selfTransform:getWorldRotation()
+
+    local forward = selfRotation:forward()
+    forward.y = 0
+    if forward:Magnitude() > 0 then
+        forward = forward:Normalized()
+    end
+
+    local spawnDistance = -3.5
+    local verticalOffset = 8.0
+    local spawnPos = pos + forward * spawnDistance
+    spawnPos.y = spawnPos.y + verticalOffset
+
+    -- Find closest enemy (by distance to spawn position)
+    local closestPos = nil
+    local closestDist = math.huge
+    for i = 1, #enemies do
+        local e = enemies[i]
+        if e ~= nil then
+            local eT = e:findTransform()
+            if eT ~= nil then
+                local ePos = eT:getWorldPosition()
+                local d = ePos - spawnPos
+                local dist = d:Magnitude()
+                if dist < closestDist then
+                    closestDist = dist
+                    closestPos = ePos
+                end
+            end
+        end
+    end
+
+    -- No valid target found -> do nothing
+    if closestPos == nil then return end
+    closestPos.y = spawnPos.y
+    -- Instantiate projectile and aim at the chosen target
+    local proj = SceneManager:instantiate("prefabs/projectile.prefab.json")
+    if proj == nil then return end
+
+    local projTransform = proj:findTransform()
+    if projTransform == nil then return end
+
+    projTransform:setWorldPosition(spawnPos.x, spawnPos.y, spawnPos.z)
+
+    local dir = closestPos - spawnPos
+    if dir:Magnitude() > 0 then
+        dir = dir:Normalized()
+    else
+        dir = forward -- fallback
+    end
+
+    -- Set projectile yaw to face the target (keep roll/pitch zero)
+    local flat = Vector3.new(dir.x, 0, dir.z)
+    if flat:Magnitude() > 0 then
+        local angle = math.atan(-flat.x, -flat.z)
+        projTransform:setWorldRotation(Quaternion.fromEuler(0, angle, 0))
+    else
+        projTransform:setWorldRotation(selfRotation)
+    end
+
+    local projBody = proj:findPhysics()
+    if projBody ~= nil then
+        local projectileSpeed = 100.0 -- tune as needed
+        projBody:setLinearVelocity(dir * projectileSpeed)
     end
 end
 
