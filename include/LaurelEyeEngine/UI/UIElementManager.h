@@ -68,7 +68,8 @@ namespace LaurelEye {
         void setLeftKey(Key key) { leftKey = key; }
         void setRightKey(Key key) { rightKey = key; }
         void setEscapeKey(Key key) { escapeKey = key; }
-        void setIsUIActive(bool isActive) { isUIActive = isActive; }
+        void setIsUIActive(bool isActive);
+        void updateIsUIActive();
         bool getIsUIActive() const { return isUIActive; }
 
         void dispatchActivateEvent();

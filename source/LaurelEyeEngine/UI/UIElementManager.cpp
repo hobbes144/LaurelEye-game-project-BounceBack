@@ -20,33 +20,27 @@ namespace LaurelEye {
         }
 
         hoverDelay += deltaTime;
-        if ( hoverDelay >= hoverCooldown ) {
-            if ( inputManager->isKeyPressed(escapeKey) || inputManager->isButtonPressed(escapeButton) ) {
-                isUIActive = !isUIActive;
-                hoverDelay = 0.0f;
-            }
-        }
-
-        if ( isUIActive ) {
-            enableCurrentUI();
-        }
-        else {
-            disableAllUI();
+        if ( hoverDelay < hoverCooldown ) {
             return;
         }
-
-        for ( const auto& it : elements ) {
+        else {
             auto [mouseX, mouseY] = mouseToUICoordinate();
-            if ( it.second->MouseInRange(mouseX, mouseY) && it.second->isActive() ) {
-                setCurrentUIComponent(it.second);
-                if ( inputManager->isMouseButtonPressed(mouseActivateButton) && currentComponent->CanBeActivated() ) {
-                    dispatchActivateEvent();
+
+            for ( const auto& it : elements ) {
+                if ( it.second->MouseInRange(mouseX, mouseY) && it.second->isActive() ) {
+                    setCurrentUIComponent(it.second);
+                    if ( inputManager->isMouseButtonPressed(mouseActivateButton) && currentComponent->CanBeActivated() ) {
+                        dispatchActivateEvent();
+                    }
                 }
             }
-        }
 
-        if ( currentComponent->isActive() ) {
-            if ( hoverDelay >= hoverCooldown ) {
+            if ( inputManager->isKeyPressed(escapeKey) || inputManager->isButtonPressed(escapeButton) ) {
+                setIsUIActive(!isUIActive);
+                hoverDelay = 0.0f;
+            }
+
+            if ( currentComponent->isActive() ) {
                 if ( inputManager->isKeyHeld(leftKey) || inputManager->getGamepadAxis(GamepadAxes::gamepadLStickX) < -0.2 ) {
                     toLeft();
                     hoverDelay = 0.0f;
@@ -80,6 +74,7 @@ namespace LaurelEye {
             setCurrentUIComponent(elementToRegister);
         }
         std::cout << "Registered UI Element: " << elementToRegister->GetUIName() << std::endl;
+        updateIsUIActive();
     }
 
     void UIElementManager::deregisterUIElement(Graphics::UIComponent* elementToDeregister) {
@@ -112,17 +107,6 @@ namespace LaurelEye {
 
     void UIElementManager::pushInputMap(const std::string& inputMapName) {
         auto it = inputMapStorage.find(inputMapName);
-        if ( inputMaps.empty() ) {
-            if ( it != inputMapStorage.end() ) {
-                inputMaps.push(it->second);
-                enableCurrentUI();
-            }
-            else {
-                std::cerr << "UIElementManager: InputMap " << inputMapName << " not found!" << std::endl;
-            }
-            disableAllUI();
-            return;
-        }
         if ( it != inputMapStorage.end() ) {
             disableCurrentUI();
             inputMaps.push(it->second);
@@ -131,8 +115,6 @@ namespace LaurelEye {
         else {
             std::cerr << "UIElementManager: InputMap " << inputMapName << " not found!" << std::endl;
         }
-
-        disableAllUI();
     }
 
     void UIElementManager::popInputMap() {
@@ -291,6 +273,20 @@ namespace LaurelEye {
         }
         else {
             setCurrentUIComponent(it->second);
+        }
+    }
+
+    void UIElementManager::setIsUIActive(bool isActive) {
+        isUIActive = isActive;
+        updateIsUIActive();
+    }
+
+    void UIElementManager::updateIsUIActive() {
+        if ( isUIActive ) {
+            enableCurrentUI();
+        }
+        else {
+            disableAllUI();
         }
     }
 

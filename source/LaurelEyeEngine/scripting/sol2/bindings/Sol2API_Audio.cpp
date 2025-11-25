@@ -1,6 +1,6 @@
 ﻿#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Audio.h"
 #include "LaurelEyeEngine/audio/SpeakerComponent.h"
-#include "LaurelEyeEngine/audio/interfaces/IAudioManager.h "
+#include "LaurelEyeEngine/audio/interfaces/IAudioManager.h"
 #include "LaurelEyeEngine/audio/FModAudioManager.h"
 
 namespace LaurelEye::Scripting {

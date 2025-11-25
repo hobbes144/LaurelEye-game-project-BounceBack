@@ -165,6 +165,11 @@ namespace LaurelEye {
             textureBackground = true;
             colorBackground = false;
         }
+        if ( settingsValue.HasMember("UIActiveOnLoad") && settingsValue["UIActiveOnLoad"].IsBool() ) {
+            if (auto* uiM = ctx.getService<UIElementManager>()) {
+                uiM->setIsUIActive(settingsValue["UIActiveOnLoad"].GetBool());
+            }
+        }
         if ( settingsValue.HasMember("UILayout") && settingsValue["UILayout"].IsArray() ) {
             const auto& uiLayout = settingsValue["UILayout"];
             loadUISettings(uiLayout.GetArray());
@@ -187,32 +192,32 @@ namespace LaurelEye {
         UILayout* layout = new UILayout();
         layout->setName(name);
 
-        if (uiJson.HasMember("mappings") && uiJson["mappings"].IsArray()) {
-            const auto& mappings = uiJson["mappings"].GetArray();
-            for ( const auto& mappingJson : mappings ) {
-                if ( !mappingJson.IsObject() ) continue;
-                auto* mapping = new SingleUIMapping();
-                if ( mappingJson.HasMember("name") && mappingJson["name"].IsString() ) {
-                    mapping->setCurrent(mappingJson["name"].GetString());
+        if ( uiJson.HasMember("mappings") && uiJson["mappings"].IsArray() ) {
+                const auto& mappings = uiJson["mappings"].GetArray();
+                for ( const auto& mappingJson : mappings ) {
+                    if ( !mappingJson.IsObject() ) continue;
+                    auto* mapping = new SingleUIMapping();
+                    if ( mappingJson.HasMember("name") && mappingJson["name"].IsString() ) {
+                        mapping->setCurrent(mappingJson["name"].GetString());
+                    }
+                    if ( mappingJson.HasMember("current") && mappingJson["current"].IsString() ) {
+                        mapping->setCurrent(mappingJson["current"].GetString());
+                    }
+                    if ( mappingJson.HasMember("left") && mappingJson["left"].IsString() ) {
+                        mapping->setLeft(mappingJson["left"].GetString());
+                    }
+                    if ( mappingJson.HasMember("right") && mappingJson["right"].IsString() ) {
+                        mapping->setRight(mappingJson["right"].GetString());
+                    }
+                    if ( mappingJson.HasMember("up") && mappingJson["up"].IsString() ) {
+                        mapping->setUp(mappingJson["up"].GetString());
+                    }
+                    if ( mappingJson.HasMember("down") && mappingJson["down"].IsString() ) {
+                        mapping->setDown(mappingJson["down"].GetString());
+                    }
+                    layout->addMappingUnit(mapping);
                 }
-                if ( mappingJson.HasMember("current") && mappingJson["current"].IsString() ) {
-                    mapping->setCurrent(mappingJson["current"].GetString());
-                }
-                if ( mappingJson.HasMember("left") && mappingJson["left"].IsString() ) {
-                    mapping->setLeft(mappingJson["left"].GetString());
-                }
-                if ( mappingJson.HasMember("right") && mappingJson["right"].IsString() ) {
-                    mapping->setRight(mappingJson["right"].GetString());
-                }
-                if ( mappingJson.HasMember("up") && mappingJson["up"].IsString() ) {
-                    mapping->setUp(mappingJson["up"].GetString());
-                }
-                if ( mappingJson.HasMember("down") && mappingJson["down"].IsString() ) {
-                    mapping->setDown(mappingJson["down"].GetString());
-                }
-                layout->addMappingUnit(mapping);
             }
-        }
 
         return layout;
     }
