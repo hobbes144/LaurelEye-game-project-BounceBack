@@ -27,6 +27,10 @@ namespace LaurelEye::Graphics {
     namespace DataBuffer {
         /// @brief Sentinel value representing an invalid buffer handle.
         static constexpr DataBufferHandle InvalidDataBuffer = UINT32_MAX;
+
+        /// @brief common binding points for uniform/storage buffers
+        ///
+        /// NOTE: These are only meaningful for UBO/SSBO `DataBufferType`s
         static constexpr uint32_t CameraDataBinding = 0;
         static constexpr uint32_t GlobalLightDataBinding = 1;
         static constexpr uint32_t LocalLightDataBinding = 2;
@@ -46,7 +50,9 @@ namespace LaurelEye::Graphics {
     ///
     /// Determines how the buffer will be bound and accessed in the rendering pipeline.
     enum class DataBufferType { UBO,
-                                SSBO };
+                                SSBO,
+                                Vertex,
+                                Index };
 
     /// @enum DataBufferUpdateMode
     /// @brief Describes how the data buffer will be updated during runtime.
@@ -68,5 +74,46 @@ namespace LaurelEye::Graphics {
         uint64_t sizeBytes{0};
         uint32_t bindingPoint{0};
     };
+
+    // Optional convenience helpers (nice for call-sites, but not required)
+    inline DataBufferDesc makeUBODesc(uint64_t sizeBytes,
+                                      uint32_t bindingPoint,
+                                      DataBufferUpdateMode mode = DataBufferUpdateMode::Dynamic) {
+        return DataBufferDesc{
+            .type = DataBufferType::UBO,
+            .mode = mode,
+            .sizeBytes = sizeBytes,
+            .bindingPoint = bindingPoint};
+    }
+
+    inline DataBufferDesc makeSSBODesc(uint64_t sizeBytes,
+                                       uint32_t bindingPoint,
+                                       DataBufferUpdateMode mode = DataBufferUpdateMode::Dynamic) {
+        return DataBufferDesc{
+            .type = DataBufferType::SSBO,
+            .mode = mode,
+            .sizeBytes = sizeBytes,
+            .bindingPoint = bindingPoint};
+    }
+
+    inline DataBufferDesc makeVertexBufferDesc(uint64_t sizeBytes,
+                                               DataBufferUpdateMode mode = DataBufferUpdateMode::Dynamic) {
+        return DataBufferDesc{
+            .type = DataBufferType::Vertex,
+            .mode = mode,
+            .sizeBytes = sizeBytes,
+            .bindingPoint = 0 // ignored
+        };
+    }
+
+    inline DataBufferDesc makeIndexBufferDesc(uint64_t sizeBytes,
+                                              DataBufferUpdateMode mode = DataBufferUpdateMode::Dynamic) {
+        return DataBufferDesc{
+            .type = DataBufferType::Index,
+            .mode = mode,
+            .sizeBytes = sizeBytes,
+            .bindingPoint = 0 // ignored
+        };
+    }
 
 } // namespace LaurelEye::Graphics

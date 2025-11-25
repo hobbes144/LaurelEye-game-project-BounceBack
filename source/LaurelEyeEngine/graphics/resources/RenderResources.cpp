@@ -12,8 +12,8 @@
 #include "LaurelEyeEngine/graphics/resources/Framebuffer.h"
 #include "LaurelEyeEngine/graphics/resources/SizeRegistry.h"
 #include "LaurelEyeEngine/graphics/resources/Texture.h"
+#include "LaurelEyeEngine/graphics/resources/VertexArray.h"
 #include "LaurelEyeEngine/graphics/surface/IWindowSurfaceProvider.h"
-#include <cstdint>
 
 namespace LaurelEye::Graphics {
 
@@ -45,10 +45,10 @@ namespace LaurelEye::Graphics {
     // DataBuffers
 
     DataBufferHandle RenderResources::createDataBuffer(
-        const std::string& name, const DataBufferDesc& d, const std::vector<std::string>& tags) {
+        const std::string& name, const DataBufferDesc& d, const std::vector<std::string>& tags, const void* init) {
         if ( dataBuffers.contains(name) ) return dataBuffers[name].handle;
         DataBufferResource r{};
-        r.handle = device.createDataBuffer(d);
+        r.handle = device.createDataBuffer(d, init);
         r.desc = d;
         r.tags = tags;
         // r.lifetime = l;
@@ -58,8 +58,8 @@ namespace LaurelEye::Graphics {
     }
 
     DataBufferHandle RenderResources::createDataBuffer(const std::string& name, const DataBufferDesc& d,
-                                                       const std::string& tag) {
-        return createDataBuffer(name, d, std::vector<std::string>{tag});
+                                                       const std::string& tag, const void* init) {
+        return createDataBuffer(name, d, std::vector<std::string>{tag}, init);
     }
 
     DataBufferHandle RenderResources::dataBuffer(const std::string& name) {
@@ -70,6 +70,47 @@ namespace LaurelEye::Graphics {
         DataBufferResource& buf = dataBuffers[name];
         device.destroyDataBuffer(buf.handle);
         dataBuffers.erase(name);
+    }
+
+    void RenderResources::destroyDataBuffer(DataBufferHandle h) {
+        device.destroyDataBuffer(h);
+        for ( auto it = dataBuffers.begin(); it != dataBuffers.end(); ) {
+            if ( it->second.handle == h ) {
+                it = dataBuffers.erase(it); // erase returns an iterator to the next element
+                return;
+            }
+            else {
+                ++it; // move to the next element
+            }
+        }
+    }
+
+    void RenderResources::updateDataBuffer(const std::string& name,
+                                           uint64_t offset,
+                                           uint64_t size,
+                                           const void* data) {
+        device.updateDataBufferSubData(dataBuffers[name].handle, offset, size, data);
+    }
+
+    void RenderResources::updateDataBuffer(DataBufferHandle h,
+                                           uint64_t offset,
+                                           uint64_t size,
+                                           const void* data) {
+        device.updateDataBufferSubData(h, offset, size, data);
+    }
+
+    // Vertex Arrays
+    VertexArrayHandle RenderResources::createVertexArray(const std::string& name, const VertexArrayDesc& d,
+                                                         const std::vector<std::string>& tags) {
+        if ( vertexArrays.contains(name) ) return vertexArrays[name].handle;
+
+        VertexArrayResource r{};
+        r.desc = d;
+        r.handle = device.createVertexArray(d);
+
+        r.tags = tags;
+        vertexArrays[name] = r;
+        return r.handle;
     }
 
     // Textures

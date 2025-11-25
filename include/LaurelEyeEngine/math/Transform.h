@@ -43,6 +43,8 @@ namespace LaurelEye {
         Vector3 getScaling() const;
         Matrix4 getLocalMatrix() const;
         Matrix4 getInverseLocalMatrix();
+        Matrix4 getMatrix() const;
+        Matrix4 getInverseMatrix();
 
         // Setters
         Transform& setPosition(const Vector3& newPosition);

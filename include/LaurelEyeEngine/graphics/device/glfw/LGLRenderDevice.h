@@ -10,6 +10,7 @@
 #include "LaurelEyeEngine/graphics/device/IRenderDevice.h"
 
 #include "LaurelEyeEngine/graphics/resources/DataBuffer.h"
+#include "LaurelEyeEngine/graphics/resources/VertexArray.h"
 #include "LaurelEyeEngine/graphics/resources/Texture.h"
 
 #include <glad/glad.h>
@@ -19,6 +20,7 @@
 namespace LaurelEye::Graphics {
 
     class LGLDataBufferFactory;
+    class LGLVertexArrayFactory;
     class LGLTextureFactory;
     class LGLFramebufferFactory;
 
@@ -88,6 +90,10 @@ namespace LaurelEye::Graphics {
 
         // TODO: virtual void destroyAllDataBufffers() = 0;
 
+        /* Vertex Array operations */
+        [[nodiscard]] VertexArrayHandle createVertexArray(const VertexArrayDesc& d) override;
+        void destroyVertexArray(VertexArrayHandle h) override;
+
         /* Texture operations */
 
         /// \copydoc IRenderDevice::createTexture
@@ -131,6 +137,7 @@ namespace LaurelEye::Graphics {
 
     private:
         std::unique_ptr<LGLDataBufferFactory> dataBufferFactory;
+        std::unique_ptr<LGLVertexArrayFactory> vertexArrayFactory;
         std::unique_ptr<LGLTextureFactory> textureFactory;
         std::unique_ptr<LGLFramebufferFactory> framebufferFactory;
 

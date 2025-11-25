@@ -25,6 +25,8 @@
 #include <unordered_map>
 #include <vector>
 
+constexpr size_t max_vertices_per_bone = 4;
+
 namespace LaurelEye::Graphics {
     /// @class Mesh
     /// @brief Represents geometric data for renderable objects in the engine.
@@ -34,6 +36,31 @@ namespace LaurelEye::Graphics {
     /// the actual GPU-side storage of vertex data.
     class Mesh {
     public:
+        /// @class SkinData
+        /// @brief Mesh vertice to bone relationships.
+        ///
+        /// This stores the vertex modification weight from the bone
+        /// transforms. This is particularly important to ensure things like
+        /// arm joints behave correctly.
+        ///
+        struct SkinData {
+            int ids[max_vertices_per_bone] = {0};
+            float w[max_vertices_per_bone] = {0.0f};
+
+            void AddSkinData(int _id, float _w) {
+                int arr_size = sizeof(ids) / sizeof(ids[0]);
+                for ( int i = 0; i < arr_size; i++ ) {
+                    if ( w[i] == 0.0 ) {
+                        ids[i] = _id;
+                        w[i] = _w;
+                        return;
+                    }
+                }
+
+                assert(0);
+            }
+        };
+
         /// @brief Attribute storage type mapping GeometryBuffer attributes to their data and element size.
         ///
         /// Each entry maps an `AttributeType` (e.g., Position, Normal) to a pair containing:
@@ -168,6 +195,9 @@ namespace LaurelEye::Graphics {
         std::shared_ptr<GeometryBuffer> geometryBuffer;
         /// @brief Index buffer data for drawing with EBOs.
         std::vector<unsigned int> indices;
+
+        /// @brief Skin data.
+        std::vector<SkinData> skin;
 
         /// @brief Combines multiple attribute maps into a single Attributes object.
         static Attributes combineAttributes(const std::vector<Attributes>& attributesList);

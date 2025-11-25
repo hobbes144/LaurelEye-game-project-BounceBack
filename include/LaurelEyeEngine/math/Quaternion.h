@@ -133,6 +133,7 @@ namespace LaurelEye {
     extern template class QuaternionBase<float>;
     extern template class QuaternionBase<double>;
     using Quaternion = QuaternionBase<float>;
-    using QuaternionD = QuaternionBase<double>;
+    using FQuaternion = QuaternionBase<float>;
+    using DQuaternion = QuaternionBase<double>;
 
 } // namespace LaurelEye

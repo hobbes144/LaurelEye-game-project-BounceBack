@@ -16,6 +16,8 @@
 #pragma once
 
 // TODO: Move GL operations to the Device
+#include "LaurelEyeEngine/math/Quaternion.h"
+#include "LaurelEyeEngine/math/VectorTemplated.h"
 #include <glad/glad.h>
 
 #include <memory>
@@ -43,14 +45,16 @@ namespace LaurelEye::Graphics {
         /// @brief Attribute types supported by the GeometryBuffer.
         /// These correspond to specific vertex attribute locations in the shader program.
         enum class AttributeType {
-            Position, ///< Vertex position attribute.       0
-            Normal,   ///< Vertex normal attribute.         1
-            TexCoord, ///< Texture coordinate attribute.    2
-            Color,    ///< Vertex color attribute.          3
-            Tangent,  ///< Tangent vector attribute.        4
-            Bitangent, ///< Bitangent vector attribute.     5
-            ParticleSize, ///< Particle Size                6
-            ParticleRotation ///< Particle Rotation         7
+            Position,         ///< FVector3 Vertex position attribute.          0
+            Normal,           ///< FVector3 Vertex normal attribute.            1
+            TexCoord,         ///< FVector2 Texture coordinate attribute.       2
+            Color,            ///< FVector4 Vertex color attribute.             3
+            Tangent,          ///< FVector3 Tangent vector attribute.           4
+            Bitangent,        ///< FVector3 Bitangent vector attribute.         5
+            ParticleSize,     ///< float Particle Size                          6
+            ParticleRotation, ///< float Particle Rotation                      7
+            BoneIndex,        ///< IVector4 Mesh Bone Indices                   8
+            BoneWeight,       ///< float Mesh Bone Weights (max 4)              9
         };
 
         /// @enum AttributeInfo
@@ -74,7 +78,6 @@ namespace LaurelEye::Graphics {
             AttributeType,
             AttributeInfo>;
 
-        
         /// @brief Attribute input data structure
         ///
         /// Attributes stores:
@@ -83,7 +86,7 @@ namespace LaurelEye::Graphics {
         ///   - std::vector<float>  data: 1D vector of size (Dimension * numpoints)
         ///   - GLint               elementSize: Number of dimensions
         ///   - GLenum              type: GL type
-        ///   - GLboolean           normalized: If should normalize 
+        ///   - GLboolean           normalized: If should normalize
         using Attributes = const std::unordered_map<
             AttributeType,
             AttributeInfo>;
@@ -123,6 +126,13 @@ namespace LaurelEye::Graphics {
             const std::vector<unsigned int>& indices,
             const std::string& name,
             bool bufferIsInterleaved = true);
+
+        static std::shared_ptr<GeometryBuffer> create(
+            const void* vertices,
+            int vertexCount,
+            const std::vector<AttributeType>& attributeTypes,
+            const std::vector<unsigned int>& indices,
+            const std::string& name);
 
         void destroy();
 
@@ -190,9 +200,9 @@ namespace LaurelEye::Graphics {
         /// @brief Whether attribute data is interleaved.
         bool isInterleaved;
 
-        /// @brief Number of Vertices 
+        /// @brief Number of Vertices
         GLsizei vertexCount;
-        /// @brief Number of Indices 
+        /// @brief Number of Indices
         GLsizei indexCount;
 
         /// @brief Currently bound VAO for static tracking.
@@ -220,6 +230,12 @@ namespace LaurelEye::Graphics {
         /// @brief Initializes vertex buffer data.
         void initializeVertexBuffers(
             Attributes& attributeData);
+        /// @brief Initializes vertex buffer data.
+        void initializeVertexBuffers(
+            const void* data,
+            int vertexCount,
+            const std::vector<AttributeType>& attributeTypes);
+
         /// @brief Initializes element/index buffer data.
         void initializeElementBuffers(const std::vector<unsigned int>& indices);
 
@@ -229,6 +245,12 @@ namespace LaurelEye::Graphics {
         /// @brief Initializes buffer data for indexed geometry.
         void initializeBuffers(
             Attributes& attributeData,
+            const std::vector<unsigned int>& indices);
+
+        void initializeBuffers(
+            const void* vertices,
+            int vertexCount,
+            const std::vector<AttributeType>& attributeTypes,
             const std::vector<unsigned int>& indices);
 
         GLenum getGlType(AttributeType);

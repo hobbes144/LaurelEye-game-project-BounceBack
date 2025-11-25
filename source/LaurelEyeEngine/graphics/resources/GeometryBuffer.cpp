@@ -78,6 +78,23 @@ namespace LaurelEye::Graphics {
         return buffer;
     }
 
+    std::shared_ptr<GeometryBuffer> GeometryBuffer::create(
+        const void* vertices,
+        int vertexCount,
+        const std::vector<AttributeType>& attributeTypes,
+        const std::vector<unsigned int>& indices,
+        const std::string& name) {
+
+        auto buffer = std::shared_ptr<GeometryBuffer>(new GeometryBuffer(name));
+        buffer->isInterleaved = true;
+        buffer->initializeBuffers(
+            vertices,
+            vertexCount,
+            attributeTypes,
+            indices);
+        return buffer;
+    }
+
     void GeometryBuffer::destroy() {
         cleanupBuffers();
 
@@ -272,6 +289,16 @@ namespace LaurelEye::Graphics {
         }
     }
 
+    void GeometryBuffer::initializeVertexBuffers(
+        const void* data,
+        int vertexCount,
+        const std::vector<AttributeType>& attributeTypes) {
+
+        glGenBuffers(1, &vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+    }
+
     /*!****************************************************************************
      * \brief Initialize the EBO with the indices
      *
@@ -341,6 +368,16 @@ namespace LaurelEye::Graphics {
         initializeElementBuffers(indices);
 
         glBindVertexArray(0);
+    }
+
+    void GeometryBuffer::initializeBuffers(
+        const void* vertices,
+        int vertexCount,
+        const std::vector<AttributeType>& attributeTypes,
+        const std::vector<unsigned int>& indices) {
+
+        glGenVertexArrays(1, &vao);
+        glBindVertexArray(vao);
     }
 
     /*!****************************************************************************

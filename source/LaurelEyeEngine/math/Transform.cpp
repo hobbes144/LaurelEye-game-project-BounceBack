@@ -58,12 +58,20 @@ namespace LaurelEye {
     }
 
     Matrix4 Transform::getLocalMatrix() const {
+        return getMatrix();
+    }
+
+    Matrix4 Transform::getInverseLocalMatrix() {
+        return getInverseMatrix();
+    }
+
+    Matrix4 Transform::getMatrix() const {
         return Matrix4::translation(position) *
                Matrix4::rotation(rotation) *
                Matrix4::scale(scaling);
     }
 
-    Matrix4 Transform::getInverseLocalMatrix() {
+    Matrix4 Transform::getInverseMatrix() {
         Vector3 invTranslation(-position.x, -position.y, -position.z);
         Quaternion invRotation = rotation.inverse();
         Vector3 invScaling(1.0f / scaling.x, 1.0f / scaling.y, 1.0f / scaling.z);

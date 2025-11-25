@@ -12,9 +12,8 @@
 #include "LaurelEyeEngine/graphics/resources/DataBuffer.h"
 #include "LaurelEyeEngine/graphics/resources/Framebuffer.h"
 #include "LaurelEyeEngine/graphics/resources/Texture.h"
-#include "LaurelEyeEngine/math/Vector3.h"
+#include "LaurelEyeEngine/graphics/resources/VertexArray.h"
 #include <cstdint>
-#include <string>
 
 namespace LaurelEye::Graphics {
 
@@ -90,6 +89,10 @@ namespace LaurelEye::Graphics {
         virtual void bindDataBufferBase(DataBufferHandle h) = 0;
 
         // TODO: virtual void destroyAllDataBufffers() = 0;
+
+        /* Vertex Array operations */
+        [[nodiscard]] virtual VertexArrayHandle createVertexArray(const VertexArrayDesc& d) = 0;
+        virtual void destroyVertexArray(VertexArrayHandle h) = 0;
 
         /* Texture operations */
 

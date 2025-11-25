@@ -42,11 +42,19 @@ namespace LaurelEye::Graphics {
         // of the data range is visible per shader run. This sets up the ring.
 
         // Separated in case there's any type specific init needed later.
-        if ( d.type == DataBufferType::UBO ) {
+        switch ( d.type ) {
+        case DataBufferType::UBO:
             glBindBufferBase(GL_UNIFORM_BUFFER, d.bindingPoint, r.id);
-        }
-        else {
+            break;
+        case DataBufferType::SSBO:
             glBindBufferBase(GL_SHADER_STORAGE_BUFFER, d.bindingPoint, r.id);
+            break;
+        case DataBufferType::Vertex:
+            // Binding is deferred to VAO creation via glVertexArrayVertexBuffer(...)
+            break;
+        case DataBufferType::Index:
+            // Binding is deferred to VAO creation via glVertexArrayElementBuffer(...)
+            break;
         }
 
         return h;
@@ -67,7 +75,6 @@ namespace LaurelEye::Graphics {
         }
         createdBuffers.clear();
     }
-
 
     void LGLDataBufferFactory::updateSubData(DataBufferHandle h, uint64_t offset, uint64_t size, const void* data) {
         glNamedBufferSubData(h, offset, size, data);

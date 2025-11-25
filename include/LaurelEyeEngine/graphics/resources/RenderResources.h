@@ -16,6 +16,7 @@
 #include "LaurelEyeEngine/graphics/resources/Framebuffer.h"
 #include "LaurelEyeEngine/graphics/resources/SizeRegistry.h"
 #include "LaurelEyeEngine/graphics/resources/Texture.h"
+#include "LaurelEyeEngine/graphics/resources/VertexArray.h"
 #include "LaurelEyeEngine/graphics/surface/IWindowSurfaceProvider.h"
 
 #include <string>
@@ -38,6 +39,12 @@ namespace LaurelEye::Graphics {
         std::vector<std::string> tags;
 
         // Lifetime life{Lifetime::Persistent};
+    };
+
+    struct VertexArrayResource {
+        VertexArrayHandle handle{};
+        VertexArrayDesc desc{};
+        std::vector<std::string> tags;
     };
 
     /// @struct TextureResource
@@ -97,9 +104,9 @@ namespace LaurelEye::Graphics {
         /// @param tag Optional tag used to group related resources.
         /// @return Handle to the created DataBuffer resource.
         [[nodiscard]] DataBufferHandle createDataBuffer(const std::string& name, const DataBufferDesc& d,
-                                                        const std::vector<std::string>& tags);
+                                                        const std::vector<std::string>& tags, const void* init = nullptr);
         [[nodiscard]] DataBufferHandle createDataBuffer(const std::string& name, const DataBufferDesc& d,
-                                                        const std::string& tag);
+                                                        const std::string& tag, const void* init = nullptr);
         /// @brief Retrieves a handle to an existing data buffer.
         ///
         /// @param name Name of the buffer to retrieve.
@@ -109,7 +116,21 @@ namespace LaurelEye::Graphics {
         ///
         /// @param name Name of the buffer to destroy.
         void destroyDataBuffer(const std::string& name);
+        void destroyDataBuffer(DataBufferHandle h);
         // void resizeDataBuffer(const std::string& name, uint32_t size);
+        void updateDataBuffer(const std::string& name,
+                              uint64_t offset,
+                              uint64_t size,
+                              const void* data);
+        void updateDataBuffer(DataBufferHandle h,
+                              uint64_t offset,
+                              uint64_t size,
+                              const void* data);
+
+        [[nodiscard]] VertexArrayHandle createVertexArray(const std::string& name, const VertexArrayDesc& d,
+                                                          const std::vector<std::string>& tags);
+        VertexArrayHandle vertexArray(const std::string& name);
+        void destroyVertexArray(const std::string& name);
 
         [[nodiscard]] TextureHandle createTexture(const std::string& name, const TextureDesc& d,
                                                   const std::vector<std::string>& tags, const void* init = nullptr);
@@ -157,6 +178,7 @@ namespace LaurelEye::Graphics {
 
         /// @brief Map of data buffer names to their corresponding resource metadata.
         std::unordered_map<std::string, DataBufferResource> dataBuffers;
+        std::unordered_map<std::string, VertexArrayResource> vertexArrays;
         /// @brief Map of texture names to their corresponding resource metadata.
         std::unordered_map<std::string, TextureResource> textures;
         /// @brief Map of framebuffer names to their corresponding handles.

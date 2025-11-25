@@ -11,6 +11,7 @@
 #include "LaurelEyeEngine/graphics/device/glfw/LGLFramebufferFactory.h"
 #include "LaurelEyeEngine/graphics/device/glfw/LGLRenderState.h"
 #include "LaurelEyeEngine/graphics/device/glfw/LGLTextureFactory.h"
+#include "LaurelEyeEngine/graphics/device/glfw/LGLVertexArrayFactory.h"
 #include "LaurelEyeEngine/graphics/resources/DataBuffer.h"
 #include "LaurelEyeEngine/graphics/resources/Framebuffer.h"
 #include "LaurelEyeEngine/graphics/resources/Texture.h"
@@ -123,6 +124,7 @@ namespace LaurelEye::Graphics {
         glDepthMask(GL_TRUE);
 
         dataBufferFactory = std::make_unique<LGLDataBufferFactory>();
+        vertexArrayFactory = std::make_unique<LGLVertexArrayFactory>();
         textureFactory = std::make_unique<LGLTextureFactory>();
         framebufferFactory = std::make_unique<LGLFramebufferFactory>(textureFactory.get());
     }
@@ -244,6 +246,13 @@ namespace LaurelEye::Graphics {
 
     void LGLRenderDevice::bindDataBufferBase(DataBufferHandle h) {
         dataBufferFactory->bindBase(h);
+    }
+    VertexArrayHandle LGLRenderDevice::createVertexArray(const VertexArrayDesc& d) {
+        return vertexArrayFactory->createArray(d);
+    }
+
+    void LGLRenderDevice::destroyVertexArray(VertexArrayHandle h) {
+        vertexArrayFactory->destroyArray(h);
     }
 
     TextureHandle LGLRenderDevice::createTexture(const TextureDesc& d, const void* init) {
