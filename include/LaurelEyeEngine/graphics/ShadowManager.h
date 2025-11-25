@@ -23,10 +23,10 @@
 namespace LaurelEye::Graphics {
 
     class RenderResources;
-    class PointLight;
-    class DirectionalLight;
-    class GlobalLights;
-    class LocalLights;
+    struct PointLight;
+    struct DirectionalLight;
+    struct GlobalLights;
+    struct LocalLights;
 
     class ShadowManager {
     public:

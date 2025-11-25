@@ -81,7 +81,7 @@ namespace LaurelEye {
             return q *= other;
         }
 
-        friend QuaternionBase operator*(QuaternionBase q, float other) {
+        friend QuaternionBase operator*(QuaternionBase q, T other) {
             return q *= other;
         }
 

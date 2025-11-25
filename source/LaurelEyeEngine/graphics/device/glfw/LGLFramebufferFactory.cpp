@@ -41,7 +41,7 @@ namespace LaurelEye::Graphics {
         }
 
         glBindFramebuffer(GL_FRAMEBUFFER, r.id);
-        glDrawBuffers(bufferAttachments.size(), bufferAttachments.data());
+        glDrawBuffers((GLsizei)bufferAttachments.size(), bufferAttachments.data());
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         GLenum status = glCheckNamedFramebufferStatus(r.id, GL_FRAMEBUFFER);

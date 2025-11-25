@@ -68,7 +68,7 @@ namespace LaurelEye {
 
         const Vector3 uv = quatVec.cross(v);
         const Vector3 uuv = quatVec.cross(uv);
-        return v + ((uv * this->data[0]) + uuv) * 2.0f;
+        return v + ((uv * (float)this->data[0]) + uuv) * 2.0f;
     }
 
     template <typename T>
@@ -129,11 +129,11 @@ namespace LaurelEye {
             return Vector3(eulerVector);
         normalize();
 
-        float y, x;
+        T y, x;
 
         // Note: following code was taken from glm
         // Roll (X-axis rotation)
-        y = 2.0f * (this->data[1] * this->data[2] + this->data[0] * this->data[3]);
+        y = (T)2.0 * (this->data[1] * this->data[2] + this->data[0] * this->data[3]);
         x = this->data[0] * this->data[0] + this->data[1] * this->data[1] -
             this->data[2] * this->data[2] - this->data[3] * this->data[3];
 
@@ -164,12 +164,12 @@ namespace LaurelEye {
 
     template <typename T>
     QuaternionBase<T> QuaternionBase<T>::fromEuler(const VectorTemplated<T, 3>& euler) {
-        float cx = cos(euler[0] * 0.5f);
-        float sx = sin(euler[0] * 0.5f);
-        float cy = cos(euler[1] * 0.5f);
-        float sy = sin(euler[1] * 0.5f);
-        float cz = cos(euler[2] * 0.5f);
-        float sz = sin(euler[2] * 0.5f);
+        T cx = cos(euler[0] * 0.5f);
+        T sx = sin(euler[0] * 0.5f);
+        T cy = cos(euler[1] * 0.5f);
+        T sy = sin(euler[1] * 0.5f);
+        T cz = cos(euler[2] * 0.5f);
+        T sz = sin(euler[2] * 0.5f);
 
         QuaternionBase<T> q;
         q[0] = cx * cy * cz + sx * sy * sz; // w
@@ -200,12 +200,12 @@ namespace LaurelEye {
 
     template <typename T>
     QuaternionBase<T> QuaternionBase<T>::fromEuler(const T pitch, const T yaw, const T roll) {
-        float cx = cos(pitch * 0.5f);
-        float sx = sin(pitch * 0.5f);
-        float cy = cos(yaw * 0.5f);
-        float sy = sin(yaw * 0.5f);
-        float cz = cos(roll * 0.5f);
-        float sz = sin(roll * 0.5f);
+        T cx = cos(pitch * 0.5f);
+        T sx = sin(pitch * 0.5f);
+        T cy = cos(yaw * 0.5f);
+        T sy = sin(yaw * 0.5f);
+        T cz = cos(roll * 0.5f);
+        T sz = sin(roll * 0.5f);
 
         QuaternionBase<T> q;
         q[0] = cx * cy * cz + sx * sy * sz; // w
@@ -218,8 +218,8 @@ namespace LaurelEye {
 
     template <typename T>
     QuaternionBase<T> QuaternionBase<T>::axisAngleToQuaternion(const VectorTemplated<T, 3>& axis, T angle) {
-        float halfAngle = angle * 0.5f;
-        float s = std::sin(halfAngle);
+        T halfAngle = angle * 0.5f;
+        T s = std::sin(halfAngle);
         return QuaternionBase<T>(std::cos(halfAngle), axis[0] * s, axis[1] * s, axis[2] * s);
     }
 
@@ -227,7 +227,7 @@ namespace LaurelEye {
     QuaternionBase<T> QuaternionBase<T>::slerp(const QuaternionBase<T>& x, const QuaternionBase<T>& y, T a) {
         QuaternionBase<T> z = y;
 
-        float cosTheta = x.dot(y);
+        T cosTheta = x.dot(y);
 
         // If cosTheta < 0, the interpolation will take the long way around the sphere.
         // To fix this, one quat must be negated.
@@ -247,14 +247,14 @@ namespace LaurelEye {
         }
         else {
             // Essential Mathematics, page 467
-            float angle = acos(cosTheta);
+            T angle = acos(cosTheta);
             return (sin((static_cast<T>(1) - a) * angle) * x + sin(a * angle) * z) / sin(angle);
         }
     }
 
     template <typename T>
     QuaternionBase<T> QuaternionBase<T>::lerp(const QuaternionBase<T>& start, const QuaternionBase<T>& end, T t) {
-        return start * ((1.0f) - t) + (end * t);
+        return start * ((T)(1.0) - t) + (end * t);
     }
 
     template class QuaternionBase<float>;
