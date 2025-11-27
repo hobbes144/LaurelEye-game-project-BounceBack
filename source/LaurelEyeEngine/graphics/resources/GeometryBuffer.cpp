@@ -164,10 +164,10 @@ namespace LaurelEye::Graphics {
      *
      *****************************************************************************/
     void GeometryBuffer::bind() const {
-        if ( vao != boundVAO ) {
+        // if ( vao != boundVAO ) {
             glBindVertexArray(vao);
-            boundVAO = vao;
-        }
+            // boundVAO = vao;
+        // }
     }
 
     /*!****************************************************************************

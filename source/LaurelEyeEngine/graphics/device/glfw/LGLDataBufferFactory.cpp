@@ -25,6 +25,9 @@ namespace LaurelEye::Graphics {
         if ( d.mode == DataBufferUpdateMode::Dynamic ) {
             flags = GL_DYNAMIC_STORAGE_BIT;
         }
+        else if ( d.mode == DataBufferUpdateMode::Static ) {
+            flags = 0;
+        }
         else {
             throw std::runtime_error("LAURELEYE::GRAPHICS::OPENGL::DATABUFFERFACTORY::Persistent buffers unimplemented");
         }

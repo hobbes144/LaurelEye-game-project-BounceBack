@@ -255,6 +255,10 @@ namespace LaurelEye::Graphics {
         vertexArrayFactory->destroyArray(h);
     }
 
+    void LGLRenderDevice::bindVertexArray(VertexArrayHandle h) {
+        vertexArrayFactory->bindBase(h);
+    }
+
     TextureHandle LGLRenderDevice::createTexture(const TextureDesc& d, const void* init) {
         return textureFactory->create(d, init);
     }

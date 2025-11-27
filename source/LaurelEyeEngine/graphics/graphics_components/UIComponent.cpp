@@ -6,17 +6,18 @@
 /// @brief Implementation of UI component on screen.
 
 #include "LaurelEyeEngine/graphics/graphics_components/UIComponent.h"
+#include "LaurelEyeEngine/graphics/resources/RenderMesh.h"
 
 namespace LaurelEye::Graphics {
     UIComponent::UIComponent()
         : Renderable2DComponent() {
-        SetMeshPrimitiveType(Graphics::Mesh::Square);
+        SetMeshPrimitiveType(PrimitiveMeshType::Square);
         uiName = "DefaultUIComponent";
     }
 
     UIComponent::UIComponent(RenderableComponentDesc rcd)
         : Renderable2DComponent(rcd) {
-        SetMeshPrimitiveType(Graphics::Mesh::Square);
+        SetMeshPrimitiveType(PrimitiveMeshType::Square);
         uiName = "DefaultUIComponent";
     }
 

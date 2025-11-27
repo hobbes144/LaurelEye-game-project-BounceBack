@@ -4,12 +4,11 @@
         "Transform": {
             "position": [ 0, 10.0, 0.0 ],
             "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
-            "scale": [ 1.0, 1.0, 1.0 ]
+            "scale": [ 0.05, 0.05, 0.05 ]
         },
         "Render3D": {
             "mesh": {
-                "name": "cubeMesh",
-                "primitiveType": "Cube"
+                "file": "models/viking_C.fbx"
             },
             "material": {
                 "texture": "textures/texture_01_green.png",

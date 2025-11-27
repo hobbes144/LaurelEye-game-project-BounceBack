@@ -10,12 +10,14 @@
 #include "LaurelEyeEngine/graphics/Graphics.h"
 
 #include "LaurelEyeEngine/graphics/graphics_components/UIComponent.h"
+#include "LaurelEyeEngine/graphics/MeshManager.h"
 #include "LaurelEyeEngine/graphics/renderpass/DeferredRenderPass.h"
 #include "LaurelEyeEngine/graphics/renderpass/ParticleRenderPass.h"
 #include "LaurelEyeEngine/graphics/renderpass/SkydomePass.h"
 #include "LaurelEyeEngine/graphics/RenderStateSaver.h"
 #include "LaurelEyeEngine/graphics/resources/DataBuffer.h"
 #include "LaurelEyeEngine/graphics/resources/Lights.h"
+#include "LaurelEyeEngine/graphics/resources/RenderMesh.h"
 #include "LaurelEyeEngine/graphics/resources/Shadow.h"
 #include "LaurelEyeEngine/graphics/resources/SizeRegistry.h"
 #include "LaurelEyeEngine/graphics/ShadowManager.h"
@@ -134,6 +136,8 @@ namespace LaurelEye::Graphics {
         initGlobalLightsBuffer();
 
         tempShadowManager = std::make_unique<ShadowManager>(tempRenderResources.get());
+
+        meshManager = std::make_unique<MeshManager>(*tempRenderResources.get());
     }
 
     void RenderSystem::setCurrentCamera(CameraComponent* currCamera) {
@@ -292,13 +296,17 @@ namespace LaurelEye::Graphics {
     }
 
     void RenderSystem::shutdown() {
-        // tempMesh = nullptr;
-        // tempShader = nullptr;
+        meshManager->destroyAllMeshes();
+        meshManager = nullptr;
+        tempShadowManager = nullptr;
         sp = nullptr;
         uiPass = nullptr;
         prp = nullptr;
         dbrp = nullptr;
+        tempRenderResources = nullptr;
         ShaderManager::getInstance().unloadShaders();
+
+        // TODO: Add code to cleanly destroy OpenGL and Surfaces here
     }
 
     void RenderSystem::registerComponent(const ComponentPtr component) {
@@ -321,17 +329,40 @@ namespace LaurelEye::Graphics {
                 renderComponent->GetMaterial()->setTexture("mainTexture", handle);
                 renderComponent->GetMaterial()->setProperty<int>("useTexture", 1);
             }
-            if ( std::shared_ptr<IO::MeshAsset> meshAsset = renderComponent->GetMeshAsset() ) {
-                auto meshObj = Graphics::Mesh::createMeshFromAsset(meshAsset);
-                renderComponent->SetMesh(meshObj);
+            if ( auto skinnedMeshAsset = renderComponent->GetSkinnedMeshAsset() ) {
+                auto meshHandle = meshManager->getHandle(skinnedMeshAsset->getName());
+                if ( !isValidMesh(meshHandle) ) {
+                    meshHandle = meshManager->createSkinnedMesh(skinnedMeshAsset->getName(), skinnedMeshAsset->vertices.data(), skinnedMeshAsset->vertices.size(), skinnedMeshAsset->indices.data(), skinnedMeshAsset->indices.size(), 4);
+                }
+                auto meshResource = meshManager->getMesh(meshHandle);
+
+                renderComponent->SetMesh(meshHandle);
+                renderComponent->SetMeshTempAttr(meshResource->gpu.vao, meshResource->gpu.indexCount);
             }
-            else if ( renderComponent->GetMeshPrimitiveType() != Graphics::Mesh::Type::None ) {
-                renderComponent->SetMesh(Graphics::Mesh::getShapeMesh(renderComponent->GetMeshPrimitiveType()));
+            else if ( std::shared_ptr<IO::MeshAsset> meshAsset = renderComponent->GetMeshAsset() ) {
+                // auto meshObj = Graphics::Mesh::createMeshFromAsset(meshAsset);
+                auto meshHandle = meshManager->getHandle(meshAsset->getName());
+                if ( !isValidMesh(meshHandle) ) {
+                    meshHandle = meshManager->createMesh(meshAsset->getName(), meshAsset->vertices.data(), meshAsset->vertices.size(), meshAsset->indices.data(), meshAsset->indices.size());
+                }
+                auto meshResource = meshManager->getMesh(meshHandle);
+
+                renderComponent->SetMesh(meshHandle);
+                renderComponent->SetMeshTempAttr(meshResource->gpu.vao, meshResource->gpu.indexCount);
+            }
+            else if ( renderComponent->GetMeshPrimitiveType() != PrimitiveMeshType::Invalid ) {
+                auto meshHandle = meshManager->createPrimitiveMesh(renderComponent->GetMeshPrimitiveType());
+                auto meshResource = meshManager->getMesh(meshHandle);
+
+                renderComponent->SetMesh(meshHandle);
+                renderComponent->SetMeshTempAttr(meshResource->gpu.vao, meshResource->gpu.indexCount);
             }
             ISystem::registerComponent(component);
             break;
         }
         case RenderComponentType::Renderable2D:
+            // NOTE: This is currently a stub because UI was supposed to have
+            // implemented this. Will come back to it later.
             ISystem::registerComponent(component);
             break;
         case RenderComponentType::PropertyCamera: {
@@ -381,12 +412,45 @@ namespace LaurelEye::Graphics {
             uiComponent->GetMaterial()->setTexture("mainTexture", handle);
             uiComponent->GetMaterial()->setProperty<int>("useTexture", 1);
         }
-        if ( std::shared_ptr<IO::MeshAsset> meshAsset = uiComponent->GetMeshAsset() ) {
-            auto meshObj = Graphics::Mesh::createMeshFromAsset(meshAsset);
-            uiComponent->SetMesh(meshObj);
+
+        // Mesh creation
+        // NOTE: Ideally no meshes should be created here, but instead be
+        // created by the scene. That would ensure efficient mesh resource
+        // handling and safer creation and deletion of duplicates.
+        if ( auto skinnedMeshAsset = uiComponent->GetSkinnedMeshAsset() ) {
+            auto meshHandle = meshManager->getHandle(skinnedMeshAsset->getName());
+            if ( !isValidMesh(meshHandle) ) {
+                meshHandle = meshManager->createSkinnedMesh(skinnedMeshAsset->getName(), skinnedMeshAsset->vertices.data(), skinnedMeshAsset->vertices.size(), skinnedMeshAsset->indices.data(), skinnedMeshAsset->indices.size(), 4);
+            }
+            auto meshResource = meshManager->getMesh(meshHandle);
+
+            uiComponent->SetMesh(meshHandle);
+            uiComponent->SetMeshTempAttr(meshResource->gpu.vao, meshResource->gpu.indexCount);
         }
-        else if ( uiComponent->GetMeshPrimitiveType() != Graphics::Mesh::Type::None ) {
-            uiComponent->SetMesh(Graphics::Mesh::getShapeMesh(uiComponent->GetMeshPrimitiveType()));
+        else if ( std::shared_ptr<IO::MeshAsset> meshAsset = uiComponent->GetMeshAsset() ) {
+            // auto meshObj = Graphics::Mesh::createMeshFromAsset(meshAsset);
+            auto meshHandle = meshManager->getHandle(meshAsset->getName());
+            if ( !isValidMesh(meshHandle) ) {
+                meshHandle = meshManager->createMesh(meshAsset->getName(), meshAsset->vertices.data(), meshAsset->vertices.size(), meshAsset->indices.data(), meshAsset->indices.size());
+            }
+            auto meshResource = meshManager->getMesh(meshHandle);
+
+            uiComponent->SetMesh(meshHandle);
+            uiComponent->SetMeshTempAttr(meshResource->gpu.vao, meshResource->gpu.indexCount);
+        }
+        else if ( uiComponent->GetMeshPrimitiveType() != PrimitiveMeshType::Invalid ) {
+            auto meshHandle = meshManager->createPrimitiveMesh(uiComponent->GetMeshPrimitiveType());
+            auto meshResource = meshManager->getMesh(meshHandle);
+
+            uiComponent->SetMesh(meshHandle);
+            uiComponent->SetMeshTempAttr(meshResource->gpu.vao, meshResource->gpu.indexCount);
+        }
+        else {
+            auto meshHandle = meshManager->createPrimitiveMesh(PrimitiveMeshType::Square);
+            auto meshResource = meshManager->getMesh(meshHandle);
+
+            uiComponent->SetMesh(meshHandle);
+            uiComponent->SetMeshTempAttr(meshResource->gpu.vao, meshResource->gpu.indexCount);
         }
         uiComponents.push_back(uiComponent);
 
@@ -398,10 +462,21 @@ namespace LaurelEye::Graphics {
         switch ( component->GetRenderCompType() ) {
         case RenderComponentType::Renderable3D: {
             auto renderComponent = static_cast<Renderable3DComponent*>(component);
-            auto mat = renderComponent->GetMaterial();
+            // WARNING: Refer to the warning note for meshes, the same applies to
+            // textures.
+            //
+            // auto mat = renderComponent->GetMaterial();
 
-            renderComponent->GetMaterial()->setProperty<int>("useTexture", 1);
-            renderComponent->SetMesh(nullptr);
+            // WARNING: We cannot delete meshes safely with this system if we
+            // want to allow reuse.
+            // This should have been taken care of by the Scene.
+            // Doing this deletion will break due to duplicate meshes using
+            // the same mesh resource.
+            //
+            // if ( renderComponent->GetMeshPrimitiveType() == PrimitiveMeshType::Invalid ) {
+            //     meshManager->destroyMesh(renderComponent->GetMesh());
+            // }
+            renderComponent->SetMesh(RenderMesh::InvalidMesh);
 
             ISystem::deregisterComponent(component);
             break;
@@ -435,19 +510,27 @@ namespace LaurelEye::Graphics {
         auto mat = renderComponent->GetMaterial();
 
         // If the material has a texture, release it from GPU
-        if ( auto texAsset = renderComponent->GetImageAsset() ) {
-            const std::string& texName = texAsset->getName();
-            if ( tempRenderResources->texture(texName) != InvalidTexture ) {
-                tempRenderResources->destroyTexture(texName);
-            }
-        }
 
-        if ( renderComponent->GetMesh() && renderComponent->GetMeshPrimitiveType() == Mesh::Type::None ) {
-            if ( auto geo = renderComponent->GetMesh()->getGeometryBuffer() ) {
-                geo->destroy();
-            }
-            renderComponent->SetMesh(nullptr);
-        }
+        // WARNING: Refer to the warning note for meshes, the same applies to
+        // textures.
+        //
+        // if ( auto texAsset = renderComponent->GetImageAsset() ) {
+        //     const std::string& texName = texAsset->getName();
+        //     if ( tempRenderResources->texture(texName) != InvalidTexture ) {
+        //         tempRenderResources->destroyTexture(texName);
+        //     }
+        // }
+
+        // WARNING: We cannot delete meshes safely with this system if we
+        // want to allow reuse.
+        // This should have been taken care of by the Scene.
+        // Doing this deletion will break due to duplicate meshes using
+        // the same mesh resource.
+        //
+        // if ( renderComponent->GetMeshPrimitiveType() == PrimitiveMeshType::Invalid ) {
+        //     meshManager->destroyMesh(renderComponent->GetMesh());
+        // }
+        renderComponent->SetMesh(RenderMesh::InvalidMesh);
 
         uiComponents.erase(
             std::remove(uiComponents.begin(), uiComponents.end(), component),

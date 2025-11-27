@@ -61,7 +61,8 @@ namespace LaurelEye::Graphics {
     /// Persistent mapping allows CPU-GPU shared memory for faster access, while
     /// dynamic mode uses transient updates per frame.
     enum class DataBufferUpdateMode { PersistentMapped,
-                                      Dynamic };
+                                      Dynamic,
+                                      Static };
 
     /// @struct DataBufferDesc
     /// @brief Describes the properties and creation parameters for a GPU data buffer.
@@ -97,7 +98,7 @@ namespace LaurelEye::Graphics {
     }
 
     inline DataBufferDesc makeVertexBufferDesc(uint64_t sizeBytes,
-                                               DataBufferUpdateMode mode = DataBufferUpdateMode::Dynamic) {
+                                               DataBufferUpdateMode mode = DataBufferUpdateMode::Static) {
         return DataBufferDesc{
             .type = DataBufferType::Vertex,
             .mode = mode,
@@ -107,7 +108,7 @@ namespace LaurelEye::Graphics {
     }
 
     inline DataBufferDesc makeIndexBufferDesc(uint64_t sizeBytes,
-                                              DataBufferUpdateMode mode = DataBufferUpdateMode::Dynamic) {
+                                              DataBufferUpdateMode mode = DataBufferUpdateMode::Static) {
         return DataBufferDesc{
             .type = DataBufferType::Index,
             .mode = mode,

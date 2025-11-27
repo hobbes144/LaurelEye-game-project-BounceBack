@@ -36,6 +36,7 @@ namespace LaurelEye {
 namespace LaurelEye::Graphics {
 
     class IRenderDevice;
+    class MeshManager;
 
     // temp
     class LightComponent;
@@ -175,6 +176,12 @@ namespace LaurelEye::Graphics {
         void resize(SurfaceHandle h, const SizeRegistry& size);
 
         std::map<SurfaceHandle, std::vector<std::function<void(const SizeRegistry&)>>> resizeCallbacks;
+
+        // NOTE: The Mesh Manager is closely tied to the RS being initialized
+        // So this might actually be final.
+
+        /// @bried Mesh Manager
+        std::unique_ptr<MeshManager> meshManager;
 
         /// @brief Temporary rendering resource storage used during frame execution.
         std::unique_ptr<RenderResources> tempRenderResources;

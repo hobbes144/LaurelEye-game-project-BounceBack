@@ -150,7 +150,7 @@ namespace LaurelEye::Graphics {
 
         /// @brief Draws the Mesh using the provided draw mode (default: GL_TRIANGLES).
         /// @param mode OpenGL draw mode (e.g., GL_TRIANGLES, GL_LINES).
-        void draw(GLenum mode = GL_TRIANGLES);
+        virtual void draw(GLenum mode = GL_TRIANGLES);
         /// @brief Draws triangles from the EBO without rebinding buffers.
         void drawEBOTrisWithoutBind();
 
@@ -197,7 +197,7 @@ namespace LaurelEye::Graphics {
         std::vector<unsigned int> indices;
 
         /// @brief Skin data.
-        std::vector<SkinData> skin;
+        // std::vector<SkinData> skin;
 
         /// @brief Combines multiple attribute maps into a single Attributes object.
         static Attributes combineAttributes(const std::vector<Attributes>& attributesList);

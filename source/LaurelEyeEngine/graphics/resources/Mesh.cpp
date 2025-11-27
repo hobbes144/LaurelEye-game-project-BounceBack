@@ -461,6 +461,7 @@ namespace LaurelEye::Graphics {
 
         cubeMeshData = combineAttributes(faceAttributes);
 
+
         std::shared_ptr<Mesh> newMesh = std::make_shared<Mesh>(
             name + "_Mesh",
             cubeMeshData,
@@ -507,13 +508,14 @@ namespace LaurelEye::Graphics {
         tangents.reserve(vertexCount * 3);
         bitangents.reserve(vertexCount * 3);
 
-        for ( const auto& v : meshAsset->vertices ) {
-            positions.insert(positions.end(), v.position, v.position + 3);
-            normals.insert(normals.end(), v.normal, v.normal + 3);
-            uvs.insert(uvs.end(), v.uv, v.uv + 2);
-            tangents.insert(tangents.end(), v.tangent, v.tangent + 3);
-            bitangents.insert(bitangents.end(), v.bitangent, v.bitangent + 3);
-        }
+        assert("MESH::CREATE_MESH_FROM_ASSET::DEPRICATED" && false);
+        // for ( const auto& v : meshAsset->vertices ) {
+        //     positions.insert(positions.end(), v.position, v.position + 3);
+        //     normals.insert(normals.end(), v.normal, v.normal + 3);
+        //     uvs.insert(uvs.end(), v.uv, v.uv + 2);
+        //     tangents.insert(tangents.end(), v.tangent, v.tangent + 3);
+        //     // bitangents.insert(bitangents.end(), v.bitangent, v.bitangent + 3);
+        // }
 
         attributes[GeometryBuffer::AttributeType::Position] = {positions, 3};
         attributes[GeometryBuffer::AttributeType::Normal] = {normals, 3};

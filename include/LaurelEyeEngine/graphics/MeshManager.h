@@ -9,27 +9,115 @@
 /// be moved here in the future.
 #pragma once
 
-#include "LaurelEyeEngine/graphics/Graphics.h"
-#include "LaurelEyeEngine/graphics/resources/Mesh.h"
+#include "LaurelEyeEngine/graphics/resources/RenderMesh.h"
+#include "LaurelEyeEngine/graphics/resources/RenderMeshResource.h"
+#include "LaurelEyeEngine/graphics/resources/RenderResources.h"
+#include "LaurelEyeEngine/math/Transform.h"
+#include <cstdint>
+#include <vector>
 
 namespace LaurelEye::Graphics {
 
     class MeshManager {
     public:
-        MeshManager(GraphicsBackend type = GraphicsBackend::OpenGL);
-
-        void initialize();            // Dummy call, but may want to auto create main window?
-        void update(float deltaTime); // Dummy call
-        void shutdown();              // Dummy call
+        explicit MeshManager(RenderResources& _renderResources);
+        ~MeshManager();
 
         // Mesh* createMesh(const MeshDescription& wDesc);
-        Mesh* createMesh(Mesh::Type);
-        Mesh* getMesh(int id);
+
+        MeshHandle createPrimitiveMesh(PrimitiveMeshType type);
+        MeshHandle createPrimitiveMesh(const std::string& name,
+                                       PrimitiveMeshType type);
+        MeshHandle createSphereMesh(const std::string& name,
+                                    float radius = 1.0f,
+                                    uint32_t stacks = 32,
+                                    uint32_t slices = 16);
+        MeshHandle createSquareMesh(const std::string& name,
+                                    float scale = 1.0f);
+        MeshHandle createCubeMesh(const std::string& name,
+                                  float scale = 1.0f);
+
+        MeshHandle createMesh(
+            const std::string& name,
+            const MeshVertex* vertices,
+            uint32_t vertexCount,
+            const uint32_t* indices,
+            uint32_t indexCount);
+
+        // // --- Skinned mesh (skin lives in MeshAsset) ---
+        MeshHandle createSkinnedMesh(
+            const std::string& name,
+            const SkinnedMeshVertex* vertices,
+            uint32_t vertexCount,
+            const uint32_t* indices,
+            uint32_t indexCount,
+            // SkeletonHandle skeleton,
+            // const Matrix4* inverseBindMatrices,
+            uint32_t boneCount,
+            uint32_t maxBonesPerVertex = 4);
+
+        // MeshHandle createSkinnedMesh(
+        //     const std::string& name,
+        //     const SkinnedMeshVertex* vertices,
+        //     uint32_t vertexCount,
+        //     const uint32_t* indices,
+        //     uint32_t indexCount,
+        //     SkeletonHandle skeletonHandle,
+        //     const std::vector<uint32_t>& meshBoneIndices // mapping from mesh bones -> skeleton bones
+        // );
+
+        MeshHandle getHandle(const std::string& name) const;
+
+        const RenderMeshResource* getMesh(MeshHandle h) const;
+        RenderMeshResource* getMesh(MeshHandle h);
+
+        void destroyMesh(MeshHandle h);
+
+        void destroyAllMeshes();
 
     private:
-        GraphicsBackend systemType;
-        std::vector<std::unique_ptr<Mesh>> managedMeshes;
+        RenderResources& renderResources;
+        // SkeletonMaanger& skeletonManager;
+        std::vector<RenderMeshResource> meshes;
+        std::unordered_map<std::string, MeshHandle> meshNames;
+        std::unordered_map<PrimitiveMeshType, MeshHandle> primitiveMeshes;
 
+        void pushquad(std::vector<uint32_t>& indices,
+                      uint32_t i, uint32_t j,
+                      uint32_t k, uint32_t l,
+                      uint32_t offset = 0);
+
+        void createFace(const Transform& tr,
+                        std::vector<MeshVertex>& vertices,
+                        std::vector<uint32_t>& indices,
+                        uint32_t indexOffset = 0);
+
+        MeshHandle allocateMeshHandle(const std::string& name);
+
+        // GPU creation paths:
+        GpuMesh createGpuMeshForStatic(
+            const std::string& meshName,
+            const MeshVertex* vertices,
+            uint32_t vertexCount,
+            const uint32_t* indices,
+            uint32_t indexCount);
+
+        GpuMesh createGpuMeshForSkinned(
+            const std::string& meshName,
+            const SkinnedMeshVertex* vertices,
+            uint32_t vertexCount,
+            const uint32_t* indices,
+            uint32_t indexCount,
+            uint32_t maxBonesPerVertex);
+
+        // Note: We don't modify the GpuMesh resource itself, but we destroy
+        // the relevant GPU side resources.
+        void destroyGpuMesh(const GpuMesh& r);
     };
 
-}
+    // Bounds:
+    // This is very important for advanced rendering stuff like frustum culling and RT.
+    // AABB computeLocalBounds(const MeshVertex* vertices, uint32_t vertexCount) const;
+    // AABB computeLocalBounds(const SkinnedMeshVertex* vertices, uint32_t vertexCount) const;
+
+} // namespace LaurelEye::Graphics

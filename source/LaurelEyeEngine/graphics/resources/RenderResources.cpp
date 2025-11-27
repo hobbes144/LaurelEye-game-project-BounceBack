@@ -113,6 +113,25 @@ namespace LaurelEye::Graphics {
         return r.handle;
     }
 
+    void RenderResources::destroyVertexArray(const std::string& name) {
+        VertexArrayResource& vao = vertexArrays[name];
+        device.destroyDataBuffer(vao.handle);
+        dataBuffers.erase(name);
+    }
+
+    void RenderResources::destroyVertexArray(VertexArrayHandle h) {
+        device.destroyVertexArray(h);
+        for ( auto it = vertexArrays.begin(); it != vertexArrays.end(); ) {
+            if ( it->second.handle == h ) {
+                it = vertexArrays.erase(it); // erase returns an iterator to the next element
+                return;
+            }
+            else {
+                ++it; // move to the next element
+            }
+        }
+    }
+
     // Textures
 
     TextureHandle RenderResources::createTexture(const std::string& name, const TextureDesc& d,

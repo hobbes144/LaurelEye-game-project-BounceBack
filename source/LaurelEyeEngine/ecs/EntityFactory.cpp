@@ -9,6 +9,7 @@
 #include "LaurelEyeEngine/graphics/graphics_components/PointLightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/Renderable3DComponent.h"
 #include "LaurelEyeEngine/graphics/RenderSystem.h"
+#include "LaurelEyeEngine/graphics/resources/RenderMesh.h"
 #include "LaurelEyeEngine/io/AssetManager.h"
 #include "LaurelEyeEngine/memory/MemoryManager.h"
 #include "LaurelEyeEngine/particles/ParticleEmitterComponent.h"
@@ -218,13 +219,13 @@ namespace LaurelEye {
             else if ( mesh.HasMember("primitiveType") && mesh["primitiveType"].IsString() ) {
                 std::string shapeType = mesh["primitiveType"].GetString();
                 if ( shapeType == "Square" ) {
-                    renderComponent->SetMeshPrimitiveType(Graphics::Mesh::Square);
+                    renderComponent->SetMeshPrimitiveType(Graphics::PrimitiveMeshType::Square);
                 }
                 else if ( shapeType == "Cube" ) {
-                    renderComponent->SetMeshPrimitiveType(Graphics::Mesh::Cube);
+                    renderComponent->SetMeshPrimitiveType(Graphics::PrimitiveMeshType::Cube);
                 }
                 else if ( shapeType == "Sphere" ) {
-                    renderComponent->SetMeshPrimitiveType(Graphics::Mesh::Sphere);
+                    renderComponent->SetMeshPrimitiveType(Graphics::PrimitiveMeshType::Sphere);
                 }
             }
         }

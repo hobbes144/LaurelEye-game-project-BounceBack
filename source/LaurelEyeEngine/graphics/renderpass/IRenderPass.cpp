@@ -10,6 +10,8 @@
 #include "LaurelEyeEngine/graphics/graphics_components/IRenderableComponent.h"
 #include "LaurelEyeEngine/graphics/resources/DataBuffer.h"
 #include "LaurelEyeEngine/graphics/resources/FrameContext.h"
+#include "LaurelEyeEngine/graphics/resources/GeometryBuffer.h"
+#include "LaurelEyeEngine/graphics/resources/RenderMesh.h"
 
 #include <memory>
 
@@ -30,7 +32,12 @@ namespace LaurelEye::Graphics {
                 component->GetBoundTransform()->getWorldTransform().getInverseLocalMatrix());
 
             component->GetMaterial()->apply(shader);
-            component->GetMesh()->draw();
+
+            if (isValidMesh(component->GetMesh())) {
+                // component->GetMesh()->draw();
+                ctx.device.bindVertexArray(component->vao);
+                glDrawElements(GL_TRIANGLES, component->indexCount, GL_UNSIGNED_INT, 0);
+            }
         }
     }
 

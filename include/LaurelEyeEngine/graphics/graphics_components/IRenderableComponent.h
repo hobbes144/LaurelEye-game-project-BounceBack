@@ -3,15 +3,19 @@
 /// @par    **DigiPen Email**
 ///         nick.shaw@digipen.edu
 /// @date   10-07-2025
-/// @brief  Base interface for all renderable components and render properties 
-///         within the rendering system, providing shared functionality for 
-///         mesh and material management. 
+/// @brief  Base interface for all renderable components and render properties
+///         within the rendering system, providing shared functionality for
+///         mesh and material management.
 
 #pragma once
 
 #include "LaurelEyeEngine/graphics/graphics_components/IRenderComponent.h"
-#include "LaurelEyeEngine/graphics/resources/Mesh.h"
 #include "LaurelEyeEngine/graphics/resources/Material.h"
+#include "LaurelEyeEngine/graphics/resources/RenderMesh.h"
+#include "LaurelEyeEngine/graphics/resources/VertexArray.h"
+#include "LaurelEyeEngine/io/Assets.h"
+#include <cstdint>
+#include <memory>
 
 namespace LaurelEye::Graphics {
 
@@ -20,7 +24,7 @@ namespace LaurelEye::Graphics {
     ///        renderable components.
     struct RenderableComponentDesc {
         /// @brief Pointer to the mesh resource for this renderable.
-        std::shared_ptr<Mesh> mesh;
+        MeshHandle mesh;
         /// @brief Pointer to the material resource for this renderable.
         std::shared_ptr<Material> material;
 
@@ -45,7 +49,7 @@ namespace LaurelEye::Graphics {
         ///        another renderable component.
         /// @param other The renderable component to copy from.
         IRenderableComponent(const IRenderableComponent& other)
-            : m_mesh(other.m_mesh), m_material(other.m_material), IRenderComponent(other.rcType) {}
+            : vao(other.vao), indexCount(other.indexCount), m_mesh(other.m_mesh), m_material(other.m_material), IRenderComponent(other.rcType) {}
 
         /// @brief Virtual destructor.
         virtual ~IRenderableComponent() override = default;
@@ -53,8 +57,14 @@ namespace LaurelEye::Graphics {
         /// @brief Assigns a mesh to this component.
         /// @param mesh Shared pointer to the mesh.
         /// @return Reference to this component (for chaining).
-        IRenderableComponent& SetMesh(std::shared_ptr<Mesh> mesh) {
-            m_mesh = std::move(mesh);
+        IRenderableComponent& SetMesh(MeshHandle mesh) {
+            m_mesh = mesh;
+            return *this;
+        }
+
+        IRenderableComponent& SetMeshTempAttr(VertexArrayHandle _vao, uint32_t _indexCount) {
+            vao = _vao;
+            indexCount = _indexCount;
             return *this;
         }
 
@@ -68,38 +78,45 @@ namespace LaurelEye::Graphics {
 
         /// @brief Retrieves the mesh assigned to this component.
         /// @return Shared pointer to the mesh.
-        std::shared_ptr<Mesh> GetMesh() const { return m_mesh; }
+        MeshHandle GetMesh() const { return m_mesh; }
         /// @brief Retrieves the material assigned to this component.
         /// @return Shared pointer to the material.
         std::shared_ptr<Material> GetMaterial() const { return m_material; }
 
-        /// @brief Retrieves the raw mesh pointer.
-        /// @return Raw pointer to the mesh, or nullptr if none assigned.
-        Mesh* GetMeshRaw() const { return m_mesh.get(); }
         /// @brief Retrieves the raw material pointer.
         /// @return Raw pointer to the material, or nullptr if none assigned.
         Material* GetMaterialRaw() const { return m_material.get(); }
 
         /// @brief Checks whether this component has an assigned mesh.
         /// @return True if a mesh is assigned, false otherwise.
-        bool HasMesh() const { return static_cast<bool>(m_mesh); }
+        bool HasMesh() const { return isValidMesh(m_mesh); }
         /// @brief Checks whether this component has an assigned material.
         /// @return True if a material is assigned, false otherwise.
         bool HasMaterial() const { return static_cast<bool>(m_material); }
 
         void SetMeshAsset(std::shared_ptr<IO::MeshAsset> asset) { meshAsset = asset; }
         void SetImageAsset(std::shared_ptr<IO::ImageAsset> asset) { imageAsset = asset; }
-        void SetMeshPrimitiveType(Mesh::Type type) { primitiveType = type; }
+        void SetMeshPrimitiveType(PrimitiveMeshType type) { primitiveType = type; }
         const std::shared_ptr<IO::MeshAsset> GetMeshAsset() { return meshAsset; }
+        const std::shared_ptr<IO::SkinnedMeshAsset> GetSkinnedMeshAsset() {
+            return std::dynamic_pointer_cast<IO::SkinnedMeshAsset>(meshAsset);
+        }
         const std::shared_ptr<IO::ImageAsset> GetImageAsset() { return imageAsset; }
-        const Mesh::Type GetMeshPrimitiveType() const { return primitiveType;}
+        const PrimitiveMeshType GetMeshPrimitiveType() const { return primitiveType; }
+
+        // Temporary until FrameContext properly uses RenderRegistry which
+        // stores the actual GPU values.
+        VertexArrayHandle vao;
+        uint32_t indexCount;
+
     protected:
         /// @brief Shared pointer to the mesh resource.
-        std::shared_ptr<Mesh> m_mesh;
+        MeshHandle m_mesh;
+
         /// @brief Shared pointer to the material resource.
         std::shared_ptr<Material> m_material;
 
-        Mesh::Type primitiveType = Mesh::Type::None;
+        PrimitiveMeshType primitiveType = PrimitiveMeshType::Invalid;
         std::shared_ptr<IO::MeshAsset> meshAsset;
         std::shared_ptr<IO::ImageAsset> imageAsset; // [Needed for now] To send images as textures to gpu dynamically
     };

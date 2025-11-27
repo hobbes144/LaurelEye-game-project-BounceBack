@@ -53,7 +53,7 @@ namespace LaurelEye {
         auto groundPB = ground->addComponent<Physics::PhysicsBodyComponent>(
             Physics::PhysicsBodyData::StaticBox({50.0f, 1.0f, 50.0f}));
         auto groundRC = ground->addComponent<Graphics::Renderable3DComponent>();
-        groundRC->SetMesh(Graphics::Mesh::getShapeMesh(Graphics::Mesh::Cube));
+        // groundRC->SetMesh(Graphics::Mesh::getShapeMesh(Graphics::Mesh::Cube));
         groundRC->SetMaterial(std::make_shared<Graphics::Material>());
 
         // Texture Addition for testing
@@ -89,7 +89,7 @@ namespace LaurelEye {
             Physics::PhysicsBodyData::DynamicBox({1.0f, 1.0f, 1.0f}, 1.0f));
         auto cubeRC = cube->addComponent<Graphics::Renderable3DComponent>();
         // cubeRC->SetMesh(Graphics::Mesh::loadMesh(std::string(TEST_MEDIA_DIR) + "/models/viking_C.fbx"));
-        cubeRC->SetMesh(Graphics::Mesh::loadMesh(std::string(TEST_MEDIA_DIR) + "/models/roman_D.fbx"));
+        // cubeRC->SetMesh(Graphics::Mesh::loadMesh(std::string(TEST_MEDIA_DIR) + "/models/roman_D.fbx"));
         cubeRC->SetMaterial(std::make_shared<Graphics::Material>());
         cubeRC->GetMaterial()->setProperty<int>("useTexture", 1);
 
@@ -253,10 +253,10 @@ namespace LaurelEye {
 
             if ( pInputManager->isKeyPressed(LaurelEye::Key::Space) || pInputManager->isKeyPressed(LaurelEye::Key::Escape) || window->shouldClose() ) {
                 groundRC->SetMaterial(nullptr);
-                groundRC->SetMesh(nullptr);
+                // groundRC->SetMesh(nullptr);
 
                 cubeRC->SetMaterial(nullptr);
-                cubeRC->SetMesh(nullptr);
+                // cubeRC->SetMesh(nullptr);
                 Graphics::Mesh::clearBuffers();
                 physicsSystem.shutdown();
                 transformSystem.shutdown();
@@ -285,10 +285,10 @@ namespace LaurelEye {
         }
 
         groundRC->SetMaterial(nullptr);
-        groundRC->SetMesh(nullptr);
+        // groundRC->SetMesh(nullptr);
 
         cubeRC->SetMaterial(nullptr);
-        cubeRC->SetMesh(nullptr);
+        // cubeRC->SetMesh(nullptr);
         Graphics::Mesh::clearBuffers();
 
         physicsSystem.shutdown();

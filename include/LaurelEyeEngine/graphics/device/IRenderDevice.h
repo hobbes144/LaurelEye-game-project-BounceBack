@@ -94,6 +94,8 @@ namespace LaurelEye::Graphics {
         [[nodiscard]] virtual VertexArrayHandle createVertexArray(const VertexArrayDesc& d) = 0;
         virtual void destroyVertexArray(VertexArrayHandle h) = 0;
 
+        virtual void bindVertexArray(VertexArrayHandle h) = 0;
+
         /* Texture operations */
 
         /// @brief Create a Texture.

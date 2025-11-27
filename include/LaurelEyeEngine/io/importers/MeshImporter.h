@@ -24,6 +24,12 @@ namespace LaurelEye::IO {
         /// @param path - Path to the mesh file
         /// @return a MeshAsset loaded with the raw mesh data (vertices, indices, etc).
         std::shared_ptr<IAsset> import(const std::string& path) override;
+
+    private:
+        std::shared_ptr<IAsset> createAsset(const std::string& path, const aiScene* scene);
+        std::shared_ptr<IAsset> createSkinnedAsset(const std::string& path, const aiScene* scene);
+
+        void addBoneData(SkinnedMeshAsset::SkinnedVertex& vertex, int boneIndex, float boneWeight);
     };
 
 } // namespace LaurelEye::IO

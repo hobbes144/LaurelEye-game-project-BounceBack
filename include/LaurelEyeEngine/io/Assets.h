@@ -9,11 +9,15 @@
 /// Copyright © 2025 DIGIPEN Institute of Technology. All rights reserved.
 
 #pragma once
+
+#include "LaurelEyeEngine/graphics/resources/RenderMesh.h"
+#include "LaurelEyeEngine/io/IAsset.h"
+
+#include <cstdint>
+#include <memory>
 #include <rapidjson/document.h>
 #include <unordered_map>
 #include <vector>
-#include <memory>
-#include "LaurelEyeEngine/io/IAsset.h"
 
 namespace LaurelEye::IO {
 
@@ -62,18 +66,20 @@ namespace LaurelEye::IO {
 
     struct MeshAsset : public IAsset {
         using IAsset::IAsset; // Inherits default constructor
-        struct Vertex {
-            float position[3];
-            float normal[3];
-            float uv[2];
-            float tangent[3];
-            float bitangent[3];
-            // int boneIndices[4];
-            // float boneWeights[4];
-        };
+        using Vertex = Graphics::MeshVertex;
 
         std::vector<Vertex> vertices;
-        std::vector<unsigned int> indices;
+        std::vector<uint32_t> indices;
+
+        int materialIndex = -1; // maps to MaterialAsset later
+    };
+
+    struct SkinnedMeshAsset : public MeshAsset {
+        using MeshAsset::MeshAsset; // Inherits default constructor
+        using SkinnedVertex = Graphics::SkinnedMeshVertex;
+
+        std::vector<SkinnedVertex> vertices;
+        std::vector<uint32_t> indices;
 
         int materialIndex = -1; // maps to MaterialAsset later
     };

@@ -104,7 +104,7 @@ namespace LaurelEye::Graphics {
         /// @param tag Optional tag used to group related resources.
         /// @return Handle to the created DataBuffer resource.
         [[nodiscard]] DataBufferHandle createDataBuffer(const std::string& name, const DataBufferDesc& d,
-                                                        const std::vector<std::string>& tags, const void* init = nullptr);
+                                                        const std::vector<std::string>& tags = {}, const void* init = nullptr);
         [[nodiscard]] DataBufferHandle createDataBuffer(const std::string& name, const DataBufferDesc& d,
                                                         const std::string& tag, const void* init = nullptr);
         /// @brief Retrieves a handle to an existing data buffer.
@@ -128,28 +128,29 @@ namespace LaurelEye::Graphics {
                               const void* data);
 
         [[nodiscard]] VertexArrayHandle createVertexArray(const std::string& name, const VertexArrayDesc& d,
-                                                          const std::vector<std::string>& tags);
+                                                          const std::vector<std::string>& tags = {});
         VertexArrayHandle vertexArray(const std::string& name);
         void destroyVertexArray(const std::string& name);
+        void destroyVertexArray(VertexArrayHandle h);
 
         [[nodiscard]] TextureHandle createTexture(const std::string& name, const TextureDesc& d,
-                                                  const std::vector<std::string>& tags, const void* init = nullptr);
+                                                  const std::vector<std::string>& tags = {}, const void* init = nullptr);
         [[nodiscard]] TextureHandle createTexture(const std::string& name, const TextureDesc& d,
                                                   const std::string& tag, const void* init = nullptr);
         [[nodiscard]] TextureHandle createScreenSizeTexture(const std::string& name,
-                                                            const std::vector<std::string>& tags,
+                                                            const std::vector<std::string>& tags = {},
                                                             const SampleCount& samples = SampleCount::X1);
         TextureHandle texture(const std::string& name);
         void destroyTexture(const std::string& name);
         void resizeTexture(const std::string& name, const SizeRegistry& size);
 
         [[nodiscard]] FramebufferHandle createFramebuffer(const std::string& name, const FramebufferDesc& d,
-                                                          const std::vector<std::string>& tags);
+                                                          const std::vector<std::string>& tags = {});
         [[nodiscard]] FramebufferHandle createFramebuffer(const std::string& name, const FramebufferDesc& d,
                                                           const std::string& tag);
         [[nodiscard]] TextureHandle createScreenSizeFramebuffer(const std::string& name,
                                                                 const std::vector<std::string>& textureNames,
-                                                                const std::vector<std::string>& tags,
+                                                                const std::vector<std::string>& tags = {},
                                                                 const SampleCount& samples = SampleCount::X1);
         FramebufferHandle framebuffer(const std::string& name);
         void destroyFramebuffer(const std::string& name);
