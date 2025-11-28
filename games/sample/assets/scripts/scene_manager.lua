@@ -3,6 +3,14 @@
 
 function onStart()
     log("Scene Manager script started")
+    UI.onButtonPressed("Play", function(name)
+        log("Button pressed from Lua: " .. name)
+        SceneManager:changeScene("Level1")
+    end)
+    UI.onButtonPressed("Quit", function(name)
+        log("Button pressed from Lua: " .. name)
+        Engine:stop()
+    end)
 end
 
 function onUpdate(dt)

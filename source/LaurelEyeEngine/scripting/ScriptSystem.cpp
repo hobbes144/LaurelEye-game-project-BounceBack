@@ -38,7 +38,7 @@ namespace LaurelEye::Scripting {
             }
         }
         if ( scriptEngineState ) {
-            scriptEngineState->shutdown();
+            scriptEngineState->shutdown(context);
             scriptEngineState.reset();
         }
     }

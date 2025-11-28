@@ -20,7 +20,7 @@ namespace LaurelEye::Scripting {
     class Sol2State : public IScriptEngineState{
     public:
         void initialize(EngineContext* ctx) override;
-        void shutdown() override;
+        void shutdown(EngineContext* ctx) override;
         std::unique_ptr<IScriptInstance> createInstance(const std::string& path, LaurelEye::Entity* owner) override;
 
         const sol::state& getState() const { return lua; }

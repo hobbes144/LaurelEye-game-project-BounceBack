@@ -1,6 +1,10 @@
 ﻿{
-    "initialScene": "Level1",
+    "initialScene": "MainMenu",
     "scenes": [
+        {
+            "name": "MainMenu",
+            "path": "scenes/main_menu.scene.json"
+        },
         {
             "name": "Level1",
             "path": "scenes/sample_scene_one.scene.json"

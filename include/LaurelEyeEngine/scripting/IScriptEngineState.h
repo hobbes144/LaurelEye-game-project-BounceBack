@@ -27,7 +27,7 @@ namespace LaurelEye::Scripting {
         virtual void initialize(EngineContext* context) = 0;
 
         /// @brief Shutdown and cleanup scripting resources
-        virtual void shutdown() = 0;
+        virtual void shutdown(EngineContext* ctx) = 0;
 
         /// @brief Create a new script instance bound to this engine state
         /// @param path The path to the script file

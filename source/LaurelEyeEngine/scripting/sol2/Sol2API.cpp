@@ -9,6 +9,7 @@
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Scene.h"
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Particles.h"
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Audio.h"
+#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_UI.h"
 
 namespace LaurelEye::Scripting {
 
@@ -46,6 +47,8 @@ namespace LaurelEye::Scripting {
         /* Audio */
         Sol2API_Audio::setup(lua, ctx);
 
+        /* UI */
+        Sol2API_UI::setup(lua, ctx);
     }
 
     void Sol2API::registerEnvironment(sol::environment& env, LaurelEye::Entity* owner) {
@@ -53,6 +56,11 @@ namespace LaurelEye::Scripting {
         env["self"] = owner; // you can keep this raw pointer for now
 
         // Optional: you can override env-specific things here later
+    }
+
+    void Sol2API::shutdown(EngineContext* ctx) {
+        // Clean up any global resources if needed
+        Sol2API_UI::shutdown(ctx);
     }
 
     void Sol2API::log(const std::string& msg) {

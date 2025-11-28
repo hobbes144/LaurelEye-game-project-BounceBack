@@ -9,7 +9,8 @@ namespace LaurelEye::Scripting {
         Sol2API::registerState(lua, ctx);
     }
 
-    void Sol2State::shutdown() {
+    void Sol2State::shutdown(EngineContext* ctx) {
+        Sol2API::shutdown(ctx);
         lua.collect_garbage();
     }
 

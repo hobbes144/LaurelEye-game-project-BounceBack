@@ -26,6 +26,7 @@ namespace LaurelEye::Scripting {
         /// @param owner The entity owner of the script
         static void registerEnvironment(sol::environment& env, LaurelEye::Entity* owner);
 
+        static void shutdown(EngineContext* ctx);
     private:
         // Logging helpers
         static void log(const std::string& msg);

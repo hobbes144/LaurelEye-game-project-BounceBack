@@ -1,0 +1,163 @@
+﻿{
+    "settings": {
+        "resetOnLoad": false,
+        "backgroundTexture": "textures/Tropical_Beach_8k.jpg",
+        "UILayout": [
+            {
+                "name": "baseMapping",
+                "mappings": [
+                    {
+                        "name": "Play",
+                        "right": "B2",
+                        "down": "B3"
+                    },
+                    {
+                        "name": "B2",
+                        "left": "Play",
+                        "down": "Quit"
+                    },
+                    {
+                        "name": "B3",
+                        "up": "Play",
+                        "right": "Quit"
+                    },
+                    {
+                        "name": "Quit",
+                        "left": "B3",
+                        "up": "B2"
+                    }
+                ]
+            }
+        ]
+    },
+    "entities": [
+        {
+            "name": "Camera",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 15.0, 40.0 ],
+                    "rotation": [ -50.0, 10.0, 0.0, 0.0 ],
+                    "scale": [ 50.0, 1.0, 50.0 ]
+                },
+                "Camera": {
+
+                },
+                "Script": {
+                    "path": "scripts/camera_movement.lua"
+                }
+            }
+        },
+        {
+            "name": "DirectionalLight",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, -1.0, 0.0 ],
+                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Light": {
+                    "type": "Directional",
+                    "direction": [ 0.75, -1.0, 0.75 ],
+                    "intensity": 4.0,
+                    "color": [ 1.0, 1.0, 1.0 ]
+                }
+            }
+        },
+        {
+            "name": "AmbientLight",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 0.0, 0.0 ],
+                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Light": {
+                    "type": "Ambient",
+                    "intensity": 0.3,
+                    "color": [ 1.0, 1.0, 1.0 ]
+                }
+            }
+        },
+        {
+            "name": "PlayButton",
+            "components": {
+                "Transform": {
+                    "position": [ -0.5, 0.5, 0.0 ],
+                    "rotation": [ 0.0, 180.0, 0.0, 1.0 ],
+                    "scale": [ 0.2, 0.2, 0.2 ]
+                },
+                "UIButton": {
+                    "name": "Play",
+                    "material": {
+                        "texture": "textures/PlayButton.jpg",
+                        "transparency": 0.6
+                    }
+                }
+            }
+        },
+        {
+            "name": "Button2",
+            "components": {
+                "Transform": {
+                    "position": [ 0.5, 0.5, 0.0 ],
+                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "scale": [ 0.2, 0.2, 0.2 ]
+                },
+                "UIButton": {
+                    "name": "B2",
+                    "material": {
+                        "texture": "textures/texture_01_dark.png",
+                        "transparency": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "name": "Button3",
+            "components": {
+                "Transform": {
+                    "position": [ -0.5, -0.5, 0.0 ],
+                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "scale": [ 0.2, 0.2, 0.2 ]
+                },
+                "UIButton": {
+                    "name": "B3",
+                    "material": {
+                        "texture": "textures/texture_01_orange.png",
+                        "transparency": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "name": "QuitButton",
+            "components": {
+                "Transform": {
+                    "position": [ 0.5, -0.5, 0.0 ],
+                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "scale": [ 0.2, 0.2, 0.2 ]
+                },
+                "UIButton": {
+                    "name": "Quit",
+                    "material": {
+                        "texture": "textures/texture_01_purple.png",
+                        "transparency": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "name": "SceneManager",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 10.0, 0.0 ],
+                    "rotation": [ 180.0, 0.0, 180.0, 1.0 ],
+                    "scale": [ 0.08, 0.08, 0.08 ]
+                },
+                "Script": {
+                    "path": "scripts/scene_manager.lua"
+                }
+            }
+        }
+    ]
+}

@@ -125,74 +125,6 @@
             "prefab": "prefabs/player.prefab.json"
         },
         {
-            "name": "Button1",
-            "components": {
-                "Transform": {
-                    "position": [ -0.5, 0.5, 0.0 ],
-                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
-                    "scale": [ 0.2, 0.2, 0.2 ]
-                },
-                "UIButton": {
-                    "name": "B1",
-                    "material": {
-                        "texture": "textures/texture_01_red.png",
-                        "transparency": 1.0
-                    }
-                }
-            }
-        },
-        {
-            "name": "Button2",
-            "components": {
-                "Transform": {
-                    "position": [ 0.5, 0.5, 0.0 ],
-                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
-                    "scale": [ 0.2, 0.2, 0.2 ]
-                },
-                "UIButton": {
-                    "name": "B2",
-                    "material": {
-                        "texture": "textures/texture_01_light.png",
-                        "transparency": 1.0
-                    }
-                }
-            }
-        },
-        {
-            "name": "Button3",
-            "components": {
-                "Transform": {
-                    "position": [ -0.5, -0.5, 0.0 ],
-                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
-                    "scale": [ 0.2, 0.2, 0.2 ]
-                },
-                "UIButton": {
-                    "name": "B3",
-                    "material": {
-                        "texture": "textures/texture_01_orange.png",
-                        "transparency": 1.0
-                    }
-                }
-            }
-        },
-        {
-            "name": "Button4",
-            "components": {
-                "Transform": {
-                    "position": [ 0.5, -0.5, 0.0 ],
-                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
-                    "scale": [ 0.2, 0.2, 0.2 ]
-                },
-                "UIButton": {
-                    "name": "B4",
-                    "material": {
-                        "texture": "textures/texture_01_purple.png",
-                        "transparency": 1.0
-                    }
-                }
-            }
-        },
-        {
             "name": "SceneManager",
             "components": {
                 "Transform": {
@@ -202,14 +134,6 @@
                 },
                 "Script": {
                     "path": "scripts/scene_manager.lua"
-                },
-                "Speaker": {
-                    "audioName": "music",
-                    "audioPath": "audio/slide.mp3",
-                    "volume": 1.0,
-                    "loop": true,
-                    "3D": true,
-                    "playOnLoad": true
                 }
             }
         },
