@@ -27,6 +27,8 @@ namespace LaurelEye {
             auto [mouseX, mouseY] = mouseToUICoordinate();
 
             for ( const auto& it : elements ) {
+                it.second->UpdateScaling();
+
                 if ( it.second->MouseInRange(mouseX, mouseY) && it.second->isActive() ) {
                     setCurrentUIComponent(it.second);
                     if ( inputManager->isMouseButtonPressed(mouseActivateButton) && currentComponent->CanBeActivated() ) {
@@ -69,17 +71,24 @@ namespace LaurelEye {
 
     void UIElementManager::registerUIElement(Graphics::UIComponent* elementToRegister) {
         assert(elementToRegister && "Could not register UIComponent to UIElementManager");
+
         elements[elementToRegister->GetUIName()] = elementToRegister;
+        elementToRegister->BindWindow(window);
         if ( currentComponent == nullptr ) {
             setCurrentUIComponent(elementToRegister);
         }
+
+
         std::cout << "Registered UI Element: " << elementToRegister->GetUIName() << std::endl;
         updateIsUIActive();
     }
 
     void UIElementManager::deregisterUIElement(Graphics::UIComponent* elementToDeregister) {
         assert(elementToDeregister && "Could not deregister UIComponent from UIElementManager");
+
         elements.erase(elementToDeregister->GetUIName());
+        elementToDeregister->BindWindow(nullptr);
+
         if ( currentComponent == elementToDeregister ) {
             if ( elements.empty() ) {
                 currentComponent = nullptr;
@@ -147,6 +156,18 @@ namespace LaurelEye {
         auto it = inputMapStorage.find(inputMap->getName());
         if ( it != inputMapStorage.end() ) {
             inputMapStorage.erase(it);
+        }
+    }
+
+    void UIElementManager::setUIWindow(LaurelEye::IWindow* _window) {
+        window = _window;
+        if (elements.empty()) {
+            return;
+        }
+        else {
+            for ( const auto& it : elements ) {
+                it.second->BindWindow(window);
+            }
         }
     }
 

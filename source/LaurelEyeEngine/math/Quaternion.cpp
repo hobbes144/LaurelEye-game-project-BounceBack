@@ -20,32 +20,36 @@ namespace LaurelEye {
 
     template <typename T>
     VectorTemplated<T, 3> QuaternionBase<T>::forward() {
-        normalize();
 
-        return VectorTemplated<T, 3>(
-            2.0f * (this->data[1] * this->data[3] + this->data[0] * this->data[2]),
-            2.0f * (this->data[2] * this->data[3] - this->data[0] * this->data[1]),
-            1.0f - 2.0f * (this->data[1] * this->data[1] + this->data[2] * this->data[2]));
+        return (*this) * VectorTemplated<T, 3>(0.0, 0.0, -1.0);
+        // normalize();
+        //
+        // return VectorTemplated<T, 3>(
+        //     2.0f * (this->data[1] * this->data[3] + this->data[0] * this->data[2]),
+        //     2.0f * (this->data[2] * this->data[3] - this->data[0] * this->data[1]),
+        //     1.0f - 2.0f * (this->data[1] * this->data[1] + this->data[2] * this->data[2]));
     }
 
     template <typename T>
     VectorTemplated<T, 3> QuaternionBase<T>::right() {
-        normalize();
-
-        return VectorTemplated<T, 3>(
-            1.0f - 2.0f * (this->data[2] * this->data[2] + this->data[3] * this->data[3]),
-            2.0f * (this->data[1] * this->data[2] + this->data[0] * this->data[3]),
-            2.0f * (this->data[1] * this->data[3] - this->data[0] * this->data[2]));
+        return (*this) * VectorTemplated<T, 3>(1.0, 0.0, 0.0);
+        // normalize();
+        //
+        // return VectorTemplated<T, 3>(
+        //     1.0f - 2.0f * (this->data[2] * this->data[2] + this->data[3] * this->data[3]),
+        //     2.0f * (this->data[1] * this->data[2] + this->data[0] * this->data[3]),
+        //     2.0f * (this->data[1] * this->data[3] - this->data[0] * this->data[2]));
     }
 
     template <typename T>
     VectorTemplated<T, 3> QuaternionBase<T>::up() {
-        normalize();
-
-        return VectorTemplated<T, 3>(
-            2.0f * (this->data[1] * this->data[2] - this->data[0] * this->data[3]),
-            1.0f - 2.0f * (this->data[1] * this->data[1] + this->data[3] * this->data[3]),
-            2.0f * (this->data[2] * this->data[3] + this->data[0] * this->data[1]));
+        return (*this) * VectorTemplated<T, 3>(0.0, 1.0, 0.0);
+        // normalize();
+        //
+        // return VectorTemplated<T, 3>(
+        //     2.0f * (this->data[1] * this->data[2] - this->data[0] * this->data[3]),
+        //     1.0f - 2.0f * (this->data[1] * this->data[1] + this->data[3] * this->data[3]),
+        //     2.0f * (this->data[2] * this->data[3] + this->data[0] * this->data[1]));
     }
 
     template <typename T>

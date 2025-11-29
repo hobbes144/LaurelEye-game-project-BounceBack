@@ -27,6 +27,7 @@ namespace LaurelEye::Graphics {
         UIComponent(RenderableComponentDesc rcd);
 
         virtual void SetIsFocused(bool newIsFocused);
+        void UpdateScaling();
 
         void SetOriginalScale(const Vector3& scale) { originalScale = scale; }
 
@@ -39,6 +40,7 @@ namespace LaurelEye::Graphics {
         bool CanBeActivated() const { return canBeActivated; }
 
         virtual void BindTransform() override;
+        void BindWindow(LaurelEye::IWindow* _window) { window = _window; }
 
         bool MouseInRange(float mouseX, float mouseY);
 
@@ -49,5 +51,6 @@ namespace LaurelEye::Graphics {
         bool canBeActivated = false;
 
         Vector3 originalScale = Vector3();
+        LaurelEye::IWindow* window = nullptr;
     };
 } // namespace LaurelEye::Graphics

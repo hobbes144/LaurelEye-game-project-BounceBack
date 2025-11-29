@@ -49,7 +49,7 @@ function onStart()
             cameraTransform = cameraEntity:findTransform()
         end
     end
-    
+
     smokeEmitter = self:findParticleEmitter()
 
     if smokeEmitter ~= nil then
@@ -70,8 +70,8 @@ function onUpdate(dt)
     local inputX = (Input:isKeyHeld(Key.D) and 1 or 0) +
                    (Input:isKeyHeld(Key.A) and -1 or 0)
 
-    local inputZ = (Input:isKeyHeld(Key.S) and 1 or 0) +
-                   (Input:isKeyHeld(Key.W) and -1 or 0)
+    local inputZ = (Input:isKeyHeld(Key.S) and -1 or 0) +
+                   (Input:isKeyHeld(Key.W) and 1 or 0)
 
     if Input:isMouseButtonPressed(MouseButton.Left) then
         shootProjectile()
@@ -146,7 +146,7 @@ function onUpdate(dt)
 
     -- Rotate
     if mag > 0 then
-        local angle = math.atan(-moveDir.x, -moveDir.z)
+        local angle = math.atan(moveDir.x, moveDir.z)
         rotateTo(angle, dt)
     end
 
@@ -221,13 +221,16 @@ function getCameraRelativeMovement(inputX, inputZ)
     end
 
     local camRot = cameraTransform:getWorldRotation()
+    -- print("Camera rotation:", camRot)
     local forward = camRot:forward()
+    -- print("Camera forward:", forward)
     forward.y = 0
     if forward:Magnitude() > 0 then
         forward = forward:Normalized()
     end
 
     local right = camRot:right()
+    -- print("Camera right:", right)
     right.y = 0
     if right:Magnitude() > 0 then
         right = right:Normalized()

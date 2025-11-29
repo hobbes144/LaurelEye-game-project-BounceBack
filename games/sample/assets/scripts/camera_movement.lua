@@ -24,20 +24,22 @@ function onUpdate(dt)
     end
 
     local playerPos = target:getWorldPosition()
+    -- print("Player position: ", playerPos)
     local camPos = transform:getWorldPosition()
+    -- print("Camera position: ", camPos)
 
     -- Camera controlling input
     if Input:isKeyHeld(Key.ArrowLeft) then
-        yaw = yaw + rotationSpeed * dt  
+        yaw = yaw - rotationSpeed * dt
     end
     if Input:isKeyHeld(Key.ArrowRight) then
-        yaw = yaw - rotationSpeed * dt
+        yaw = yaw + rotationSpeed * dt
     end
 
     -- Compute desired camera position
     local offsetX = math.sin(yaw) * distanceBack
     local offsetZ = math.cos(yaw) * distanceBack
-    local desiredPos = Vector3.new(playerPos.x + offsetX, playerPos.y + height, playerPos.z - offsetZ)
+    local desiredPos = Vector3.new(playerPos.x - offsetX, playerPos.y + height, playerPos.z + offsetZ)
 
     --interpolate to desired position
     camPos.x = camPos.x + (desiredPos.x - camPos.x) * lerpSpeed * dt
@@ -47,15 +49,18 @@ function onUpdate(dt)
 
     -- Look at player
     local dir = playerPos - camPos
+    print("Camera direction: ", dir)
     dir = dir:Normalized()
 
     local yawAngle = math.atan(-dir.x, -dir.z)
-    local pitchAngle = math.asin(dir.y)
+    local pitchAngle = math.asin(-dir.y)
 
-    local targetQuat = Quaternion.fromEuler(pitchAngle, yawAngle, 0)
+    local targetQuat = Quaternion.fromEuler(-pitchAngle, yawAngle, 0)
 
     -- Smoothly interpolate rotation to remove jitter
     local currentRot = transform:getWorldRotation()
+    print("Current rotation: ", currentRot)
+    print("Target rotation: ", targetQuat)
     local newRot = Quaternion.slerp(currentRot, targetQuat, dt * lerpSpeed)
     transform:setWorldRotation(newRot)
 end

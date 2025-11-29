@@ -28,8 +28,5 @@ out vec3 FragColor;
 void main()
 {
     vec2 scaledTexCoord = texCoord * mainTextureScale;
-    float x = scaledTexCoord.x;
-    float y = scaledTexCoord.y;
-    scaledTexCoord = vec2(x, 1-y);
     FragColor = texture(mainTexture, scaledTexCoord).xyz * transparency;
 }

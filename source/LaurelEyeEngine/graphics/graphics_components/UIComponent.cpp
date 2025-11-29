@@ -23,11 +23,16 @@ namespace LaurelEye::Graphics {
 
     void UIComponent::SetIsFocused(bool newIsFocused) {
         isFocused = newIsFocused;
+        UpdateScaling();
+    }
+
+    void UIComponent::UpdateScaling() {
+        Vector3 scale = Vector3(originalScale.x / window->getWidth(), originalScale.y / window->getHeight(), 0.0f);
         if ( isFocused ) {
-            transComp->getWorldTransform().setScaling(originalScale * 1.1f);
+            transComp->getWorldTransform().setScaling(scale * 1.1f);
         }
         else {
-            transComp->getWorldTransform().setScaling(originalScale);
+            transComp->getWorldTransform().setScaling(scale);
         }
     }
 

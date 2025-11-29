@@ -7,6 +7,7 @@
 
 #include "LaurelEyeEngine/graphics/graphics_components/CameraComponent.h"
 #include "LaurelEyeEngine/graphics/resources/Camera.h"
+#include "LaurelEyeEngine/math/Vector3.h"
 
 #include <source_location>
 
@@ -36,7 +37,7 @@ namespace LaurelEye::Graphics {
         : IRenderPropertyComponent(RenderComponentType::PropertyCamera),
           name("Camera"),
           position(Vector3()),
-          rotation(Quaternion(0.0f, 0.0f, 1.0f, 0.0f)),
+          rotation(Quaternion(1.0f, 0.0f, 0.0f, 0.0f)),
           cameraData() {};
 
     CameraComponent::~CameraComponent() = default;
@@ -64,11 +65,12 @@ namespace LaurelEye::Graphics {
     void CameraComponent::updateViewMatrix() {
         // Extract basis vectors (Right, Up, Forward)
         forward = rotation.forward();
-        up = rotation.up();
+        // up = rotation.up();
+        up = Vector3(0.0f, 1.0f, 0.0f);
         // right = rotation.right();
 
         // Compute view matrix using LookAt
-        cameraData.viewMatrix = Matrix4::lookAt(position, position - forward, up);
+        cameraData.viewMatrix = Matrix4::lookAt(position, position + forward, up);
         cameraData.inverseViewMatrix = Matrix4::inverse(cameraData.viewMatrix);
     }
 
@@ -143,8 +145,7 @@ namespace LaurelEye::Graphics {
     }
 
     void CameraComponent::updateFromTransform(const LaurelEye::TransformComponent* transform) {
-        setPosition(transform->getWorldPosition());
-        setRotation(transform->getWorldRotation());
+        setPositionRotation(transform->getWorldPosition(), transform->getWorldRotation());
     }
 
 } // namespace LaurelEye::Graphics

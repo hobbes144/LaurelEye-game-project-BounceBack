@@ -1,9 +1,9 @@
-﻿{
+{
     "name": "Physics Ball",
     "components": {
         "Transform": {
             "position": [ 0, 10.0, 0 ],
-            "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+            "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
             "scale": [ 1.0, 1.0, 1.0 ]
         },
         "Render3D": {

@@ -54,6 +54,11 @@ namespace LaurelEye {
             markDirty();
         }
 
+        void setLocalRotation(const Vector3& rot) {
+            localTransform.setRotation(rot);
+            markDirty();
+        }
+
         Vector3 getLocalScale() const { return localTransform.getScaling(); }
         void setLocalScale(const Vector3& scale) {
             localTransform.setScaling(scale);
@@ -69,6 +74,11 @@ namespace LaurelEye {
 
         Quaternion getWorldRotation() const { return worldTransform.getRotation(); }
         void setWorldRotation(const Quaternion& rot) {
+            worldTransform.setRotation(rot);
+            markDirty();
+        }
+
+        void setWorldRotation(const Vector3& rot) {
             worldTransform.setRotation(rot);
             markDirty();
         }

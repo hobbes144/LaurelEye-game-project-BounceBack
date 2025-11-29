@@ -46,9 +46,7 @@ namespace LaurelEye {
             inputManager = inputMgr;
         }
 
-        void setUIWindow(LaurelEye::IWindow* _window) {
-            window = _window;
-        }
+        void setUIWindow(LaurelEye::IWindow* _window);
 
         void enableCurrentUI();
         void disableCurrentUI();

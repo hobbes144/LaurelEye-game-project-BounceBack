@@ -1,4 +1,4 @@
-﻿{
+{
     "settings": {
         "resetOnLoad": true,
         "backgroundTexture": "textures/Tropical_Beach_8k.jpg"
@@ -9,7 +9,7 @@
             "components": {
                 "Transform": {
                     "position": [ 0.0, -1.0, 0.0 ],
-                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
                     "scale": [ 50.0, 1.0, 50.0 ]
                 },
                 "Render3D": {
@@ -63,7 +63,7 @@
             "components": {
                 "Transform": {
                     "position": [ 0.0, -1.0, 0.0 ],
-                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
                     "scale": [ 1.0, 1.0, 1.0 ]
                 },
                 "Light": {
@@ -79,7 +79,7 @@
             "components": {
                 "Transform": {
                     "position": [ 0.0, 0.0, 0.0 ],
-                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
                     "scale": [ 1.0, 1.0, 1.0 ]
                 },
                 "Light": {
@@ -94,7 +94,7 @@
             "components": {
                 "Transform": {
                     "position": [ 0.0, 10.0, 0.0 ],
-                    "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
                     "scale": [ 1.0, 1.0, 1.0 ]
                 },
                 "Script": {

@@ -8,7 +8,6 @@ namespace LaurelEye::IO {
         const aiScene* scene = importer.ReadFile(path,
                                                  aiProcess_CalcTangentSpace |
                                                      aiProcess_JoinIdenticalVertices |
-                                                     aiProcess_MakeLeftHanded |
                                                      aiProcess_Triangulate |
                                                      aiProcess_GenSmoothNormals |
                                                      aiProcess_ImproveCacheLocality |

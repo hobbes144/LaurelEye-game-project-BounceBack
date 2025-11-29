@@ -136,6 +136,10 @@ namespace LaurelEye::Graphics {
             return tempRenderResources.get();
         }
 
+        MeshManager* getMeshManager() {
+            return meshManager.get();
+        }
+
         void setClearColor(float r, float g, float b, float a = 1.0f) {
             config.clearColor = Vector4(r, g, b, a);
         }
