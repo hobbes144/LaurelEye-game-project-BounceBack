@@ -1,4 +1,4 @@
-{
+﻿{
     "settings": {
         "resetOnLoad": true,
         "backgroundTexture": "textures/Tropical_Beach_8k.jpg"
@@ -50,8 +50,8 @@
             "components": {
                 "Transform": {
                     "position": [ 0.0, 15.0, 40.0 ],
-                    "rotation": [ -50.0, 10.0, 0.0, 0.0 ],
-                    "scale": [ 50.0, 1.0, 50.0 ]
+                    "rotation": [ -0.261799, 0.0, 0.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
                 },
                 "Camera": {
 
@@ -107,7 +107,7 @@
             "components": {
                 "Transform": {
                     "position": [ 0.0, 10.0, 0.0 ],
-                    "rotation": [ 180.0, 0.0, 180.0, 1.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
                     "scale": [ 0.08, 0.08, 0.08 ]
                 },
                 "Script": {
