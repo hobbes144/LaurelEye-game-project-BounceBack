@@ -150,6 +150,7 @@ namespace LaurelEye {
         if ( inputMaps.empty() ) {
             pushInputMap(inputMap->getName());
         }
+        updateIsUIActive();
     }
 
     void UIElementManager::deregisterInputMap(UILayout* inputMap) {
