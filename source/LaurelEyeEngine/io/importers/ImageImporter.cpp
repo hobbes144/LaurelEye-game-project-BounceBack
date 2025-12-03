@@ -71,24 +71,4 @@ namespace LaurelEye::IO {
 
         return asset;
     }
-
-    /*
-    two types of textures we are importing: hdr and sdr
-    Anish gave me all the code in messages for importing them both
-    One line that does a check to see if its an hdr or sdr, the rest of the code is specific to each type
-
-    Main difference is the image description
-    above function (import) works with sdr, but not hdr
-    import will call the two functions
-    Have the functions sent be a part of image importer class as helper functions - make them private
-
-    For each part of texture description, keep the line in from the helper functions
-    If not in textureDesc, comment out line
-    Main ones to set are width, height, and format
-    This should call RenderResources.createtexture
-    Figure out how RenderResources can be called in this
-    Anish thinks it could be AssetManager.AddRenderwhateverthefuck
-
-
-    */
 } // namespace LaurelEye::IO

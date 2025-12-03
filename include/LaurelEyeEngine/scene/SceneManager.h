@@ -108,6 +108,10 @@ namespace LaurelEye {
         /// in order to populate the sceneFilePaths for deferred loading
         void sceneListDeserialize();
 
-        std::future<void> deserializationFuture;
+        std::thread deserializationThread;
+        std::atomic<bool> deserializationRunning{false};
+
+        void sceneListDeserializeFromJson(std::shared_ptr<IO::JsonAsset> jsonAsset);
+
     };
 } // namespace LaurelEye

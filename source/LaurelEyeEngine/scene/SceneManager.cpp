@@ -15,6 +15,10 @@ namespace LaurelEye {
     }
 
     SceneManager::~SceneManager() {
+        if ( deserializationThread.joinable() ) {
+            deserializationRunning.store(false);
+            deserializationThread.join();
+        }
 
         currentScene = nullptr;
         scenes.clear();
@@ -23,12 +27,19 @@ namespace LaurelEye {
     }
 
     void SceneManager::initialize() {
-        // Run sceneListDeserialize on its own thread
-        deserializationFuture = std::async(std::launch::async, [this]() {
-            sceneListDeserialize();
-            assetIsLoaded.store(true, std::memory_order_release);
-            std::cout << "[SceneManager] Scene list deserialization complete\n";
+        deserializationRunning.store(true);
+        deserializationThread = std::thread([this]() {
+            try {
+                sceneListDeserialize(); // synchronous loading, same as before
+                assetIsLoaded.store(true, std::memory_order_release);
+                std::cout << "[SceneManager] Scene list deserialization complete\n";
+            }
+            catch ( const std::exception& e ) {
+                std::cerr << "[SceneManager] Error during scene deserialization: " << e.what() << "\n";
+            }
+            deserializationRunning.store(false);
         });
+
         auto* renderSystem = context->getService<Graphics::RenderSystem>();
         auto* assetManager = context->getService<IO::AssetManager>();
         renderSystem->setClearColor(0.208f, 0.222f, 0.236f);
@@ -217,46 +228,6 @@ namespace LaurelEye {
             initialSceneName = doc["initialScene"].GetString();
         }
     }
-
-    // I believe this function can be deleted
-    // void SceneManager::preloadSceneAssetsAsync(const std::string& sceneName) {
-    //    auto assetManager = context->getService<IO::AssetManager>();
-    //    if ( !assetManager )
-    //        return;
-
-    //    fs::path sceneFilePath = fs::path(assetsRoot) / sceneFilePaths[sceneName];
-    //    auto sceneAsset = assetManager->load(sceneFilePath.string());
-    //    auto jsonAsset = std::dynamic_pointer_cast<IO::JsonAsset>(sceneAsset);
-    //    if ( !jsonAsset )
-    //        return;
-
-    //    const rapidjson::Document& doc = jsonAsset->jsonDocument;
-
-    //    std::vector<std::string> assetPaths;
-    //    if ( doc.HasMember("entities") && doc["entities"].IsArray() ) {
-    //        for ( auto& ent : doc["entities"].GetArray() ) {
-    //            if ( ent.HasMember("components") && ent["components"].IsObject() ) {
-    //                const auto& comps = ent["components"];
-    //                if ( comps.HasMember("Render3D") ) {
-    //                    const auto& render = comps["Render3D"];
-    //                    if ( render.HasMember("mesh") && render["mesh"].IsObject() ) {
-    //                        const auto& mesh = render["mesh"];
-    //                        if ( mesh.HasMember("file") && mesh["file"].IsString() )
-    //                            assetPaths.push_back(mesh["file"].GetString());
-    //                    }
-    //                    if ( render.HasMember("material") && render["material"].IsObject() ) {
-    //                        const auto& mat = render["material"];
-    //                        if ( mat.HasMember("texture") && mat["texture"].IsString() )
-    //                            assetPaths.push_back(mat["texture"].GetString());
-    //                    }
-    //                }
-    //            }
-    //        }
-    //    }
-
-    //    // Launch async loads
-    //    preloadingFutures = assetManager->loadBatchAsync(assetPaths);
-    //}
 
 #if !defined(NDEBUG)
     void SceneManager::injectSceneForTest(const std::string& name, std::unique_ptr<Scene> scene) {

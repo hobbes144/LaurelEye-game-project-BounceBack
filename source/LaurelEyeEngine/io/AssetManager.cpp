@@ -54,23 +54,7 @@ namespace LaurelEye::IO {
         return asset;
     }
 
-    std::future<std::shared_ptr<IAsset>> AssetManager::loadAsync(const std::string& path) {
-        return std::async(std::launch::async, [this, path]() {
-            return this->load(path);
-        });
-    }
-
-    std::vector<std::future<std::shared_ptr<IAsset>>> AssetManager::loadBatchAsync(const std::vector<std::string>& paths) {
-        std::vector<std::future<std::shared_ptr<IAsset>>> futures;
-        futures.reserve(paths.size());
-        for ( const auto& path : paths ) {
-            futures.emplace_back(loadAsync(path));
-        }
-        return futures;
-    }
-
     void AssetManager::unload(const std::string& path) {
-        std::unique_lock lock(cacheMutex);
         assetCache.erase(path);
     }
 
@@ -87,5 +71,4 @@ namespace LaurelEye::IO {
                        [](unsigned char c) { return std::tolower(c); });
         return lower;
     }
-
 } // namespace LaurelEye
