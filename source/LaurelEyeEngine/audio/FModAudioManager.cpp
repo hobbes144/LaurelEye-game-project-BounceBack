@@ -153,6 +153,9 @@ namespace LaurelEye::Audio {
      *****************************************************************************/
     void FModAudioManager::createSound(const std::string& name, const std::string& path, float volume, bool is3D, bool loop) {
         assert(fmodSystem_ && "FMOD system not initialized");
+        if ( sounds_.find(name) != sounds_.end() ) {
+            return;
+        }
         auto fullPath = IO::resolve(path);
 
         AudioAsset* newAsset = new AudioAsset(fullPath.string(), volume, is3D, loop);
