@@ -333,6 +333,9 @@ namespace LaurelEye {
         if ( currentComponent ) {
             currentComponent->SetIsFocused(false);
         }
+        if ( component == nullptr || !component->CanBeFocused() ) {
+            return;
+        }
         currentComponent = component;
         if ( currentComponent ) {
             currentComponent->SetIsFocused(true);
