@@ -55,6 +55,13 @@ namespace LaurelEye {
             monitor,
             nullptr);
 
+        glfwSetInputMode(static_cast<GLFWwindow*>(nativeHandle), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+        // Enable raw mouse motion if the OS supports it
+        if ( glfwRawMouseMotionSupported() ) {
+            glfwSetInputMode(static_cast<GLFWwindow*>(nativeHandle), GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+        }
+
         assert(nativeHandle && "Failed to create GLFW window");
 
         glfwSetWindowUserPointer(nativeHandle, this);

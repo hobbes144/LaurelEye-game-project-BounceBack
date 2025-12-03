@@ -28,6 +28,10 @@ namespace LaurelEye {
         return inputBackend->getMousePosition();
     }
 
+    std::pair<float, float> InputManager::getMouseDelta() {
+        return inputBackend->getMouseDelta();
+    }
+
     bool InputManager::isButtonPressed(GamepadButton button) {
         return inputBackend->isButtonPressed(button);
     }

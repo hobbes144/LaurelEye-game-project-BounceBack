@@ -105,6 +105,7 @@ namespace LaurelEye::Scripting {
             "isMouseButtonHeld", &InputManager::isMouseButtonHeld,
             "isMouseButtonReleased", &InputManager::isMouseButtonReleased,
             "getMousePosition", &InputManager::getMousePosition,
+            "getMouseDelta", &InputManager::getMouseDelta,
 
             "isButtonPressed", &InputManager::isButtonPressed,
             "isButtonHeld", &InputManager::isButtonHeld,

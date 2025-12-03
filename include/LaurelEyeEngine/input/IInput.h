@@ -34,6 +34,7 @@ namespace LaurelEye {
         virtual bool isMouseButtonReleased(MouseButton button) = 0;
         virtual void updateMousePosition() = 0;
         virtual std::pair<float, float> getMousePosition() = 0;
+        virtual std::pair<float, float> getMouseDelta() = 0;
 
         /*Virtual functions for checking states for gamepads*/
         virtual bool isButtonPressed(GamepadButton button) = 0;

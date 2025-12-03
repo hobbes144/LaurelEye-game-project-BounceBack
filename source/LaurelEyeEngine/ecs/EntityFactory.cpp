@@ -179,23 +179,22 @@ namespace LaurelEye {
 #pragma region Setup
 
     void EntityFactory::setupTransformComponent(Entity& entity, const rapidjson::Value& transformData) {
-        TransformComponent transform;
+        auto* transform = entity.addComponent<TransformComponent>();
         if ( transformData.HasMember("position") ) {
             const auto& pos = transformData["position"];
-            transform.setLocalPosition({pos[0].GetFloat(), pos[1].GetFloat(), pos[2].GetFloat()});
+            transform->setLocalPosition({pos[0].GetFloat(), pos[1].GetFloat(), pos[2].GetFloat()});
         }
         if ( transformData.HasMember("rotation") ) { // Quaternion
             const auto& rot = transformData["rotation"];
             if ( rot.IsArray() && rot.GetArray().Size() == 4 )
-                transform.setLocalRotation({rot[0].GetFloat(), rot[1].GetFloat(), rot[2].GetFloat(), rot[3].GetFloat()});
+                transform->setLocalRotation({rot[0].GetFloat(), rot[1].GetFloat(), rot[2].GetFloat(), rot[3].GetFloat()});
             else
-                transform.setLocalRotation(Vector3{rot[0].GetFloat(), rot[1].GetFloat(), rot[2].GetFloat()});
+                transform->setLocalRotation(Vector3{rot[0].GetFloat(), rot[1].GetFloat(), rot[2].GetFloat()});
         }
         if ( transformData.HasMember("scale") ) {
             const auto& scale = transformData["scale"];
-            transform.setLocalScale({scale[0].GetFloat(), scale[1].GetFloat(), scale[2].GetFloat()});
+            transform->setLocalScale({scale[0].GetFloat(), scale[1].GetFloat(), scale[2].GetFloat()});
         }
-        entity.addComponent<TransformComponent>(transform);
     }
 
     void EntityFactory::setupRender3DComponent(Entity& entity, const rapidjson::Value& render3DData) {

@@ -34,6 +34,9 @@ namespace LaurelEye {
         bool isMouseButtonReleased(MouseButton button) override;
         void updateMousePosition() override;
         std::pair<float, float> getMousePosition() override;
+        std::pair<float, float> getMouseDelta() override {
+            return mouseDelta;
+        }
 
         /*Gamepad functions*/
         bool isButtonPressed(GamepadButton button) override;
@@ -49,6 +52,9 @@ namespace LaurelEye {
         std::unordered_map<int, KeyState> gamepadStates;
         std::unordered_map<int, float> axisStates;
         std::pair<float, float> currMousePos;
+        std::pair<float, float> prevMousePos;
+        std::pair<float, float> mouseDelta;
+        bool firstMouse = true;
 
         /*Conversion functions to turn struct values from Input.h to GLFW codes*/
         int toGLFWKey(Key key);

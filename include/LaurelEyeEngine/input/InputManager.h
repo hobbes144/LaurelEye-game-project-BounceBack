@@ -30,6 +30,7 @@ namespace LaurelEye {
         bool isMouseButtonHeld(MouseButton button);
         bool isMouseButtonReleased(MouseButton button);
         std::pair<float, float> getMousePosition();
+        std::pair<float, float> getMouseDelta();
 
         /*Gamepad functions*/
         bool isButtonPressed(GamepadButton button);

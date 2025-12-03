@@ -126,8 +126,20 @@ namespace LaurelEye {
     void GLFWInput::updateMousePosition() {
         double x, y;
         glfwGetCursorPos(pWindow, &x, &y);
-        currMousePos.first = static_cast<float>(x);
-        currMousePos.second = static_cast<float>(y);
+
+        if ( firstMouse ) {
+            prevMousePos = {(float)x, (float)y};
+            currMousePos = prevMousePos;
+            mouseDelta = {0.0f, 0.0f};
+            firstMouse = false;
+            return;
+        }
+
+        prevMousePos = currMousePos;
+        currMousePos = {(float)x, (float)y};
+
+        mouseDelta.first = currMousePos.first - prevMousePos.first;
+        mouseDelta.second = currMousePos.second - prevMousePos.second;
     }
 
     std::pair<float, float> GLFWInput::getMousePosition() {
