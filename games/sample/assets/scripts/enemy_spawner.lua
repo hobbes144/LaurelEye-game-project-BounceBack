@@ -1,5 +1,5 @@
-﻿local minPlayerDistance = 45.0     -- enemies will NOT spawn closer than this
-local maxPlayerDistance = 75.0    -- enemies will spawn within this max distance
+﻿local minPlayerDistance = 25.0     -- enemies will NOT spawn closer than this
+local maxPlayerDistance = 45.0    -- enemies will spawn within this max distance
 
 local function randomPointOutsideRadius(minRadius, maxRadius)
     -- random angle around circle
@@ -16,28 +16,23 @@ local function randomPointOutsideRadius(minRadius, maxRadius)
 end
 
 
-spawnInterval = 3.0           -- seconds between spawns
+spawnInterval = 2.0           -- seconds between spawns
 spawnTimer = 0.0               -- internal timer
 spawnCount = 0                 -- how many spawned so far
-totalToSpawn = 10
-
 
 function onStart()
-    print("[Spawner] Starting up, will spawn " .. totalToSpawn .. " enemies.")
+
 end
 
 function onUpdate(deltaTime)
-    -- only spawn until we reach the limit
-    if spawnCount >= totalToSpawn then
-        return
-    end
-
     -- accumulate time
     spawnTimer = spawnTimer + deltaTime
-
+    if spawnCount == 10 and spawnInterval > 0.0 then
+        spawnInterval = spawnInterval - 0.2
+        spawnCount = 0
+    end
     if spawnTimer >= spawnInterval then
         spawnTimer = 0.0
-        spawnCount = spawnCount + 1
 
         -- Use the Scene API exposed to Sol2
         local entity = SceneManager:instantiate("prefabs/following_enemy.prefab.json")

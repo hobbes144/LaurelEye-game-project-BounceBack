@@ -9,6 +9,12 @@ lerpSpeed = 8.0      -- smooth follow speed
 
 yaw = 0.0 -- camera rotation around player
 
+-- Right-stick / camera control settings
+rStickDeadzone = 0.25
+heightSpeed = 15.0
+heightMin = 5.0
+heightMax = 80.0
+
 function onStart()
     transform = self:findTransform()
     target = findPlayer()
@@ -23,18 +29,39 @@ function onUpdate(dt)
         if target == nil then return end
     end
 
+    local rStickX = Input:getGamepadAxis(GamepadAxes.RStickX)
+    local rStickY = Input:getGamepadAxis(GamepadAxes.RStickY)
+
+    if rStickX < 0.5 and rStickX > -0.5 then
+        rStickX = 0.0
+    end
+    if rStickY < 0.5 and rStickY > -0.5 then
+        rStickY = 0.0
+    end
+
     local playerPos = target:getWorldPosition()
     -- print("Player position: ", playerPos)
     local camPos = transform:getWorldPosition()
     -- print("Camera position: ", camPos)
 
-    -- Camera controlling input
+    -- Camera controlling input (keyboard)
     if Input:isKeyHeld(Key.ArrowLeft) then
         yaw = yaw - rotationSpeed * dt
     end
     if Input:isKeyHeld(Key.ArrowRight) then
         yaw = yaw + rotationSpeed * dt
     end
+    if Input:isKeyHeld(Key.ArrowUp) then
+        height = height + heightSpeed * dt
+    end
+    if Input:isKeyHeld(Key.ArrowDown) then
+        height = height - heightSpeed * dt
+    end
+
+    -- Right-stick adds camera control:
+    yaw = yaw + rStickX * rotationSpeed * dt
+    height = height + rStickY * heightSpeed * dt
+
 
     -- Compute desired camera position
     local offsetX = math.sin(yaw) * distanceBack
@@ -49,7 +76,7 @@ function onUpdate(dt)
 
     -- Look at player
     local dir = playerPos - camPos
-    print("Camera direction: ", dir)
+    --print("Camera direction: ", dir)
     dir = dir:Normalized()
 
     local yawAngle = math.atan(-dir.x, -dir.z)
@@ -59,8 +86,8 @@ function onUpdate(dt)
 
     -- Smoothly interpolate rotation to remove jitter
     local currentRot = transform:getWorldRotation()
-    print("Current rotation: ", currentRot)
-    print("Target rotation: ", targetQuat)
+    --print("Current rotation: ", currentRot)
+    --print("Target rotation: ", targetQuat)
     local newRot = Quaternion.slerp(currentRot, targetQuat, dt * lerpSpeed)
     transform:setWorldRotation(newRot)
 end

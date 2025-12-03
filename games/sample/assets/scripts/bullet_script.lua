@@ -5,9 +5,16 @@ timeAlive = 0.0
 transform = nil
 body = nil
 
+speaker = nil
+
 function onStart()
     transform = self:findTransform()
     body = self:findPhysics()
+
+    speaker = self:findAudioSpeaker()
+    if speaker ~= nil then
+        speaker:play()
+    end
 end
 
 function onUpdate(dt)
@@ -23,9 +30,6 @@ end
 
 function onCollisionEnter(data)
     if destroyed then return end
-
-    local other = data.entityB
-    local name = other:getName()
 
     local tagsA = data.entityA:getTags()
     for _, tag in pairs(tagsA) do
@@ -47,9 +51,6 @@ end
 function destroySelf()
     if destroyed then return end
     destroyed = true
-
-    -- Optional: spawn particle or sound
-    -- SceneManager:instantiate("prefabs/hit_effect.json")
 
     SceneManager:destroy(self)
 end

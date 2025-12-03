@@ -1,18 +1,18 @@
 ﻿{
-    "name": "FollowingEnemyPrefab",
-    "tags": ["enemy"],
+    "name": "PlayerPrefab",
+    "tags": [ "player" ],
     "components": {
         "Transform": {
-            "position": [ 20.0, 0.0, 20.0 ],
-            "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+            "position": [ 0.0, 0.0, 0.0 ],
+            "rotation": [ 0.0, 0.0, 180.0, 1.0 ],
             "scale": [ 0.08, 0.08, 0.08 ]
         },
         "Render3D": {
             "mesh": {
-                "file": "models/viking_C.fbx"
+                "file": "models/roman_D.fbx"
             },
             "material": {
-                "texture": "textures/viking_blue_C_texture.jpg",
+                "texture": "textures/roman_blue_D_texture.jpg",
                 "diffuse": [ 10.0, 1.0, 1.0 ],
                 "specular": [ 0.2, 0.2, 0.2 ],
                 "shininess": 32.0
@@ -23,9 +23,9 @@
             "shapeDefinition": {
                 "type": "Box",
                 "size": {
-                    "x": 40.0,
-                    "y": 100.0,
-                    "z": 40.0
+                    "x": 30.0,
+                    "y": 40.0,
+                    "z": 30.0
                 },
                 "radius": 0.5,
                 "height": 1.0
@@ -48,7 +48,7 @@
             },
             "centerOfMass": {
                 "x": 0.0,
-                "y": 4.0,
+                "y": 1.5,
                 "z": 0.0
             },
             "linearDamping": 0.5,
@@ -62,16 +62,34 @@
             "ccdSweptSphereRadius": 1.0,
             "gravityScale": 8.0
         },
+        "ParticleEmitter": {
+            "emissionRate": 60.0,
+            "spreadAngle": 65.0,
+            "particleLifetime": 0.6,
+            "lifetimeVariation": 0.2,
+            "initialSpeed": 2.0,
+            "speedVariation": 1.0,
+
+            "startSize": 15.0,
+            "endSize": 5.0,
+            "sizeVariation": 0.4,
+
+            "startColor": [ 0.3, 0.25, 0.2, 0.6 ],
+            "endColor": [ 0.3, 0.25, 0.2, 0.0 ],
+
+            "usePhysics": false,
+            "maxParticles": 200
+        },
         "Speaker": {
-            "audioName": "explosion",
-            "audioPath": "audio/explosionCrunch_000.mp3",
-            "volume": 0.2,
+            "audioName": "footsteps",
+            "audioPath": "audio/footstep.mp3",
+            "volume": 0.5,
             "loop": false,
             "3D": false,
             "playOnLoad": false
         },
         "Script": {
-            "path": "scripts/following_enemy.lua"
+            "path": "scripts/mb_character.lua"
         }
     }
 }

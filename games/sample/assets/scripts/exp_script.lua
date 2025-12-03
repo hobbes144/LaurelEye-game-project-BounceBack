@@ -1,7 +1,7 @@
-﻿maxSpeed    = 35.0       -- max units per second
-accel       = 20.0      -- acceleration toward target
+﻿maxSpeed    = 105.0       -- max units per second
+accel       = 50.0      -- acceleration toward target
 decel       = 10.0      -- deceleration when stopping
-chaseRange  = 1000.0      -- distance to start chasing
+chaseRange  = 10.0      -- distance to start chasing
 stopRange   = 0.2       -- distance to stop
 
 turnSpeed   = 8.0       -- how fast the enemy rotates toward movement
@@ -10,13 +10,9 @@ transform = nil
 body = nil
 destroyed = false
 
-speaker = nil
-
 function onStart()
     transform = self:findTransform()
     body = self:findPhysics()
-
-    speaker = self:findAudioSpeaker()
 end
 
 function onUpdate(dt)
@@ -51,7 +47,7 @@ function onUpdate(dt)
         -- Rotation
         local horizMag = math.sqrt(vel.x*vel.x + vel.z*vel.z)
         if horizMag > 0.05 then
-            local angle = math.atan(vel.x, vel.z)
+            local angle = math.atan(-vel.x, -vel.z)
             rotateTo(angle, dt)
         end
     elseif dist <= stopRange then
@@ -74,31 +70,18 @@ end
 function onCollisionEnter(data)
     local tagsA = data.entityA:getTags()
     for _, tag in pairs(tagsA) do
-        if tag == "bullet" then
-            print("Collided with Bullet!")
+        if tag == "player" then
+            print("Collided with Player!")
             if destroyed then return end
-            local selfTransform = self:findTransform()
-            local pos = selfTransform:getWorldPosition()
-
-            local entity = SceneManager:instantiate("prefabs/exp_ball.prefab.json")
-            local expTransform = entity:findTransform()
-            expTransform:setWorldPosition(pos)
             destroySelf()
         end
     end
 
     local tagsB = data.entityB:getTags()
     for _, tag in pairs(tagsB) do
-        if tag == "bullet" then
-            print("Collided with Bullet!")
+        if tag == "player" then
+            print("Collided with Player!")
             if destroyed then return end
-            local selfTransform = self:findTransform()
-            local pos = selfTransform:getWorldPosition()
-
-            local entity = SceneManager:instantiate("prefabs/exp_ball.prefab.json")
-            local expTransform = entity:findTransform()
-            expTransform:setWorldPosition(pos)
-
             destroySelf()
         end
     end
@@ -124,10 +107,6 @@ end
 function destroySelf()
     if destroyed then return end
     destroyed = true
-    print(speaker)
-    if speaker ~= nil then
-        print("speaker noise")
-        speaker:play()
-    end
+
     SceneManager:destroy(self)
 end

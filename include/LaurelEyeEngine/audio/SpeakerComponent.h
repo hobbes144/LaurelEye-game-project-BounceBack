@@ -39,6 +39,8 @@ namespace LaurelEye::Audio {
         void setPlayOnLoad(bool play) { playOnLoad = play; }
         const bool getPlayOnLoad() const { return playOnLoad; }
 
+        void setIsLooping(bool loop) { isLooping = loop; }
+        const bool getIsLooping() const { return isLooping; }
         // Create audio asset in the audio manager
         void createAudioAsset(const std::string& path, float volume = 1.0f, bool is3D = false, bool loop = true);
 
@@ -49,6 +51,7 @@ namespace LaurelEye::Audio {
     private:
         bool isPlaying;
         bool playOnLoad;
+        bool isLooping;
         std::string audioName;
 
         IAudioManager* audioManager; // Pointer to the AudioManager instance

@@ -24,6 +24,10 @@
         {
             "name": "SpawnerScene",
             "path": "scenes/entity_limit_test.scene.json"
+        },
+        {
+            "name": "MBPrototype",
+            "path": "scenes/mb_prototype.scene.json"
         }
     ]
 }

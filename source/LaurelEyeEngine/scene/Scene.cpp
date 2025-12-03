@@ -475,7 +475,10 @@ namespace LaurelEye {
                 if ( audioSystem ) {
                     audioSystem->deregisterComponent(speakerComp);
                 }
-                speakerComp->stopSound(speakerComp->getAudioName());
+                // BG music n jazz
+                if ( speakerComp->getIsLooping() ) {
+                    speakerComp->stopSound(speakerComp->getAudioName());
+                }
             }
             else if ( auto* uiComponent = dynamic_cast<Graphics::UIComponent*>(comp.get()) ) {
                 if ( uiManager ) {

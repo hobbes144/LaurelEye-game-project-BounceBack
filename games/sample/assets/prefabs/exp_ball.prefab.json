@@ -1,11 +1,11 @@
 ﻿{
-    "name": "Bullet",
-    "tags": ["bullet"],
+    "name": "exp",
+    "tags": [ "exp" ],
     "components": {
         "Transform": {
             "position": [ 0, 0.0, 0 ],
-            "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-            "scale": [ 1.0, 1.0, 1.0 ]
+            "rotation": [ 0.0, 0.0, 0.0, 1.0 ],
+            "scale": [ 0.5, 0.5, 0.5 ]
         },
         "Render3D": {
             "mesh": {
@@ -13,7 +13,7 @@
                 "primitiveType": "Sphere"
             },
             "material": {
-                "texture": "textures/texture_01_dark.png",
+                "texture": "textures/texture_01_red.png",
                 "diffuse": [ 1.0, 10.0, 1.0 ],
                 "specular": [ 0.2, 0.2, 0.2 ],
                 "shininess": 32.0
@@ -53,16 +53,8 @@
             "ccdSweptSphereRadius": 1.0,
             "gravityScale": 0.0
         },
-        "Speaker": {
-            "audioName": "laser",
-            "audioPath": "audio/laserLarge_002.mp3",
-            "volume": 0.3,
-            "loop": false,
-            "3D": false,
-            "playOnLoad": false
-        },
         "Script": {
-            "path": "scripts/bullet_script.lua"
+            "path": "scripts/exp_script.lua"
         }
     }
 }

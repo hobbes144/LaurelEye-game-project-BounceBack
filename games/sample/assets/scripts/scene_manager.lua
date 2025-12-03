@@ -5,7 +5,7 @@ function onStart()
     log("Scene Manager script started")
     UI.onButtonPressed("Prototype1", function(name)
         log("Button pressed from Lua: " .. name)
-        SceneManager:changeScene("Level1")
+        SceneManager:changeScene("MBPrototype")
     end)
     UI.onButtonPressed("Prototype2", function(name)
         log("Button pressed from Lua: " .. name)
@@ -40,6 +40,9 @@ function onUpdate(dt)
     elseif Input:isKeyPressed(Key.Six) then
         log("Reloading Current Scene")
         SceneManager:reloadCurrentScene()
+    elseif Input:isKeyPressed(Key.Seven) then
+        log("Loading Scene: MBPrototype")
+        SceneManager:changeScene("MBPrototype")
     elseif Input:isKeyPressed(Key.Escape) then
         Engine:stop()
     end
