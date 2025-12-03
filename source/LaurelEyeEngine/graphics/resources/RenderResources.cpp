@@ -48,7 +48,7 @@ namespace LaurelEye::Graphics {
         const std::string& name, const DataBufferDesc& d, const std::vector<std::string>& tags, const void* init) {
         if ( dataBuffers.contains(name) ) return dataBuffers[name].handle;
         DataBufferResource r{};
-        r.handle = device.createDataBuffer(d, init);
+        r.handle = device.createDataBuffer(d, init, name);
         r.desc = d;
         r.tags = tags;
         // r.lifetime = l;
@@ -86,15 +86,15 @@ namespace LaurelEye::Graphics {
     }
 
     void RenderResources::updateDataBuffer(const std::string& name,
-                                           uint64_t offset,
-                                           uint64_t size,
+                                           size_t offset,
+                                           size_t size,
                                            const void* data) {
         device.updateDataBufferSubData(dataBuffers[name].handle, offset, size, data);
     }
 
     void RenderResources::updateDataBuffer(DataBufferHandle h,
-                                           uint64_t offset,
-                                           uint64_t size,
+                                           size_t offset,
+                                           size_t size,
                                            const void* data) {
         device.updateDataBufferSubData(h, offset, size, data);
     }

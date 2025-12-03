@@ -10,14 +10,35 @@
 /// Copyright © 2025 DIGIPEN Institute of Technology. All rights reserved.
 
 #pragma once
+#include "LaurelEyeEngine/graphics/resources/RenderMesh.h"
 #include "LaurelEyeEngine/io/Assets.h"
 #include "LaurelEyeEngine/io/IAssetImporter.h"
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 
+#include <cstdint>
+
 namespace LaurelEye::IO {
 
+    /// @class MeshImporter
+    /// @brief Importer for all Mesh and related resources.
+    ///
+    /// This includes: Mesh, Skin, Skeleton.
+    ///
+    /// Temporarily also includes Animations.
+    ///
+    /// Note regarding use and cleanup:
+    /// The Mesh Asset should only need to be loaded into the RenderSystem
+    /// once. The repeated uses will reuse the name of the resources. This
+    /// means we can cleanup the asset so the raw data can be deleted after
+    /// first load into system. This is in place for a future scene asset
+    /// manager that loads resources into the systems instead of relying on
+    /// component register.
+    ///
+    /// For now, after load into system, components will remove the pointers
+    /// to the assets, since they don't need them anymore.
+    ///
     class MeshImporter : public IAssetImporter {
     public:
         /// @brief Imports 3D meshes. Specifically uses assimp to populate a MeshAsset
@@ -29,7 +50,18 @@ namespace LaurelEye::IO {
         std::shared_ptr<IAsset> createAsset(const std::string& path, const aiScene* scene);
         std::shared_ptr<IAsset> createSkinnedAsset(const std::string& path, const aiScene* scene);
 
+        void buildSkeletonRecursive(const aiNode* node,
+                                    int parentIndex,
+                                    SkeletonAsset& skel,
+                                    const std::unordered_set<std::string>& usedBoneNames);
+        std::shared_ptr<SkeletonAsset> buildSkeleton(const std::string& path, const aiScene* scene);
         void addBoneData(SkinnedMeshAsset::SkinnedVertex& vertex, int boneIndex, float boneWeight);
+
+        template <std::convertible_to<LaurelEye::Graphics::MeshVertex> TVertex>
+        void populateVerticesIndices(std::vector<TVertex>& vertices,
+                                     std::vector<uint32_t>& indices,
+                                     const aiMesh* mesh,
+                                     uint32_t vertexOffset = 0);
     };
 
 } // namespace LaurelEye::IO

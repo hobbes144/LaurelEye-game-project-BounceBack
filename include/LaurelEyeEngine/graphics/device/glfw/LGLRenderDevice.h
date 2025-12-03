@@ -77,13 +77,13 @@ namespace LaurelEye::Graphics {
         /* DataBuffer operations (UBOs/SSBOs) */
 
         /// \copydoc IRenderDevice::createDataBuffer
-        [[nodiscard]] DataBufferHandle createDataBuffer(const DataBufferDesc& d, const void* initialData = nullptr) override;
+        [[nodiscard]] DataBufferHandle createDataBuffer(const DataBufferDesc& d, const void* initialData = nullptr, const std::string& debugName = "LEUnnamed") override;
 
         /// \copydoc IRenderDevice::destroyDataBuffer
         void destroyDataBuffer(DataBufferHandle h) override;
 
         /// \copydoc IRenderDevice::updateDataBufferSubData
-        void updateDataBufferSubData(DataBufferHandle h, uint64_t offset, uint64_t size, const void* data) override;
+        void updateDataBufferSubData(DataBufferHandle h, size_t offset, size_t size, const void* data) override;
 
         /// \copydoc IRenderDevice::bindDataBufferBase
         void bindDataBufferBase(DataBufferHandle h) override;

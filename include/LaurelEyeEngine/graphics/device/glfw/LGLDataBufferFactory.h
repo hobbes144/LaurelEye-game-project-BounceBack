@@ -11,7 +11,6 @@
 
 #include <glad/glad.h>
 
-#include <cstdint>
 #include <unordered_map>
 
 namespace LaurelEye::Graphics {
@@ -37,7 +36,7 @@ namespace LaurelEye::Graphics {
         ~LGLDataBufferFactory();
 
         /// \copydoc IRenderDevice::createDataBuffer
-        [[nodiscard]] DataBufferHandle createBuffer(const DataBufferDesc& d, const void* initialData = nullptr);
+        [[nodiscard]] DataBufferHandle createBuffer(const DataBufferDesc& d, const void* initialData = nullptr, const std::string& debugName = "LEUnnamed");
 
         /// \copydoc IRenderDevice::destroyDataBuffer
         void destroyBuffer(DataBufferHandle h);
@@ -49,7 +48,7 @@ namespace LaurelEye::Graphics {
         // void advanceBufferFrames();
 
         /// \copydoc IRenderDevice::updateDataBufferSubData
-         void updateSubData(DataBufferHandle h, uint64_t offset, uint64_t size, const void* data);
+         void updateSubData(DataBufferHandle h, size_t offset, size_t size, const void* data);
 
         // void updateWholeData(DataBufferHandle h, uint64_t size, const void* data);
 

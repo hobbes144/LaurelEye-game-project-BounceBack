@@ -232,15 +232,15 @@ namespace LaurelEye::Graphics {
     /// @param d Data Buffer description
     /// @param initialData Initial data (This must be the same as d.sizeBytes)
     /// @return DataBufferHandle
-    DataBufferHandle LGLRenderDevice::createDataBuffer(const DataBufferDesc& d, const void* initialData) {
-        return dataBufferFactory->createBuffer(d, initialData);
+    DataBufferHandle LGLRenderDevice::createDataBuffer(const DataBufferDesc& d, const void* initialData, const std::string& debugName) {
+        return dataBufferFactory->createBuffer(d, initialData, debugName);
     }
 
     void LGLRenderDevice::destroyDataBuffer(DataBufferHandle h) {
         dataBufferFactory->destroyBuffer(h);
     }
 
-    void LGLRenderDevice::updateDataBufferSubData(DataBufferHandle h, uint64_t offset, uint64_t size, const void* data) {
+    void LGLRenderDevice::updateDataBufferSubData(DataBufferHandle h, size_t offset, size_t size, const void* data) {
         dataBufferFactory->updateSubData(h, offset, size, data);
     }
 

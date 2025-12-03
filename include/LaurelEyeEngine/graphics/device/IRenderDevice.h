@@ -60,7 +60,7 @@ namespace LaurelEye::Graphics {
         /// behavior.
         ///
         /// @return Handle of the Data Buffer.
-        [[nodiscard]] virtual DataBufferHandle createDataBuffer(const DataBufferDesc& d, const void* init = nullptr) = 0;
+        [[nodiscard]] virtual DataBufferHandle createDataBuffer(const DataBufferDesc& d, const void* init = nullptr, const std::string& debugName = "LEUnnamed") = 0;
 
         /// @brief Destroy a Data Buffer.
         ///
@@ -78,7 +78,7 @@ namespace LaurelEye::Graphics {
         /// @param offset Offset to begin writing to.
         /// @param size Size of data in bytes to write.
         /// @param data Pointer to data to be written.
-        virtual void updateDataBufferSubData(DataBufferHandle h, uint64_t offset, uint64_t size, const void* data) = 0;
+        virtual void updateDataBufferSubData(DataBufferHandle h, size_t offset, size_t size, const void* data) = 0;
 
         /// @brief Bind a Data Buffer to use in a shader.
         ///

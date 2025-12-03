@@ -5,42 +5,57 @@
 /// @date    10-14-2025
 /// @brief Implementation of RenderSystem
 
+#include "LaurelEyeEngine/graphics/RenderSystem.h"
+
+// System headers
 #include "LaurelEyeEngine/ecs/Entity.h"
 #include "LaurelEyeEngine/ecs/ISystem.h"
+
+// Device headers
+#include "LaurelEyeEngine/graphics/device/glfw/LGLRenderDevice.h"
 #include "LaurelEyeEngine/graphics/Graphics.h"
 
-#include "LaurelEyeEngine/graphics/graphics_components/UIComponent.h"
-#include "LaurelEyeEngine/graphics/MeshManager.h"
-#include "LaurelEyeEngine/graphics/renderpass/DeferredRenderPass.h"
-#include "LaurelEyeEngine/graphics/renderpass/ParticleRenderPass.h"
-#include "LaurelEyeEngine/graphics/renderpass/SkydomePass.h"
+// Utility headers
 #include "LaurelEyeEngine/graphics/RenderStateSaver.h"
-#include "LaurelEyeEngine/graphics/resources/DataBuffer.h"
-#include "LaurelEyeEngine/graphics/resources/Lights.h"
-#include "LaurelEyeEngine/graphics/resources/RenderMesh.h"
-#include "LaurelEyeEngine/graphics/resources/Shadow.h"
-#include "LaurelEyeEngine/graphics/resources/SizeRegistry.h"
-#include "LaurelEyeEngine/graphics/ShadowManager.h"
+
+// Surface headers
 #include "LaurelEyeEngine/graphics/surface/glfw/LGlfwOpenGLWindowSurface.h"
 #include "LaurelEyeEngine/graphics/surface/IWindowSurfaceProvider.h"
 
-#include "LaurelEyeEngine/graphics/device/glfw/LGLRenderDevice.h"
+// Manager headers
+#include "LaurelEyeEngine/graphics/MeshManager.h"
+#include "LaurelEyeEngine/graphics/ShaderManager.h"
+#include "LaurelEyeEngine/graphics/ShadowManager.h"
+#include "LaurelEyeEngine/graphics/SkeletonManager.h"
 
+// Resource headers
+#include "LaurelEyeEngine/graphics/resources/DataBuffer.h"
+#include "LaurelEyeEngine/graphics/resources/FrameContext.h"
+#include "LaurelEyeEngine/graphics/resources/Lights.h"
+#include "LaurelEyeEngine/graphics/resources/RenderMesh.h"
+#include "LaurelEyeEngine/graphics/resources/RenderResources.h"
+#include "LaurelEyeEngine/graphics/resources/Shadow.h"
+#include "LaurelEyeEngine/graphics/resources/SizeRegistry.h"
+#include "LaurelEyeEngine/io/Assets.h"
+
+// Component headers
 #include "LaurelEyeEngine/graphics/graphics_components/AmbientLightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/CameraComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/DirectionalLightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/LightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/Renderable3DComponent.h"
-// #include "LaurelEyeEngine/graphics/renderpass/SingleBufferedDataPass.h"
+#include "LaurelEyeEngine/graphics/graphics_components/UIComponent.h"
+
+// Render pass Headers
 #include "LaurelEyeEngine/graphics/renderpass/DebugDrawRenderPass.h"
+#include "LaurelEyeEngine/graphics/renderpass/DeferredRenderPass.h"
 #include "LaurelEyeEngine/graphics/renderpass/GBufferPass.h"
+#include "LaurelEyeEngine/graphics/renderpass/ParticleRenderPass.h"
 #include "LaurelEyeEngine/graphics/renderpass/SinglePass.h"
 #include "LaurelEyeEngine/graphics/renderpass/SinglePassShadow.h"
+#include "LaurelEyeEngine/graphics/renderpass/SkydomePass.h"
 #include "LaurelEyeEngine/graphics/renderpass/UIPass.h"
-#include "LaurelEyeEngine/graphics/RenderSystem.h"
-#include "LaurelEyeEngine/graphics/resources/FrameContext.h"
-#include "LaurelEyeEngine/graphics/resources/RenderResources.h"
-#include "LaurelEyeEngine/graphics/ShaderManager.h"
+// #include "LaurelEyeEngine/graphics/renderpass/SingleBufferedDataPass.h"
 
 #include <memory>
 #include <stdexcept>
@@ -138,6 +153,7 @@ namespace LaurelEye::Graphics {
         tempShadowManager = std::make_unique<ShadowManager>(tempRenderResources.get());
 
         meshManager = std::make_unique<MeshManager>(*tempRenderResources.get());
+        skeletonManager = std::make_unique<SkeletonManager>();
     }
 
     void RenderSystem::setCurrentCamera(CameraComponent* currCamera) {
@@ -296,6 +312,7 @@ namespace LaurelEye::Graphics {
     }
 
     void RenderSystem::shutdown() {
+        skeletonManager = nullptr;
         meshManager->destroyAllMeshes();
         meshManager = nullptr;
         tempShadowManager = nullptr;
@@ -328,27 +345,29 @@ namespace LaurelEye::Graphics {
                 TextureHandle handle = tempRenderResources->createTexture(texAsset->getName(), desc, "ImageImporter", texAsset->pixelData.data());
                 renderComponent->GetMaterial()->setTexture("mainTexture", handle);
                 renderComponent->GetMaterial()->setProperty<int>("useTexture", 1);
+                // renderComponent->SetImageAsset(nullptr);
             }
-            if ( auto skinnedMeshAsset = renderComponent->GetSkinnedMeshAsset() ) {
-                auto meshHandle = meshManager->getHandle(skinnedMeshAsset->getName());
-                if ( !isValidMesh(meshHandle) ) {
-                    meshHandle = meshManager->createSkinnedMesh(skinnedMeshAsset->getName(), skinnedMeshAsset->vertices.data(), skinnedMeshAsset->vertices.size(), skinnedMeshAsset->indices.data(), skinnedMeshAsset->indices.size(), 4);
+            if ( std::shared_ptr<IO::MeshAsset> meshAsset = renderComponent->GetMeshAsset() ) {
+                MeshHandle handle = meshManager->getHandle(meshAsset->getName());
+                if ( !isValidMesh(handle) ) {
+                    if ( auto skinnedMeshAsset = std::dynamic_pointer_cast<IO::SkinnedMeshAsset>(meshAsset) ) {
+                        auto skeletonHandle = skeletonManager->createSkeleton(
+                            *(skinnedMeshAsset->skeleton.get()));
+                        handle = meshManager->createSkinnedMesh(skinnedMeshAsset.get(), skeletonHandle);
+                        skinnedMeshAsset->skeleton = nullptr;
+                    }
+                    else {
+                        handle = meshManager->createMesh(meshAsset.get());
+                    }
                 }
-                auto meshResource = meshManager->getMesh(meshHandle);
+                auto meshResource = meshManager->getMesh(handle);
 
-                renderComponent->SetMesh(meshHandle);
-                renderComponent->SetMeshTempAttr(meshResource->gpu.vao, meshResource->gpu.indexCount);
-            }
-            else if ( std::shared_ptr<IO::MeshAsset> meshAsset = renderComponent->GetMeshAsset() ) {
-                // auto meshObj = Graphics::Mesh::createMeshFromAsset(meshAsset);
-                auto meshHandle = meshManager->getHandle(meshAsset->getName());
-                if ( !isValidMesh(meshHandle) ) {
-                    meshHandle = meshManager->createMesh(meshAsset->getName(), meshAsset->vertices.data(), meshAsset->vertices.size(), meshAsset->indices.data(), meshAsset->indices.size());
-                }
-                auto meshResource = meshManager->getMesh(meshHandle);
-
-                renderComponent->SetMesh(meshHandle);
-                renderComponent->SetMeshTempAttr(meshResource->gpu.vao, meshResource->gpu.indexCount);
+                renderComponent->SetMesh(handle);
+                renderComponent->SetMeshTempAttr(
+                    meshResource->gpu.vao,
+                    meshResource->gpu.indexCount,
+                    meshResource->skinDataBuffer);
+                // renderComponent->SetMeshAsset(nullptr);
             }
             else if ( renderComponent->GetMeshPrimitiveType() != PrimitiveMeshType::Invalid ) {
                 auto meshHandle = meshManager->createPrimitiveMesh(renderComponent->GetMeshPrimitiveType());
@@ -417,26 +436,27 @@ namespace LaurelEye::Graphics {
         // NOTE: Ideally no meshes should be created here, but instead be
         // created by the scene. That would ensure efficient mesh resource
         // handling and safer creation and deletion of duplicates.
-        if ( auto skinnedMeshAsset = uiComponent->GetSkinnedMeshAsset() ) {
-            auto meshHandle = meshManager->getHandle(skinnedMeshAsset->getName());
-            if ( !isValidMesh(meshHandle) ) {
-                meshHandle = meshManager->createSkinnedMesh(skinnedMeshAsset->getName(), skinnedMeshAsset->vertices.data(), skinnedMeshAsset->vertices.size(), skinnedMeshAsset->indices.data(), skinnedMeshAsset->indices.size(), 4);
+        if ( std::shared_ptr<IO::MeshAsset> meshAsset = uiComponent->GetMeshAsset() ) {
+            MeshHandle handle = meshManager->getHandle(meshAsset->getName());
+            if ( !isValidMesh(handle) ) {
+                if ( auto skinnedMeshAsset = std::dynamic_pointer_cast<IO::SkinnedMeshAsset>(meshAsset) ) {
+                    auto skeletonHandle = skeletonManager->createSkeleton(
+                        *(skinnedMeshAsset->skeleton.get()));
+                    handle = meshManager->createSkinnedMesh(skinnedMeshAsset.get(), skeletonHandle);
+                    skinnedMeshAsset->skeleton = nullptr;
+                }
+                else {
+                    handle = meshManager->createMesh(meshAsset.get());
+                }
             }
-            auto meshResource = meshManager->getMesh(meshHandle);
+            auto meshResource = meshManager->getMesh(handle);
 
-            uiComponent->SetMesh(meshHandle);
-            uiComponent->SetMeshTempAttr(meshResource->gpu.vao, meshResource->gpu.indexCount);
-        }
-        else if ( std::shared_ptr<IO::MeshAsset> meshAsset = uiComponent->GetMeshAsset() ) {
-            // auto meshObj = Graphics::Mesh::createMeshFromAsset(meshAsset);
-            auto meshHandle = meshManager->getHandle(meshAsset->getName());
-            if ( !isValidMesh(meshHandle) ) {
-                meshHandle = meshManager->createMesh(meshAsset->getName(), meshAsset->vertices.data(), meshAsset->vertices.size(), meshAsset->indices.data(), meshAsset->indices.size());
-            }
-            auto meshResource = meshManager->getMesh(meshHandle);
-
-            uiComponent->SetMesh(meshHandle);
-            uiComponent->SetMeshTempAttr(meshResource->gpu.vao, meshResource->gpu.indexCount);
+            uiComponent->SetMesh(handle);
+            uiComponent->SetMeshTempAttr(
+                meshResource->gpu.vao,
+                meshResource->gpu.indexCount,
+                meshResource->skinDataBuffer);
+            // uiComponent->SetMeshAsset(nullptr);
         }
         else if ( uiComponent->GetMeshPrimitiveType() != PrimitiveMeshType::Invalid ) {
             auto meshHandle = meshManager->createPrimitiveMesh(uiComponent->GetMeshPrimitiveType());
@@ -446,6 +466,7 @@ namespace LaurelEye::Graphics {
             uiComponent->SetMeshTempAttr(meshResource->gpu.vao, meshResource->gpu.indexCount);
         }
         else {
+            uiComponent->SetMeshPrimitiveType(PrimitiveMeshType::Square);
             auto meshHandle = meshManager->createPrimitiveMesh(PrimitiveMeshType::Square);
             auto meshResource = meshManager->getMesh(meshHandle);
 
@@ -507,13 +528,13 @@ namespace LaurelEye::Graphics {
 
     void RenderSystem::deregisterUIComponent(const ComponentPtr component) {
         auto renderComponent = static_cast<UIComponent*>(component);
-        auto mat = renderComponent->GetMaterial();
 
         // If the material has a texture, release it from GPU
 
         // WARNING: Refer to the warning note for meshes, the same applies to
         // textures.
         //
+        // auto mat = renderComponent->GetMaterial();
         // if ( auto texAsset = renderComponent->GetImageAsset() ) {
         //     const std::string& texName = texAsset->getName();
         //     if ( tempRenderResources->texture(texName) != InvalidTexture ) {
@@ -640,7 +661,7 @@ namespace LaurelEye::Graphics {
         camera->setCameraBufferHandle(device->createDataBuffer(DataBufferDesc{
             DataBufferType::UBO, DataBufferUpdateMode::Dynamic,
             sizeof(Camera),
-            DataBuffer::CameraDataBinding}));
+            DataBuffer::CameraDataBinding}, nullptr, "CameraData"));
         camera->setInitStatus(true);
     }
 
@@ -691,7 +712,7 @@ namespace LaurelEye::Graphics {
                 DataBufferUpdateMode::Dynamic,
                 sizeof(GlobalLights),
                 DataBuffer::GlobalLightDataBinding},
-            &globalLights);
+            &globalLights, "GlobalLightData");
     }
 
     void RenderSystem::updateGlobalLights() const {

@@ -1,6 +1,10 @@
 ﻿#include "LaurelEyeEngine/graphics/MeshManager.h"
+#include "LaurelEyeEngine/graphics/resources/DataBuffer.h"
 #include "LaurelEyeEngine/graphics/resources/RenderMesh.h"
-#include "LaurelEyeEngine/graphics/resources/RenderMeshResource.h"
+#include "LaurelEyeEngine/graphics/resources/RenderResources.h"
+#include "LaurelEyeEngine/io/Assets.h"
+#include "LaurelEyeEngine/math/Matrix4.h"
+#include <cstdint>
 
 namespace LaurelEye::Graphics {
 
@@ -13,7 +17,7 @@ namespace LaurelEye::Graphics {
 
     MeshHandle MeshManager::allocateMeshHandle(const std::string& name) {
         MeshHandle handle = static_cast<MeshHandle>(meshes.size());
-        meshes.push_back(RenderMeshResource{});
+        meshes.push_back(RenderMesh{});
         meshes.back().handle = handle;
         meshes.back().name = name;
         meshNames[name] = handle;
@@ -29,14 +33,44 @@ namespace LaurelEye::Graphics {
         return it->second;
     }
 
-    const RenderMeshResource* MeshManager::getMesh(MeshHandle h) const {
+    const RenderMesh* MeshManager::getMesh(MeshHandle h) const {
         if ( !isValidMesh(h) || h >= meshes.size() ) return nullptr;
         return &meshes[h];
     }
 
-    RenderMeshResource* MeshManager::getMesh(MeshHandle h) {
+    RenderMesh* MeshManager::getMesh(MeshHandle h) {
         if ( !isValidMesh(h) || h >= meshes.size() ) return nullptr;
         return &meshes[h];
+    }
+
+    MeshHandle MeshManager::createMesh(const IO::MeshAsset* asset) {
+
+        MeshHandle handle = getHandle(asset->getName());
+        if ( isValidMesh(handle) ) return handle;
+
+        return createMesh(asset->getName(),
+                          asset->vertices.data(),
+                          asset->vertices.size(),
+                          asset->indices.data(),
+                          asset->indices.size());
+    }
+
+    MeshHandle MeshManager::createSkinnedMesh(const IO::SkinnedMeshAsset* asset,
+                                              SkeletonHandle skeleton,
+                                              uint32_t maxBonesPerVertex) {
+
+        MeshHandle handle = getHandle(asset->getName());
+        if ( isValidMesh(handle) ) return handle;
+
+        return createSkinnedMesh(asset->getName(),
+                                 asset->vertices.data(),
+                                 asset->vertices.size(),
+                                 asset->indices.data(),
+                                 asset->indices.size(),
+                                 asset->inverseBindMatrices.data(),
+                                 asset->skeleton->bones.size(),
+                                 skeleton,
+                                 maxBonesPerVertex);
     }
 
     MeshHandle MeshManager::createMesh(
@@ -46,8 +80,11 @@ namespace LaurelEye::Graphics {
         const uint32_t* indices,
         uint32_t indexCount) {
 
-        MeshHandle handle = allocateMeshHandle(name);
-        RenderMeshResource& mesh = meshes[handle];
+        MeshHandle handle = getHandle(name);
+        if ( isValidMesh(handle) ) return handle;
+
+        handle = allocateMeshHandle(name);
+        RenderMesh& mesh = meshes[handle];
 
         mesh.gpu = createGpuMeshForStatic(name, vertices, vertexCount, indices, indexCount);
         // mesh.localBounds = computeLocalBounds(vertices, vertexCount);
@@ -63,21 +100,58 @@ namespace LaurelEye::Graphics {
         uint32_t vertexCount,
         const uint32_t* indices,
         uint32_t indexCount,
-        // SkeletonHandle skeleton,
-        // const Matrix4* inverseBindMatrices,
+        const Matrix4* inverseBindMatrices,
         uint32_t boneCount,
+        SkeletonHandle skeleton,
         uint32_t maxBonesPerVertex) {
-        MeshHandle handle = allocateMeshHandle(name);
-        RenderMeshResource& mesh = meshes[handle];
+
+        MeshHandle handle = getHandle(name);
+        if ( isValidMesh(handle) ) return handle;
+
+        handle = allocateMeshHandle(name);
+        RenderMesh& mesh = meshes[handle];
 
         // GPU resources for this skinned mesh
         mesh.gpu = createGpuMeshForSkinned(name, vertices, vertexCount, indices, indexCount, maxBonesPerVertex);
         // mesh.localBounds = computeLocalBounds(vertices, vertexCount);
 
-        // Skin data stored directly on the mesh
-        // mesh.skeleton = skeleton;
-        // mesh.inverseBindMatrices.assign(inverseBindMatrices, inverseBindMatrices + boneCount);
+        // Skin weight data stored directly on the mesh
+        mesh.skeleton = skeleton;
+        mesh.inverseBindMatrices.assign(inverseBindMatrices, inverseBindMatrices + boneCount);
         mesh.maxBonesPerVertex = maxBonesPerVertex;
+
+        // Setup SkinData for buffer
+        struct SkinHeader {
+            uint32_t boneCount;
+            uint32_t _pad[3]; // pad to 16 bytes
+        };
+
+        SkinHeader header{};
+        header.boneCount = boneCount;
+
+        std::size_t bufferSize = sizeof(SkinHeader) + boneCount * sizeof(Matrix4);
+
+        std::vector<std::byte> blob(bufferSize);
+
+        // copy header
+        std::memcpy(blob.data(), &header, sizeof(SkinHeader));
+
+        // copy matrices right after header
+        std::memcpy(blob.data() + sizeof(SkinHeader),
+                    mesh.inverseBindMatrices.data(),
+                    boneCount * sizeof(Matrix4));
+
+        // Create Skin inverseBindMatrices UBO
+        mesh.skinDataBuffer = renderResources.createDataBuffer(
+            name + ":IBM",
+            DataBufferDesc{
+                DataBufferType::SSBO,
+                DataBufferUpdateMode::Static,
+                bufferSize,
+                DataBuffer::InverseBindMatricesBinding},
+            "meshManager:inverseBindMatrices",
+            blob.data()
+        );
 
         mesh.alive = true;
 
@@ -94,7 +168,7 @@ namespace LaurelEye::Graphics {
     //     const std::vector<uint32_t>& meshBoneIndices // mapping from mesh bones -> skeleton bones
     // ) {
     //     MeshHandle handle = allocateMeshHandle(name);
-    //     RenderMeshResource& mesh = meshes[handle];
+    //     RenderMesh& mesh = meshes[handle];
     //
     //     // Skeleton* skeleton = skeletonManager.getSkeleton(skeletonHandle);
     //     // assume skeleton != nullptr
@@ -122,7 +196,7 @@ namespace LaurelEye::Graphics {
     void MeshManager::destroyMesh(MeshHandle h) {
         if ( !isValidMesh(h) || h >= meshes.size() ) return;
 
-        RenderMeshResource& mesh = meshes[h];
+        RenderMesh& mesh = meshes[h];
 
         if ( !mesh.alive ) return;
 
@@ -262,42 +336,42 @@ namespace LaurelEye::Graphics {
         vaoDesc.attributes.push_back(VertexAttributeDesc{
             .location = 0,
             .bindingIndex = 0,
-            .relativeOffset = static_cast<uint32_t>(offsetof(SkinnedMeshVertex, position)),
+            .relativeOffset = offsetof(SkinnedMeshVertex, position),
             .format = VertexAttribFormat::Float32x3});
 
         // layout(location = 1) in vec3 aNormal;
         vaoDesc.attributes.push_back(VertexAttributeDesc{
             .location = 1,
             .bindingIndex = 0,
-            .relativeOffset = static_cast<uint32_t>(offsetof(SkinnedMeshVertex, normal)),
+            .relativeOffset = offsetof(SkinnedMeshVertex, normal),
             .format = VertexAttribFormat::Float32x3});
 
         // layout(location = 2) in vec2 aUV;
         vaoDesc.attributes.push_back(VertexAttributeDesc{
             .location = 2,
             .bindingIndex = 0,
-            .relativeOffset = static_cast<uint32_t>(offsetof(SkinnedMeshVertex, uv)),
+            .relativeOffset = offsetof(SkinnedMeshVertex, uv),
             .format = VertexAttribFormat::Float32x2});
 
         // layout(location = 3) in vec3 aTangents;
         vaoDesc.attributes.push_back(VertexAttributeDesc{
             .location = 3,
             .bindingIndex = 0,
-            .relativeOffset = static_cast<uint32_t>(offsetof(MeshVertex, tangent)),
+            .relativeOffset = offsetof(MeshVertex, tangent),
             .format = VertexAttribFormat::Float32x3});
 
         // layout(location = 3) in vec4 aBoneIndicesEncoded;  // we'll decode ints in shader
         vaoDesc.attributes.push_back(VertexAttributeDesc{
             .location = 4,
             .bindingIndex = 0,
-            .relativeOffset = static_cast<uint32_t>(offsetof(SkinnedMeshVertex, boneIndices)),
+            .relativeOffset = offsetof(SkinnedMeshVertex, boneIndices),
             .format = VertexAttribFormat::Uint8x4Norm});
 
         // layout(location = 4) in vec4 aBoneWeights;
         vaoDesc.attributes.push_back(VertexAttributeDesc{
             .location = 5,
             .bindingIndex = 0,
-            .relativeOffset = static_cast<uint32_t>(offsetof(SkinnedMeshVertex, boneWeights)),
+            .relativeOffset = offsetof(SkinnedMeshVertex, boneWeights),
             .format = VertexAttribFormat::Float32x4});
 
         vaoDesc.indexBuffer = gpu.indexBuffer;

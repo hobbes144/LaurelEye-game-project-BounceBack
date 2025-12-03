@@ -92,7 +92,7 @@ namespace LaurelEye::Audio {
 
         void createSound(const std::string& name, const std::string& path, float volume = 1.0f, bool is3D = false, bool loop = false) override;
         void loadSound(const std::string& name) override;
-        void loadSoundImmidiate(const std::string& name);
+        void loadSoundImmidiate(const std::string& name) override;
         void playSound(const std::string& name) override;
         void stopSound(const std::string& name) override;
 

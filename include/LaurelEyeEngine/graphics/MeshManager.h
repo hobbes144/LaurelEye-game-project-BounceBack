@@ -10,13 +10,17 @@
 #pragma once
 
 #include "LaurelEyeEngine/graphics/resources/RenderMesh.h"
-#include "LaurelEyeEngine/graphics/resources/RenderMeshResource.h"
-#include "LaurelEyeEngine/graphics/resources/RenderResources.h"
+// #include "LaurelEyeEngine/graphics/resources/RenderResources.h"
+#include "LaurelEyeEngine/io/Assets.h"
 #include "LaurelEyeEngine/math/Transform.h"
+
 #include <cstdint>
+#include <unordered_map>
 #include <vector>
 
 namespace LaurelEye::Graphics {
+
+    class RenderResources;
 
     class MeshManager {
     public:
@@ -37,6 +41,11 @@ namespace LaurelEye::Graphics {
         MeshHandle createCubeMesh(const std::string& name,
                                   float scale = 1.0f);
 
+        MeshHandle createMesh(const IO::MeshAsset* asset);
+        MeshHandle createSkinnedMesh(const IO::SkinnedMeshAsset* asset,
+                                     SkeletonHandle skeleton,
+                                     uint32_t maxBonesPerVertex = 4);
+
         MeshHandle createMesh(
             const std::string& name,
             const MeshVertex* vertices,
@@ -51,9 +60,9 @@ namespace LaurelEye::Graphics {
             uint32_t vertexCount,
             const uint32_t* indices,
             uint32_t indexCount,
-            // SkeletonHandle skeleton,
-            // const Matrix4* inverseBindMatrices,
+            const Matrix4* inverseBindMatrices,
             uint32_t boneCount,
+            SkeletonHandle skeleton,
             uint32_t maxBonesPerVertex = 4);
 
         // MeshHandle createSkinnedMesh(
@@ -68,8 +77,8 @@ namespace LaurelEye::Graphics {
 
         MeshHandle getHandle(const std::string& name) const;
 
-        const RenderMeshResource* getMesh(MeshHandle h) const;
-        RenderMeshResource* getMesh(MeshHandle h);
+        const RenderMesh* getMesh(MeshHandle h) const;
+        RenderMesh* getMesh(MeshHandle h);
 
         void destroyMesh(MeshHandle h);
 
@@ -78,7 +87,7 @@ namespace LaurelEye::Graphics {
     private:
         RenderResources& renderResources;
         // SkeletonMaanger& skeletonManager;
-        std::vector<RenderMeshResource> meshes;
+        std::vector<RenderMesh> meshes;
         std::unordered_map<std::string, MeshHandle> meshNames;
         std::unordered_map<PrimitiveMeshType, MeshHandle> primitiveMeshes;
 

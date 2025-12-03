@@ -9,6 +9,8 @@
 
 #include "LaurelEyeEngine/graphics/resources/DataBuffer.h"
 
+#include <GL/gl.h>
+#include <GL/glext.h>
 #include <stdexcept>
 
 namespace LaurelEye::Graphics {
@@ -17,7 +19,7 @@ namespace LaurelEye::Graphics {
         destroyAll();
     }
 
-    DataBufferHandle LGLDataBufferFactory::createBuffer(const DataBufferDesc& d, const void* initialData) {
+    DataBufferHandle LGLDataBufferFactory::createBuffer(const DataBufferDesc& d, const void* initialData, const std::string& debugName) {
         LGLDataBufferRecord r{};
         r.desc = d;
 
@@ -35,6 +37,11 @@ namespace LaurelEye::Graphics {
         // Create the buffer
         glCreateBuffers(1, &r.id);
         glNamedBufferStorage(r.id, (GLsizeiptr)d.sizeBytes, initialData, flags);
+
+#if !defined(NDEBUG)
+        std::cout << "Created buffer: " << debugName << std::endl;
+        glObjectLabel(GL_BUFFER, r.id, -1, debugName.c_str());
+#endif
 
         DataBufferHandle h = r.id;
 
@@ -79,8 +86,8 @@ namespace LaurelEye::Graphics {
         createdBuffers.clear();
     }
 
-    void LGLDataBufferFactory::updateSubData(DataBufferHandle h, uint64_t offset, uint64_t size, const void* data) {
-        glNamedBufferSubData(h, offset, size, data);
+    void LGLDataBufferFactory::updateSubData(DataBufferHandle h, size_t offset, size_t size, const void* data) {
+        glNamedBufferSubData(h, (GLintptr)offset, (GLsizeiptr)size, data);
     }
 
     // This is for resize, we don't do this right now so skipping.

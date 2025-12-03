@@ -37,6 +37,7 @@ namespace LaurelEye::Graphics {
 
     class IRenderDevice;
     class MeshManager;
+    class SkeletonManager;
 
     // temp
     class LightComponent;
@@ -140,6 +141,10 @@ namespace LaurelEye::Graphics {
             return meshManager.get();
         }
 
+        SkeletonManager* getSkeletonManager() {
+            return skeletonManager.get();
+        }
+
         void setClearColor(float r, float g, float b, float a = 1.0f) {
             config.clearColor = Vector4(r, g, b, a);
         }
@@ -186,6 +191,9 @@ namespace LaurelEye::Graphics {
 
         /// @bried Mesh Manager
         std::unique_ptr<MeshManager> meshManager;
+
+        /// @brief Skeleton Manager
+        std::unique_ptr<SkeletonManager> skeletonManager;
 
         /// @brief Temporary rendering resource storage used during frame execution.
         std::unique_ptr<RenderResources> tempRenderResources;

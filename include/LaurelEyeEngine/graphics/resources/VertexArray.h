@@ -32,15 +32,15 @@ namespace LaurelEye::Graphics {
     struct VertexBufferBindingDesc {
         DataBufferHandle buffer; ///< Must be DataBufferType::Vertex
         uint32_t bindingIndex;   ///< glVertexArrayVertexBuffer binding slot
-        uint32_t stride;         ///< Size of one vertex in bytes
-        uint32_t offset;         ///< Byte offset to first vertex in buffer (usually 0)
+        size_t stride;         ///< Size of one vertex in bytes
+        size_t offset;         ///< Byte offset to first vertex in buffer (usually 0)
     };
 
     /// @brief Description of one vertex attribute (position, normal, UV, etc).
     struct VertexAttributeDesc {
         uint32_t location;       ///< Shader location (layout(location = X))
         uint32_t bindingIndex;   ///< Which vertex stream this attribute reads from
-        uint32_t relativeOffset; ///< Offset within one vertex element (struct) in bytes
+        size_t relativeOffset; ///< Offset within one vertex element (struct) in bytes
         VertexAttribFormat format;
     };
 

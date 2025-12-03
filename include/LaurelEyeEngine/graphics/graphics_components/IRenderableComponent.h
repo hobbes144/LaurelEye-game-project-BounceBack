@@ -10,6 +10,7 @@
 #pragma once
 
 #include "LaurelEyeEngine/graphics/graphics_components/IRenderComponent.h"
+#include "LaurelEyeEngine/graphics/resources/DataBuffer.h"
 #include "LaurelEyeEngine/graphics/resources/Material.h"
 #include "LaurelEyeEngine/graphics/resources/RenderMesh.h"
 #include "LaurelEyeEngine/graphics/resources/VertexArray.h"
@@ -62,9 +63,15 @@ namespace LaurelEye::Graphics {
             return *this;
         }
 
-        IRenderableComponent& SetMeshTempAttr(VertexArrayHandle _vao, uint32_t _indexCount) {
+        IRenderableComponent& SetMeshTempAttr(
+            VertexArrayHandle _vao,
+            uint32_t _indexCount,
+            DataBufferHandle _skinDataBuffer = DataBuffer::InvalidDataBuffer) {
+
             vao = _vao;
             indexCount = _indexCount;
+            skinDataBuffer = _skinDataBuffer;
+
             return *this;
         }
 
@@ -106,8 +113,9 @@ namespace LaurelEye::Graphics {
 
         // Temporary until FrameContext properly uses RenderRegistry which
         // stores the actual GPU values.
-        VertexArrayHandle vao;
-        uint32_t indexCount;
+        VertexArrayHandle vao = VertexArray::InvalidVertexArray;
+        uint32_t indexCount = 0;
+        DataBufferHandle skinDataBuffer = DataBuffer::InvalidDataBuffer;
 
     protected:
         /// @brief Shared pointer to the mesh resource.

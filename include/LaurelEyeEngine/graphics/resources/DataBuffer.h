@@ -34,6 +34,8 @@ namespace LaurelEye::Graphics {
         static constexpr uint32_t CameraDataBinding = 0;
         static constexpr uint32_t GlobalLightDataBinding = 1;
         static constexpr uint32_t LocalLightDataBinding = 2;
+        static constexpr uint32_t InverseBindMatricesBinding = 3;
+        static constexpr uint32_t AnimationDataBinding = 4;
         static constexpr uint32_t ShaderDataBinding = 10;
 
     } // namespace DataBuffer
@@ -72,12 +74,12 @@ namespace LaurelEye::Graphics {
     struct DataBufferDesc {
         DataBufferType type;
         DataBufferUpdateMode mode{DataBufferUpdateMode::Dynamic};
-        uint64_t sizeBytes{0};
+        size_t sizeBytes{0};
         uint32_t bindingPoint{0};
     };
 
     // Optional convenience helpers (nice for call-sites, but not required)
-    inline DataBufferDesc makeUBODesc(uint64_t sizeBytes,
+    inline DataBufferDesc makeUBODesc(size_t sizeBytes,
                                       uint32_t bindingPoint,
                                       DataBufferUpdateMode mode = DataBufferUpdateMode::Dynamic) {
         return DataBufferDesc{
@@ -87,7 +89,7 @@ namespace LaurelEye::Graphics {
             .bindingPoint = bindingPoint};
     }
 
-    inline DataBufferDesc makeSSBODesc(uint64_t sizeBytes,
+    inline DataBufferDesc makeSSBODesc(size_t sizeBytes,
                                        uint32_t bindingPoint,
                                        DataBufferUpdateMode mode = DataBufferUpdateMode::Dynamic) {
         return DataBufferDesc{
@@ -97,7 +99,7 @@ namespace LaurelEye::Graphics {
             .bindingPoint = bindingPoint};
     }
 
-    inline DataBufferDesc makeVertexBufferDesc(uint64_t sizeBytes,
+    inline DataBufferDesc makeVertexBufferDesc(size_t sizeBytes,
                                                DataBufferUpdateMode mode = DataBufferUpdateMode::Static) {
         return DataBufferDesc{
             .type = DataBufferType::Vertex,
@@ -107,7 +109,7 @@ namespace LaurelEye::Graphics {
         };
     }
 
-    inline DataBufferDesc makeIndexBufferDesc(uint64_t sizeBytes,
+    inline DataBufferDesc makeIndexBufferDesc(size_t sizeBytes,
                                               DataBufferUpdateMode mode = DataBufferUpdateMode::Static) {
         return DataBufferDesc{
             .type = DataBufferType::Index,

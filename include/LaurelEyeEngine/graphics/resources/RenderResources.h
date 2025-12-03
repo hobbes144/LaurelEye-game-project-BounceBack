@@ -119,12 +119,12 @@ namespace LaurelEye::Graphics {
         void destroyDataBuffer(DataBufferHandle h);
         // void resizeDataBuffer(const std::string& name, uint32_t size);
         void updateDataBuffer(const std::string& name,
-                              uint64_t offset,
-                              uint64_t size,
+                              size_t offset,
+                              size_t size,
                               const void* data);
         void updateDataBuffer(DataBufferHandle h,
-                              uint64_t offset,
-                              uint64_t size,
+                              size_t offset,
+                              size_t size,
                               const void* data);
 
         [[nodiscard]] VertexArrayHandle createVertexArray(const std::string& name, const VertexArrayDesc& d,
