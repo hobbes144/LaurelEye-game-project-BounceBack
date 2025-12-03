@@ -54,6 +54,18 @@ namespace LaurelEye::IO {
         const auto meshBoneCount = skeletonAsset->bones.size();
         meshAsset->skeleton = skeletonAsset;
 
+        auto animationAsset = buildAnimation(path, scene, *skeletonAsset);
+        // TODO - can be adapted to a vector of animation assets later
+        meshAsset->animation = animationAsset;
+
+        // At this point:
+        // Skeleton's bone order has been established, so you need to set the
+        // order of inverseBindMatrices and animation channel Transform vectors
+        // to follow that order. Read the bone name and position in the
+        // Skeleton's Bone vector, and fill that index in the target vector.
+
+        // Add animation import code here.
+
         meshAsset->inverseBindMatrices.resize(meshBoneCount);
 
         for ( unsigned int m = 0; m < scene->mNumMeshes; ++m ) {
@@ -129,6 +141,88 @@ namespace LaurelEye::IO {
         buildSkeletonRecursive(scene->mRootNode, -1, *asset.get(), usedBoneNames);
 
         return asset;
+    }
+
+    std::shared_ptr<AnimationAsset> MeshImporter::buildAnimation(const std::string& path, const aiScene* scene, const SkeletonAsset& skeleton) {
+        if ( scene->mNumAnimations == 0 )
+            return nullptr;
+
+        // First anim for now
+        aiAnimation* aiAnim = scene->mAnimations[0];
+
+        auto anim = std::make_shared<AnimationAsset>(path);
+        anim->animName = aiAnim->mName.C_Str();
+        anim->duration = aiAnim->mDuration;
+        anim->ticksPerSecond = aiAnim->mTicksPerSecond != 0 ? aiAnim->mTicksPerSecond : 30.0;
+
+        // Skeleton order = animation channel index order, match here
+        size_t boneCount = skeleton.bones.size();
+        anim->reserveSize(boneCount);
+
+        // maps animation channels to skeleton bone indices
+        for ( unsigned int c = 0; c < aiAnim->mNumChannels; ++c ) {
+            aiNodeAnim* aiChannel = aiAnim->mChannels[c];
+            std::string boneName = aiChannel->mNodeName.C_Str();
+
+            // Find matching bone index in skeleton if it exists
+            auto it = skeleton.boneNameIndex.find(boneName);
+            if ( it == skeleton.boneNameIndex.end() )
+                continue;
+
+            size_t boneIndex = it->second;
+            AnimationAsset::Channel& ch = anim->channels[boneIndex];
+
+            // Determine number of keys
+            size_t keyCount = std::max({aiChannel->mNumPositionKeys,
+                                        aiChannel->mNumRotationKeys,
+                                        aiChannel->mNumScalingKeys});
+
+            ch.keyframe.reserve(keyCount);
+            ch.timeStamp.reserve(keyCount);
+
+            for ( size_t i = 0; i < keyCount; ++i ) {
+                Transform t;
+
+                // POSITION
+                if ( i < aiChannel->mNumPositionKeys ) {
+                    const auto& p = aiChannel->mPositionKeys[i].mValue;
+                    t.setPosition(p.x, p.y, p.z);
+                }
+                else t.setPosition(0, 0, 0);
+
+                // ROTATION
+                if ( i < aiChannel->mNumRotationKeys ) {
+                    const auto& r = aiChannel->mRotationKeys[i].mValue;
+                    t.setRotation(Quaternion(r.w, r.x, r.y, r.z));
+                }
+                else t.setRotation(Quaternion());
+
+                // SCALE
+                if ( i < aiChannel->mNumScalingKeys ) {
+                    const auto& s = aiChannel->mScalingKeys[i].mValue;
+                    t.setScaling(s.x, s.y, s.z);
+                }
+                else t.setScaling(1, 1, 1);
+
+                ch.keyframe.push_back(t);
+
+                // determine timestamp from the keys with the highest time
+                double tPos = (i < aiChannel->mNumPositionKeys)
+                                ? aiChannel->mPositionKeys[i].mTime
+                                : 0.0;
+                double tRot = (i < aiChannel->mNumRotationKeys)
+                                ? aiChannel->mRotationKeys[i].mTime
+                                : 0.0;
+                double tScale = (i < aiChannel->mNumScalingKeys)
+                                  ? aiChannel->mScalingKeys[i].mTime
+                                  : 0.0;
+
+                double tstamp = std::max({tPos, tRot, tScale});
+                ch.timeStamp.push_back(tstamp);
+            }
+        }
+
+        return anim;
     }
 
     void MeshImporter::addBoneData(SkinnedMeshAsset::SkinnedVertex& vertex, int boneIndex, float boneWeight) {

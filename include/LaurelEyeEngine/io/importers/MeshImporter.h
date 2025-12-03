@@ -39,6 +39,21 @@ namespace LaurelEye::IO {
     /// For now, after load into system, components will remove the pointers
     /// to the assets, since they don't need them anymore.
     ///
+    /// Note regarding future of this Importer:
+    /// Ideally we should change this to a general AssimpImporter maybe,
+    /// because Assimp can load a lot more than just models and animations.
+    ///
+    /// This AssimpImporter would independently read the fbx or other Assimp
+    /// supported file for all the asset names, such as meshes, materials,
+    /// skeletons, assets, and Node Graph. Then it only loads in the relevant
+    /// data based on what the Scene json file asks for from this file.
+    ///
+    /// We could have a flag saying use the file as the scene, in which case we
+    /// just create all the objects in the scene from the file along with the
+    /// tree from it. If we need only specific assets, we can send a list for
+    /// each resource type like a list of animations, meshes and so on that
+    /// should specifically be loaded.
+    ///
     class MeshImporter : public IAssetImporter {
     public:
         /// @brief Imports 3D meshes. Specifically uses assimp to populate a MeshAsset
@@ -55,6 +70,7 @@ namespace LaurelEye::IO {
                                     SkeletonAsset& skel,
                                     const std::unordered_set<std::string>& usedBoneNames);
         std::shared_ptr<SkeletonAsset> buildSkeleton(const std::string& path, const aiScene* scene);
+        std::shared_ptr<AnimationAsset> buildAnimation(const std::string& path, const aiScene* scene, const SkeletonAsset& skeleton);
         void addBoneData(SkinnedMeshAsset::SkinnedVertex& vertex, int boneIndex, float boneWeight);
 
         template <std::convertible_to<LaurelEye::Graphics::MeshVertex> TVertex>

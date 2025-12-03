@@ -67,6 +67,41 @@ namespace LaurelEye::IO {
         // std::unordered_map<Stage, std::string> entryPoints;
     };
 
+    /// @class AnimationAsset
+    /// @brief Animation info
+    ///
+    /// Each Channel stores one bone's animation keyframes.
+    /// Channels MUST be in the same vector order as the bones in the
+    /// SkeletonAsset and the MeshAsset.
+    ///
+    /// In the final implementation, ideally this should be loaded along with
+    /// the MeshAsset and SkeletonAsset in an AssetImporter that is specific to
+    /// files read by Assimp instead of something called a MeshImporter.
+    ///
+    struct AnimationAsset : public IAsset {
+        using IAsset::IAsset;
+
+        /// @class Channel
+        /// @brief Each channel holds one bone node's animation keyframes
+        ///
+        /// The number of Position, Rotation and Scale values will be equal.
+        /// Use length of any one of them to size the Transform and double
+        /// vectors.
+        struct Channel {
+            std::vector<Transform> keyframe;
+            std::vector<double> timeStamp;
+        };
+
+        std::vector<Channel> channels;
+        std::string animName;
+        double ticksPerSecond;
+        double duration;
+
+        void reserveSize(size_t boneCount) {
+            channels.resize(boneCount);
+        }
+    };
+
     struct SkeletonAsset : public IAsset {
         using IAsset::IAsset;
 
@@ -113,6 +148,14 @@ namespace LaurelEye::IO {
         /// can reuse the skeleton over multiple meshes, which can each have
         /// different properties.
         std::shared_ptr<SkeletonAsset> skeleton;
+
+        /// @brief AnimationAsset that ties to this mesh.
+        ///
+        /// Ideally this should be completely separated and sent to the
+        /// AnimationSystem, but no time. For now, AnimationSystem is under
+        /// RenderSystem and we will read this and set up AnimationSystem
+        /// there.
+        std::shared_ptr<AnimationAsset> animation;
 
         /// @brief Inverse bind transforms.
         ///
