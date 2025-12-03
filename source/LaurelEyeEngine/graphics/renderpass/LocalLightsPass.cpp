@@ -1,33 +1,40 @@
-﻿/// @file   DeferredRenderPass.cpp
+﻿/// @file   GBufferPass.cpp
 /// @author Anish Murthy (anish.murthy.dev@gmail.com)
 /// @par    **DigiPen Email**
 ///     anish.murthy@digipen.edu
 /// @date    11-06-2025
-/// @brief  Deferred Render Pass
+/// @brief  GBuffer Pass
 
-#include "LaurelEyeEngine/graphics/renderpass/DeferredRenderPass.h"
-#include "LaurelEyeEngine/graphics/device/glfw/LGLRenderDevice.h"
+#include "LaurelEyeEngine/graphics/renderpass/LocalLightsPass.h"
+
 #include "LaurelEyeEngine/graphics/RenderStateSaver.h"
+#include "LaurelEyeEngine/graphics/resources/FrameContext.h"
+#include "LaurelEyeEngine/graphics/resources/GeometryBuffer.h"
 #include "LaurelEyeEngine/graphics/resources/Mesh.h"
+#include "LaurelEyeEngine/graphics/resources/RenderResources.h"
 #include "LaurelEyeEngine/graphics/resources/Shader.h"
-#include "LaurelEyeEngine/graphics/resources/SizeRegistry.h"
-#include "LaurelEyeEngine/graphics/resources/Texture.h"
 #include "LaurelEyeEngine/graphics/ShaderManager.h"
-#include "LaurelEyeEngine/graphics/ShadowManager.h"
+
+#include <GL/gl.h>
 
 namespace LaurelEye::Graphics {
-    void DeferredRenderPass::setup(RenderResources& rs) {
-        shader = ShaderManager::getInstance().loadFile("../../../assets/shaders/DeferredRender.frag\n../../../assets/shaders/DeferredRender.vert");
 
-        screenQuad = (Mesh::createSquareMesh("screenQuad", 1.0f));
+    void LocalLightsPass::setup(RenderResources& rs) {
+        shader = ShaderManager::getInstance().loadFile("../../../assets/shaders/LocalLights.frag\n../../../assets/shaders/LocalLights.vert");
+        lightSphere = (Mesh::createSphereMesh("sphere", 32));
     }
 
-    void DeferredRenderPass::execute(const FrameContext& ctx) {
-        RenderStateSaver rs{&ctx.device};
+    void LocalLightsPass::execute(const FrameContext& ctx) {
+        // RenderStateSaver rs{&ctx.device};
         const SizeRegistry& size = ctx.resources.getSurfaceSize(0);
-        glViewport(0, 0, size.width, size.height);
+        // glViewport(0, 0, size.width, size.height);
+
         glDisable(GL_DEPTH_TEST);
         glDepthMask(GL_FALSE);
+        glEnable(GL_BLEND);
+
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_FRONT);
 
         shader->use();
         shader->setUInt("width", size.width);
@@ -54,40 +61,21 @@ namespace LaurelEye::Graphics {
                    "LAURELEYE::RENDER_SYSTEM::DEFERRED_RENDER_PASS::GBUFFER_SPECULAR_MISSING");
         }
 
-        if ( !isValidTexture(sunShadowTex) ) {
-            for ( const auto& shadow : ctx.shadowManager->getShadows() ) {
-                if ( shadow.source == ShadowSourceType::Directional ) {
-                    sunShadowTex = ctx.shadowManager->getShadowResource(shadow.handle).texture;
-                    break;
-                }
-            }
-        }
-
         shader->bindTexture(0, "gbuffer_position", gbufferPosition);
         shader->bindTexture(1, "gbuffer_normal", gbufferNormal);
         shader->bindTexture(2, "gbuffer_diffuse", gbufferDiffuse);
         shader->bindTexture(3, "gbuffer_specular", gbufferSpecular);
-        if ( isValidTexture(sunShadowTex) ) shader->bindTexture(10, "ShadowMap", sunShadowTex);
 
-        screenQuad->draw(GL_TRIANGLES);
+        shader->use();
 
-        shader->unuse();
+        for ( size_t lightIndex = 0; lightIndex < lightCount; ++lightIndex ) {
+            shader->setUInt("lightIndex", lightIndex);
+            lightSphere->draw(GL_TRIANGLES);
+        }
 
-        glDepthMask(GL_TRUE);
+        glDisable(GL_CULL_FACE);
+        glDisable(GL_BLEND);
         glEnable(GL_DEPTH_TEST);
-
-        // glBindFramebuffer(GL_READ_FRAMEBUFFER, ctx.resources.framebuffer("gbuffer"));
-        // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // or your post-FBO if you have one
-        //
-        // // 2. Blit only depth
-        // glBlitFramebuffer(
-        //     0, 0, 1280, 720, // src rect
-        //     0, 0, 1280, 720, // dst rect
-        //     GL_DEPTH_BUFFER_BIT, // what to copy
-        //     GL_NEAREST           // filter (must be NEAREST for depth)
-        // );
-        //
-        // // 3. Go back to your main draw target if needed
-        // glBindFramebuffer(GL_FRAMEBUFFER, 0); // or your forward FBO
+        glDepthMask(GL_TRUE);
     }
 } // namespace LaurelEye::Graphics

@@ -100,8 +100,25 @@
                 "Light": {
                     "type": "Directional",
                     "direction": [ 0.75, -1.0, 0.75 ],
-                    "intensity": 4.0,
+                    "intensity": 0.05,
                     "color": [ 1.0, 1.0, 1.0 ]
+                }
+            }
+        },
+        {
+            "name": "PointLight",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 0.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Light": {
+                    "type": "Point",
+                    "position": [ 0.0, 20.0, 0.0 ],
+                    "intensity": 1000.0,
+                    "color": [ 1.0, 1.0, 1.0 ],
+                    "range": 1000.0
                 }
             }
         },
@@ -115,7 +132,7 @@
                 },
                 "Light": {
                     "type": "Ambient",
-                    "intensity": 0.3,
+                    "intensity": 0.01,
                     "color": [ 1.0, 1.0, 1.0 ]
                 }
             }

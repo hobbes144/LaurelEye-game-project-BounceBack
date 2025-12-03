@@ -23,7 +23,7 @@ namespace LaurelEye {
         virtual void setOwner(Entity* entity) { owner = entity; }
 
         bool isActive() const { return active; }
-        void setIsActive(bool isActive) { active = isActive; } 
+        void setIsActive(bool isActive) { active = isActive; }
 
     protected:
         bool active{true};

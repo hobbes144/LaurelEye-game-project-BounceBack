@@ -19,6 +19,8 @@
 #include "LaurelEyeEngine/graphics/RenderStateSaver.h"
 
 // Surface headers
+#include "LaurelEyeEngine/graphics/graphics_components/PointLightComponent.h"
+#include "LaurelEyeEngine/graphics/renderpass/LocalLightsPass.h"
 #include "LaurelEyeEngine/graphics/surface/glfw/LGlfwOpenGLWindowSurface.h"
 #include "LaurelEyeEngine/graphics/surface/IWindowSurfaceProvider.h"
 
@@ -126,6 +128,9 @@ namespace LaurelEye::Graphics {
         deferredRenderPass = std::make_shared<DeferredRenderPass>();
         deferredRenderPass->setup(*tempRenderResources.get());
 
+        localLightsPass = std::make_shared<LocalLightsPass>();
+        localLightsPass->setup(*tempRenderResources.get());
+
         // sp = std::make_shared<SinglePass>();
         // sp = std::make_shared<SinglePassShadow>();
         // sp = std::make_shared<SingleBufferedDataPass>();
@@ -149,6 +154,7 @@ namespace LaurelEye::Graphics {
 
         initDefaultCamera();
         initGlobalLightsBuffer();
+        initLocalLightsBuffer();
 
         tempShadowManager = std::make_unique<ShadowManager>(tempRenderResources.get());
 
@@ -185,6 +191,9 @@ namespace LaurelEye::Graphics {
         // need to keep calling this. We just call it when there's a change.
         updateGlobalLights();
         device->bindDataBufferBase(globalLightsBufferHandle);
+
+        updateLocalLights();
+        device->bindDataBufferBase(localLightsBufferHandle);
 
         // TODO: Code for point lights: eventually move to local lights
         // interaction functions.
@@ -266,6 +275,15 @@ namespace LaurelEye::Graphics {
             RenderStateSaver savedState = RenderStateSaver(device.get());
             deferredRenderPass->execute(ctx);
         }
+
+        // GBuffer only needs the Camera.
+        device->bindDataBufferBase(camera->getCameraBufferHandle());
+        {
+            localLightsPass->execute(ctx);
+        }
+
+        device->blitFramebuffers(ctx.resources.framebuffer("gbuffer"), 0, true);
+        device->bindFramebufferBase(0);
 
         // Draw the particles.
         if ( runDebugDraw ) {
@@ -515,10 +533,8 @@ namespace LaurelEye::Graphics {
             break;
         }
         case RenderComponentType::PropertyLight: {
-            auto it = lightProperties.find(component->GetRenderID());
-            if ( it != lightProperties.end() ) {
-                lightProperties.erase(it);
-            }
+            auto* light = static_cast<LightComponent*>(component);
+            deregisterLight(light);
             break;
         }
         default:
@@ -659,9 +675,10 @@ namespace LaurelEye::Graphics {
     void RenderSystem::initCameraBuffer(CameraComponent* camera) {
         // TODO: Update code to handle multiple cameras.
         camera->setCameraBufferHandle(device->createDataBuffer(DataBufferDesc{
-            DataBufferType::UBO, DataBufferUpdateMode::Dynamic,
-            sizeof(Camera),
-            DataBuffer::CameraDataBinding}, nullptr, "CameraData"));
+                                                                   DataBufferType::UBO, DataBufferUpdateMode::Dynamic,
+                                                                   sizeof(Camera),
+                                                                   DataBuffer::CameraDataBinding},
+                                                               nullptr, "CameraData"));
         camera->setInitStatus(true);
     }
 
@@ -694,7 +711,8 @@ namespace LaurelEye::Graphics {
         case LightType::Point:
             // registerLocalLight(light);
             // NOTE: Currently unimplemented, just storing.
-            // localLights.pointLights.push_back(static_c1ast<PointLightComponent*>(light)->getLightData());
+            pointLightMapping[light->GetRenderID()] = localLights.pointLights.size();
+            localLights.pointLights.push_back(static_cast<PointLightComponent*>(light)->getLightData());
             break;
         case LightType::Default:
         default:
@@ -703,6 +721,34 @@ namespace LaurelEye::Graphics {
         }
 
         light->setHandle(globalLightsBufferHandle);
+    }
+
+    void RenderSystem::deregisterLight(LightComponent* light) {
+        auto it = lightProperties.find(light->GetRenderID());
+        if ( it != lightProperties.end() ) {
+            switch ( it->second->getType() ) {
+            case LightType::Ambient:
+                globalLights.ambientLight = AmbientLight{};
+                break;
+            case LightType::Directional:
+                globalLights.sunLight = DirectionalLight{};
+                // Temporarily auto adding shadows.
+                if ( isShadowPending(globalLights.sunLight.shadowIndex) ) {
+                    tempShadowManager->addShadow(0, &globalLights.sunLight, ShadowDesc());
+                }
+                globalLights.sunLight.shadowIndex = Shadow::NoShadow;
+                updateGlobalLights();
+                break;
+            case LightType::Point:
+                localLights.pointLights[pointLightMapping[it->second->GetRenderID()]] = PointLight{};
+                break;
+            case LightType::Default:
+            default:
+                throw std::logic_error("ERROR::GRAPHICS::RENDERSYSTEM::INVALID_LIGHT_TYPE");
+                break;
+            }
+            lightProperties.erase(it);
+        }
     }
 
     void RenderSystem::initGlobalLightsBuffer() {
@@ -715,11 +761,38 @@ namespace LaurelEye::Graphics {
             &globalLights, "GlobalLightData");
     }
 
+    void RenderSystem::initLocalLightsBuffer() {
+        localLightsBufferHandle = device->createDataBuffer(
+            DataBufferDesc{
+                DataBufferType::SSBO,
+                DataBufferUpdateMode::Dynamic,
+                sizeof(PointLight) * 200,
+                DataBuffer::LocalLightDataBinding},
+            &localLights, "LocalLightData");
+    }
+
     void RenderSystem::updateGlobalLights() const {
         assert(isValidDataBuffer(globalLightsBufferHandle) && "ERROR::GRAPHICS::RENDERSYSTEM::GLOBALLIGHTS_UNINITIALIZED");
         device->updateDataBufferSubData(
             globalLightsBufferHandle, 0,
             sizeof(GlobalLights), &globalLights);
+    }
+
+    void RenderSystem::updateLocalLights() {
+        assert(isValidDataBuffer(localLightsBufferHandle) && "ERROR::GRAPHICS::RENDERSYSTEM::LOCALLIGHTS_UNINITIALIZED");
+        assert(localLights.pointLights.size() < 200 && "ERROR::GRAPHICS::RENDERSYSTEM::LOCALLIGHTS_EXCEEDED_MAXIMUM");
+        for (const auto& light : lightProperties) {
+            if ( pointLightMapping.contains(light.second->GetRenderID()) ) {
+                auto pointLight = static_cast<PointLightComponent*>(light.second);
+                auto& lightData = pointLight->getLightData();
+                lightData.active = pointLight->isActive();
+                localLights.pointLights[pointLightMapping[pointLight->GetRenderID()]] = lightData;
+            }
+        }
+        device->updateDataBufferSubData(
+            localLightsBufferHandle, 0,
+            sizeof(PointLight) * localLights.pointLights.size(), localLights.pointLights.data());
+        localLightsPass->setLightCount(localLights.pointLights.size());
     }
 
 } // namespace LaurelEye::Graphics

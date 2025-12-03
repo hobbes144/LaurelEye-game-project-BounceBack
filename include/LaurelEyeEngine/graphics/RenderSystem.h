@@ -44,6 +44,7 @@ namespace LaurelEye::Graphics {
     class CameraComponent;
     class GBufferPass;
     class DeferredRenderPass;
+    class LocalLightsPass;
     class SinglePass;
     class SingleBufferedDataPass;
     class SinglePassShadow;
@@ -202,6 +203,7 @@ namespace LaurelEye::Graphics {
         // std::shared_ptr<SinglePass> sp;
         std::shared_ptr<GBufferPass> gbufferPass;
         std::shared_ptr<DeferredRenderPass> deferredRenderPass;
+        std::shared_ptr<LocalLightsPass> localLightsPass;
         std::shared_ptr<SinglePassShadow> sp;
         std::shared_ptr<SkydomePass> bp;
         // std::shared_ptr<SingleBufferedDataPass> sp;
@@ -223,6 +225,8 @@ namespace LaurelEye::Graphics {
         LocalLights localLights;
         bool localLightsInitStatus = false;
 
+        std::unordered_map<unsigned int, size_t> pointLightMapping;
+
         // Camera interactions
         void initDefaultCamera();
         void initCameraBuffer(CameraComponent* camera);
@@ -231,9 +235,11 @@ namespace LaurelEye::Graphics {
 
         // Light interactions
         void registerLight(LightComponent* light);
+        void deregisterLight(LightComponent* light);
         void initGlobalLightsBuffer();
+        void initLocalLightsBuffer();
         void updateGlobalLights() const;
-        void updateLocalLight(LightComponent* light) const;
-        void updateLocalLights() const;
+        // void updateLocalLight(LightComponent* light);
+        void updateLocalLights();
     };
 } // namespace LaurelEye::Graphics

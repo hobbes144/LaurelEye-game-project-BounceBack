@@ -186,6 +186,7 @@ namespace LaurelEye::Graphics {
         }
         else {
             glDisable(GL_DEPTH_TEST);
+            glDepthMask(GL_TRUE);
             clearMask = GL_COLOR_BUFFER_BIT;
         }
 
