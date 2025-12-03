@@ -14,6 +14,11 @@ namespace LaurelEye {
         clearInputMaps();
     }
 
+    void UIElementManager::initialize() {
+        isUIActive = shouldUIBeActiveOnStart;
+        updateIsUIActive();
+    }
+
     void UIElementManager::update(float deltaTime) {
         if ( !currentComponent || !inputManager || elements.empty() ) {
             return;

@@ -8,24 +8,24 @@
                 "name": "baseMapping",
                 "mappings": [
                     {
-                        "name": "Play",
-                        "right": "B2",
-                        "down": "B3"
+                        "name": "Prototype1",
+                        "right": "Prototype2",
+                        "down": "Prototype3"
                     },
                     {
-                        "name": "B2",
-                        "left": "Play",
+                        "name": "Prototype2",
+                        "left": "Prototype1",
                         "down": "Quit"
                     },
                     {
-                        "name": "B3",
-                        "up": "Play",
+                        "name": "Prototype3",
+                        "up": "Prototype1",
                         "right": "Quit"
                     },
                     {
                         "name": "Quit",
-                        "left": "B3",
-                        "up": "B2"
+                        "left": "Prototype3",
+                        "up": "Prototype2"
                     }
                 ]
             }
@@ -80,7 +80,7 @@
             }
         },
         {
-            "name": "PlayButton",
+            "name": "Prototype1Button",
             "components": {
                 "Transform": {
                     "position": [ -0.5, 0.5, 0.0 ],
@@ -88,16 +88,16 @@
                     "scale": [ 300.0, 100.0, 0.0 ]
                 },
                 "UIButton": {
-                    "name": "Play",
+                    "name": "Prototype1",
                     "material": {
-                        "texture": "textures/PlayButton.jpg",
-                        "transparency": 0.6
+                        "texture": "textures/Prototype1.jpg",
+                        "transparency": 1.0
                     }
                 }
             }
         },
         {
-            "name": "Button2",
+            "name": "Prototype2Button",
             "components": {
                 "Transform": {
                     "position": [ 0.5, 0.5, 0.0 ],
@@ -105,16 +105,16 @@
                     "scale": [ 300.0, 100.0, 0.0 ]
                 },
                 "UIButton": {
-                    "name": "B2",
+                    "name": "Prototype2",
                     "material": {
-                        "texture": "textures/texture_01_dark.png",
+                        "texture": "textures/Prototype2.jpg",
                         "transparency": 1.0
                     }
                 }
             }
         },
         {
-            "name": "Button3",
+            "name": "Prototype3Button",
             "components": {
                 "Transform": {
                     "position": [ -0.5, -0.5, 0.0 ],
@@ -122,9 +122,9 @@
                     "scale": [ 300.0, 100.0, 0.0 ]
                 },
                 "UIButton": {
-                    "name": "B3",
+                    "name": "Prototype3",
                     "material": {
-                        "texture": "textures/texture_01_orange.png",
+                        "texture": "textures/Prototype3.jpg",
                         "transparency": 1.0
                     }
                 }
@@ -141,9 +141,28 @@
                 "UIButton": {
                     "name": "Quit",
                     "material": {
-                        "texture": "textures/texture_01_purple.png",
+                        "texture": "textures/Quit.jpg",
                         "transparency": 1.0
                     }
+                }
+            }
+        },
+        {
+            "name": "DigiPenLogo",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 0.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 2000.0, 1000.0, 0.0 ]
+                },
+                "UI": {
+                    "material": {
+                        "texture": "textures/DigiPen_Logo_Large.jpg",
+                        "transparency": 1.0
+                    }
+                },
+                "Script": {
+                    "path": "scripts/delayed_deactivate.lua"
                 }
             }
         },

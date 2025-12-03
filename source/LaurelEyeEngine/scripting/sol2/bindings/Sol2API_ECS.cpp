@@ -12,6 +12,7 @@
 #include "LaurelEyeEngine/audio/SpeakerComponent.h"
 #include "LaurelEyeEngine/particles/ParticleEmitterComponent.h"
 #include "LaurelEyeEngine/audio/SpeakerComponent.h"
+#include "LaurelEyeEngine/ecs/IComponent.h"
 
 namespace LaurelEye::Scripting {
     void Sol2API_ECS::setup(sol::state& lua, EngineContext* ctx) {
@@ -36,7 +37,16 @@ namespace LaurelEye::Scripting {
             "addTag", &Entity::addTag,
             "compareTag", &Entity::compareTag,
             "getTags", &Entity::getTags,
-            "findComponent", &dynamicFindComponent);
+            "findComponent", &dynamicFindComponent,
+            "setActive",
+            [](Entity& ent, bool active) {
+                const auto& comps = ent.getComponents();
+                for ( const auto& comp : comps ) {
+                    if ( comp ) {
+                        comp->setIsActive(active);
+                    }
+                }
+            });
 
         // --- Type-safe finders (fast path) ---
         entityType.set_function("findTransform", &safeFindComponent<TransformComponent>);

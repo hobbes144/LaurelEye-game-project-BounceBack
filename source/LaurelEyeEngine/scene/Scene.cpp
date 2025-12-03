@@ -84,6 +84,7 @@ namespace LaurelEye {
         if ( auto* t = ctx.getService<TransformSystem>() ) t->update(0.016f);
         if ( auto* p = ctx.getService<Physics::PhysicsSystem>() ) p->registerCollisionEnterListeners();
         if ( auto* uiM = ctx.getService<UIElementManager>() ) {
+            uiM->initialize();
             uiM->registerListener();
         }
         active = true;
@@ -167,7 +168,7 @@ namespace LaurelEye {
         }
         if ( settingsValue.HasMember("UIActiveOnLoad") && settingsValue["UIActiveOnLoad"].IsBool() ) {
             if (auto* uiM = ctx.getService<UIElementManager>()) {
-                uiM->setIsUIActive(settingsValue["UIActiveOnLoad"].GetBool());
+                uiM->setShouldUIBeActiveOnStart(settingsValue["UIActiveOnLoad"].GetBool());
             }
         }
         if ( settingsValue.HasMember("UILayout") && settingsValue["UILayout"].IsArray() ) {

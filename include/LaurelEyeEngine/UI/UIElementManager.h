@@ -24,6 +24,8 @@ namespace LaurelEye {
 
         void setInputAndWindow(LaurelEye::InputManager* inputMgr, LaurelEye::IWindow* _window);
 
+        void initialize();
+
         void update(float deltaTime);
 
         void registerUIElement(Graphics::UIComponent* elementToRegister);
@@ -67,6 +69,9 @@ namespace LaurelEye {
         void setRightKey(Key key) { rightKey = key; }
         void setEscapeKey(Key key) { escapeKey = key; }
         void setIsUIActive(bool isActive);
+        void setShouldUIBeActiveOnStart(bool shouldBeActive) {
+            shouldUIBeActiveOnStart = shouldBeActive;
+        }
         void updateIsUIActive();
         bool getIsUIActive() const { return isUIActive; }
 
@@ -90,6 +95,7 @@ namespace LaurelEye {
         const float hoverCooldown = 0.1f;
 
         bool isUIActive = true;
+        bool shouldUIBeActiveOnStart = true;
 
         Graphics::UIComponent* currentComponent = nullptr;
 
