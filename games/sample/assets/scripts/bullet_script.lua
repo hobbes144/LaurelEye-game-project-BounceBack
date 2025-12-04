@@ -13,6 +13,7 @@ function onStart()
 
     speaker = self:findAudioSpeaker()
     if speaker ~= nil then
+        speaker:stop()
         speaker:play()
     end
 end
