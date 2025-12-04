@@ -13,7 +13,7 @@ function onStart()
     end)
     UI.onButtonPressed("Prototype3", function(name)
         log("Button pressed from Lua: " .. name)
-        SceneManager:changeScene("SpawnerScene")
+        SceneManager:changeScene("BulletHellPrototype")
     end)
     UI.onButtonPressed("Quit", function(name)
         log("Button pressed from Lua: " .. name)
@@ -39,6 +39,9 @@ function onUpdate(dt)
         SceneManager:changeScene("SpawnerScene")
     elseif Input:isKeyPressed(Key.Six) then
         log("Reloading Current Scene")
+    elseif Input:isKeyPressed(Key.Eight) then
+        log("Loading Scene: BulletHellPrototype")
+        SceneManager:changeScene("BulletHellPrototype")
         SceneManager:reloadCurrentScene()
     elseif Input:isKeyPressed(Key.Seven) then
         log("Loading Scene: MBPrototype")
