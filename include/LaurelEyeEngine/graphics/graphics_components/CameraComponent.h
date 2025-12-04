@@ -159,7 +159,7 @@ namespace LaurelEye::Graphics {
         /// @param _aspectRatio New aspect ratio.
         void updateAspectRatio(float _aspectRatio);
 
-        void updateFromTransform(const LaurelEye::TransformComponent* transform);
+        void updateFromTransform(LaurelEye::TransformComponent* transform);
 
     private:
         std::string name;

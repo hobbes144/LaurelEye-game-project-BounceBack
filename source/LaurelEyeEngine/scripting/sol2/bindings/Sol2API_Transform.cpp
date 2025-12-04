@@ -5,10 +5,10 @@ namespace LaurelEye::Scripting {
         lua.new_usertype<TransformComponent>(
         "TransformComponent",
         sol::constructors<TransformComponent()>(),
-        
+
         // --- Space Type ---
-        "setIsLocalSpace", &TransformComponent::setIsLocalSpace,
-        "getIsLocalSpace", &TransformComponent::getIsLocalSpace,
+        //"setIsLocalSpace", &TransformComponent::setIsLocalSpace,
+        //"getIsLocalSpace", &TransformComponent::getIsLocalSpace,
 
         // --- Local Transform Access ---
         "getLocalPosition", &TransformComponent::getLocalPosition,
@@ -30,7 +30,14 @@ namespace LaurelEye::Scripting {
             }
         ),
 
-        // --- World Transform Access ---
+        // --- World Transform Access ---"
+        "getWorldTransform", &TransformComponent::getWorldTransform,
+        "setWorldTransform", sol::overload(
+            static_cast<void(TransformComponent::*)(const Transform&)>(&TransformComponent::setWorldTransform),
+            [](TransformComponent& self, const Transform& tr) {
+                self.setWorldTransform(tr);
+            }
+        ),
         "getWorldPosition", &TransformComponent::getWorldPosition,
         "setWorldPosition", sol::overload(
             static_cast<void(TransformComponent::*)(const Vector3&)>(&TransformComponent::setWorldPosition),
@@ -53,12 +60,12 @@ namespace LaurelEye::Scripting {
         // --- Hierarchy ---
         "getParent", &TransformComponent::getParent,
         "getChildren", &TransformComponent::getChildren,
-        "setParent", &TransformComponent::setParent,
+        "setParent", &TransformComponent::setParent
 
         // --- Dirty Flag ---
-        "markDirty", &TransformComponent::markDirty,
-        "markClean", &TransformComponent::markClean,
-        "isDirty", &TransformComponent::isDirty
+        //"markDirty", &TransformComponent::markDirty,
+        //"markClean", &TransformComponent::markClean,
+        //"isDirty", &TransformComponent::isDirty
         );
     }
 }

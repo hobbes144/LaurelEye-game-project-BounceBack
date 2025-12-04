@@ -350,7 +350,7 @@ namespace LaurelEye {
             if ( auto* transformComp = dynamic_cast<TransformComponent*>(comp.get()) ) {
                 if ( transformSystem ) {
                     transformSystem->registerComponent(transformComp);
-                    transformSystem->update(0.016f);
+                    // transformSystem->update(0.016f);
                 }
             }
             else if ( auto* physComp = dynamic_cast<Physics::PhysicsBodyComponent*>(comp.get()) ) {

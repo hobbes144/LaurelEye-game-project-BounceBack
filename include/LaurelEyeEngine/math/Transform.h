@@ -47,6 +47,7 @@ namespace LaurelEye {
         Matrix4 getInverseMatrix();
 
         // Setters
+
         Transform& setPosition(const Vector3& newPosition);
         Transform& setPosition(float x, float y, float z);
 

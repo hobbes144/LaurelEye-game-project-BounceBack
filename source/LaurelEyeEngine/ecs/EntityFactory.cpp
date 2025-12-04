@@ -182,18 +182,18 @@ namespace LaurelEye {
         auto* transform = entity.addComponent<TransformComponent>();
         if ( transformData.HasMember("position") ) {
             const auto& pos = transformData["position"];
-            transform->setLocalPosition({pos[0].GetFloat(), pos[1].GetFloat(), pos[2].GetFloat()});
+            transform->setWorldPosition({pos[0].GetFloat(), pos[1].GetFloat(), pos[2].GetFloat()});
         }
         if ( transformData.HasMember("rotation") ) { // Quaternion
             const auto& rot = transformData["rotation"];
             if ( rot.IsArray() && rot.GetArray().Size() == 4 )
-                transform->setLocalRotation({rot[0].GetFloat(), rot[1].GetFloat(), rot[2].GetFloat(), rot[3].GetFloat()});
+                transform->setWorldRotation({rot[0].GetFloat(), rot[1].GetFloat(), rot[2].GetFloat(), rot[3].GetFloat()});
             else
-                transform->setLocalRotation(Vector3{rot[0].GetFloat(), rot[1].GetFloat(), rot[2].GetFloat()});
+                transform->setWorldRotation(Vector3{rot[0].GetFloat(), rot[1].GetFloat(), rot[2].GetFloat()});
         }
         if ( transformData.HasMember("scale") ) {
             const auto& scale = transformData["scale"];
-            transform->setLocalScale({scale[0].GetFloat(), scale[1].GetFloat(), scale[2].GetFloat()});
+            transform->setWorldScale({scale[0].GetFloat(), scale[1].GetFloat(), scale[2].GetFloat()});
         }
     }
 

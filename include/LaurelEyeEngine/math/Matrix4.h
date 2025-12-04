@@ -90,6 +90,8 @@ namespace LaurelEye {
 
         Vector3 transformDirection(const Vector3& direction) const;
 
+        Vector3 transformPoint(const Vector3& point) const;
+
         static Matrix4 rotationAxis(const Vector3& axis, float radians);
 
         Quaternion toQuaternion() const;

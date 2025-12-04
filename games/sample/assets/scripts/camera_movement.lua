@@ -41,7 +41,8 @@ function onUpdate(dt)
 
     local playerPos = target:getWorldPosition()
     -- print("Player position: ", playerPos)
-    local camPos = transform:getWorldPosition()
+    local camTransform = transform:getWorldTransform()
+    local camPos = camTransform:getPosition()
     -- print("Camera position: ", camPos)
 
     -- Camera controlling input (keyboard)
@@ -72,7 +73,7 @@ function onUpdate(dt)
     camPos.x = camPos.x + (desiredPos.x - camPos.x) * lerpSpeed * dt
     camPos.y = camPos.y + (desiredPos.y - camPos.y) * lerpSpeed * dt
     camPos.z = camPos.z + (desiredPos.z - camPos.z) * lerpSpeed * dt
-    transform:setWorldPosition(camPos)
+    camTransform:setPosition(camPos)
 
     -- Look at player
     local dir = playerPos - camPos
@@ -85,11 +86,12 @@ function onUpdate(dt)
     local targetQuat = Quaternion.fromEuler(-pitchAngle, yawAngle, 0)
 
     -- Smoothly interpolate rotation to remove jitter
-    local currentRot = transform:getWorldRotation()
-    --print("Current rotation: ", currentRot)
-    --print("Target rotation: ", targetQuat)
+    local currentRot = camTransform:getRotation()
+    print("Current rotation: ", currentRot)
+    print("Target rotation: ", targetQuat)
     local newRot = Quaternion.slerp(currentRot, targetQuat, dt * lerpSpeed)
-    transform:setWorldRotation(newRot)
+    camTransform:setRotation(newRot)
+    transform:setWorldTransform(camTransform)
 end
 
 function onShutdown()

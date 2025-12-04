@@ -144,8 +144,9 @@ namespace LaurelEye::Graphics {
         return cameraData.projectionMatrix;
     }
 
-    void CameraComponent::updateFromTransform(const LaurelEye::TransformComponent* transform) {
-        setPositionRotation(transform->getWorldPosition(), transform->getWorldRotation());
+    void CameraComponent::updateFromTransform(LaurelEye::TransformComponent* transform) {
+        const auto& cameraTransform = transform->getWorldTransform();
+        setPositionRotation(cameraTransform.getPosition(), cameraTransform.getRotation());
     }
 
 } // namespace LaurelEye::Graphics

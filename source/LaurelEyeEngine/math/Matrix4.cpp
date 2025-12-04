@@ -493,6 +493,30 @@ namespace LaurelEye {
             .normalized();
     }
 
+    Vector3 Matrix4::transformPoint(const Vector3& point) const {
+        // Multiply treating the input as a POINT (w = 1)
+        float x = data[0][0] * point.x + data[1][0] * point.y +
+                  data[2][0] * point.z + data[3][0];
+
+        float y = data[0][1] * point.x + data[1][1] * point.y +
+                  data[2][1] * point.z + data[3][1];
+
+        float z = data[0][2] * point.x + data[1][2] * point.y +
+                  data[2][2] * point.z + data[3][2];
+
+        float w = data[0][3] * point.x + data[1][3] * point.y +
+                  data[2][3] * point.z + data[3][3]; // Usually 1
+
+        // Perspective divide (in case the matrix is not affine)
+        if ( w != 0.0f && w != 1.0f ) {
+            x /= w;
+            y /= w;
+            z /= w;
+        }
+
+        return Vector3(x, y, z);
+    }
+
     /// @brief Static function to get the rotation matrix for
     ///     a given axis angle rotation
     /// @param axis Axis of the rotation.
@@ -616,7 +640,7 @@ namespace LaurelEye {
     }
 
     Vector3 Matrix4::position() const {
-        return Vector3(data[0][3], data[1][3], data[2][3]);
+        return Vector3(data[3][0], data[3][1], data[3][2]);
     }
 
     Vector3 Matrix4::scaling() const {

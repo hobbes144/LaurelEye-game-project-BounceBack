@@ -23,6 +23,6 @@ namespace LaurelEye {
     private:
         void updateSubtree(TransformComponent* rootLevelComponent);
         // Use this when utilizing pure ECS
-        void updateTransforms(TransformComponent* comp);
+        void updateTransformComponent(TransformComponent* comp);
     };
 } // namespace LaurelEye

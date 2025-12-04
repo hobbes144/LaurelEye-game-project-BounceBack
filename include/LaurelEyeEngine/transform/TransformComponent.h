@@ -13,107 +13,248 @@
 #include "LaurelEyeEngine/ecs/IComponent.h"
 #include "LaurelEyeEngine/math/Transform.h"
 
+#include <cassert>
+
 namespace LaurelEye {
     class TransformComponent : public IComponent {
     public:
         TransformComponent()
-            : parentTransform(nullptr), dirty(true) {}
-
-        void setIsLocalSpace(bool isLocal) { isLocalSpace = isLocal; }
-        bool getIsLocalSpace() const { return isLocalSpace; }
+            : parentTransform(nullptr), worldDirty(true) {}
 
         Transform& getLocalTransform() {
+            updateLocalTransforms();
+
             return localTransform;
+        }
+        void setLocalTransform(const Transform& t) {
+            updateLocalTransforms();
+            localTransform = t;
+            markWorldDirty(); // Setting a transform requires recomputation
         }
 
         Transform& getWorldTransform() {
+            updateWorldTransforms();
+
             return worldTransform;
         }
-
-        void setLocalTransform(const Transform& t) {
-            localTransform = t;
-            isLocalSpace = true;
-            markDirty(); // Setting a transform requires recomputation
-        }
         void setWorldTransform(const Transform& t) {
+            updateWorldTransforms();
             worldTransform = t;
-            isLocalSpace = false;
-            markDirty(); // Setting a transform requires recomputation
+            markLocalDirty();
+            dirtyDescendents();
         }
 
         // --- Local Position / Rotation / Scale ---
-        Vector3 getLocalPosition() const { return localTransform.getPosition(); }
+        Vector3 getLocalPosition() {
+            updateLocalTransforms();
+            return localTransform.getPosition();
+        }
         void setLocalPosition(const Vector3& pos) {
+            updateLocalTransforms();
             localTransform.setPosition(pos);
-            markDirty();
+            markWorldDirty();
         }
 
-        Quaternion getLocalRotation() const { return localTransform.getRotation(); }
+        Quaternion getLocalRotation() {
+            updateLocalTransforms();
+            return localTransform.getRotation();
+        }
         void setLocalRotation(const Quaternion& rot) {
+            updateLocalTransforms();
             localTransform.setRotation(rot);
-            markDirty();
+            markWorldDirty();
         }
 
         void setLocalRotation(const Vector3& rot) {
+            updateLocalTransforms();
             localTransform.setRotation(rot);
-            markDirty();
+            markWorldDirty();
         }
 
-        Vector3 getLocalScale() const { return localTransform.getScaling(); }
+        Vector3 getLocalScale() {
+            updateLocalTransforms();
+            return localTransform.getScaling();
+        }
         void setLocalScale(const Vector3& scale) {
+            updateLocalTransforms();
             localTransform.setScaling(scale);
-            markDirty();
+            markWorldDirty();
         }
 
         // --- World Position / Rotation / Scale ---
-        Vector3 getWorldPosition() const { return worldTransform.getPosition(); }
-        void setWorldPosition(const Vector3& pos) {
+        // Must call updateTransforms() before calling this
+        void setAbsoluteWorldPosRot(const Vector3& pos, const Quaternion& rot) {
+            // updateLocalTransforms();
+            assert(!isLocalDirty() && "Physics update called on component that isn't updated");
             worldTransform.setPosition(pos);
-            markDirty();
+            worldTransform.setRotation(rot);
+            markLocalDirty();
+            dirtyDescendents();
+            markWorldClean();
         }
 
-        Quaternion getWorldRotation() const { return worldTransform.getRotation(); }
+        Vector3 getWorldPosition() {
+            updateWorldTransforms();
+            return worldTransform.getPosition();
+        }
+        void setWorldPosition(const Vector3& pos) {
+            updateWorldTransforms();
+
+            worldTransform.setPosition(pos);
+            markLocalDirty();
+            dirtyDescendents();
+        }
+
+        Quaternion getWorldRotation() {
+            updateWorldTransforms();
+            return worldTransform.getRotation();
+        }
         void setWorldRotation(const Quaternion& rot) {
+            updateWorldTransforms();
             worldTransform.setRotation(rot);
-            markDirty();
+            markLocalDirty();
+            dirtyDescendents();
         }
 
         void setWorldRotation(const Vector3& rot) {
+            updateLocalTransforms();
+
+            if ( !parentTransform ) {
+                localTransform.setRotation(rot);
+                worldTransform.setRotation(rot);
+                return;
+            }
+
+            Transform parentWorldTransform = parentTransform->getWorldTransform();
+            localTransform.setRotation(parentWorldTransform.getRotation().inverse() * rot);
             worldTransform.setRotation(rot);
-            markDirty();
         }
 
-        Vector3 getWorldScale() const { return worldTransform.getScaling(); }
+        Vector3 getWorldScale() {
+            updateWorldTransforms();
+            return worldTransform.getScaling();
+        }
         void setWorldScale(const Vector3& scale) {
+            updateWorldTransforms();
             worldTransform.setScaling(scale);
-            markDirty();
+            markLocalDirty();
+            dirtyDescendents();
         }
 
-        void setParent(TransformComponent* parent) { parentTransform = parent; }
-        void addChild(TransformComponent* child) { childTransforms.push_back(child); }
+        void setParent(TransformComponent* newParent) {
+            updateTransforms();
+
+            TransformComponent* currParent = parentTransform;
+            if ( currParent ) {
+                // 1. erase the found node from parent's children vector and update sibling numbers
+                unsigned int removedIndex = siblingNumber;
+                currParent->getChildren().erase(currParent->getChildren().begin() + removedIndex);
+                // still have a reference shared in foundNode variable
+                currParent->updateSiblingNumbers(removedIndex);
+            }
+
+            // 2. attach this to dstNode
+            newParent->addChild(this);
+
+            markLocalDirty();
+        }
+        void addChild(TransformComponent* child) {
+            child->setSiblingNumber(childTransforms.size());
+            childTransforms.push_back(child);
+        }
 
         TransformComponent* getParent() const { return parentTransform; }
-        const std::vector<TransformComponent*>& getChildren() const { return childTransforms; }
+        // const std::vector<TransformComponent*>& getChildren() const { return childTransforms; }
+        std::vector<TransformComponent*>& getChildren() { return childTransforms; }
 
-        void markDirty() {
-            if ( dirty ) return;
-            dirty = true;
-            for ( auto* child : childTransforms ) {
-                if ( child ) child->markDirty();
+        void updateSiblingNumbers(unsigned int removedIndex) {
+
+            for ( unsigned int i = removedIndex; i < childTransforms.size(); i++ ) {
+                childTransforms[i]->setSiblingNumber(i);
             }
         }
 
-        void markClean() {
-            dirty = false;
+        void setSiblingNumber(unsigned int n) {
+            siblingNumber = n;
         }
 
-        bool isDirty() const { return dirty; }
+        unsigned int getSiblingNumber() {
+            return siblingNumber;
+        }
+
+        void markLocalDirty() {
+            localDirty = true;
+        }
+
+        void markWorldDirty() {
+            worldDirty = true;
+        }
+
+        void markLocalClean() {
+            localDirty = false;
+        }
+
+        void markWorldClean() {
+            worldDirty = false;
+        }
+
+        bool isLocalDirty() const { return localDirty; }
+
+        bool isWorldDirty() const { return worldDirty; }
+
+        void dirtyDescendents(bool prop = true) {
+            for ( TransformComponent* tChild : childTransforms ) {
+                // tChild->markLocalDirty();
+                tChild->markWorldDirty();
+                tChild->dirtyDescendents();
+            }
+        }
+
+        void updateTransforms() {
+            assert(!(isLocalDirty() && isWorldDirty()) && "[TransformComponent.h] Both Local & World are Dirty (No Ground Truth)");
+
+            updateWorldTransforms();
+            updateLocalTransforms();
+        }
+
+        void updateLocalTransforms() {
+            if ( isLocalDirty() ) {
+                if ( parentTransform ) {
+
+                    Transform parentWorldTransform = parentTransform->getWorldTransform();
+                    Transform newLocalTransform(
+                        parentWorldTransform.getInverseLocalMatrix() * worldTransform.getPosition(),
+                        worldTransform.getRotation() * parentWorldTransform.getRotation().inverse(),
+                        worldTransform.getScaling() * parentWorldTransform.getScaling().reciprocal());
+                    setLocalTransform(newLocalTransform);
+                }
+                else {
+                    localTransform = worldTransform;
+                }
+                markLocalClean();
+            }
+        }
+        void updateWorldTransforms() {
+            if ( isWorldDirty() ) {
+                if ( parentTransform ) {
+                    Transform parentWorldTransform = parentTransform->getWorldTransform();
+                    worldTransform = parentWorldTransform * localTransform;
+                }
+                else {
+                    worldTransform = localTransform;
+                }
+                markWorldClean();
+            }
+        }
 
     private:
-        bool dirty = true; // Should have its transforms recalculated
-        bool isLocalSpace = true;
+        bool localDirty = false;
+        bool worldDirty = true; // Should have its transforms recalculated
+
         Transform localTransform;
         Transform worldTransform;
+
+        unsigned int siblingNumber = 0;
 
         // TODO - this kind of breaks pure ECS, since this is technically more than pure data
         // in the future, potentially let system manage hierarchy

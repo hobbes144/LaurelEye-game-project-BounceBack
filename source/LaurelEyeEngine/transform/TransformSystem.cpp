@@ -9,9 +9,10 @@ namespace LaurelEye {
 
     void TransformSystem::update(float deltaTime) {
         for ( auto* comp : components ) {
-            if ( comp->isActive() && comp->getParent() == nullptr ) {
-                updateSubtree(comp);
-            }
+            // if ( comp->isActive() ) {
+                //updateTransforms(comp);
+                comp->updateTransforms();
+            // }
         }
     }
 
@@ -20,10 +21,7 @@ namespace LaurelEye {
     }
 
     void TransformSystem::updateSubtree(TransformComponent* comp) {
-        if ( comp->isDirty() ) {
-            updateTransforms(comp);
-            comp->markClean();
-        }
+        comp->updateTransforms();
 
         for ( auto* child : comp->getChildren() ) {
             if ( child->isActive() ) {
@@ -32,10 +30,13 @@ namespace LaurelEye {
         }
     }
 
-    void TransformSystem::updateTransforms(TransformComponent* comp) {
+    void TransformSystem::updateTransformComponent(TransformComponent* comp) {
+        comp->updateTransforms();
+
+        /*
         TransformComponent* parent = comp->getParent();
         if ( parent ) {
-            if ( comp->getIsLocalSpace() ) {
+            if ( !comp->isDirty() ) {
                 comp->setWorldTransform(parent->getWorldTransform() * comp->getLocalTransform());
             }
             else {
@@ -46,16 +47,17 @@ namespace LaurelEye {
                     worldTransform.getRotation() * parentWorldTransform.getRotation().inverse(),
                     worldTransform.getScaling() * parentWorldTransform.getScaling().reciprocal());
                 comp->setLocalTransform(newLocalTransform);
-                comp->setIsLocalSpace(true);
+                comp->markClean();
             }
         }
         else { // Allow for root entities
-            if ( comp->getIsLocalSpace() )
+            if ( !comp->isDirty() )
                 comp->setWorldTransform(comp->getLocalTransform());
             else {
                 comp->setLocalTransform(comp->getWorldTransform());
-                comp->setIsLocalSpace(true);
+                comp->markClean();
             }
         }
+        */
     }
 } // namespace LaurelEye

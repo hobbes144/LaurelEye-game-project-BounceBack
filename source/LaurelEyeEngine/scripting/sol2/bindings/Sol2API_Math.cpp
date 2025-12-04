@@ -144,7 +144,8 @@ namespace LaurelEye::Scripting {
             "orthographic", &Matrix4::orthographic,
             "perspective", &Matrix4::perspective,
             "lookAt", &Matrix4::lookAt,
-            "inverse", &Matrix4::inverse
+            "inverse", &Matrix4::inverse,
+            "position", &Matrix4::position
         );
     }
 
