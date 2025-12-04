@@ -56,12 +56,6 @@ void main()
     float radius = light.radius;
     float lightDistance = length(L);
 
-    if ( lightDistance > radius ) {
-      // FragColor = vec3(0);
-      discard;
-      return;
-    }
-
     float G = 0.0;
 
     vec3 eyeVec = (inverseView*vec4(0,0,0,1)).xyz-worldPos;
@@ -104,5 +98,6 @@ void main()
 
     FragColor *= attenuation;
 
-    if ( lights[lightIndex].isActive == false ) discard;
+    if ( lights[lightIndex].isActive == false || lightDistance > radius  || texture(gbuffer_diffuse, gBufferPosition).w == 0.0f )
+      discard;
 }
