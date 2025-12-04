@@ -60,6 +60,7 @@ namespace LaurelEye::Scripting {
         entityType.set_function("findSpeaker", &safeFindComponent<Audio::SpeakerComponent>);
         entityType.set_function("findParticleEmitter", &safeFindComponent<Particles::ParticleEmitterComponent>);
         entityType.set_function("findAudioSpeaker", &safeFindComponent<Audio::SpeakerComponent>);
+        entityType.set_function("findPointLight", &safeFindComponent<Graphics::PointLightComponent>);
     }
 
     sol::object Sol2API_ECS::dynamicFindComponent(Entity& e, const std::string& type, sol::this_state s) {
@@ -107,6 +108,10 @@ namespace LaurelEye::Scripting {
         }
         else if ( type == "AudioSpeakerComponent" ) {
             if ( auto* c = e.findComponent<Audio::SpeakerComponent>() )
+                return sol::make_object(lua, c);
+        }
+        else if ( type == "PointLightComponent" ) {
+            if ( auto* c = e.findComponent<Graphics::PointLightComponent>() )
                 return sol::make_object(lua, c);
         }
 

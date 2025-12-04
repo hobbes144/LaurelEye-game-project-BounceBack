@@ -2,6 +2,7 @@
 playerTransform = nil
 
 mouseSensitivity = 0.002
+stickSensitivity = 2.0
 headHeight = 8.0
 forwardOffset = 5.0
 
@@ -53,14 +54,25 @@ function onUpdate(dt)
         return
     end
 
+    local rStickX = Input:getGamepadAxis(GamepadAxes.RStickX)
+    local rStickY = Input:getGamepadAxis(GamepadAxes.RStickY)
+
+    if rStickX < 0.5 and rStickX > -0.5 then
+        rStickX = 0.0
+    end
+    if rStickY < 0.5 and rStickY > -0.5 then
+        rStickY = 0.0
+    end
+
     local dx, dy = Input:getMouseDelta()
 
     lastMouseX = mx
     lastMouseY = my
 
     -- Update rotation
-    yaw = yaw - dx * mouseSensitivity
-    pitch = pitch - dy * mouseSensitivity
+    yaw   = yaw   - (dx * mouseSensitivity) - (rStickX * stickSensitivity * dt)
+    pitch = pitch - (dy * mouseSensitivity) - (rStickY * stickSensitivity * dt)
+
 
     -- Clamp pitch
     if pitch < pitchMin then pitch = pitchMin end

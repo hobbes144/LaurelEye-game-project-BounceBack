@@ -16,6 +16,7 @@ body = nil
 cameraTransform = nil
 smokeEmitter = nil
 speaker = nil
+playerPointLight = nil
 
 isGrounded = true
 jumping = false
@@ -36,6 +37,14 @@ footstepTimer = 0.0
 stepInterval = 0.35   -- seconds between steps
 speedThreshold = 2.0  -- when footsteps should begin
 
+health = 3.0
+invincible = false
+invincibleTimer = 0.0
+
+shakeTrauma = 0.0          -- how intense the shake is
+shakeDecay = 1.5           -- how fast the shake fades out (per second)
+shakeMaxAngle = 25.0        -- degrees of maximum shake
+
 function onStart()
     transform = self:findTransform()
     body = self:findPhysics()
@@ -44,6 +53,11 @@ function onStart()
         local cameraEntity = scene:findEntityByName("Camera")
         if cameraEntity ~= nil then
             cameraTransform = cameraEntity:findTransform()
+        end
+
+        local playerLightEntity = scene:findEntityByName("PlayerPointLight")
+        if playerLightEntity ~= nil then
+            playerPointLight = playerLightEntity:findPointLight()
         end
     end
     
@@ -63,11 +77,34 @@ function onStart()
 end
 
 function onUpdate(dt)
+	if health <= 0 then
+        print("Player has died!")
+        Engine:stop()
+    end
+
+	if invincible then
+        invincibleTimer = invincibleTimer + dt
+        if invincibleTimer >= 5.5 then
+            invincible = false
+        end
+    end
+
     -- Poll input
-    local inputX = (Input:isKeyHeld(Key.D) and 1 or 0) +
+    local lStickX = Input:getGamepadAxis(GamepadAxes.LStickX)
+    local lStickY = Input:getGamepadAxis(GamepadAxes.LStickY)
+    if lStickX < 0.5 and lStickX > -0.5 then
+        lStickX = 0.0
+    end
+    if lStickY < 0.5 and lStickY > -0.5 then
+        lStickY = 0.0
+    end
+
+    local inputX = lStickX +
+                   (Input:isKeyHeld(Key.D) and 1 or 0) +
                    (Input:isKeyHeld(Key.A) and -1 or 0)
 
-    local inputZ = (Input:isKeyHeld(Key.S) and -1 or 0) +
+    local inputZ = -lStickY +
+                   (Input:isKeyHeld(Key.S) and -1 or 0) +
                    (Input:isKeyHeld(Key.W) and 1 or 0)
 
     local mag = math.sqrt(inputX*inputX + inputZ*inputZ)
@@ -121,7 +158,7 @@ function onUpdate(dt)
     end
 
     -- Jump check
-    if isGrounded and Input:isKeyPressed(Key.Space) then
+    if isGrounded and (Input:isKeyPressed(Key.Space) or Input:isButtonPressed(GamepadButton.A)) then
         local mass = body:getBodyData().mass
         body:applyImpulse(Vector3.new(0, jumpVelocity * mass, 0))
         jumping = true
@@ -129,7 +166,7 @@ function onUpdate(dt)
     end
 
     -- Jump cut
-    if jumping and not Input:isKeyHeld(Key.Space) and vel.y > 0 then
+    if jumping and not (Input:isKeyHeld(Key.Space) or Input:isButtonHeld(GamepadButton.A)) and vel.y > 0 then
         vel.y = vel.y * jumpCut
         body:setLinearVelocity(vel)
         jumping = false
@@ -137,6 +174,26 @@ function onUpdate(dt)
 
     -- Rotate
     local camRot = cameraTransform:getWorldRotation()
+	if shakeTrauma > 0 then
+		shakeTrauma = math.max(0, shakeTrauma - shakeDecay * dt)
+
+		-- Trauma squared for smoother feeling (Dead Cells style)
+		local shake = shakeTrauma * shakeTrauma
+
+		-- Random angles in degrees
+		local yawShake   = (math.random() * 2 - 1) * shakeMaxAngle * shake
+		local pitchShake = (math.random() * 2 - 1) * shakeMaxAngle * shake
+		local rollShake  = (math.random() * 2 - 1) * shakeMaxAngle * shake * 0.6
+
+		-- Convert to quaternion and apply AFTER normal rotation
+		local shakeRot = Quaternion.fromEuler(
+			math.rad(pitchShake),
+			math.rad(yawShake),
+			math.rad(rollShake)
+		)
+
+		cameraTransform:setWorldRotation(shakeRot * camRot)
+	end
     local camForward = camRot:forward()
 
     -- Extract yaw from camera forward vector
@@ -192,6 +249,14 @@ function onUpdate(dt)
             footstepTimer = 0.0
         end
     end
+
+    if playerPointLight ~= nil then
+        local lightPos = transform:getWorldPosition() + Vector3.new(0, 4.0, 0)
+        local data = playerPointLight:getLightData()
+
+        data.position = lightPos
+        playerPointLight:setLightData(data)
+    end
 end
 
 function triggerLandingBurst()
@@ -242,16 +307,54 @@ function rotateTo(angle, dt)
 end
 
 function onCollisionEnter(data)
-    local name = data.entityB:getName()
-    if name == "Ground" then
-
-        if not isGrounded then
-            triggerLandingBurst()
+    --Check for enemy collision
+    local tagsA = data.entityA:getTags()
+    for _, tag in pairs(tagsA) do
+        if tag == "enemy" and invincible == false then
+            print("Collided with Enemy!")
+            health = health - 1.0
+			shakeTrauma = math.min(shakeTrauma + 0.35, 1.0)
+			if speaker ~= nil then
+				speaker:stop("damage")
+				speaker:play("damage")
+			end
+            invincible = true
         end
 
-        isGrounded = true
-        jumping = false
+        if tag == "ground" then
+            if not isGrounded then
+                triggerLandingBurst()
+            end
+
+            isGrounded = true
+            jumping = false
+        end
+
     end
+
+    local tagsB = data.entityB:getTags()
+    for _, tag in pairs(tagsB) do
+        if tag == "enemy" and invincible == false then
+            print("Collided with Enemy!")
+            health = health - 1.0
+			shakeTrauma = math.min(shakeTrauma + 0.35, 1.0)
+			if speaker ~= nil then
+				speaker:stop("damage")
+				speaker:play("damage")
+			end
+            invincible = true
+        end
+
+        if tag == "ground" then
+            if not isGrounded then
+                triggerLandingBurst()
+            end
+
+            isGrounded = true
+            jumping = false
+        end
+    end
+
 end
 
 function onCollisionExit(data)

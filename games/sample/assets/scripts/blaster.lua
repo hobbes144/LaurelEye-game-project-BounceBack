@@ -3,6 +3,7 @@ blasterTransform = nil
 blasterEmitterTransform = nil
 blasterParticleEmitter = nil
 blasterSFXEmitter = nil
+local canFire = true
 
 -- Offsets relative to camera
 local blasterOffsetPos = Vector3.new(1.0, -1.5, 3.0)
@@ -34,9 +35,21 @@ end
 function onUpdate(dt)
     updateBlasterTransform()
     updateEmitterTransform()
+    local isMousePressed = Input:isMouseButtonPressed(MouseButton.Left)
+    local rtAxis = Input:getGamepadAxis(GamepadAxes.RT)
+    local isGamepadPressed = rtAxis > 0.5
 
-    if Input:isMouseButtonPressed(MouseButton.Left) then
+    local pressed = isMousePressed or isGamepadPressed
+
+    -- SEMI AUTO LOGIC
+    if pressed and canFire then
         shootProjectile()
+        canFire = false
+    end
+
+    -- Reset fire ability when user RELEASES the trigger/button
+    if not pressed then
+        canFire = true
     end
 end
 

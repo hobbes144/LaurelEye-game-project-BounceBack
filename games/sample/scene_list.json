@@ -10,8 +10,8 @@
             "path": "scenes/sample_scene_one.scene.json"
         },
         {
-            "name": "Level2",
-            "path": "scenes/sample_scene_two.scene.json"
+            "name": "ZombiePrototype",
+            "path": "scenes/zombie_prototype.scene.json"
         },
         {
             "name": "PhysicsScene",

@@ -127,8 +127,8 @@ function destroySelf()
     print(speaker)
     if speaker ~= nil then
         print("speaker noise")
-        speaker:stop()
-        speaker:play()
+        speaker:stop("explosion")
+        speaker:play("explosion")
     end
     SceneManager:destroy(self)
 end
