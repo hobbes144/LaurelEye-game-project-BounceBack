@@ -37,6 +37,8 @@ namespace LaurelEye::Scripting {
             "addTag", &Entity::addTag,
             "compareTag", &Entity::compareTag,
             "getTags", &Entity::getTags,
+            "getPlayerHealth", &Entity::getPlayerHealth,
+            "setPlayerHealth", &Entity::setPlayerHealth,
             "findComponent", &dynamicFindComponent,
             "setActive",
             [](Entity& ent, bool active) {

@@ -89,9 +89,9 @@ namespace LaurelEye {
         std::string getName() const { return name; }
 
     private:
-        std::string name;
+        std::string name = "Default";
 
-        SingleUIMapping* current;
+        SingleUIMapping* current = nullptr;
         std::unordered_map<std::string, SingleUIMapping*> inputMap = std::unordered_map<std::string, SingleUIMapping*>();
     };
 } // namespace LaurelEye

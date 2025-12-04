@@ -20,7 +20,7 @@ namespace LaurelEye {
     }
 
     void UIElementManager::update(float deltaTime) {
-        if ( !currentComponent || !inputManager || elements.empty() ) {
+        if ( !inputManager || elements.empty() ) {
             return;
         }
 
@@ -32,6 +32,10 @@ namespace LaurelEye {
             auto [mouseX, mouseY] = mouseToUICoordinate();
 
             for ( const auto& it : elements ) {
+                if (it.second == nullptr) {
+                    continue;
+                }
+
                 it.second->UpdateScaling();
 
                 if ( it.second->MouseInRange(mouseX, mouseY) && it.second->isActive() ) {
@@ -45,6 +49,10 @@ namespace LaurelEye {
             if ( inputManager->isKeyPressed(escapeKey) || inputManager->isButtonPressed(escapeButton) ) {
                 setIsUIActive(!isUIActive);
                 hoverDelay = 0.0f;
+            }
+
+            if ( !currentComponent ) {
+                return;
             }
 
             if ( currentComponent->isActive() ) {
@@ -79,12 +87,12 @@ namespace LaurelEye {
 
         elements[elementToRegister->GetUIName()] = elementToRegister;
         elementToRegister->BindWindow(window);
-        if ( currentComponent == nullptr ) {
+        if ( currentComponent == nullptr && elementToRegister->CanBeFocused() ) {
             setCurrentUIComponent(elementToRegister);
         }
 
-
         std::cout << "Registered UI Element: " << elementToRegister->GetUIName() << std::endl;
+        elementToRegister->UpdateScaling();
         updateIsUIActive();
     }
 
@@ -122,7 +130,12 @@ namespace LaurelEye {
     void UIElementManager::pushInputMap(const std::string& inputMapName) {
         auto it = inputMapStorage.find(inputMapName);
         if ( it != inputMapStorage.end() ) {
-            disableCurrentUI();
+            if ( disableAllPrev ) {
+                disableAllUI();
+            }
+            else {
+                disableCurrentFocusableUI();
+            }
             inputMaps.push(it->second);
             enableCurrentUI();
         }
@@ -167,7 +180,7 @@ namespace LaurelEye {
 
     void UIElementManager::setUIWindow(LaurelEye::IWindow* _window) {
         window = _window;
-        if (elements.empty()) {
+        if ( elements.empty() ) {
             return;
         }
         else {
@@ -182,6 +195,17 @@ namespace LaurelEye {
             std::unordered_map<std::string, SingleUIMapping*> map = inputMaps.top()->getInputMap();
             for ( auto& [key, val] : map ) {
                 if ( elements[key] != nullptr ) {
+                    elements[key]->setIsActive(false);
+                }
+            }
+        }
+    }
+
+    void UIElementManager::disableCurrentFocusableUI() {
+        if ( !inputMaps.empty() ) {
+            std::unordered_map<std::string, SingleUIMapping*> map = inputMaps.top()->getInputMap();
+            for ( auto& [key, val] : map ) {
+                if ( elements[key] != nullptr && elements[key]->CanBeFocused() ) {
                     elements[key]->setIsActive(false);
                 }
             }
@@ -346,6 +370,14 @@ namespace LaurelEye {
                 inputMaps.top()->setCurrent(currentComponent->GetUIName());
             }
         }
+    }
+
+    Graphics::UIComponent* UIElementManager::findUIComponent(const std::string& name) const {
+        auto it = elements.find(name);
+        if ( it != elements.end() ) {
+            return it->second;
+        }
+        return nullptr;
     }
 
     void UIElementManager::setInputAndWindow(LaurelEye::InputManager* inputMgr, LaurelEye::IWindow* _window) {

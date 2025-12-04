@@ -45,6 +45,8 @@ shakeTrauma = 0.0          -- how intense the shake is
 shakeDecay = 1.5           -- how fast the shake fades out (per second)
 shakeMaxAngle = 25.0        -- degrees of maximum shake
 
+healthUIElements = {}
+
 function onStart()
     transform = self:findTransform()
     body = self:findPhysics()
@@ -74,6 +76,11 @@ function onStart()
     end
 
     speaker = self:findAudioSpeaker()
+
+    for i = 1, 3 do
+        healthUIElements[i] = UIElementManager:findUIComponent("HealthUI" .. i)
+        print("Thingy: " .. tostring(healthUIElements[i]))
+    end
 end
 
 function onUpdate(dt)
@@ -84,8 +91,9 @@ function onUpdate(dt)
 
 	if invincible then
         invincibleTimer = invincibleTimer + dt
-        if invincibleTimer >= 5.5 then
+        if invincibleTimer >= 2.5 then
             invincible = false
+            invincibleTimer = 0.0
         end
     end
 
@@ -256,6 +264,16 @@ function onUpdate(dt)
 
         data.position = lightPos
         playerPointLight:setLightData(data)
+    end
+
+    for i, uiElement in ipairs(healthUIElements) do
+        if uiElement then
+            if i <= health then
+                uiElement:setActive(true)
+            else
+                uiElement:setActive(false)
+            end
+        end
     end
 end
 

@@ -8,10 +8,12 @@
 
 #pragma once
 #include "LaurelEyeEngine/core/EngineContext.h"
+#include "LaurelEyeEngine/events/EventManager.h"
+#include "LaurelEyeEngine/UI/UIElementManager.h"
 #include <sol/sol.hpp>
+#include <string>
 #include <unordered_map>
 #include <vector>
-#include <string>
 
 namespace LaurelEye::Scripting {
 
@@ -20,6 +22,13 @@ namespace LaurelEye::Scripting {
         static void setup(sol::state& lua, EngineContext* ctx);
         static void shutdown(EngineContext* ctx);
     private:
+        static void setupUIComponent(sol::state& lua);
+        static void setupUIButtons(sol::state& lua);
+        static void setupUILayout(sol::state& lua);
+        static void setupButtonCallbacks(sol::state& lua);
+        static void setupEventListener(sol::state& lua, EventManager* eventManager);
+        static void setupUIManager(sol::state& lua, UIElementManager* uiManager);
+
         static inline std::unordered_map<std::string, std::vector<sol::function>> buttonCallbacks;
         static inline uint32_t listenerID;
     };

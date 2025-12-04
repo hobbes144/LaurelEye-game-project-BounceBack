@@ -67,6 +67,9 @@ namespace LaurelEye {
         void setRegistered(bool isRegistered) { registered = isRegistered; }
         bool getRegistered() const { return registered; }
 
+        void setPlayerHealth(int newHealth) { playerHealth = newHealth; }
+        int getPlayerHealth() const { return playerHealth; }
+
         void addTag(std::string tagToAdd) {
             tags.insert(tagToAdd);
         }
@@ -100,6 +103,9 @@ namespace LaurelEye {
             static unsigned int counter = 0;
             return counter++;
         }
+
+        // should be moved to data
+        int playerHealth = 1;
 
         std::unordered_set<std::string> tags; // Tags are strings and not constrained. Up to designers to coordinate
         unsigned int layer;                   // identifies the layer the entity is assigned to

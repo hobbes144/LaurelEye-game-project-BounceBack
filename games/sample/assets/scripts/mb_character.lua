@@ -49,6 +49,9 @@ invincibleTimer = 0.0
 exp = 0.0
 lvl = 1.0
 
+-- Health UI Elements
+healthUIElements = {}
+
 function onStart()
     transform = self:findTransform()
     body = self:findPhysics()
@@ -73,6 +76,11 @@ function onStart()
     end
 
     speaker = self:findAudioSpeaker()
+
+    -- Assume there are 3 health UI elements; adjust count as needed
+    for i = 1, 3 do
+        healthUIElements[i] = UIElementManager:findUIComponent("HealthUI" .. i)
+    end
 end
 
 function onUpdate(dt)
@@ -82,10 +90,21 @@ function onUpdate(dt)
         Engine:stop()
     end
 
+    for i, uiElement in ipairs(healthUIElements) do
+        if uiElement then
+            if i <= health then
+                uiElement:setActive(true)
+            else
+                uiElement:setActive(false)
+            end
+        end
+    end
+
     if invincible then
         invincibleTimer = invincibleTimer + dt
         if invincibleTimer >= 1.5 then
             invincible = false
+            invincibleTimer = 0.0
         end
     end
 

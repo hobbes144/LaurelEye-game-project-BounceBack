@@ -22,6 +22,8 @@ namespace LaurelEye::Graphics {
         // glClear(GL_DEPTH_BUFFER_BIT);
         glDisable(GL_DEPTH_TEST);
 
+        glDisable(GL_BLEND);
+
         glBlendEquation(blendFactor.equation);
         glBlendFunc(blendFactor.srcFactor, blendFactor.destFactor);
 

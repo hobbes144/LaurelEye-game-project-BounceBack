@@ -27,6 +27,10 @@ namespace LaurelEye::Graphics {
     }
 
     void UIComponent::UpdateScaling() {
+        if ( this->transComp == nullptr || this->window == nullptr ) {
+            return;
+        }
+
         Vector3 scale = Vector3(originalScale.x / window->getWidth(), originalScale.y / window->getHeight(), 0.0f);
         if ( isFocused ) {
             transComp->getWorldTransform().setScaling(scale * 1.1f);

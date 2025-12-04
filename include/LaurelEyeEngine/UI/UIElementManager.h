@@ -21,6 +21,10 @@ namespace LaurelEye {
         ~UIElementManager();
 
         void setCurrentUIComponent(Graphics::UIComponent* component);
+        Graphics::UIComponent* getCurrentUIComponent() const {
+            return currentComponent;
+        }
+        Graphics::UIComponent* findUIComponent(const std::string& name) const;
 
         void setInputAndWindow(LaurelEye::InputManager* inputMgr, LaurelEye::IWindow* _window);
 
@@ -29,19 +33,14 @@ namespace LaurelEye {
         void update(float deltaTime);
 
         void registerUIElement(Graphics::UIComponent* elementToRegister);
-
         void deregisterUIElement(Graphics::UIComponent* elementToDeregister);
 
         void removeAllUIElements();
-
         void clearInputMaps();
-
         void pushInputMap(const std::string& inputMapName);
-
         void popInputMap();
 
         void registerInputMap(UILayout* inputMap);
-
         void deregisterInputMap(UILayout* inputMap);
 
         void setInputManager(LaurelEye::InputManager* inputMgr) {
@@ -52,6 +51,7 @@ namespace LaurelEye {
 
         void enableCurrentUI();
         void disableCurrentUI();
+        void disableCurrentFocusableUI();
         void disableAllUI();
 
         void toLeft();
@@ -76,13 +76,18 @@ namespace LaurelEye {
         bool getIsUIActive() const { return isUIActive; }
 
         void dispatchActivateEvent();
-
         void registerListener();
-
         void deregisterListener();
 
         void setEngineContext(EngineContext& newContext) {
             context = &newContext;
+        }
+
+        void setDisableAllPrevious(bool disableAll) {
+            disableAllPrev = disableAll;
+        }
+        bool getDisableAllPrevious() const {
+            return disableAllPrev;
         }
 
         // Converts mouse position to UI coordinate system (-1 to 1)
@@ -93,10 +98,19 @@ namespace LaurelEye {
     private:
         float hoverDelay = 0.0f;
         const float hoverCooldown = 0.1f;
-
-        bool isUIActive = true;
         bool shouldUIBeActiveOnStart = true;
-
+        bool isUIActive = true;
+        bool disableAllPrev = false; // true = disable all previous UI, false = disable all focusable previous UI
+        /**
+         * Controls how previous UI elements are disabled when a new input map is pushed.
+         * - true: Disables all previous UI elements, making only the current input map's UI active.
+         * - false: Disables only the previous UI elements that are focusable, allowing non-focusable UI to remain interactive.
+         * 
+         * Set to true when you want to ensure that only the current UI is interactive (e.g., for modal dialogs or overlays).
+         * Set to false when you want to allow background UI elements that are not focusable to remain active (e.g., for tooltips or notifications).
+         * This field affects UI behavior when pushing input maps by determining the scope of UI elements that are disabled.
+         */
+        //bool disableAllPrev = false;
         Graphics::UIComponent* currentComponent = nullptr;
 
         std::unordered_map<std::string, Graphics::UIComponent*> elements = std::unordered_map<std::string, Graphics::UIComponent*>(); // All available UI elements
