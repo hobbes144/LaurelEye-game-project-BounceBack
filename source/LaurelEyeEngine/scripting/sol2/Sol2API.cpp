@@ -10,6 +10,10 @@
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Particles.h"
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Audio.h"
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_UI.h"
+#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Renderable.h"
+#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Camera.h"
+#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Lights.h"
+
 
 namespace LaurelEye::Scripting {
 
@@ -37,6 +41,13 @@ namespace LaurelEye::Scripting {
         Sol2API_ECS::setup(lua, ctx);
 
         /* Renderer*/
+        Sol2API_Renderable::setup(lua, ctx);
+
+        /* Camera */
+        Sol2API_Camera::setup(lua);
+
+        /* Lights */
+        Sol2API_Lights::setup(lua);
 
         /* Physics */
         Sol2API_Physics::setup(lua, ctx);
