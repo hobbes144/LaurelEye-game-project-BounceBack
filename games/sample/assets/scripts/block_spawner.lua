@@ -23,7 +23,6 @@ spawnCount = 0
 
 
 function onStart()
-    math.randomseed(os.time())
 end
 
 function onUpdate(deltaTime)

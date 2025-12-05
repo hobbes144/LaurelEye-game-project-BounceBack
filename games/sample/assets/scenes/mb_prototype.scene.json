@@ -1,8 +1,7 @@
 ﻿{
     "settings": {
         "resetOnLoad": true,
-        "backgroundTexture": "textures/Tropical_Beach_8k.jpg",
-        "UIActiveOnLoad": true
+        "backgroundTexture": "textures/Tropical_Beach_8k.jpg"
     },
     "entities": [
         {

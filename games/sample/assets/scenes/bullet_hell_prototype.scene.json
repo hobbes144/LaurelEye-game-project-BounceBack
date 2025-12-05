@@ -1,12 +1,12 @@
 ﻿{
     "settings": {
         "resetOnLoad": true,
-        "backgroundTexture": "textures/Tropical_Beach_8k.jpg",
-        "UIActiveOnLoad": false
+        "backgroundTexture": "textures/Tropical_Beach_8k.jpg"
     },
     "entities": [
         {
             "name": "Ground",
+            "tags": [ "ground" ],
             "components": {
                 "Transform": {
                     "position": [ 0.0, -1.0, 0.0 ],

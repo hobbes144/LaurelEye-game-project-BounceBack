@@ -401,12 +401,14 @@ function onCollisionEnter(data)
     for _, tag in pairs(tagsA) do
         if tag == "enemy" and invincible == false then
             print("Collided with Enemy!")
-            health = health - 1.0
+            if invincible == false then
+                health = health - 1.0
+                invincible = true
+            end
             if speaker ~= nil then
 				speaker:stop("damage")
 				speaker:play("damage")
 			end
-            invincible = true
         end
 
         if tag == "exp" then
@@ -429,12 +431,14 @@ function onCollisionEnter(data)
     for _, tag in pairs(tagsB) do
         if tag == "enemy" and invincible == false then
             print("Collided with Enemy!")
-            health = health - 1.0
+            if invincible == false then
+                health = health - 1.0
+                invincible = true
+            end
             if speaker ~= nil then
 				speaker:stop("damage")
 				speaker:play("damage")
 			end
-            invincible = true
         end
 
         if tag == "exp" then

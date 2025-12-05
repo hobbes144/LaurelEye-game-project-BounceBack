@@ -2,8 +2,6 @@
 accelGround    = 250.0
 accelAir       = 30.0
 decelGround    = 5.0
-jumpVelocity   = 60.5
-jumpCut        = 0.45
 turnSpeed      = 10.0
 dustTimer = 0.0
 dustInterval = 0.05
@@ -16,9 +14,6 @@ body = nil
 cameraTransform = nil
 smokeEmitter = nil
 speaker = nil
-
-isGrounded = true
-jumping = false
 
 landingBurstTime = 0.1
 landingBurstTimer = 0.0
@@ -79,7 +74,7 @@ function onUpdate(dt)
 
     if health <= 0 then
         print("Player has died!")
-        Engine:stop()
+        SceneManager:changeScene("MainMenu")
     end
 
     for i, uiElement in ipairs(healthUIElements) do
@@ -150,7 +145,7 @@ function onUpdate(dt)
     -- small deadzone to avoid jitter
     if dvMag > dvDeadzone then
         -- choose time constant depending on grounded state
-        local timeToReach = isGrounded and timeToReachGround or timeToReachAir
+        local timeToReach = timeToReachGround or timeToReachAir
 
         -- desired acceleration to reach the target within timeToReach
         local accelReqX = dvx / math.max(timeToReach, 0.0001)
@@ -158,7 +153,7 @@ function onUpdate(dt)
         local accelReqMag = math.sqrt(accelReqX*accelReqX + accelReqZ*accelReqZ)
 
         -- clamp to maximum allowed acceleration (ground/air)
-        local maxAccel = isGrounded and accelGround or accelAir
+        local maxAccel = accelGround or accelAir
         if accelReqMag > maxAccel then
             accelReqX = accelReqX / accelReqMag * maxAccel
             accelReqZ = accelReqZ / accelReqMag * maxAccel
@@ -181,7 +176,7 @@ function onUpdate(dt)
     if smokeEmitter ~= nil and not inLandingBurst then
         local horizontalSpeed = math.sqrt(v.x*v.x + v.z*v.z)
 
-        if isGrounded and horizontalSpeed > 50.0 then
+        if horizontalSpeed > 50.0 then
             dustTimer = dustTimer - dt
             if dustTimer <= 0.0 then
                 smokeEmitter:play()
@@ -208,7 +203,7 @@ function onUpdate(dt)
     if speaker ~= nil then
         local horizontalSpeed = math.sqrt(v.x*v.x + v.z*v.z)
 
-        if isGrounded and horizontalSpeed > walkSoundMinSpeed then
+        if horizontalSpeed > walkSoundMinSpeed then
             footstepTimer = footstepTimer + dt
             if footstepTimer >= stepInterval then
                 footstepTimer = 0.0
@@ -273,24 +268,14 @@ function rotateTo(angle, dt)
 end
 
 function onCollisionEnter(data)
-    local name = data.entityB:getName()
-    if name == "Ground" then
-
-        if not isGrounded then
-            triggerLandingBurst()
-        end
-
-        isGrounded = true
-        jumping = false
-    end
-
-    if destroyed then return end
-
     local tagsA = data.entityA:getTags()
     for _, tag in pairs(tagsA) do
         if tag == "projectile" then
             print("Collided with Projectile!")
-            health = health - 1.0
+            if invincible == false then
+                health = health - 1.0
+                invincible = true
+            end
             if speaker ~= nil then
 				speaker:stop("damage")
 				speaker:play("damage")
@@ -303,7 +288,10 @@ function onCollisionEnter(data)
     for _, tag in pairs(tagsB) do
         if tag == "projectile" then
             print("Collided with Projectile!")
-            health = health - 1.0
+            if invincible == false then
+                health = health - 1.0
+                invincible = true
+            end
             if speaker ~= nil then
 				speaker:stop("damage")
 				speaker:play("damage")
@@ -315,8 +303,5 @@ function onCollisionEnter(data)
 end
 
 function onCollisionExit(data)
-    local name = data.entityB:getName()
-    if name == "Ground" then
-        isGrounded = false
-    end
+
 end

@@ -48,6 +48,8 @@ function onUpdate(dt)
         SceneManager:changeScene("MBPrototype")
     elseif Input:isKeyPressed(Key.Escape) then
         SceneManager:changeScene("MainMenu")
+    elseif Input:isKeyPressed(Key.Nine) then
+        Engine:stop()
     end
 
 end
