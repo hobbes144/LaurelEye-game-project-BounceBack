@@ -101,10 +101,22 @@ function onUpdate(dt)
     end
 
     -- Poll input
-    local inputX = (Input:isKeyHeld(Key.D) and 1 or 0) +
+    local lStickX = Input:getGamepadAxis(GamepadAxes.LStickX)
+    local lStickY = Input:getGamepadAxis(GamepadAxes.LStickY)
+
+    if lStickX < 0.5 and lStickX > -0.5 then
+        lStickX = 0.0
+    end
+    if lStickY < 0.5 and lStickY > -0.5 then
+        lStickY = 0.0
+    end
+
+    local inputX = lStickX +
+                   (Input:isKeyHeld(Key.D) and 1 or 0) +
                    (Input:isKeyHeld(Key.A) and -1 or 0)
 
-    local inputZ = (Input:isKeyHeld(Key.S) and -1 or 0) +
+    local inputZ = -lStickY +
+                   (Input:isKeyHeld(Key.S) and -1 or 0) +
                    (Input:isKeyHeld(Key.W) and 1 or 0)
 
     local mag = math.sqrt(inputX*inputX + inputZ*inputZ)
@@ -279,6 +291,10 @@ function onCollisionEnter(data)
         if tag == "projectile" then
             print("Collided with Projectile!")
             health = health - 1.0
+            if speaker ~= nil then
+				speaker:stop("damage")
+				speaker:play("damage")
+			end
             invincible = true
         end
     end
@@ -288,6 +304,10 @@ function onCollisionEnter(data)
         if tag == "projectile" then
             print("Collided with Projectile!")
             health = health - 1.0
+            if speaker ~= nil then
+				speaker:stop("damage")
+				speaker:play("damage")
+			end
             invincible = true
         end
     end

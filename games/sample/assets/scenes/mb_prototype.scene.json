@@ -1,6 +1,6 @@
 ﻿{
     "settings": {
-        "resetOnLoad": false,
+        "resetOnLoad": true,
         "backgroundTexture": "textures/Tropical_Beach_8k.jpg",
         "UIActiveOnLoad": true
     },
@@ -12,7 +12,7 @@
                 "Transform": {
                     "position": [ 0.0, -1.0, 0.0 ],
                     "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 200.0, 2.0, 200.0 ]
+                    "scale": [ 1000.0, 2.0, 1000.0 ]
                 },
                 "Render3D": {
                     "mesh": {
@@ -20,7 +20,7 @@
                         "primitiveType": "Cube"
                     },
                     "material": {
-                        "texture": "textures/texture_01_green.png",
+                        "texture": "textures/grass03.jpg",
                         "diffuse": [ 1.0, 10.0, 1.0 ],
                         "specular": [ 0.2, 0.2, 0.2 ],
                         "shininess": 32.0
@@ -167,6 +167,25 @@
             "components": {
                 "Script": {
                     "path": "scripts/enemy_spawner.lua"
+                }
+            }
+        },
+        {
+            "name": "BackgroundMusic",
+            "tags": [ "" ],
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 0.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Speaker": {
+                    "audioName": "background",
+                    "audioPath": "audio/background_music_loop.mp3",
+                    "volume": 0.05,
+                    "loop": true,
+                    "3D": false,
+                    "playOnLoad": true
                 }
             }
         }

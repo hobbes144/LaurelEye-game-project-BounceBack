@@ -167,7 +167,6 @@ namespace LaurelEye {
 
                     if ( childTransform && parentTransform ) {
                         childTransform->setParent(parentTransform);
-                        parentTransform->addChild(childTransform);
                     }
                 }
             }

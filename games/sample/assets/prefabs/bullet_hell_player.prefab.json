@@ -4,7 +4,7 @@
     "components": {
         "Transform": {
             "position": [ 0.0, 0.0, 0.0 ],
-            "rotation": [ 0.0, 0.0, 180.0, 1.0 ],
+            "rotation": [ 0.0, 0.0, -1.0, 0.0 ],
             "scale": [ 0.08, 0.08, 0.08 ]
         },
         "Render3D": {

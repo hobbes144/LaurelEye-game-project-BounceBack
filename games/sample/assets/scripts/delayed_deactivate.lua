@@ -25,7 +25,7 @@ function onUpdate(dt)
     -- end
 
     -- When timer ends, deactivate entity
-    if timer >= delay then
+    if timer >= delay or Input:isKeyPressed(Key.Tab) then
         self:setActive(false)
     end
 end

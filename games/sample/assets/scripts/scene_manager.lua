@@ -23,8 +23,8 @@ end
 
 function onUpdate(dt)
     if Input:isKeyPressed(Key.One) then
-        log("Loading Scene: Level1")
-        SceneManager:changeScene("Level1")
+        log("Loading Scene: MBPrototype")
+        SceneManager:changeScene("MBPrototype")
     elseif Input:isKeyPressed(Key.Two) then
         log("Loading Scene: Level2")
         SceneManager:changeScene("ZombiePrototype")
@@ -47,7 +47,7 @@ function onUpdate(dt)
         log("Loading Scene: MBPrototype")
         SceneManager:changeScene("MBPrototype")
     elseif Input:isKeyPressed(Key.Escape) then
-        Engine:stop()
+        SceneManager:changeScene("MainMenu")
     end
 
 end

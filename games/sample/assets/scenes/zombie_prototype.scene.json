@@ -1,6 +1,6 @@
 ﻿{
     "settings": {
-        "resetOnLoad": false,
+        "resetOnLoad": true,
         "backgroundTexture": "textures/sky_27_2k.jpg"
     },
     "entities": [

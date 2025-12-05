@@ -1,35 +1,8 @@
 ﻿{
     "settings": {
-        "resetOnLoad": false,
+        "resetOnLoad": true,
         "backgroundTexture": "textures/Tropical_Beach_8k.jpg",
-        "UIActiveOnLoad": false,
-        "UILayout": [
-            {
-                "name": "baseMapping",
-                "mappings": [
-                    {
-                        "name": "B1",
-                        "right": "B2",
-                        "down": "B3"
-                    },
-                    {
-                        "name": "B2",
-                        "left": "B1",
-                        "down": "B4"
-                    },
-                    {
-                        "name": "B3",
-                        "up": "B1",
-                        "right": "B4"
-                    },
-                    {
-                        "name": "B4",
-                        "left": "B3",
-                        "up": "B2"
-                    }
-                ]
-            }
-        ]
+        "UIActiveOnLoad": false
     },
     "entities": [
         {
@@ -38,7 +11,7 @@
                 "Transform": {
                     "position": [ 0.0, -1.0, 0.0 ],
                     "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 200.0, 2.0, 200.0 ]
+                    "scale": [ 1000.0, 2.0, 1000.0 ]
                 },
                 "Render3D": {
                     "mesh": {
@@ -46,7 +19,7 @@
                         "primitiveType": "Cube"
                     },
                     "material": {
-                        "texture": "textures/texture_01_green.png",
+                        "texture": "textures/grass03.jpg",
                         "diffuse": [ 1.0, 10.0, 1.0 ],
                         "specular": [ 0.2, 0.2, 0.2 ],
                         "shininess": 32.0
@@ -190,6 +163,25 @@
             "components": {
                 "Script": {
                     "path": "scripts/block_spawner.lua"
+                }
+            }
+        },
+        {
+            "name": "BackgroundMusic",
+            "tags": [ "" ],
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 0.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Speaker": {
+                    "audioName": "background",
+                    "audioPath": "audio/background_music_loop.mp3",
+                    "volume": 0.05,
+                    "loop": true,
+                    "3D": false,
+                    "playOnLoad": true
                 }
             }
         }

@@ -155,6 +155,7 @@ namespace LaurelEye {
 
             // 2. attach this to dstNode
             newParent->addChild(this);
+            parentTransform = newParent;
 
             markLocalDirty();
         }
@@ -226,7 +227,7 @@ namespace LaurelEye {
                         parentWorldTransform.getInverseLocalMatrix() * worldTransform.getPosition(),
                         worldTransform.getRotation() * parentWorldTransform.getRotation().inverse(),
                         worldTransform.getScaling() * parentWorldTransform.getScaling().reciprocal());
-                    setLocalTransform(newLocalTransform);
+                    localTransform = newLocalTransform;
                 }
                 else {
                     localTransform = worldTransform;

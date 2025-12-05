@@ -2,8 +2,8 @@
 target = nil
 
 -- Camera offsets
-distanceBack = 35.0
-height = 20.0
+distanceBack = 40.0
+height = 16.0
 rotationSpeed = 1.0  -- radians per second
 lerpSpeed = 8.0      -- smooth follow speed
 

@@ -87,7 +87,7 @@ function onUpdate(dt)
     --Check if health = 0
     if health <= 0 then
         print("Player has died!")
-        Engine:stop()
+        SceneManager:changeScene("MainMenu")
     end
 
     for i, uiElement in ipairs(healthUIElements) do
@@ -191,7 +191,7 @@ function onUpdate(dt)
     end
 
     -- Jump check
-    if isGrounded and Input:isKeyPressed(Key.Space) then
+    if isGrounded and (Input:isKeyPressed(Key.Space) or Input:isButtonPressed(GamepadButton.A)) then
         local mass = body:getBodyData().mass
         body:applyImpulse(Vector3.new(0, jumpVelocity * mass, 0))
         jumping = true
@@ -199,7 +199,7 @@ function onUpdate(dt)
     end
 
     -- Jump cut
-    if jumping and not Input:isKeyHeld(Key.Space) and vel.y > 0 then
+    if jumping and not (Input:isKeyHeld(Key.Space) or Input:isButtonHeld(GamepadButton.A)) and vel.y > 0 then
         vel.y = vel.y * jumpCut
         body:setLinearVelocity(vel)
         jumping = false
@@ -402,6 +402,10 @@ function onCollisionEnter(data)
         if tag == "enemy" and invincible == false then
             print("Collided with Enemy!")
             health = health - 1.0
+            if speaker ~= nil then
+				speaker:stop("damage")
+				speaker:play("damage")
+			end
             invincible = true
         end
 
@@ -426,6 +430,10 @@ function onCollisionEnter(data)
         if tag == "enemy" and invincible == false then
             print("Collided with Enemy!")
             health = health - 1.0
+            if speaker ~= nil then
+				speaker:stop("damage")
+				speaker:play("damage")
+			end
             invincible = true
         end
 

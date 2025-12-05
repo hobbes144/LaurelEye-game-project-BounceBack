@@ -1,6 +1,6 @@
 ﻿{
     "settings": {
-        "resetOnLoad": false,
+        "resetOnLoad": true,
         "backgroundTexture": "textures/Tropical_Beach_8k.jpg",
         "UIActiveOnLoad": true,
         "UILayout": [
