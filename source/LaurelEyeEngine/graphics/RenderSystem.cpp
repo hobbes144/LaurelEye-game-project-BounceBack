@@ -792,7 +792,8 @@ namespace LaurelEye::Graphics {
         device->updateDataBufferSubData(
             localLightsBufferHandle, 0,
             sizeof(PointLight) * localLights.pointLights.size(), localLights.pointLights.data());
-        localLightsPass->setLightCount(localLights.pointLights.size());
+        uint32_t count = static_cast<uint32_t>(localLights.pointLights.size());
+        localLightsPass->setLightCount(count);
     }
 
 } // namespace LaurelEye::Graphics

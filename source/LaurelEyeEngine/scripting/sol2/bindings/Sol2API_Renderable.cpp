@@ -103,6 +103,7 @@ namespace LaurelEye::Scripting {
 
         // Add a helper: Material.fromImage(path) -> Material*
         // This will use AssetManager to fetch the image asset and then call Material::FromAsset
+        /*
         lua["Material"]["fromImage"] = [ctx](const std::string& path) -> std::shared_ptr<Graphics::Material> {
             if ( !ctx ) return nullptr;
             auto* am = ctx->getService<IO::AssetManager>();
@@ -115,7 +116,10 @@ namespace LaurelEye::Scripting {
                 std::cerr << "[Lua Material.fromImage] failed to load asset: " << path << std::endl;
                 return nullptr;
             }
+            auto mat = std::make_shared<Graphics::Material>(asset);
+            return mat;
         };
+        */
     }
 
     void Sol2API_Renderable::setupIRenderable(sol::state& lua) {

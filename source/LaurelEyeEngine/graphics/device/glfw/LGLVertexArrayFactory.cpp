@@ -67,11 +67,11 @@ namespace LaurelEye::Graphics {
 
             glVertexArrayAttribFormat(
                 r.id,
-                attr.location,
+                (GLint)attr.location,
                 size,
                 type,
                 normalized,
-                attr.relativeOffset);
+                (GLuint)attr.relativeOffset);
 
             glVertexArrayAttribBinding(
                 r.id,

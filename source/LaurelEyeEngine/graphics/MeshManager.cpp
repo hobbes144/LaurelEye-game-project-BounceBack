@@ -48,11 +48,13 @@ namespace LaurelEye::Graphics {
         MeshHandle handle = getHandle(asset->getName());
         if ( isValidMesh(handle) ) return handle;
 
+        uint32_t countVerticies = static_cast<uint32_t>(asset->vertices.size());
+        uint32_t countIndicies = static_cast<uint32_t>(asset->indices.size());
         return createMesh(asset->getName(),
                           asset->vertices.data(),
-                          asset->vertices.size(),
+                          countVerticies,
                           asset->indices.data(),
-                          asset->indices.size());
+                          countIndicies);
     }
 
     MeshHandle MeshManager::createSkinnedMesh(const IO::SkinnedMeshAsset* asset,
@@ -62,13 +64,17 @@ namespace LaurelEye::Graphics {
         MeshHandle handle = getHandle(asset->getName());
         if ( isValidMesh(handle) ) return handle;
 
+
+        uint32_t countVerticies = static_cast<uint32_t>(asset->vertices.size());
+        uint32_t countIndicies = static_cast<uint32_t>(asset->indices.size());
+        uint32_t countBones = static_cast<uint32_t>(asset->skeleton->bones.size());
         return createSkinnedMesh(asset->getName(),
                                  asset->vertices.data(),
-                                 asset->vertices.size(),
+                                 countVerticies,
                                  asset->indices.data(),
-                                 asset->indices.size(),
+                                 countIndicies,
                                  asset->inverseBindMatrices.data(),
-                                 asset->skeleton->bones.size(),
+                                 countBones,
                                  skeleton,
                                  maxBonesPerVertex);
     }
@@ -212,8 +218,9 @@ namespace LaurelEye::Graphics {
     }
 
     void MeshManager::destroyAllMeshes() {
-        for ( size_t h = 0; h < meshes.size(); ++h ) {
-            destroyMesh(h);
+        uint32_t countMeshes = static_cast<uint32_t>(meshes.size());
+        for ( size_t h = 0; h < countMeshes; ++h ) {
+            destroyMesh((MeshHandle)h);
         }
 
         meshes.clear();

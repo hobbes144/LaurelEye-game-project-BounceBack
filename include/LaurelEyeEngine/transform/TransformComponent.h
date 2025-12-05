@@ -160,7 +160,8 @@ namespace LaurelEye {
             markLocalDirty();
         }
         void addChild(TransformComponent* child) {
-            child->setSiblingNumber(childTransforms.size());
+            uint32_t count = static_cast<uint32_t>(childTransforms.size());
+            child->setSiblingNumber(count);
             childTransforms.push_back(child);
         }
 

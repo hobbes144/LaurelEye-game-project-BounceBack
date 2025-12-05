@@ -69,7 +69,8 @@ namespace LaurelEye::Graphics {
         shader->use();
 
         for ( size_t lightIndex = 0; lightIndex < lightCount; ++lightIndex ) {
-            shader->setUInt("lightIndex", lightIndex);
+            uint32_t uiLightIndex = static_cast<uint32_t>(lightIndex);
+            shader->setUInt("lightIndex", uiLightIndex);
             lightSphere->draw(GL_TRIANGLES);
         }
 

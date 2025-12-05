@@ -112,7 +112,9 @@ namespace LaurelEye::Graphics {
             }
         }
 
-        return createMesh(name, vertices.data(), vertices.size(), indices.data(), indices.size());
+        uint32_t countVerticies = static_cast<uint32_t>(vertices.size());
+        uint32_t countIndicies = static_cast<uint32_t>(indices.size());
+        return createMesh(name, vertices.data(), countVerticies, indices.data(), countIndicies);
     }
 
     void MeshManager::pushquad(std::vector<uint32_t>& indices,
@@ -165,7 +167,9 @@ namespace LaurelEye::Graphics {
 
         createFace(I, vertices, indices);
 
-        return createMesh(name, vertices.data(), vertices.size(), indices.data(), indices.size());
+        uint32_t countVerticies = static_cast<uint32_t>(vertices.size());
+        uint32_t countIndicies = static_cast<uint32_t>(indices.size());
+        return createMesh(name, vertices.data(), countVerticies, indices.data(), countIndicies);
     }
 
     MeshHandle MeshManager::createCubeMesh(const std::string& name,
@@ -175,7 +179,7 @@ namespace LaurelEye::Graphics {
         std::vector<uint32_t> indices;
 
         Transform I = Transform().setScaling(scale);
-        float r90 = std::numbers::pi / 2;
+        float r90 = (float)(std::numbers::pi / 2.0f);
 
         // Six faces, each a rotation of a rectangle placed on the z axis.
 
@@ -200,10 +204,12 @@ namespace LaurelEye::Graphics {
                    vertices, indices, 16);
 
         // Front face
-        createFace(I.setPosition(Vector3(.0f, .0f, -.5f)).setRotation(Quaternion::fromEuler(std::numbers::pi, 0.0f, 0.0f)),
+        createFace(I.setPosition(Vector3(.0f, .0f, -.5f)).setRotation(Quaternion::fromEuler((float)std::numbers::pi, 0.0f, 0.0f)),
                    vertices, indices, 20);
 
-        return createMesh(name, vertices.data(), vertices.size(), indices.data(), indices.size());
+        uint32_t countVerticies = static_cast<uint32_t>(vertices.size());
+        uint32_t countIndicies = static_cast<uint32_t>(indices.size());
+        return createMesh(name, vertices.data(), countVerticies, indices.data(), countIndicies);
     }
 
 } // namespace LaurelEye::Graphics
