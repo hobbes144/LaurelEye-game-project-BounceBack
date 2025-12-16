@@ -1,0 +1,6 @@
+{
+  "include_exts": [".cpp", ".c", ".h", ".hpp", ".py", ".lua"],
+  "include_paths": ["source/", "include/", "games/", "tests/"],
+  "exclude_paths": ["third_party/", "external/", "vendor/", "bin/", "build/", "out/"]
+}
+

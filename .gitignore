@@ -91,5 +91,9 @@ out/
 *.suo
 .vs/
 
+# python cache files
+__pycache__/
+
 # Code analysis folders
 /user-contributions/
+/code-analysis/
