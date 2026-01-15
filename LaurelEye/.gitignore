@@ -1,0 +1,91 @@
+﻿
+# Ignore VS configuration directory
+/.vs/
+
+# Ignore build directory
+/build/
+
+# Ignore experimental directory
+/experimental/
+
+# Ignore user files
+.user
+
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Linker files
+*.ilk
+
+# Debugger Files
+*.pdb
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+!external/fmod/**/*.so
+!external/fmod/**/*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+!external/fmod/**/*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# debug information files
+*.dwo
+
+# CMake files
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps
+CMakeUserPresets.json
+.cache
+
+# Doxygen output Files
+doc/html/
+CMakeDoxyfile.in
+CMakeDoxygenDefaults.cmake
+doc/Doxyfile.doc
+
+# Visual Studio user and workspace files
+*.vcxproj.user
+*.user
+*.suo
+.vs/
+
+# python cache files
+__pycache__/
+
+# Code analysis folders
+/user-contributions/
+/code-analysis/

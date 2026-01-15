@@ -34,10 +34,6 @@
 *.so
 *.dylib
 *.dll
-!external/fmod/fmoddlls/fmod.dll
-!external/fmod/fmoddlls/fmodL.dll
-!external/fmod/fmoddlls/fmodstudio.dll
-!external/fmod/fmoddlls/fmodstudioL.dll
 
 # Fortran module files
 *.mod
@@ -48,10 +44,6 @@
 *.la
 *.a
 *.lib
-!external/fmod/fmodlibs/fmod_vc.lib
-!external/fmod/fmodlibs/fmodL_vc.lib
-!external/fmod/fmodlibs/fmodstudio_vc.lib
-!external/fmod/fmodlibs/fmodstudioL_vc.lib
 
 # Executables
 *.exe
@@ -81,9 +73,6 @@ doc/html/
 CMakeDoxyfile.in
 CMakeDoxygenDefaults.cmake
 doc/Doxyfile.doc
-
-# Temporarily added until I track down why cmake is still creating this
-out/
 
 # Visual Studio user and workspace files
 *.vcxproj.user
