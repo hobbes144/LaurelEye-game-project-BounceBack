@@ -1,0 +1,141 @@
+﻿{
+    "settings": {
+        "resetOnLoad": false,
+        "backgroundTexture": "textures/Tropical_Beach_8k.jpg",
+        "UIActiveOnLoad": true,
+        "UILayout": [
+            {
+                "name": "baseMapping",
+                "mappings": [
+                    {
+                        "name": "B1",
+                        "right": "B2",
+                        "down": "B3"
+                    },
+                    {
+                        "name": "B2",
+                        "left": "B1",
+                        "down": "B4"
+                    },
+                    {
+                        "name": "B3",
+                        "up": "B1",
+                        "right": "B4"
+                    },
+                    {
+                        "name": "B4",
+                        "left": "B3",
+                        "up": "B2"
+                    }
+                ]
+            }
+        ]
+    },
+    "entities": [
+        {
+            "name": "Ground",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, -1.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 200.0, 2.0, 200.0 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "cubeMesh",
+                        "primitiveType": "Cube"
+                    },
+                    "material": {
+                        "texture": "textures/texture_01_green.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        }
+                    },
+                    "mass": 0.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.5,
+                    "restitution": 0.0,
+                    "collisionGroup": 1,
+                    "collisionMask": 4294967295,
+                    "gravityScale": 0.0
+                }
+            }
+        },
+        {
+            "name": "Camera",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 15.0, 40.0 ],
+                    "rotation": [ -0.261799, 0.0, 0.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Camera": {
+
+                },
+                "Script": {
+                    "path": "scripts/camera_movement.lua"
+                }
+            }
+        },
+        {
+            "name": "DirectionalLight",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, -1.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Light": {
+                    "type": "Directional",
+                    "direction": [ 0.75, -1.0, 0.75 ],
+                    "intensity": 4.0,
+                    "color": [ 1.0, 1.0, 1.0 ]
+                }
+            }
+        },
+        {
+            "name": "AmbientLight",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 0.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Light": {
+                    "type": "Ambient",
+                    "intensity": 1.0,
+                    "color": [ 1.0, 1.0, 1.0 ]
+                }
+            }
+        },
+        {
+            "name": "Player",
+            "prefab": "prefabs/player.prefab.json"
+        },
+        {
+            "name": "SceneManager",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 10.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 0.08, 0.08, 0.08 ]
+                },
+                "Script": {
+                    "path": "scripts/scene_manager.lua"
+                }
+            }
+        }
+    ]
+}

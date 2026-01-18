@@ -3,6 +3,8 @@
 namespace LaurelEye::Scripting {
 
     void Sol2API_Math::setup(sol::state& lua) {
+        // Vector2
+        setupVec2(lua);
         // Vector3
         setupVec3(lua);
 
@@ -17,6 +19,21 @@ namespace LaurelEye::Scripting {
 
         // Transform
         setupTransform(lua);
+    }
+
+    void Sol2API_Math::setupVec2(sol::state& lua) {
+        using Vector2 = VectorTemplated<float, 2>;
+        lua.new_usertype<Vector2>(
+            "Vector2",
+            sol::no_constructor,
+            // The default constructor not work for me, so we use factories instead
+            // Factory functions
+            "new", sol::factories([]() { return Vector2(); },                    // Default constructor
+                                  [](float x, float y) { return Vector2(x, y); } // Two-arg constructor
+                                  ),
+
+            "x", sol::property([](Vector2& v) { return v[0]; }, [](Vector2& v, float value) { v[0] = value; }),
+            "y", sol::property([](Vector2& v) { return v[1]; }, [](Vector2& v, float value) { v[1] = value; }));
     }
 
     void Sol2API_Math::setupVec3(sol::state& lua) {

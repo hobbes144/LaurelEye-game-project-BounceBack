@@ -24,6 +24,7 @@ namespace LaurelEye::Scripting {
 
     private:
         // Setting up individual math structures
+        static void setupVec2(sol::state& lua);
         static void setupVec3(sol::state& lua);
         static void setupVec4(sol::state& lua);
         static void setupMatrix4(sol::state& lua);

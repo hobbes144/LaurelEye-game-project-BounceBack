@@ -13,6 +13,7 @@
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Renderable.h"
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Camera.h"
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Lights.h"
+#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Spline.h"
 
 
 namespace LaurelEye::Scripting {
@@ -60,6 +61,8 @@ namespace LaurelEye::Scripting {
 
         /* UI */
         Sol2API_UI::setup(lua, ctx);
+
+        Sol2API_Spline::setup(lua);
     }
 
     void Sol2API::registerEnvironment(sol::environment& env, LaurelEye::Entity* owner) {
