@@ -39,7 +39,7 @@ namespace LaurelEye {
     };
 
     struct PhysicsConfig {
-        float fixedDeltaTime = 0.02f;
+        float fixedDeltaTime = 0.0083333f;
         bool enableDebugDraw = false;
         std::string backend = "Bullet";
         int solverIterations = 10;

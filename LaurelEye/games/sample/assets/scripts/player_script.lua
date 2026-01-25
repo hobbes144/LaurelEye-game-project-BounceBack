@@ -39,6 +39,8 @@ speedThreshold = 2.0  -- when footsteps should begin
 --auto shooting timer
 shotTimer = 0.0
 
+prevPos = 0.0
+
 function onStart()
     transform = self:findTransform()
     body = self:findPhysics()
@@ -76,6 +78,11 @@ function onUpdate(dt)
     if Input:isMouseButtonPressed(MouseButton.Left) then
         shootProjectile()
     end
+
+    playerPos = transform:getWorldPosition()
+    print("Delta PlayerPos = ", playerPos - prevPos)
+    print("dt = ", dt)
+    prevPos = playerPos
 
     autoShootProjectile(dt)
 

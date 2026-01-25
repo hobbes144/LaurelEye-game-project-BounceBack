@@ -76,7 +76,7 @@ namespace LaurelEye {
         }
         renderSystem->update(deltaTime);
         audioSystem->update(deltaTime);
-        transformSystem->update(deltaTime);
+        // transformSystem->update(deltaTime);
         scriptSystem->update(deltaTime);
     }
     void SystemCoordinator::updateFixed(float deltaTimeFixed) {

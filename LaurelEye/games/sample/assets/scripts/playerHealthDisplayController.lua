@@ -1,4 +1,4 @@
-healthUIElements = {}
+﻿healthUIElements = {}
 
 function onStart()
     -- Assume there are 3 health UI elements; adjust count as needed
@@ -17,4 +17,5 @@ function onUpdate(dt)
                 uiElement:setActive(false)
             end
         end
+    end
 end

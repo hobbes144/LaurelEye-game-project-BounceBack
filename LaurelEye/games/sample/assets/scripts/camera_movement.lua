@@ -15,6 +15,8 @@ heightSpeed = 15.0
 heightMin = 5.0
 heightMax = 80.0
 
+prevPos = 0.0
+
 function onStart()
     transform = self:findTransform()
     target = findPlayer()
@@ -68,6 +70,11 @@ function onUpdate(dt)
     local offsetX = math.sin(yaw) * distanceBack
     local offsetZ = math.cos(yaw) * distanceBack
     local desiredPos = Vector3.new(playerPos.x - offsetX, playerPos.y + height, playerPos.z + offsetZ)
+    -- local deltaPos = desiredPos - camPos
+
+    -- print("Delta PlayerPos = ", playerPos - prevPos)
+    -- print("dt = ", dt)
+    -- prevPos = playerPos
 
     --interpolate to desired position
     camPos.x = camPos.x + (desiredPos.x - camPos.x) * lerpSpeed * dt
@@ -87,8 +94,8 @@ function onUpdate(dt)
 
     -- Smoothly interpolate rotation to remove jitter
     local currentRot = camTransform:getRotation()
-    print("Current rotation: ", currentRot)
-    print("Target rotation: ", targetQuat)
+    -- print("Current rotation: ", currentRot)
+    -- print("Target rotation: ", targetQuat)
     local newRot = Quaternion.slerp(currentRot, targetQuat, dt * lerpSpeed)
     camTransform:setRotation(newRot)
     transform:setWorldTransform(camTransform)

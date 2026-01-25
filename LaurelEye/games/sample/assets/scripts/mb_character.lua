@@ -62,7 +62,7 @@ function onStart()
             cameraTransform = cameraEntity:findTransform()
         end
     end
-    
+
     smokeEmitter = self:findParticleEmitter()
 
     if smokeEmitter ~= nil then
@@ -187,7 +187,7 @@ function onUpdate(dt)
 
         -- force = mass * accel (physics: F = m * a)
         local force = Vector3.new(accelReqX * mass, 0, accelReqZ * mass)
-        body:applyForce(force)
+        body:applyImpulse(force * dt)
     end
 
     -- Jump check
