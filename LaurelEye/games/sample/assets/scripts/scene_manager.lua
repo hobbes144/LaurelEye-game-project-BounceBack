@@ -23,11 +23,11 @@ end
 
 function onUpdate(dt)
     if Input:isKeyPressed(Key.One) then
-        log("Loading Scene: MBPrototype")
-        SceneManager:changeScene("MBPrototype")
+        log("Loading Scene: Level1")
+        SceneManager:changeScene("Level1")
     elseif Input:isKeyPressed(Key.Two) then
         log("Loading Scene: Level2")
-        SceneManager:changeScene("ZombiePrototype")
+        SceneManager:changeScene("Level2")
     elseif Input:isKeyPressed(Key.Three) then
         log("Loading Scene: PhysicsScene")
         SceneManager:changeScene("PhysicsScene")

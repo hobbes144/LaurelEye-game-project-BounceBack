@@ -85,7 +85,7 @@
 
                 },
                 "Script": {
-                    "path": "scripts/camera_movement.lua"
+                    "path": "scripts/camera_movement_p1.lua"
                 }
             }
         },

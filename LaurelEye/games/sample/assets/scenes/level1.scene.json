@@ -1,0 +1,574 @@
+﻿{
+    "settings": {
+        "resetOnLoad": true,
+        "backgroundTexture": "textures/Tropical_Beach_8k.jpg"
+    },
+    "entities": [
+        {
+            "name": "Ground",
+            "tags": [ "ground" ],
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, -1.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 200.0, 2.0, 200.0 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "cubeMesh",
+                        "primitiveType": "Cube"
+                    },
+                    "material": {
+                        "texture": "textures/grass03.jpg",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        }
+                    },
+                    "mass": 0.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.5,
+                    "restitution": 0.0,
+                    "collisionGroup": 1,
+                    "collisionMask": 4294967295,
+                    "gravityScale": 0.0
+                }
+            }
+        },
+        {
+            "name": "Wall1",
+            "tags": [ "ground" ],
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 0.0, 100.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 200.0, 200.0, 2.0 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "cubeMesh",
+                        "primitiveType": "Cube"
+                    },
+                    "material": {
+                        "texture": "textures/texture_01_dark.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        }
+                    },
+                    "mass": 0.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.0,
+                    "restitution": 0.0,
+                    "collisionGroup": 1,
+                    "collisionMask": 4294967295,
+                    "gravityScale": 0.0
+                }
+            }
+        },
+        {
+            "name": "Wall2",
+            "tags": [ "ground" ],
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 0.0, -100.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 200.0, 200.0, 2.0 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "cubeMesh",
+                        "primitiveType": "Cube"
+                    },
+                    "material": {
+                        "texture": "textures/texture_01_dark.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        }
+                    },
+                    "mass": 0.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.0,
+                    "restitution": 0.0,
+                    "collisionGroup": 1,
+                    "collisionMask": 4294967295,
+                    "gravityScale": 0.0
+                }
+            }
+        },
+        {
+            "name": "Wall3",
+            "tags": [ "ground" ],
+            "components": {
+                "Transform": {
+                    "position": [ 100.0, 0.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 2.0, 200.0, 200.0 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "cubeMesh",
+                        "primitiveType": "Cube"
+                    },
+                    "material": {
+                        "texture": "textures/texture_01_dark.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        }
+                    },
+                    "mass": 0.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.0,
+                    "restitution": 0.0,
+                    "collisionGroup": 1,
+                    "collisionMask": 4294967295,
+                    "gravityScale": 0.0
+                }
+            }
+        },
+        {
+            "name": "Wall4",
+            "tags": [ "ground" ],
+            "components": {
+                "Transform": {
+                    "position": [ -100.0, 0.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 2.0, 200.0, 200.0 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "cubeMesh",
+                        "primitiveType": "Cube"
+                    },
+                    "material": {
+                        "texture": "textures/texture_01_dark.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        }
+                    },
+                    "mass": 0.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.0,
+                    "restitution": 0.0,
+                    "collisionGroup": 1,
+                    "collisionMask": 4294967295,
+                    "gravityScale": 0.0
+                }
+            }
+        },
+        {
+            "name": "Ceiling",
+            "tags": [ "ground" ],
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 80.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 200.0, 2.0, 200.0 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "cubeMesh",
+                        "primitiveType": "Cube"
+                    },
+                    "material": {
+                        "texture": "textures/texture_01_dark.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        }
+                    },
+                    "mass": 0.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.5,
+                    "restitution": 0.0,
+                    "collisionGroup": 1,
+                    "collisionMask": 4294967295,
+                    "gravityScale": 0.0
+                }
+            }
+        },
+        {
+            "name": "Target1",
+            "tags": [ "target" ],
+            "components": {
+                "Transform": {
+                    "position": [ -60.0, 30.0, 80.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 20.0, 20.0, 2.0 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "cubeMesh",
+                        "primitiveType": "Cube"
+                    },
+                    "material": {
+                        "texture": "textures/texture_01_purple.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        }
+                    },
+                    "mass": 0.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.5,
+                    "restitution": 0.0,
+                    "collisionGroup": 1,
+                    "collisionMask": 4294967295,
+                    "gravityScale": 0.0
+                },
+                "Script": {
+                    "path": "scripts/target_script.lua"
+                }
+            }
+        },
+        {
+            "name": "Target2",
+            "tags": [ "target" ],
+            "components": {
+                "Transform": {
+                    "position": [ 80.0, 30.0, 60.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 2.0, 20.0, 20.0 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "cubeMesh",
+                        "primitiveType": "Cube"
+                    },
+                    "material": {
+                        "texture": "textures/texture_01_purple.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        }
+                    },
+                    "mass": 0.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.5,
+                    "restitution": 0.0,
+                    "collisionGroup": 1,
+                    "collisionMask": 4294967295,
+                    "gravityScale": 0.0
+                },
+                "Script": {
+                    "path": "scripts/target_script.lua"
+                }
+            }
+        },
+        {
+            "name": "Target3",
+            "tags": [ "target" ],
+            "components": {
+                "Transform": {
+                    "position": [ 80.0, 30.0, -60.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 2.0, 20.0, 20.0 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "cubeMesh",
+                        "primitiveType": "Cube"
+                    },
+                    "material": {
+                        "texture": "textures/texture_01_purple.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        }
+                    },
+                    "mass": 0.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.5,
+                    "restitution": 0.0,
+                    "collisionGroup": 1,
+                    "collisionMask": 4294967295,
+                    "gravityScale": 0.0
+                },
+                "Script": {
+                    "path": "scripts/target_script.lua"
+                }
+            }
+        },
+        {
+            "name": "Target4",
+            "tags": [ "target" ],
+            "components": {
+                "Transform": {
+                    "position": [ 60.0, 30.0, 80.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 20.0, 20.0, 2.0 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "cubeMesh",
+                        "primitiveType": "Cube"
+                    },
+                    "material": {
+                        "texture": "textures/texture_01_purple.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        }
+                    },
+                    "mass": 0.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.5,
+                    "restitution": 0.0,
+                    "collisionGroup": 1,
+                    "collisionMask": 4294967295,
+                    "gravityScale": 0.0
+                },
+                "Script": {
+                    "path": "scripts/target_script.lua"
+                }
+            }
+        },
+        {
+            "name": "Camera",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 15.0, 40.0 ],
+                    "rotation": [ -0.261799, 0.0, 0.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Camera": {
+
+                },
+                "Script": {
+                    "path": "scripts/camera_movement.lua"
+                }
+            }
+        },
+        {
+            "name": "DirectionalLight",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, -1.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Light": {
+                    "type": "Directional",
+                    "direction": [ 0.75, -1.0, 0.75 ],
+                    "intensity": 4.0,
+                    "color": [ 1.0, 1.0, 1.0 ]
+                }
+            }
+        },
+        {
+            "name": "AmbientLight",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 0.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Light": {
+                    "type": "Ambient",
+                    "intensity": 0.3,
+                    "color": [ 1.0, 1.0, 1.0 ]
+                }
+            }
+        },
+        {
+            "name": "HealthUI1",
+            "components": {
+                "Transform": {
+                    "position": [ -0.9, 0.9, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 50.0, 50.0, 0.0 ]
+                },
+                "UI": {
+                    "name": "HealthUI1",
+                    "material": {
+                        "texture": "textures/Heart.jpg",
+                        "transparency": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "name": "HealthUI2",
+            "components": {
+                "Transform": {
+                    "position": [ -0.8, 0.9, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 50.0, 50.0, 0.0 ]
+                },
+                "UI": {
+                    "name": "HealthUI2",
+                    "material": {
+                        "texture": "textures/Heart.jpg",
+                        "transparency": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "name": "HealthUI3",
+            "components": {
+                "Transform": {
+                    "position": [ -0.7, 0.9, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 50.0, 50.0, 0.0 ]
+                },
+                "UI": {
+                    "name": "HealthUI3",
+                    "material": {
+                        "texture": "textures/Heart.jpg",
+                        "transparency": 1.0
+                    }
+                }
+            }
+        },
+        {
+            "name": "Player",
+            "prefab": "prefabs/catch_player.prefab.json"
+        },
+        {
+            "name": "SceneManager",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 10.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 0.08, 0.08, 0.08 ]
+                },
+                "Script": {
+                    "path": "scripts/scene_manager.lua"
+                }
+            }
+        },
+        {
+            "name": "BackgroundMusic",
+            "tags": [ "" ],
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 0.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Speaker": {
+                    "audioName": "background",
+                    "audioPath": "audio/background_music_loop.mp3",
+                    "volume": 0.05,
+                    "loop": true,
+                    "3D": false,
+                    "playOnLoad": true
+                }
+            }
+        }
+    ]
+}

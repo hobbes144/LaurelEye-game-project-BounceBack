@@ -32,21 +32,7 @@ end
 function onCollisionEnter(data)
     if destroyed then return end
 
-    local tagsA = data.entityA:getTags()
-    for _, tag in pairs(tagsA) do
-        if tag == "enemy" then
-            print("Collided with Enemy!")
-            destroySelf()
-        end
-    end
-
-    local tagsB = data.entityB:getTags()
-    for _, tag in pairs(tagsB) do
-        if tag == "enemy" then
-            print("Collided with Enemy!")
-            destroySelf()
-        end
-    end
+    
 end
 
 function destroySelf()

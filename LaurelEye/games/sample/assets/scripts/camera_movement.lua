@@ -2,27 +2,30 @@
 target = nil
 
 -- Camera offsets
-distanceBack = 40.0
-height = 16.0
-rotationSpeed = 1.0  -- radians per second
-lerpSpeed = 8.0      -- smooth follow speed
+distanceBack = 22.0
+height = 8.0
+shoulderOffset = 4.0 -- positive = right shoulder, negative = left
 
-yaw = 0.0 -- camera rotation around player
+-- Rotation
+yaw = 0.0
+pitch = -0.25 -- slight downward angle
 
--- Right-stick / camera control settings
+rotationSpeed = 2.5
+lerpSpeed = 10.0
+
+-- Pitch clamp
+pitchMin = -1.2
+pitchMax = 0.35
+
+-- Right-stick settings
 rStickDeadzone = 0.25
-heightSpeed = 15.0
-heightMin = 5.0
-heightMax = 80.0
 
-prevPos = 0.0
+mouseSensitivity = 0.002
+stickSensitivity = 2.0
 
 function onStart()
     transform = self:findTransform()
     target = findPlayer()
-    if transform == nil then
-        logerr("Camera Transform Not Found")
-    end
 end
 
 function onUpdate(dt)
@@ -31,72 +34,47 @@ function onUpdate(dt)
         if target == nil then return end
     end
 
+    -- Mouse + controller look (FPS-style)
+    local dx, dy = Input:getMouseDelta()
+
     local rStickX = Input:getGamepadAxis(GamepadAxes.RStickX)
     local rStickY = Input:getGamepadAxis(GamepadAxes.RStickY)
 
-    if rStickX < 0.5 and rStickX > -0.5 then
-        rStickX = 0.0
-    end
-    if rStickY < 0.5 and rStickY > -0.5 then
-        rStickY = 0.0
-    end
+    if rStickX < 0.5 and rStickX > -0.5 then rStickX = 0 end
+    if rStickY < 0.5 and rStickY > -0.5 then rStickY = 0 end
+
+    yaw   = yaw   - (dx * mouseSensitivity) - (rStickX * stickSensitivity * dt)
+    pitch = pitch - (dy * mouseSensitivity) - (rStickY * stickSensitivity * dt)
+
+    pitch = math.max(pitchMin, math.min(pitchMax, pitch))
 
     local playerPos = target:getWorldPosition()
-    -- print("Player position: ", playerPos)
     local camTransform = transform:getWorldTransform()
     local camPos = camTransform:getPosition()
-    -- print("Camera position: ", camPos)
 
-    -- Camera controlling input (keyboard)
-    if Input:isKeyHeld(Key.ArrowLeft) then
-        yaw = yaw - rotationSpeed * dt
-    end
-    if Input:isKeyHeld(Key.ArrowRight) then
-        yaw = yaw + rotationSpeed * dt
-    end
-    if Input:isKeyHeld(Key.ArrowUp) then
-        height = height + heightSpeed * dt
-    end
-    if Input:isKeyHeld(Key.ArrowDown) then
-        height = height - heightSpeed * dt
-    end
+    -- Build camera basis
+    local rotQuat = Quaternion.fromEuler(pitch, yaw, 0)
+    local forward = rotQuat:forward()
+    local right = rotQuat:right()
 
-    -- Right-stick adds camera control:
-    yaw = yaw + rStickX * rotationSpeed * dt
-    height = height + rStickY * heightSpeed * dt
+    -- Desired camera position (over-the-shoulder)
+    local desiredPos =
+        playerPos
+        - forward * distanceBack
+        + right * shoulderOffset
+        + Vector3.new(0, height, 0)
 
-
-    -- Compute desired camera position
-    local offsetX = math.sin(yaw) * distanceBack
-    local offsetZ = math.cos(yaw) * distanceBack
-    local desiredPos = Vector3.new(playerPos.x - offsetX, playerPos.y + height, playerPos.z + offsetZ)
-    -- local deltaPos = desiredPos - camPos
-
-    -- print("Delta PlayerPos = ", playerPos - prevPos)
-    -- print("dt = ", dt)
-    -- prevPos = playerPos
-
-    --interpolate to desired position
+    -- Smooth follow
     camPos.x = camPos.x + (desiredPos.x - camPos.x) * lerpSpeed * dt
     camPos.y = camPos.y + (desiredPos.y - camPos.y) * lerpSpeed * dt
     camPos.z = camPos.z + (desiredPos.z - camPos.z) * lerpSpeed * dt
     camTransform:setPosition(camPos)
 
-    -- Look at player
-    local dir = playerPos - camPos
-    --print("Camera direction: ", dir)
-    dir = dir:Normalized()
-
-    local yawAngle = math.atan(-dir.x, -dir.z)
-    local pitchAngle = math.asin(-dir.y)
-
-    local targetQuat = Quaternion.fromEuler(-pitchAngle, yawAngle, 0)
-
-    -- Smoothly interpolate rotation to remove jitter
+    -- Camera looks forward (aim direction), not directly at player
+    local targetRot = Quaternion.fromEuler(pitch, yaw, 0)
     local currentRot = camTransform:getRotation()
-    -- print("Current rotation: ", currentRot)
-    -- print("Target rotation: ", targetQuat)
-    local newRot = Quaternion.slerp(currentRot, targetQuat, dt * lerpSpeed)
+    local newRot = Quaternion.slerp(currentRot, targetRot, dt * lerpSpeed)
+
     camTransform:setRotation(newRot)
     transform:setWorldTransform(camTransform)
 end
@@ -105,7 +83,7 @@ function onShutdown()
     log("Camera controller stopped")
 end
 
--- Helper to find player (same as enemy)
+-- Helper
 function findPlayer()
     local scene = SceneManager:getCurrentScene()
     if scene == nil then return nil end

@@ -1,5 +1,5 @@
 ﻿{
-    "initialScene": "MainMenu",
+    "initialScene": "Level1",
     "scenes": [
         {
             "name": "MainMenu",
@@ -32,6 +32,14 @@
         {
             "name": "MBPrototype",
             "path": "scenes/mb_prototype.scene.json"
+        },
+        {
+            "name": "Level1",
+            "path": "scenes/level1.scene.json"
+        },
+        {
+            "name": "Level2",
+            "path": "scenes/level2.scene.json"
         }
     ]
 }
