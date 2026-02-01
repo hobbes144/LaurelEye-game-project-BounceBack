@@ -13,7 +13,7 @@
                 "primitiveType": "Sphere"
             },
             "material": {
-                "texture": "textures/texture_01_dark.png",
+                "texture": "textures/texture_01_light.png",
                 "diffuse": [ 1.0, 10.0, 1.0 ],
                 "specular": [ 0.2, 0.2, 0.2 ],
                 "shininess": 32.0

@@ -395,6 +395,12 @@ function onCollisionEnter(data)
             jumping = false
         end
 
+        if tag == "bullet" then
+            if not invincible then
+                health = health - 1.0
+                invincible = true
+            end
+        end
     end
 
     local tagsB = data.entityB:getTags()
@@ -407,9 +413,15 @@ function onCollisionEnter(data)
             if not isGrounded then
                 triggerLandingBurst()
             end
-
             isGrounded = true
             jumping = false
+        end
+
+        if tag == "bullet" then
+            if not invincible then
+                health = health - 1.0
+                invincible = true
+            end
         end
     end
 

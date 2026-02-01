@@ -14,7 +14,7 @@ function onStart()
 end
 
 function onUpdate(dt)
-    --rotateTowardsPlayer() WIP
+    rotateTowardsPlayer(dt)
     autoShootProjectile(dt)
 end
 
@@ -38,6 +38,37 @@ end
 
 function onCollisionStay(data) end
 function onCollisionExit(data) end
+
+function rotateTowardsPlayer(dt)
+    local scene = SceneManager:getCurrentScene()
+    if scene == nil then return end
+
+    local player = scene:findEntityByName("PlayerPrefab")
+    if player == nil then return end
+
+    local playerTransform = player:findTransform()
+    if playerTransform == nil then return end
+
+    if transform == nil then return end
+
+    local selfPos = transform:getWorldPosition()
+    local playerPos = playerTransform:getWorldPosition()
+
+    local dir = playerPos - selfPos
+    dir.y = 0
+    if dir:Magnitude() == 0 then return end
+    dir = dir:Normalized()
+
+    local frontOffset = math.pi
+
+    local angle = math.atan(-dir.x, -dir.z) + frontOffset
+    local targetQuat = Quaternion.fromEuler(0, angle, 0)
+
+    local currentRot = transform:getWorldRotation()
+    local rot = Quaternion.slerp(currentRot, targetQuat, dt * turnSpeed)
+
+    transform:setWorldRotation(rot)
+end
 
 function autoShootProjectile(dt)
     if dt ~= nil then
