@@ -88,8 +88,6 @@ namespace LaurelEye::Graphics {
 
         cameraData.projectionMatrix = Matrix4::perspective(fov, aspectRatio, near, far);
 
-        std::cout << "Set Pers projection of vfov " << fixedRef << ", aspectRatio " << aspectRatio << std::endl;
-
         return;
     }
 
@@ -112,8 +110,6 @@ namespace LaurelEye::Graphics {
         cameraData.projectionMatrix = Matrix4::orthographic(
             left, right, bottom, top, near, far);
 
-        std::cout << "Set Ortho projection of halfHeight " << fixedRef << ", aspectRatio " << aspectRatio << std::endl;
-
         return;
     }
 
@@ -130,6 +126,33 @@ namespace LaurelEye::Graphics {
                 -fixedRef, fixedRef,
                 near, far);
         }
+    }
+
+    void CameraComponent::setFov(float fov) {
+        fixedRef = fov;
+        updatePerspectiveProjection();
+    }
+
+    void CameraComponent::updateProjectionMatrix() {
+        switch ( projectionType ) {
+        case CameraProjectionType::Perspective:
+            updatePerspectiveProjection();
+            break;
+        case CameraProjectionType::Orthographic:
+            updateOrthographicProjection();
+            break;
+        default:
+            assert(false && "ERROR::CAMERA_COMPONENT::UPDATE_PROJECTION_MATRIX::INVALID_PROJECTION_TYPE, how did we get here?");
+        }
+    }
+
+    void CameraComponent::updatePerspectiveProjection() {
+        cameraData.projectionMatrix = Matrix4::perspective(fixedRef, aspectRatio, near, far);
+    }
+
+    void CameraComponent::updateOrthographicProjection() {
+        cameraData.projectionMatrix = Matrix4::orthographic(
+            aspectRatio * fixedRef, fixedRef, near, far);
     }
 
     const Matrix4& CameraComponent::getViewMatrix() {

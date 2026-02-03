@@ -445,7 +445,6 @@
                     "scale": [ 1.0, 1.0, 1.0 ]
                 },
                 "Camera": {
-
                 },
                 "Script": {
                     "path": "scripts/camera_movement.lua"

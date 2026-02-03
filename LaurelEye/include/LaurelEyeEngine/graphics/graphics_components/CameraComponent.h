@@ -158,8 +158,31 @@ namespace LaurelEye::Graphics {
         ///
         /// @param _aspectRatio New aspect ratio.
         void updateAspectRatio(float _aspectRatio);
+        /// @brief Set the fov for Perspective projectionType cameras.
+        ///
+        /// @param fov New fov of the camera
+        void setFov(float fov);
 
         void updateFromTransform(LaurelEye::TransformComponent* transform);
+
+        /// @brief Refresh the Projection matrix using the existing data.
+        ///
+        /// Use this after changing the fov or other param instead of needing
+        /// to call setPerspectiveProjection (or orthographic) everytime and
+        /// resend data.
+        ///
+        /// Safer since it doesn't need us to ensure the params are the same
+        /// as before. Could also work as a forced refresh in case things get
+        /// messed up.
+        void updateProjectionMatrix();
+        /// @brief Refresh Perspective projection matrix.
+        ///
+        /// Bypass call to skip the if statement.
+        void updatePerspectiveProjection();
+        /// @brief Refresh Orthographic projection matrix.
+        ///
+        /// Bypass call to skip the if statement.
+        void updateOrthographicProjection();
 
     private:
         std::string name;

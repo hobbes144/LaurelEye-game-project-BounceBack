@@ -377,6 +377,28 @@ namespace LaurelEye {
         return result;
     }
 
+    /// @brief Static function to create an Orthographic projection matrix
+    /// @param halfWidth Half width of screen/world projection.
+    /// @param halfHeight Half height of screen/world projection.
+    /// @param near Near plane of the projection.
+    /// @param far Far plane of the projection.
+    /// @return The resulting Orthographic projection matrix.
+    Matrix4 Matrix4::orthographic(
+        const float halfWidth,
+        const float halfHeight,
+        const float near,
+        const float far) {
+        Matrix4 result;
+        result.data[0][0] = 1.0f / halfWidth;
+        result.data[1][1] = 1.0f / halfHeight;
+        result.data[2][2] = -2.0f / (far - near);
+        result.data[3][0] = 0.0f;
+        result.data[3][1] = 0.0f;
+        result.data[3][2] = -(far + near) / (far - near);
+        result.data[3][3] = 1.0f;
+        return result;
+    }
+
     /// @brief Static function to create a Perspective projection matrix
     /// @param fov FOV of the camera.
     /// @param aspectRatio Aspect ratio of the screen to be projected on.

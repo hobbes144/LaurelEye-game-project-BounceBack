@@ -1,16 +1,23 @@
-﻿transform = nil
-target = nil
+﻿defaultDistance = 22.0
+aimDistance = 12.0
 
--- Camera offsets
-distanceBack = 22.0
-height = 8.0
-shoulderOffset = 4.0 -- positive = right shoulder, negative = left
+defaultShoulder = 6.5 
+aimShoulder = 4.5   
+defaultHeight = 8.5
+aimHeight = 7.8
+zoomLerpSpeed = 12.0
+
+currentDistance = defaultDistance
+currentShoulder = defaultShoulder
+currentHeight = defaultHeight
+
+transform = nil
+target = nil
 
 -- Rotation
 yaw = 0.0
 pitch = -0.25 -- slight downward angle
 
-rotationSpeed = 2.5
 lerpSpeed = 10.0
 
 -- Pitch clamp
@@ -22,6 +29,8 @@ rStickDeadzone = 0.25
 
 mouseSensitivity = 0.002
 stickSensitivity = 2.0
+
+currentFov = 1.1
 
 function onStart()
     transform = self:findTransform()
@@ -52,6 +61,40 @@ function onUpdate(dt)
     local camTransform = transform:getWorldTransform()
     local camPos = camTransform:getPosition()
 
+    local isAiming = Input:isMouseButtonHeld(MouseButton.Right)
+
+    local targetDistance = defaultDistance
+    local targetShoulder = defaultShoulder
+    local targetHeight = defaultHeight
+
+    local scene = SceneManager:getCurrentScene()
+    local cameraEntity = scene:findEntityByName("Camera")
+    local cameraComponent = cameraEntity:findComponent("CameraComponent")
+
+    local targetFov = 1.1
+    if isAiming then
+        targetDistance = aimDistance
+        targetShoulder = aimShoulder
+        targetHeight = aimHeight
+
+        targetFov = 0.6
+    end
+
+    currentFov = currentFov + (targetFov - currentFov) * zoomLerpSpeed * dt
+
+    if cameraComponent ~= nil then
+        cameraComponent:setFov(currentFov)
+    end
+
+    currentDistance =
+        currentDistance + (targetDistance - currentDistance) * zoomLerpSpeed * dt
+
+    currentShoulder =
+        currentShoulder + (targetShoulder - currentShoulder) * zoomLerpSpeed * dt
+
+    currentHeight =
+        currentHeight + (targetHeight - currentHeight) * zoomLerpSpeed * dt
+
     -- Build camera basis
     local rotQuat = Quaternion.fromEuler(pitch, yaw, 0)
     local forward = rotQuat:forward()
@@ -60,9 +103,9 @@ function onUpdate(dt)
     -- Desired camera position (over-the-shoulder)
     local desiredPos =
         playerPos
-        - forward * distanceBack
-        + right * shoulderOffset
-        + Vector3.new(0, height, 0)
+        - forward * currentDistance
+        + right * currentShoulder
+        + Vector3.new(0, currentHeight, 0)
 
     -- Smooth follow
     camPos.x = camPos.x + (desiredPos.x - camPos.x) * lerpSpeed * dt

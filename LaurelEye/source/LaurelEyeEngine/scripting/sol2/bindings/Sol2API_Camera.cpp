@@ -22,6 +22,10 @@ namespace LaurelEye::Scripting {
             "setPerspectiveProjection", &Graphics::CameraComponent::setPerspectiveProjection,
             "setOrthographicProjection", &Graphics::CameraComponent::setOrthographicProjection,
             "updateAspectRatio", &Graphics::CameraComponent::updateAspectRatio,
+            "setFov", &Graphics::CameraComponent::setFov,
+            "updatePerspectiveProjection", &Graphics::CameraComponent::updatePerspectiveProjection,
+            "updateOrthographicProjection", &Graphics::CameraComponent::updateOrthographicProjection,
+            "updateProjectionMatrix", &Graphics::CameraComponent::updateProjectionMatrix,
 
             // ---- Exposure ----
             "getExposure", &Graphics::CameraComponent::getExposure,

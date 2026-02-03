@@ -82,6 +82,11 @@ namespace LaurelEye {
             const float top,
             const float near,
             const float far);
+        static Matrix4 orthographic(
+            const float halfWidth,
+            const float halfHeight,
+            const float near,
+            const float far);
         static Matrix4 perspective(const float fov, const float aspectRatio,
                                    const float near, const float far);
         static Matrix4 lookAt(const Vector3& eye, const Vector3& center,

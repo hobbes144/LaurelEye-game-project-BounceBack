@@ -116,6 +116,10 @@ namespace LaurelEye::Scripting {
             if ( auto* c = e.findComponent<Graphics::PointLightComponent>() )
                 return sol::make_object(lua, c);
         }
+        else if ( type == "CameraComponent" ) {
+            if ( auto* c = e.findComponent<Graphics::CameraComponent>() )
+                return sol::make_object(lua, c);
+        }
 
         return sol::make_object(lua, sol::nil);
     }

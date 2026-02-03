@@ -55,7 +55,10 @@ namespace LaurelEye::Scripting {
                 static_cast<Matrix4(*)(const Vector3)>(&Matrix4::rotationZYX)
             ),
             "rotationAxis", &Matrix4::rotationAxis,
-            "orthographic", &Matrix4::orthographic,
+            "orthographic", sol::overload(
+                static_cast<Matrix4(*)(float,float,float,float,float,float)>(&Matrix4::orthographic),
+                static_cast<Matrix4(*)(float,float,float,float)>(&Matrix4::orthographic)
+            ),
             "perspective", &Matrix4::perspective,
             "lookAt", &Matrix4::lookAt,
             "inverse", &Matrix4::inverse,
