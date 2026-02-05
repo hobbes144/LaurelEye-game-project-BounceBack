@@ -47,6 +47,8 @@ invincibleTimer = 0
 -- Health UI Elements
 healthUIElements = {}
 
+doorSpawned = false
+
 function onStart()
     transform = self:findTransform()
     body = self:findPhysics()
@@ -272,6 +274,12 @@ function onUpdate(dt)
 
         bTransform:setWorldPosition(spawnPos)
     end
+
+    local anyTargets = targetCheck()
+    if not doorSpawned and not anyTargets then
+        SceneManager:instantiate("prefabs/door.prefab.json")
+        doorSpawned = true
+    end
 end
 
 function triggerLandingBurst()
@@ -383,23 +391,20 @@ function onCollisionEnter(data)
     local tagsA = data.entityA:getTags()
     for _, tag in pairs(tagsA) do
         if tag == "ball" then
-            catchBall(data.entityA)
-        end
-
-        if tag == "ground" then
+            catchBall(data.entityB)
+        elseif tag == "ground" then
             if not isGrounded then
                 triggerLandingBurst()
             end
-
             isGrounded = true
             jumping = false
-        end
-
-        if tag == "bullet" then
+        elseif tag == "bullet" then
             if not invincible then
                 health = health - 1.0
                 invincible = true
             end
+        elseif tag == "door" then
+            changeLevels()
         end
     end
 
@@ -407,21 +412,19 @@ function onCollisionEnter(data)
     for _, tag in pairs(tagsB) do
         if tag == "ball" then
             catchBall(data.entityB)
-        end
-
-        if tag == "ground" then
+        elseif tag == "ground" then
             if not isGrounded then
                 triggerLandingBurst()
             end
             isGrounded = true
             jumping = false
-        end
-
-        if tag == "bullet" then
+        elseif tag == "bullet" then
             if not invincible then
                 health = health - 1.0
                 invincible = true
             end
+        elseif tag == "door" then
+            changeLevels()
         end
     end
 
@@ -455,4 +458,31 @@ function findForward()
     local aimDir = camRot:forward()
     aimDir = aimDir:Normalized()
     return aimDir
+end
+
+function targetCheck()
+    local scene = SceneManager:getCurrentScene()
+    if scene == nil then return end
+
+    local targetList = scene:findEntitiesWithTag("target")
+    if #targetList == 0 then
+        return false
+    end
+
+    return true
+end
+
+function changeLevels()
+    local scene = SceneManager:getCurrentScene()
+    if scene == nil then return end
+    local sceneName = scene:getName()
+    if sceneName == "Level1" then
+        SceneManager:changeScene("Level2")
+    elseif sceneName == "Level2" then
+        SceneManager:changeScene("Level3")
+    elseif sceneName == "Level3" then
+        print("Alpha Completed!")
+    end
+    SceneManager:destroy(data.EntityA)
+    doorSpawned = false
 end
