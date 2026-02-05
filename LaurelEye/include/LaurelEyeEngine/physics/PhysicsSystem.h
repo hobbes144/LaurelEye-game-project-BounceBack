@@ -20,7 +20,7 @@
 
 //Forward Declaration
 namespace LaurelEye::Debug {
-    struct DebugDrawCommand; 
+    struct DebugDrawCommand;
 }
 
 namespace LaurelEye::Physics {
@@ -31,7 +31,7 @@ namespace LaurelEye::Physics {
     };
 
     /// @brief This system manages the lifecycle of the physics simulation
-    /// (initialize, update, shutdown), provides creation methods for collision 
+    /// (initialize, update, shutdown), provides creation methods for collision
     /// shapes and physics bodies, and acts as a bridge between ECS and Physics Backend
     class PhysicsSystem : public ISystem<PhysicsBodyComponent> {
     public:
@@ -55,7 +55,7 @@ namespace LaurelEye::Physics {
         /// @brief Create a physics body and add it to the world
         /// @param type The body type (dynamic, static, kinematic)
         /// @param shapeDesc The collision shape descriptor for the body
-        /// @param transform Initial transform 
+        /// @param transform Initial transform
         /// @return A shared pointer to the created IBody
         std::shared_ptr<IBody> CreateBody(const PhysicsBodyData& data);
 
@@ -67,12 +67,47 @@ namespace LaurelEye::Physics {
         /// @brief Get a pointer to the active physics world
         /// @return A raw pointer to the IPhysicsWorld (owned internally)
         IPhysicsWorld* GetWorld();
-   
+
         CollisionManager& GetCollisionManager() {
             return collisionManager;
         }
 
         void populateWireFrameCommands(std::vector<Debug::DebugDrawCommand>& commands) const ;
+
+        // Physics Query API
+
+        /// @brief Raycast query.
+        ///
+        /// @param origin Ray origin.
+        /// @param direction Ray direction.
+        /// @param maxDistance Maximum ray distance.
+        /// @param params Raycast parameters.
+        /// @return Raycast hit.
+        RaycastHit Raycast(const Vector3& origin,
+                           const Vector3& direction,
+                           float maxDistance,
+                           const RaycastParams& params) const;
+
+        // /// @brief Helper function to return if any RayHit occurred.
+        // ///
+        // /// @return True if hit.
+        // // bool RaycastAny(...);
+        // /// @brief Helper function to get all hit objects from Raycast.
+        // ///
+        // /// @return Vector of Raycast hits.
+        // std::vector<RaycastHit> RaycastAll(...);
+
+        // /// @brief Spherecast query.
+        // ///
+        // /// @param origin Sphere origin.
+        // /// @param radius Sphere radius.
+        // /// @param params Spherecast parameters.
+        // /// @return Spherecast hit.
+        // RaycastHit Spherecast(const Vector3& origin,
+        //                    float radius,
+        //                    const RaycastParams& params);
+
+        bool IsSteppingPhysics() const { return isSteppingPhysics; };
 
     private:
         /// @brief Selected physics backend
@@ -80,6 +115,8 @@ namespace LaurelEye::Physics {
         /// @brief Unique pointer to world instance
         std::unique_ptr<IPhysicsWorld> world;
         CollisionManager collisionManager;
+
+        bool isSteppingPhysics = false;
 
         uint32_t enterListener;
         uint32_t stayListener;

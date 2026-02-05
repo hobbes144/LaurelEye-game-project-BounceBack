@@ -2,7 +2,9 @@
 #include "LaurelEyeEngine/physics/interfaces/Bullet/BulletWorld.h"
 #include "LaurelEyeEngine/events/CollisionEvent.h"
 #include "LaurelEyeEngine/events/EventManager.h"
+#include "LaurelEyeEngine/physics/interfaces/PhysicsTypes.h"
 #include "LaurelEyeEngine/scripting/ScriptComponent.h"
+#include <cassert>
 
 namespace LaurelEye::Physics {
     PhysicsSystem::PhysicsSystem(PhysicsSystemType type) {
@@ -25,7 +27,9 @@ namespace LaurelEye::Physics {
             comp->GetBodyRef()->pushTransformToPhysics();
         }
 
-        if ( world ) world->StepSimulation(dt);
+        isSteppingPhysics = true;
+        if ( world ) world->StepSimulation(dt, 4, 1.0f/60.0f);
+        isSteppingPhysics = false;
 
         //Sync Physics to Transforms
         for ( auto* comp : components ) {
@@ -206,6 +210,10 @@ namespace LaurelEye::Physics {
                     cmd.size = {0.0f, shapeDef.height * scale.y, 0.0f};
                     break;
                 }
+                case CollisionShapePhys::ShapeType::Mesh:
+                default:
+                    assert(false && "ERROR::LAURELEYE::PHYSICS_SYSTEM::POPULATE_WIRE_FRAME_COMMANDS::INVALID_SHAPE");
+                    break;
             }
 
             commands.push_back(cmd);

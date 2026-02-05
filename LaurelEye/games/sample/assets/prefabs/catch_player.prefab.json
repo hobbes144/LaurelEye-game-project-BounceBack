@@ -56,7 +56,7 @@
             "friction": 2.5,
             "restitution": 0.1,
             "collisionGroup": 1,
-            "collisionMask": 4294967295,
+            "collisionMask": 30,
             "useCCD": false,
             "ccdMotionThreshold": 0.01,
             "ccdSweptSphereRadius": 1.0,

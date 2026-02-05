@@ -71,6 +71,7 @@ namespace LaurelEye {
         // Main mathematical operations
         float dot(const Vector3& other) const;
         float magnitude() const;
+        inline float length() const { return magnitude(); };
         float magnitudSquared() const;
         Vector3 normalized() const;
         Vector3 cross(const Vector3& other) const;

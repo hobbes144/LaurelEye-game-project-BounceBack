@@ -68,20 +68,22 @@ namespace LaurelEye {
         audioSystem->initialize();
     }
     void SystemCoordinator::update(float deltaTime) {
-        // std::cout << "SysCord Update\n";
+        scriptSystem->update(deltaTime);
+        transformSystem->update(deltaTime);
+        // Moved physics here since Bullet takes care of variable timestep
+        // itself. We just call it with the real deltaTime and that's enough.
+        physicsSystem->update(deltaTime);
         transformSystem->update(deltaTime);
         particleSystem->update(deltaTime);
+        audioSystem->update(deltaTime);
         if ( debugDrawSystem ) {
             debugDrawSystem->update(deltaTime);
         }
         renderSystem->update(deltaTime);
-        audioSystem->update(deltaTime);
-        // transformSystem->update(deltaTime);
-        scriptSystem->update(deltaTime);
     }
     void SystemCoordinator::updateFixed(float deltaTimeFixed) {
-        transformSystem->update(deltaTimeFixed);
-        physicsSystem->update(deltaTimeFixed);
+        // transformSystem->update(deltaTimeFixed);
+        // physicsSystem->update(deltaTimeFixed);
     }
 
     void SystemCoordinator::shutdown() {

@@ -13,8 +13,6 @@
 #include <btBulletDynamicsCommon.h>
 
 #include "LaurelEyeEngine/physics/interfaces/IPhysicsWorld.h"
-#include "LaurelEyeEngine/physics/interfaces/Bullet/BulletBody.h"
-#include "LaurelEyeEngine/physics/interfaces/Bullet/BulletShape.h"
 
 namespace LaurelEye::Physics {
     class BulletWorld : public IPhysicsWorld {
@@ -22,16 +20,21 @@ namespace LaurelEye::Physics {
         BulletWorld();
         ~BulletWorld();
 
-        void StepSimulation(float dt) override;
+        void StepSimulation(float dt, int maxSubSteps = 1, float fixedTimeStep = 1.0f/60.0f) override;
 
         std::shared_ptr<IBody> CreateBody(const PhysicsBodyData& data) override;
 
-        void RemoveBody(std::shared_ptr<IBody> body);
+        void RemoveBody(std::shared_ptr<IBody> body) override;
 
         std::shared_ptr<ICollisionShape> CreateShape(
             const CollisionShapePhys& csPhys) override;
 
         void GatherCollisions(CollisionManager& cm) override;
+
+        RaycastHit Raycast(const Vector3& origin,
+                           const Vector3& direction,
+                           float maxDistance,
+                           const RaycastParams& params) const override;
 
     private:
         std::vector<std::shared_ptr<btDefaultMotionState>> motions;

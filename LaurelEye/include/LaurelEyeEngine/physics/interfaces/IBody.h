@@ -8,17 +8,14 @@
 
 #pragma once
 
-#include "LaurelEyeEngine/physics/interfaces/PhysicsTypes.h"
 #include "LaurelEyeEngine/transform/TransformComponent.h"
-#include "LaurelEyeEngine/physics/PhysicsBodyComponent.h"
 
-#include <any>
 #include <atomic>
 
 namespace LaurelEye::Physics {
 
     /// @brief Interface for physics bodies managed by a physics world.
-    /// An IBody represents a single object in the physics simulation, which may be static, 
+    /// An IBody represents a single object in the physics simulation, which may be static,
     /// dynamic, or kinematic depending on its configuration
     class PhysicsBodyComponent;
     class IBody {
@@ -36,7 +33,7 @@ namespace LaurelEye::Physics {
         virtual LaurelEye::TransformComponent* GetBoundTransform() const = 0;
         /// @brief Binds the pointer to the PhysicsBodyComponent to the internal physics
         /// body such that the simulation has a reference to Components
-        /// @param pbc A pointer to the 
+        /// @param pbc A pointer to the component.
         virtual void BindPhysicsBodyComponent(PhysicsBodyComponent* pbc) = 0;
 
         /// @brief Apply a continuous force to this body.

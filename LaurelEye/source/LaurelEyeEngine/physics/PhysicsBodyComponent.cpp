@@ -1,6 +1,6 @@
 ﻿#include "LaurelEyeEngine/physics/PhysicsBodyComponent.h"
 #include "LaurelEyeEngine/ecs/Entity.h"
-#include "LaurelEyeEngine/math/Transform.h"
+#include "LaurelEyeEngine/physics/interfaces/IBody.h"
 
 namespace LaurelEye::Physics {
 
@@ -27,7 +27,7 @@ namespace LaurelEye::Physics {
     }
 
     void PhysicsBodyComponent::setOwner(Entity* entity) {
-        //Call base 
+        //Call base
         IComponent::setOwner(entity);
 
         if ( entity ) {

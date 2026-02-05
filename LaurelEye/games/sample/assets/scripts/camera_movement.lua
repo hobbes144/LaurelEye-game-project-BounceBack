@@ -120,6 +120,17 @@ function onUpdate(dt)
 
     camTransform:setRotation(newRot)
     transform:setWorldTransform(camTransform)
+
+    -- Raycast demo code
+    local shoulderPos = playerPos + right * shoulderOffset
+    local raycastHit = Physics.Raycast(shoulderPos, -forward, distanceBack, {layerMask = Layers.World})
+    if (raycastHit) then
+        print("Raycast result: ", raycastHit.position)
+        print("Raycast target: ", raycastHit.entity:getName())
+    else
+        print("No raycast hit.")
+    end
+
 end
 
 function onShutdown()

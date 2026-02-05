@@ -1,4 +1,6 @@
 ﻿#include "LaurelEyeEngine/physics/interfaces/Bullet/BulletWorld.h"
+#include "LaurelEyeEngine/physics/interfaces/Bullet/BulletBody.h"
+#include "LaurelEyeEngine/physics/PhysicsBodyComponent.h"
 
 namespace LaurelEye::Physics {
 
@@ -32,9 +34,9 @@ namespace LaurelEye::Physics {
     }
 
 
-    void BulletWorld::StepSimulation(float dt) {
+    void BulletWorld::StepSimulation(float dt, int maxSubSteps, float fixedTimeStep) {
         //Run Simlation
-        world->stepSimulation(dt);
+        world->stepSimulation(dt, maxSubSteps, fixedTimeStep);
     }
 
     std::shared_ptr<IBody> BulletWorld::CreateBody(const PhysicsBodyData& data) {
@@ -205,4 +207,38 @@ namespace LaurelEye::Physics {
         }
     }
 
+    RaycastHit BulletWorld::Raycast(const Vector3& origin,
+                                    const Vector3& direction,
+                                    float maxDistance,
+                                    const RaycastParams& params) const {
+        RaycastHit out{};
+
+        Vector3 dirN = direction.normalized();
+        Vector3 end = origin + dirN * maxDistance;
+
+        btVector3 from(origin.x, origin.y, origin.z);
+        btVector3 to(end.x, end.y, end.z);
+
+        btCollisionWorld::ClosestRayResultCallback cb(from, to);
+
+        // Bullet filtering: mask/group.
+        cb.m_collisionFilterMask = params.layerMask;
+        // cb.m_collisionFilterGroup = ??? (rarely needed for raycasts)
+
+        world->rayTest(from, to, cb);
+
+        if ( !cb.hasHit() )
+            return out;
+
+        out.hit = true;
+        out.position = Vector3(cb.m_hitPointWorld.x(), cb.m_hitPointWorld.y(), cb.m_hitPointWorld.z());
+        out.normal = Vector3(cb.m_hitNormalWorld.x(), cb.m_hitNormalWorld.y(), cb.m_hitNormalWorld.z());
+        out.distance = maxDistance * cb.m_closestHitFraction;
+
+        const btCollisionObject* obj = cb.m_collisionObject;
+        auto body = static_cast<PhysicsBodyComponent*>(obj->getUserPointer());
+        out.entityRef = body->getOwner();
+
+        return out;
+    }
 }

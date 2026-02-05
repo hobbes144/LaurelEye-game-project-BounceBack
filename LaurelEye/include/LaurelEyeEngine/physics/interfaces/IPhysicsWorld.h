@@ -11,6 +11,7 @@
 
 #include <memory>
 
+#include "LaurelEyeEngine/math/Vector3.h"
 #include "LaurelEyeEngine/physics/interfaces/PhysicsTypes.h"
 #include "LaurelEyeEngine/physics/interfaces/IBody.h"
 #include "LaurelEyeEngine/physics/CollisionManager.h"
@@ -30,7 +31,7 @@ namespace LaurelEye::Physics {
 
         /// @brief Advances the simulation state by the given delta time.
         /// @param dt Delta time in seconds since the last update.
-        virtual void StepSimulation(float dt) = 0;
+        virtual void StepSimulation(float dt, int maxSubSteps = 1, float fixedTimeStep = 1.0f/60.0f) = 0;
 
         /// @brief Create a new physics body.
         /// @param type The type of body (static, dynamic, kinematic).
@@ -48,6 +49,11 @@ namespace LaurelEye::Physics {
             const CollisionShapePhys& csPhys) = 0;
 
         virtual void GatherCollisions(CollisionManager& cm) = 0;
+
+        virtual RaycastHit Raycast(const Vector3& origin,
+                                   const Vector3& direction,
+                                   float maxDistance,
+                                   const RaycastParams& params) const = 0;
 
     protected:
         //TODO: Track Physics Bodies in a more efficient manner

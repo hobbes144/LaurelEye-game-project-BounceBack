@@ -62,7 +62,8 @@ namespace LaurelEye::Scripting {
                                              sol::meta_function::subtraction, sol::overload([](const LaurelEye::Vector3& a, const LaurelEye::Vector3& b) { return a - b; }, [](const LaurelEye::Vector3& a, float b) { return a - b; }),
                                              sol::meta_function::multiplication, sol::overload([](const LaurelEye::Vector3& a, float b) { return a * b; }, [](float b, const LaurelEye::Vector3& a) { return a * b; }, [](const LaurelEye::Vector3& a, const LaurelEye::Vector3& b) { return a * b; }),
                                              sol::meta_function::division, sol::overload([](const LaurelEye::Vector3& a, float b) { return a / b; }, [](const LaurelEye::Vector3& a, const LaurelEye::Vector3& b) { return a / b; }),
-                                             sol::meta_function::equal_to, &LaurelEye::Vector3::operator==);
+                                             sol::meta_function::equal_to, &LaurelEye::Vector3::operator==,
+                                             sol::meta_function::unary_minus, [](const LaurelEye::Vector3& v) { return -v; });
 
         auto v3Table = lua["Vector3"];
         v3Table["Zero"] = LaurelEye::Vector3(0, 0, 0);

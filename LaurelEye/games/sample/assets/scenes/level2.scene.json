@@ -40,8 +40,8 @@
                     "angularDamping": 0.0,
                     "friction": 0.5,
                     "restitution": 0.0,
-                    "collisionGroup": 1,
-                    "collisionMask": 4294967295,
+                    "collisionGroup": 4,
+                    "collisionMask": 11,
                     "gravityScale": 0.0
                 }
             }
@@ -82,8 +82,8 @@
                     "angularDamping": 0.0,
                     "friction": 0.0,
                     "restitution": 0.0,
-                    "collisionGroup": 1,
-                    "collisionMask": 4294967295,
+                    "collisionGroup": 4,
+                    "collisionMask": 11,
                     "gravityScale": 0.0
                 }
             }
@@ -124,8 +124,8 @@
                     "angularDamping": 0.0,
                     "friction": 0.0,
                     "restitution": 0.0,
-                    "collisionGroup": 1,
-                    "collisionMask": 4294967295,
+                    "collisionGroup": 4,
+                    "collisionMask": 11,
                     "gravityScale": 0.0
                 }
             }
@@ -166,8 +166,8 @@
                     "angularDamping": 0.0,
                     "friction": 0.0,
                     "restitution": 0.0,
-                    "collisionGroup": 1,
-                    "collisionMask": 4294967295,
+                    "collisionGroup": 4,
+                    "collisionMask": 11,
                     "gravityScale": 0.0
                 }
             }
@@ -208,8 +208,8 @@
                     "angularDamping": 0.0,
                     "friction": 0.0,
                     "restitution": 0.0,
-                    "collisionGroup": 1,
-                    "collisionMask": 4294967295,
+                    "collisionGroup": 4,
+                    "collisionMask": 11,
                     "gravityScale": 0.0
                 }
             }
@@ -250,8 +250,8 @@
                     "angularDamping": 0.0,
                     "friction": 0.5,
                     "restitution": 0.0,
-                    "collisionGroup": 1,
-                    "collisionMask": 4294967295,
+                    "collisionGroup": 4,
+                    "collisionMask": 11,
                     "gravityScale": 0.0
                 }
             }
@@ -313,8 +313,8 @@
                     "angularDamping": 2.0,
                     "friction": 2.5,
                     "restitution": 0.1,
-                    "collisionGroup": 1,
-                    "collisionMask": 4294967295,
+                    "collisionGroup": 2,
+                    "collisionMask": 13,
                     "useCCD": false,
                     "ccdMotionThreshold": 0.01,
                     "ccdSweptSphereRadius": 1.0,
@@ -382,8 +382,8 @@
                     "angularDamping": 2.0,
                     "friction": 2.5,
                     "restitution": 0.1,
-                    "collisionGroup": 1,
-                    "collisionMask": 4294967295,
+                    "collisionGroup": 2,
+                    "collisionMask": 13,
                     "useCCD": false,
                     "ccdMotionThreshold": 0.01,
                     "ccdSweptSphereRadius": 1.0,
@@ -459,8 +459,8 @@
                     "angularDamping": 2.0,
                     "friction": 2.5,
                     "restitution": 0.1,
-                    "collisionGroup": 1,
-                    "collisionMask": 4294967295,
+                    "collisionGroup": 2,
+                    "collisionMask": 13,
                     "useCCD": false,
                     "ccdMotionThreshold": 0.01,
                     "ccdSweptSphereRadius": 1.0,

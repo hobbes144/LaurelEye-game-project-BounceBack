@@ -27,6 +27,16 @@ namespace LaurelEye::Physics {
         Static, Dynamic, Kinematic
     };
 
+    enum CollisionLayer : uint32_t {
+        None = 0,
+        Player = 1 << 0,
+        Enemy = 1 << 1,
+        World = 1 << 2,
+        Projectile = 1 << 3,
+        Trigger = 1 << 4,
+        All = 0xFFFFFFFFu
+    };
+
     /// @brief Definition of a Physics Shape, Used to build shapes and bodies
     struct CollisionShapePhys {
         enum class ShapeType {Box, Sphere, Capsule, Mesh } type = ShapeType::Box;
@@ -57,8 +67,8 @@ namespace LaurelEye::Physics {
         Vector3 freezeRotation = {false, false, false};
 
         // Collision filtering
-        uint32_t collisionGroup = 1;
-        uint32_t collisionMask = 0xFFFFFFFF;
+        uint32_t collisionGroup = CollisionLayer::World;
+        uint32_t collisionMask = CollisionLayer::All;
         // Continuous collision detection
         bool useCCD = false;
         float ccdMotionThreshold = 0.0f;
@@ -109,4 +119,24 @@ namespace LaurelEye::Physics {
         }
     };
 
+    /// @class RaycastHit
+    /// @brief Results of a raycast for each hit.
+    ///
+    struct RaycastHit {
+        bool hit = false;
+        float distance = 0.0f;
+        Vector3 position{};
+        Vector3 normal{};
+        // unsigned int entityID = 0;
+        Entity* entityRef = nullptr;
+        // uint32_t colliderId = 0; // for sub-colliders, unimplemented
+    };
+
+    struct RaycastParams {
+        uint32_t layerMask = CollisionLayer::All;
+        bool closest = true;      // closest hit vs all hits
+        // unsigned int ingoreID = 0; // Ignore certain obj
+        // Entity* ignoreRef = nullptr;
+        // bool hitTriggers = false; // for trigger volumes, unimplemented
+    };
 }
