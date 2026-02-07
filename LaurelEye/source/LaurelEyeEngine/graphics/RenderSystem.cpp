@@ -719,7 +719,7 @@ namespace LaurelEye::Graphics {
                 DataBufferUpdateMode::Dynamic,
                 sizeof(PointLight) * 200,
                 DataBuffer::LocalLightDataBinding},
-            &localLights, "LocalLightData");
+            "LocalLightData");
     }
 
     void RenderSystem::updateGlobalLights() const {
