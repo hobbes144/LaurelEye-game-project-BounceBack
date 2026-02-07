@@ -45,6 +45,9 @@ namespace LaurelEye {
         scriptSystem = std::make_unique<Scripting::ScriptSystem>();
         scriptSystem->setEngineContext(ctx);
 
+        animationSystem = std::make_unique<Animations::AnimationSystem>();
+        animationSystem->setEngineContext(ctx);
+
         // If Debug Drawing is enabled, create and register the system
         if ( engineConfig.enableDebugMode ) {
             debugDrawSystem = std::make_unique<Debug::DebugDrawSystem>();
@@ -59,6 +62,7 @@ namespace LaurelEye {
         ctx.registerService<Particles::ParticleSystem>(particleSystem.get());
         ctx.registerService<Audio::AudioSystem>(audioSystem.get());
         ctx.registerService<Scripting::ScriptSystem>(scriptSystem.get());
+        ctx.registerService<Animations::AnimationSystem>(animationSystem.get());
     }
 
     void SystemCoordinator::initialize() {
@@ -71,6 +75,7 @@ namespace LaurelEye {
         particleSystem->initialize();
         debugDrawSystem->initialize();
         audioSystem->initialize();
+        animationSystem->initialize();
     }
 
     void SystemCoordinator::update(float deltaTime) {
@@ -86,6 +91,8 @@ namespace LaurelEye {
         if ( debugDrawSystem ) {
             debugDrawSystem->update(deltaTime);
         }
+        physicsSystem->update(deltaTime);
+        animationSystem->update(deltaTime);
         renderSystem->update(deltaTime);
     }
 

@@ -40,10 +40,18 @@ namespace LaurelEye::Graphics {
                 size = 4;
                 type = GL_FLOAT;
                 break;
-            case VertexAttribFormat::Uint8x4Norm:
+            case VertexAttribFormat::Uint32x4Norm:
                 size = 4;
-                type = GL_UNSIGNED_BYTE;
+                type = GL_UNSIGNED_INT;
                 normalized = GL_TRUE;
+                break;
+            case VertexAttribFormat::Uint32x4:
+                size = 4;
+                type = GL_UNSIGNED_INT;
+                break;
+            case VertexAttribFormat::Int32x4:
+                size = 4;
+                type = GL_FLOAT;
                 break;
             case VertexAttribFormat::Float32:
                 size = 1;
@@ -65,13 +73,25 @@ namespace LaurelEye::Graphics {
 
             glEnableVertexArrayAttrib(r.id, attr.location);
 
-            glVertexArrayAttribFormat(
-                r.id,
-                (GLint)attr.location,
-                size,
-                type,
-                normalized,
-                (GLuint)attr.relativeOffset);
+            //if ( attr.format == VertexAttribFormat::Uint8x4 || attr.format == VertexAttribFormat::Int8x4 )
+            //{
+            //    glVertexArrayAttribIFormat( r.id,
+            //        (GLint)attr.location,
+            //        size,
+            //        type,
+            //        // GL_UNSIGNED_INT , GLINT
+            //        (GLuint)attr.relativeOffset);
+            //}
+            //else {
+                glVertexArrayAttribFormat(
+                    r.id,
+                    (GLint)attr.location,
+                    size,
+                    type,
+                    normalized,
+                    (GLuint)attr.relativeOffset);
+            //}
+            
 
             glVertexArrayAttribBinding(
                 r.id,

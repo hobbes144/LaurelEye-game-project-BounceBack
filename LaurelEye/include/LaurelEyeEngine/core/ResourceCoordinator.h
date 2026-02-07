@@ -21,8 +21,10 @@
 #include "LaurelEyeEngine/platforms/IPlatform.h"
 #include "LaurelEyeEngine/scene/SceneManager.h"
 #include "LaurelEyeEngine/window/WindowManager.h"
+#include "LaurelEyeEngine/animation/AnimationManager.h"
 #include <memory>
 #include <vector>
+
 
 namespace LaurelEye {
     class ResourceCoordinator {
@@ -43,6 +45,6 @@ namespace LaurelEye {
         std::unique_ptr<SceneManager> sceneManager;
         std::unique_ptr<EventManager> eventManager;
         std::unique_ptr<IPlatform> platformManager;
-
+        std::unique_ptr<Animations::AnimationManager> animationManager;
     };
 } // namespace LaurelEye

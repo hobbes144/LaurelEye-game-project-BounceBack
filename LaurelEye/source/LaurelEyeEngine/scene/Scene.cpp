@@ -17,6 +17,7 @@
 #include "LaurelEyeEngine/UI/UIComponents/UITextComponent.h"
 
 #include "LaurelEyeEngine/graphics/renderpass/GBufferPass.h"
+#include "LaurelEyeEngine/graphics/renderpass/GBufferSkinnedPass.h"
 #include "LaurelEyeEngine/graphics/renderpass/SkydomePass.h"
 #include "LaurelEyeEngine/particles/ParticleEmitterComponent.h"
 #include "LaurelEyeEngine/physics/PhysicsBodyComponent.h"
@@ -33,6 +34,8 @@
 #include "LaurelEyeEngine/physics/PhysicsSystem.h"
 #include "LaurelEyeEngine/scripting/ScriptSystem.h"
 #include "LaurelEyeEngine/transform/TransformSystem.h"
+#include "LaurelEyeEngine/animation/AnimationManager.h"
+#include "LaurelEyeEngine/animation/AnimationSystem.h"
 #include "LaurelEyeEngine/UI/UILayoutSystem.h"
 #include "LaurelEyeEngine/UI/UIInteractionSystem.h"
 
@@ -298,6 +301,7 @@ namespace LaurelEye {
         auto* scriptingSystem = ctx.getService<Scripting::ScriptSystem>();
         auto* particleSystem = ctx.getService<Particles::ParticleSystem>();
         auto* audioSystem = ctx.getService<Audio::AudioSystem>();
+        auto* animationSystem = ctx.getService<Animations::AnimationSystem>();
         auto* uiLayoutSystem = ctx.getService<UI::UILayoutSystem>();
 
         for ( auto& comp : entity->getComponents() ) {
@@ -366,6 +370,10 @@ namespace LaurelEye {
                     uiLayoutSystem->registerComponent(uitransformComp);
                 }
             }
+            else if ( auto* AnimationComp = dynamic_cast<Animations::AnimationComponent*>(comp.get()) ) {
+                //std::cout << "[Scene] Registering Animation Element " << std::endl;
+                animationSystem->registerComponent(AnimationComp);
+            }
             else if ( auto* uiinteractionComp = dynamic_cast<UI::UIRenderComponent*>(comp.get()) ) {
 
             }
@@ -384,6 +392,7 @@ namespace LaurelEye {
         auto* scriptingSystem = ctx.getService<Scripting::ScriptSystem>();
         auto* particleSystem = ctx.getService<Particles::ParticleSystem>();
         auto* audioSystem = ctx.getService<Audio::AudioSystem>();
+        auto* animationSystem = ctx.getService<LaurelEye::Animations::AnimationSystem>();
         auto* uiLayoutSystem = ctx.getService<UI::UILayoutSystem>();
 
         for ( auto& comp : entity->getComponents() ) {

@@ -9,7 +9,7 @@
         },
         "Render3D": {
             "mesh": {
-                "file": "models/roman_D.fbx"
+                "file": "models/Idle.fbx"
             },
             "material": {
                 "texture": "textures/roman_blue_D_texture.jpg",
@@ -87,6 +87,10 @@
             "loop": false,
             "3D": false,
             "playOnLoad": false
+        },
+        "Animation": {
+            "type": "Skeletal",
+            "file": [ "models/Running.fbx", "models/Idle.fbx" ]
         },
         "Script": {
             "path": "scripts/catch_player.lua"

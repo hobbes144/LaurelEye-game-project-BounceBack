@@ -1,12 +1,18 @@
 ﻿#include "LaurelEyeEngine/io/importers/MeshImporter.h"
 #include "LaurelEyeEngine/io/Assets.h"
+#include "LaurelEyeEngine/math/Transform.h"
+#include "LaurelEyeEngine/math/Vector3.h"
 #include "LaurelEyeEngine/platforms/assimp/AssimpUtilities.h"
+#include <filesystem>
 
+#include <assimp/quaternion.h>
+#include <assimp/vector3.h>
 #include <memory>
 
 namespace LaurelEye::IO {
     std::shared_ptr<IAsset> MeshImporter::import(const std::string& path) {
         Assimp::Importer importer;
+        importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
         const aiScene* scene = importer.ReadFile(path,
                                                  aiProcess_CalcTangentSpace |
                                                      aiProcess_JoinIdenticalVertices |
@@ -68,32 +74,32 @@ namespace LaurelEye::IO {
 
         meshAsset->inverseBindMatrices.resize(meshBoneCount);
 
-        for ( unsigned int m = 0; m < scene->mNumMeshes; ++m ) {
-            aiMesh* mesh = scene->mMeshes[m];
-            populateVerticesIndices(meshAsset->vertices, meshAsset->indices, mesh, vertexOffset);
+        // for ( unsigned int m = 0; m < scene->mNumMeshes; ++m ) {
+        aiMesh* mesh = scene->mMeshes[0];
+        populateVerticesIndices(meshAsset->vertices, meshAsset->indices, mesh, vertexOffset);
 
-            // Skin
-            // NOTE: This should be combined with the skeleton stuff, cause the bone index matters!!
-            for ( unsigned int i = 0; i < mesh->mNumBones; ++i ) {
-                const aiBone* b = mesh->mBones[i];
-                const std::string boneName = b->mName.C_Str();
-                const auto it = skeletonAsset->boneNameIndex.find(boneName);
-                assert("LAURELEYE::IO::MESHIMPORTER::BONEMISSING" && it != skeletonAsset->boneNameIndex.end());
-                const auto boneIndex = it->second;
+        // Skin
+        // NOTE: This should be combined with the skeleton stuff, cause the bone index matters!!
+        for ( unsigned int i = 0; i < mesh->mNumBones; ++i ) {
+            const aiBone* b = mesh->mBones[i];
+            const std::string boneName = b->mName.C_Str();
+            const auto it = skeletonAsset->boneNameIndex.find(boneName);
+            assert("LAURELEYE::IO::MESHIMPORTER::BONEMISSING" && it != skeletonAsset->boneNameIndex.end());
+            const auto boneIndex = it->second;
 
-                for ( unsigned int j = 0; j < b->mNumWeights; ++j ) {
-                    const aiVertexWeight& wt = b->mWeights[j];
-                    int vertexId = vertexOffset + b->mWeights[j].mVertexId;
+            for ( unsigned int j = 0; j < b->mNumWeights; ++j ) {
+                const aiVertexWeight& wt = b->mWeights[j];
+                int vertexId = vertexOffset + b->mWeights[j].mVertexId;
 
-                    // AddBoneData function
-                    addBoneData(meshAsset->vertices[vertexId], boneIndex, wt.mWeight);
-                }
-
-                meshAsset->inverseBindMatrices[boneIndex] = Platforms::Assimp::Utilities::convert(b->mOffsetMatrix);
+                // AddBoneData function
+                addBoneData(meshAsset->vertices[vertexId], boneIndex, wt.mWeight);
             }
 
+            meshAsset->inverseBindMatrices[boneIndex] = Platforms::Assimp::Utilities::convert(b->mOffsetMatrix);
+            // }
+
             // Update offset
-            vertexOffset += mesh->mNumVertices;
+            // vertexOffset += mesh->mNumVertices;
         }
 
         return meshAsset;
@@ -102,45 +108,69 @@ namespace LaurelEye::IO {
     void MeshImporter::buildSkeletonRecursive(const aiNode* node,
                                               int parentIndex,
                                               SkeletonAsset& skel,
-                                              const std::unordered_set<std::string>& usedBoneNames) {
+                                              Transform accumulated,
+                                              std::unordered_set<std::string>& usedBoneNames) {
         std::string nodeName = node->mName.C_Str();
-        int thisIndex = -1;
+        int thisIndex = parentIndex;
 
         if ( usedBoneNames.contains(nodeName) ) {
+            assert(!skel.boneNameIndex.contains(nodeName) && "ERROR::LAURELEYE::MESHIMPORTER::INVALID_SKELETON");
             thisIndex = static_cast<int>(skel.bones.size());
 
             SkeletonAsset::Bone bone;
             bone.name = nodeName;
-            bone.localBindTransform = Platforms::Assimp::Utilities::convert(node->mTransformation); // parent → bone in bind pose
+            bone.localBindTransform = accumulated * Platforms::Assimp::Utilities::convertTransform(node->mTransformation); // parent → bone in bind pose
+            accumulated = Transform();
+
+            skel.boneNameIndex[nodeName] = thisIndex;
 
             skel.bones.push_back(bone);
             skel.parentIndices.push_back(parentIndex);
-            skel.boneNameIndex[bone.name] = thisIndex;
-
-            parentIndex = thisIndex; // children who are also bones will use this as parent
         }
+        else {
+            accumulated = accumulated * Platforms::Assimp::Utilities::convertTransform(node->mTransformation);
+        }
+        parentIndex = thisIndex; // children who are also bones will use this as parent
 
         for ( unsigned int c = 0; c < node->mNumChildren; ++c ) {
-            buildSkeletonRecursive(node->mChildren[c], parentIndex, skel, usedBoneNames);
+            buildSkeletonRecursive(node->mChildren[c], parentIndex, skel, accumulated, usedBoneNames);
         }
     }
 
     std::shared_ptr<SkeletonAsset> MeshImporter::buildSkeleton(const std::string& path, const aiScene* scene) {
         std::unordered_set<std::string> usedBoneNames;
+        int thisIndex = -1;
+        auto asset = std::make_shared<SkeletonAsset>(path);
+        // unused, remove:
+        asset->inverseTransform = Platforms::Assimp::Utilities::convert(scene->mRootNode->mTransformation.Inverse());
 
-        for ( unsigned int m = 0; m < scene->mNumMeshes; ++m ) {
-            aiMesh* mesh = scene->mMeshes[m];
-            for ( unsigned int b = 0; b < mesh->mNumBones; ++b ) {
-                aiBone* bone = mesh->mBones[b];
+        // First get the list of actual bones.
+        aiMesh* mesh = scene->mMeshes[0];
+        for ( unsigned int b = 0; b < mesh->mNumBones; ++b ) {
+            aiBone* bone = mesh->mBones[b];
+            if ( !usedBoneNames.contains(bone->mName.C_Str()) ) {
                 usedBoneNames.insert(bone->mName.C_Str());
             }
         }
 
-        auto asset = std::make_shared<SkeletonAsset>(path);
+        // Assimp's trees have way more nodes than just the bones, and every
+        // node's transform is important. To handle this, we use an
+        // accumulator that adds up the bindTransforms of each of the nodes
+        // between the bones.
 
-        buildSkeletonRecursive(scene->mRootNode, -1, *asset.get(), usedBoneNames);
+        Transform accumulatedBindTransform = Transform();
+
+        buildSkeletonRecursive(scene->mRootNode, -1, *asset.get(), accumulatedBindTransform, usedBoneNames);
 
         return asset;
+    }
+
+    std::string CleanName(const std::string& name) {
+        const std::string suffix = "_$AssimpFbx$_";
+        size_t pos = name.find(suffix);
+        if ( pos != std::string::npos )
+            return name.substr(0, pos);
+        return name;
     }
 
     std::shared_ptr<AnimationAsset> MeshImporter::buildAnimation(const std::string& path, const aiScene* scene, const SkeletonAsset& skeleton) {
@@ -151,23 +181,26 @@ namespace LaurelEye::IO {
         aiAnimation* aiAnim = scene->mAnimations[0];
 
         auto anim = std::make_shared<AnimationAsset>(path);
-        anim->animName = aiAnim->mName.C_Str();
+        anim->animName = std::filesystem::path(path).stem().string();
         anim->duration = aiAnim->mDuration;
-        anim->ticksPerSecond = aiAnim->mTicksPerSecond != 0 ? aiAnim->mTicksPerSecond : 30.0;
+        anim->ticksPerSecond = aiAnim->mTicksPerSecond != 0.0 ? aiAnim->mTicksPerSecond : 30.0;
 
         // Skeleton order = animation channel index order, match here
         size_t boneCount = skeleton.bones.size();
         anim->reserveSize(boneCount);
 
         // maps animation channels to skeleton bone indices
-        for ( unsigned int c = 0; c < aiAnim->mNumChannels; ++c ) {
+        for ( size_t c = 0; c < aiAnim->mNumChannels; ++c ) {
             aiNodeAnim* aiChannel = aiAnim->mChannels[c];
             std::string boneName = aiChannel->mNodeName.C_Str();
+            boneName = CleanName(boneName);
 
             // Find matching bone index in skeleton if it exists
             auto it = skeleton.boneNameIndex.find(boneName);
-            if ( it == skeleton.boneNameIndex.end() )
+            if ( it == skeleton.boneNameIndex.end() ) {
+                std::cout << "Animation channel bone not found in skeleton: " << boneName << std::endl;
                 continue;
+            }
 
             size_t boneIndex = it->second;
             AnimationAsset::Channel& ch = anim->channels[boneIndex];
@@ -222,7 +255,27 @@ namespace LaurelEye::IO {
             }
         }
 
+        // After processing all aiAnim->mChannels
+        for ( size_t boneIndex = 0; boneIndex < boneCount; ++boneIndex ) {
+            AnimationAsset::Channel& ch = anim->channels[boneIndex];
+
+            // If this bone already has animation keys, skip it
+            if ( !ch.keyframe.empty() )
+                continue;
+
+            // Bone has no animation channel — use bind transform
+            const Transform& bindT = skeleton.bones[boneIndex].localBindTransform;
+
+            ch.keyframe.push_back(bindT);
+            ch.timeStamp.push_back(0.0);
+
+            std::cout << "Added bind-pose channel for missing bone: "
+                      << skeleton.bones[boneIndex].name << std::endl;
+        }
+
         return anim;
+
+
     }
 
     void MeshImporter::addBoneData(SkinnedMeshAsset::SkinnedVertex& vertex, int boneIndex, float boneWeight) {
@@ -235,6 +288,7 @@ namespace LaurelEye::IO {
             }
         }
     }
+
     template <std::convertible_to<LaurelEye::Graphics::MeshVertex> TVertex>
     void MeshImporter::populateVerticesIndices(std::vector<TVertex>& vertices,
                                                std::vector<uint32_t>& indices,

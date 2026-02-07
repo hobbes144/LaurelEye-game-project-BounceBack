@@ -27,7 +27,7 @@ namespace LaurelEye::Graphics {
         Vector3 normal;
         Vector2 uv;
         Vector3 tangent;
-        IVector4 boneIndices;
+        IVector4 boneIndices = IVector4(-1, -1, -1, -1);
         Vector4 boneWeights;
     };
 
@@ -63,6 +63,7 @@ namespace LaurelEye::Graphics {
         // One inverse bind matrix per bone in this mesh's rig
         std::vector<Matrix4> inverseBindMatrices;
         DataBufferHandle skinDataBuffer = DataBuffer::InvalidDataBuffer;
+        //DataBufferHandle animationDataBuffer = DataBuffer::InvalidDataBuffer;
 
         bool isSkinned() const noexcept {
             return isValidSkeleton(skeleton) &&

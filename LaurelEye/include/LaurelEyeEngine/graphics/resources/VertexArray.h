@@ -24,7 +24,9 @@ namespace LaurelEye::Graphics {
         Float32x2,
         Float32x3,
         Float32x4,
-        Uint8x4Norm,
+        Uint32x4Norm,
+        Uint32x4,
+        Int32x4,
         // Extend as needed (e.g. Uint16x2, etc.)
     };
 

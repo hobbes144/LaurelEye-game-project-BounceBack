@@ -96,6 +96,7 @@ namespace LaurelEye {
     extern template class VectorTemplated<float, 3ul>;
     extern template class VectorTemplated<double, 3ul>;
     extern template class VectorTemplated<int, 4ul>;
+    extern template class VectorTemplated<unsigned int, 4ul>;
     extern template class VectorTemplated<float, 4ul>;
     extern template class VectorTemplated<double, 4ul>;
     using IVector2 = VectorTemplated<int, 2ul>;
@@ -106,6 +107,7 @@ namespace LaurelEye {
     using FVector3 = VectorTemplated<float, 3ul>;
     using DVector3 = VectorTemplated<double, 3ul>;
     using IVector4 = VectorTemplated<int, 4ul>;
+    using UIVector4 = VectorTemplated<unsigned int, 4ul>;
     using Vector4 = VectorTemplated<float, 4ul>;
     using FVector4 = VectorTemplated<float, 4ul>;
     using DVector4 = VectorTemplated<double, 4ul>;

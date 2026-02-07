@@ -1,4 +1,4 @@
-﻿maxSpeed       = 200.0
+maxSpeed       = 200.0
 accelGround    = 250.0
 accelAir       = 30.0
 decelGround    = 5.0
@@ -60,6 +60,10 @@ function onStart()
             cameraTransform = cameraEntity:findTransform()
         end
     end
+
+    animator = self:findAnimator()
+    if animator == nil then return end
+    animator:changeAnimation("Idle")
 
     smokeEmitter = self:findParticleEmitter()
 
@@ -165,7 +169,19 @@ function onUpdate(dt)
 
         -- force = mass * accel (physics: F = m * a)
         local force = Vector3.new(accelReqX * mass, 0, accelReqZ * mass)
-        body:applyImpulse(force * dt)
+        body:applyForce(force)
+
+        local animName = animator.currentAnimationName
+        print(animName)
+        if animName ~= "Running" then
+            animator:changeAnimation("Running")
+        end
+    else
+        local animName = animator.currentAnimationName
+        print(animName)
+        if animName ~= "Idle" then
+            animator:changeAnimation("Idle")
+        end
     end
 
     -- Jump check
@@ -365,7 +381,7 @@ function shootProjectile()
     -- Apply velocity
     local projBody = proj:findPhysics()
     if projBody ~= nil then
-        local projectileSpeed = 150.0
+        local projectileSpeed = 125.0
         projBody:setLinearVelocity(aimDir * projectileSpeed)
     end
 end

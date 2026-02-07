@@ -1,4 +1,6 @@
-﻿// Notes:
+﻿#pragma once
+
+// Notes:
 //
 // Each Animation component will store a handle to the Animation resource.
 // The animations themselves (with the per bone channel) will be stored in the
@@ -30,3 +32,35 @@
 // the RenderComponent, and the Animation Component will always cache this on
 // init and update the relevant UBO via RenderResources.
 // DataBufferHandle buffer;
+
+#include "LaurelEyeEngine/animation/components/AnimationComponent.h"
+
+#include "LaurelEyeEngine/graphics/resources/DataBuffer.h"
+#include "LaurelEyeEngine/graphics/resources/Skeleton.h"
+#include "LaurelEyeEngine/math/Matrix4.h"
+#include "LaurelEyeEngine/math/Transform.h"
+
+namespace LaurelEye::Animations {
+
+    struct SkeletalAnimationComponent : public AnimationComponent {
+        SkeletalAnimationComponent() : AnimationComponent(Animation::Type::Skeletal) {}
+        std::vector<Transform> localPose;
+        std::vector<Matrix4> globalPose;
+        Matrix4 inverseTransform;
+
+        std::string CurrentAnimationName;
+        std::string objName;
+        bool isChange = false;
+
+        Graphics::DataBufferHandle AnimationDataBuffer;
+        Graphics::SkeletonHandle skeleton;
+
+        // this is bad, but it seems everyone is doing it
+        void changeAnimation(const std::string name);
+
+        void setTime(float input); // Animation time
+        void setStart(bool input); // turn on and off
+
+    };
+
+} // namespace LaurelEye::Animations

@@ -17,6 +17,7 @@
 #include "LaurelEyeEngine/math/Vector3.h"
 
 #include "LaurelEyeEngine/graphics/renderpass/ShadowPass.h"
+#include "LaurelEyeEngine/graphics/renderpass/ShadowSkinnedPass.h"
 #include <cstdint>
 // #include "MomentShadowMapPass.h"
 
@@ -99,7 +100,8 @@ namespace LaurelEye::Graphics {
         RenderResources* rs;
         DataBufferHandle shadowResourcesBuffer = DataBuffer::InvalidDataBuffer;
 
-        ShadowPass shadowPass;
+        // ShadowPass shadowPass;
+        ShadowSkinnedPass shadowPass;
         // MomentShadowMapPass momentShadowMapPass;
 
         // void calculateMomentWeights(int width);

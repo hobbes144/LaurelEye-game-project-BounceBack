@@ -32,7 +32,7 @@ namespace LaurelEye::Graphics {
             /// @brief Name of the bone.
             std::string name;
             /// @brief Local space bind pose relative to parent in Transform form.
-            Transform lobalBindTransform;
+            Transform localBindTransform;
 
             // Add the following back if ever needed.
             // /// @brief Local space bind pose
@@ -58,6 +58,8 @@ namespace LaurelEye::Graphics {
         /// For debugging:
         /// parentIndices.size() should always be equal to bones.size()
         std::vector<int> parentIndices;
+
+        Transform inverseTransform;
 
         // This is useful for skeleton debug drawing. We will skip for now.
         // std::vector<std::pair<int, int>> boneEdges;

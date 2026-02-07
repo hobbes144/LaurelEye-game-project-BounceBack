@@ -1,18 +1,34 @@
-﻿// Notes:
-//
-// This resource stores the animations from the animation file. This will store
-// all the keyframe transforms from the channels in the bone index order from
-// the skeleton.
-//
-// std::string name;
-// struct Keyframe {
-//     Transform localPose;
-//     float timeStamp;
-// };
-// struct AnimationChannel {
-//     std::vector<Keyframe> keyframes;
-// };
-// std::vector<AnimationChannel> channels;
-//
-// This is used by the AnimationComponent to calculate the current localPose
-// transform for each frame at the animation time unit.
+﻿#pragma once
+
+#include <cstdint>
+#include <string>
+
+namespace LaurelEye::Animations {
+
+    using AnimationHandle = uint32_t;
+
+    struct Animation {
+        static constexpr AnimationHandle InvalidAnimation = UINT32_MAX;
+        enum class Type {
+            Basic,
+            Skeletal
+        };
+
+        Animation(Type _type = Type::Basic) : type(_type) {}
+
+        virtual ~Animation() {}
+
+        AnimationHandle handle = Animation::InvalidAnimation;
+        Type type;
+        std::string name;
+        double duration;
+    };
+
+    /// @brief Checks whether a given animation handle is valid.
+    /// @param h The handle to validate.
+    /// @return `true` if the handle refers to a valid animation, otherwise `false`.
+    inline bool isValidAnimation(AnimationHandle h) noexcept {
+        return h != Animation::InvalidAnimation;
+    }
+
+} // namespace LaurelEye

@@ -18,7 +18,7 @@ find_package(RapidJSON CONFIG REQUIRED)
 find_package(lua CONFIG REQUIRED)
 find_package(sol2 CONFIG REQUIRED)
 
-add_library(LaurelEyeEngine SHARED ${ENGINE_SOURCES})
+add_library(LaurelEyeEngine SHARED ${ENGINE_SOURCES} "graphics/renderpass/ShadowSkinnedPass.cpp" "animation/Component/SkeletalAnimationComponent.cpp" "scripting/sol2/bindings/Sol2API_Animation.cpp")
 
 le_add_fmod(LaurelEyeEngine USE_STUDIO)
 

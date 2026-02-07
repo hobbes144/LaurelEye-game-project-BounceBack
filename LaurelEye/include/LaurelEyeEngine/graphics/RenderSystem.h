@@ -43,6 +43,7 @@ namespace LaurelEye::Graphics {
     class LightComponent;
     class CameraComponent;
     class GBufferPass;
+    class GBufferSkinnedPass;
     class DeferredRenderPass;
     class LocalLightsPass;
     class SinglePass;
@@ -129,7 +130,8 @@ namespace LaurelEye::Graphics {
         std::shared_ptr<SinglePassShadow> retrieveSinglePass();
         std::shared_ptr<ParticleRenderPass> retrieveParticlePass();
         std::shared_ptr<SkydomePass> retrieveSkydomePass();
-        std::shared_ptr<GBufferPass> retrieveGBufferPass();
+        // std::shared_ptr<GBufferPass> retrieveGBufferPass();
+        std::shared_ptr<GBufferSkinnedPass> retrieveGBufferPass();
         std::shared_ptr<DebugDrawRenderPass> retrieveDebugDrawRenderPass();
 
         RenderResources* getRenderResources() {
@@ -199,7 +201,8 @@ namespace LaurelEye::Graphics {
         std::unique_ptr<ShadowManager> tempShadowManager;
         /// @brief A single-pass rendering pipeline used for simple frame rendering.
         // std::shared_ptr<SinglePass> sp;
-        std::shared_ptr<GBufferPass> gbufferPass;
+        // std::shared_ptr<GBufferPass> gbufferPass;
+        std::shared_ptr<GBufferSkinnedPass> gbufferPass;
         std::shared_ptr<DeferredRenderPass> deferredRenderPass;
         std::shared_ptr<LocalLightsPass> localLightsPass;
         std::shared_ptr<SinglePassShadow> sp;

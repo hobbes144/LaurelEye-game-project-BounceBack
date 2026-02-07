@@ -1,4 +1,6 @@
-﻿// Notes:
+﻿#pragma once
+
+// Notes:
 //
 // This will contain all the animation logic.
 // Ideally we store the animation method in the config, so that we can
@@ -20,3 +22,51 @@
 //
 // During Animation resource load:
 // Create the resource with channels that map to the respective bone index.
+
+#include "LaurelEyeEngine/ecs/ISystem.h"
+#include "LaurelEyeEngine/animation/components/AnimationComponent.h"
+#include "components/SkeletalAnimationComponent.h"
+
+namespace LaurelEye::Graphics {
+    class RenderResources;
+    class SkeletonManager;
+}
+
+namespace LaurelEye::Animations {
+
+    class AnimationManager;
+
+    struct AnimationSystemConfig {
+        Graphics::RenderResources* renderResources;
+        Graphics::SkeletonManager* skeletonManager;
+    };
+
+    class AnimationSystem : public ISystem<AnimationComponent> {
+    public:
+        /// \copydoc ISystem::initialize()
+        void initialize() override;
+        /// \copydoc ISystem::update
+        void update(float deltaTime) override;
+        /// \copydoc ISystem::shutdown
+        void shutdown() override;
+
+        void setConfig(const AnimationSystemConfig& config);
+
+        void registerComponent(const ComponentPtr component) override;
+        void deregisterComponent(const ComponentPtr component) override;
+
+        AnimationSystem();  
+        ~AnimationSystem();
+
+        void setAnimation(ComponentPtr e, AnimationHandle anim);
+
+
+    private:
+        Graphics::RenderResources* renderResources;
+        Graphics::SkeletonManager* skeletonManager;
+
+        AnimationManager* animationManager;
+
+        void updateSkeletalAnimations(float deltaTime, SkeletalAnimationComponent* comp);
+    };
+}

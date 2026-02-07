@@ -21,7 +21,7 @@
 namespace LaurelEye::Graphics {
 
     void GBufferSkinnedPass::setup(RenderResources& rs) {
-        shader = ShaderManager::getInstance().loadFile("../../../assets/shaders/GBuffer.frag\n../../../assets/shaders/GBuffer.vert");
+        shader = ShaderManager::getInstance().loadFile("../../../assets/shaders/GBuffer.frag\n../../../assets/shaders/GBufferSkinned.vert");
         sphereMesh = (Mesh::createSphereMesh("sphere", 32));
 
         gbufferMultisampled = rs.createScreenSizeFramebuffer(
@@ -57,6 +57,7 @@ namespace LaurelEye::Graphics {
         if ( isValidTexture(skydomeTexture) ) {
             glDepthMask(GL_FALSE);
             shader->setInt("isSkydome", 1);
+            shader->setInt("isSkinned", 0);
             shader->setInt("useTexture", 1);
             shader->bindTexture(10, "mainTexture", skydomeTexture);
 
@@ -89,11 +90,12 @@ namespace LaurelEye::Graphics {
 
                 component->GetMaterial()->apply(shader);
 
-                if ( !isValidDataBuffer(component->skinDataBuffer) ) {
+                if ( !isValidDataBuffer(component->skinDataBuffer) || !isValidDataBuffer(component->animationDataBuffer) ) {
                     shader->setInt("isSkinned", 0);
                 }
                 else {
                     ctx.device.bindDataBufferBase(component->skinDataBuffer);
+                    ctx.device.bindDataBufferBase(component->animationDataBuffer);
                     shader->setInt("isSkinned", 1);
                 }
 

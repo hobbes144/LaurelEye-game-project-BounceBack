@@ -115,6 +115,7 @@ namespace LaurelEye::IO {
         // std::string name;
         std::vector<Bone> bones;
         std::vector<int> parentIndices;
+        Transform inverseTransform;
         std::unordered_map<std::string, int> boneNameIndex;
     };
 

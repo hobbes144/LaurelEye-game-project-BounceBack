@@ -15,6 +15,7 @@
 #include "LaurelEyeEngine/UI/UIComponents/UIRenderComponent.h"
 #include "LaurelEyeEngine/audio/SpeakerComponent.h"
 #include "LaurelEyeEngine/ecs/IComponent.h"
+#include "LaurelEyeEngine/animation/components/SkeletalAnimationComponent.h"
 
 namespace LaurelEye::Scripting {
     void Sol2API_ECS::setup(sol::state& lua, EngineContext* ctx) {
@@ -65,6 +66,7 @@ namespace LaurelEye::Scripting {
         entityType.set_function("findParticleEmitter", &safeFindComponent<Particles::ParticleEmitterComponent>);
         entityType.set_function("findAudioSpeaker", &safeFindComponent<Audio::SpeakerComponent>);
         entityType.set_function("findPointLight", &safeFindComponent<Graphics::PointLightComponent>);
+        entityType.set_function("findAnimator", &safeFindComponent<Animations::SkeletalAnimationComponent>);
     }
 
     sol::object Sol2API_ECS::dynamicFindComponent(Entity& e, const std::string& type, sol::this_state s) {
@@ -117,6 +119,10 @@ namespace LaurelEye::Scripting {
         else if ( type == "PointLightComponent" ) {
             if ( auto* c = e.findComponent<Graphics::PointLightComponent>() )
                 return sol::make_object(lua, c);
+        }
+        else if ( type == "SkeletalAnimationComponent" ) {
+            if ( auto* c = e.findComponent<Animations::SkeletalAnimationComponent>() )
+            return sol::make_object(lua, c);
         }
         else if ( type == "CameraComponent" ) {
             if ( auto* c = e.findComponent<Graphics::CameraComponent>() )

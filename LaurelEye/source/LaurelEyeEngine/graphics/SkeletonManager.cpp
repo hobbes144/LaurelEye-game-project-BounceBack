@@ -14,6 +14,7 @@ namespace LaurelEye::Graphics {
                                bone.localBindTransform});
         }
         skeleton.parentIndices = asset.parentIndices;
+        skeleton.inverseTransform = asset.inverseTransform;
         skeleton.boneNameIndex = asset.boneNameIndex;
 
         return handle;
@@ -27,6 +28,14 @@ namespace LaurelEye::Graphics {
         skeletonNames[name] = handle;
 
         return handle;
+    }
+
+    const Skeleton* SkeletonManager::getSkeleton(SkeletonHandle h) const {
+        return hasSkeleton(h) ? &skeletons[h] : nullptr;
+    }
+
+    Skeleton* SkeletonManager::getSkeleton(SkeletonHandle h) {
+        return hasSkeleton(h) ? &skeletons[h] : nullptr;
     }
 
 } // namespace LaurelEye::Graphics

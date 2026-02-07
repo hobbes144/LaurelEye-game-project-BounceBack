@@ -7,13 +7,14 @@
 #version 440
 
 const int MAX_BONE_INFLUENCE = 4;
+const uint UINT_MAX = 0xFFFFFFFFu; // or 4294967295U;
 
-layout(location = 0) in vec4 vertex;
+layout(location = 0) in vec3 vertex;
 layout(location = 1) in vec3 vertexNormal;
 layout(location = 2) in vec2 vertexTexture;
 layout(location = 4) in vec3 vertexTangent;
-layout(location = 4) in ivec4 boneIndices;
-layout(location = 4) in vec4 boneWeights;
+layout(location = 8) in ivec4 boneIndices;
+layout(location = 9) in vec4 boneWeights;
 
 layout (binding = 0) uniform camera
 {
@@ -24,13 +25,13 @@ layout (binding = 0) uniform camera
 };
 
 layout(std430, binding = 3) readonly buffer SkinData {
-    uint boneCount;
+    int boneCount;
     mat4 inverseBind[];
-};
+} skinData;
 
-layout (binding = 4) uniform animationData {
+layout(std430, binding = 4) readonly buffer AnimationData {
     mat4 globalPose[];
-};
+} animationData;
 
 uniform mat4 ModelMatrix, InvModelMatrix;
 
@@ -48,7 +49,7 @@ void main()
     vec3 totalNormal = vec3(0.0f);
     vec3 totalTangent = vec3(0.0f);
     if ( !isSkinned ) {
-            totalPosition = vertex;
+            totalPosition = vec4(vertex,1.0);
             totalNormal = vertexNormal;
             totalTangent = vertexTangent;
     }
@@ -57,16 +58,20 @@ void main()
             if ( boneIndices[i] == -1 )
                 continue;
             if ( boneIndices[i] >= skinData.boneCount ) {
-                totalPosition = vertex;
+                totalPosition = vec4(vertex,1.0);
                 totalNormal = vertexNormal;
                 totalTangent = vertexTangent;
                 break;
             }
-            vec4 localPosition = animationData.globalPose[boneIndices[i]] * skinData.inverseBind[boneIndices[i]] * vertex;
+            const mat4 M = animationData.globalPose[boneIndices[i]] * skinData.inverseBind[boneIndices[i]];
+
+            const vec4 localPosition = M * vec4(vertex,1.0);
             totalPosition += localPosition * boneWeights[i];
-            vec3 localNormal = mat3(animationData.globalPose[boneIndices[i]]) * vertexNormal;
+
+            const mat3 N = mat3(M);
+            const vec3 localNormal = N * vertexNormal;
             totalNormal += localNormal * boneWeights[i];
-            vec3 localTangent = mat3(animationData.globalPose[boneIndices[i]]) * vertexTangent;
+            const vec3 localTangent = N * vertexTangent;
             totalTangent += localTangent * boneWeights[i];
         }
     }

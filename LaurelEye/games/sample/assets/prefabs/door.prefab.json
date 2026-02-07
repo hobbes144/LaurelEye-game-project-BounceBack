@@ -34,8 +34,8 @@
             "angularDamping": 0.0,
             "friction": 0.5,
             "restitution": 0.0,
-            "collisionGroup": 1,
-            "collisionMask": 4294967295,
+            "collisionGroup": 4,
+            "collisionMask": 11,
             "gravityScale": 0.0
         }
     }

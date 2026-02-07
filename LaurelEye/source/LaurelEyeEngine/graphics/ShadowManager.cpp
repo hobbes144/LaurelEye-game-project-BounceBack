@@ -27,7 +27,7 @@
 
 namespace LaurelEye::Graphics {
 
-    ShadowManager::ShadowManager(RenderResources* _rs) : rs(_rs), shadows(), shadowPass(ShadowPass()) {
+    ShadowManager::ShadowManager(RenderResources* _rs) : rs(_rs), shadows(), shadowPass(ShadowSkinnedPass()) {
         shadowPass.setup(*rs);
         DataBufferDesc d{
             DataBufferType::SSBO,
@@ -198,7 +198,7 @@ namespace LaurelEye::Graphics {
                 params.near,
                 params.far);
             shadowPass.setProperties(
-                ShadowPass::Properties{projectionMatrix * viewMatrix});
+                ShadowSkinnedPass::Properties{projectionMatrix * viewMatrix});
             r.shadowMatrix =
                 Matrix4::translation(0.5f) * Matrix4::scale(0.5f) *
                 projectionMatrix * viewMatrix;
@@ -214,7 +214,7 @@ namespace LaurelEye::Graphics {
                 params.near,
                 params.far);
             shadowPass.setProperties(
-                ShadowPass::Properties{projectionMatrix * viewMatrix});
+                ShadowSkinnedPass::Properties{projectionMatrix * viewMatrix});
             r.shadowMatrix =
                 Matrix4::translation(0.5f) * Matrix4::scale(0.5f) *
                 projectionMatrix * viewMatrix;

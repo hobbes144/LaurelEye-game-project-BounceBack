@@ -21,10 +21,11 @@
 namespace LaurelEye::Graphics {
 
     class RenderResources;
+    class SkeletonManager;
 
     class MeshManager {
     public:
-        explicit MeshManager(RenderResources& _renderResources);
+        explicit MeshManager(RenderResources& _renderResources, SkeletonManager& _skeletonManager);
         ~MeshManager();
 
         // Mesh* createMesh(const MeshDescription& wDesc);
@@ -86,7 +87,8 @@ namespace LaurelEye::Graphics {
 
     private:
         RenderResources& renderResources;
-        // SkeletonMaanger& skeletonManager;
+        SkeletonManager& skeletonManager;
+
         std::vector<RenderMesh> meshes;
         std::unordered_map<std::string, MeshHandle> meshNames;
         std::unordered_map<PrimitiveMeshType, MeshHandle> primitiveMeshes;

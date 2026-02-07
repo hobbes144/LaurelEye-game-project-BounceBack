@@ -2,14 +2,15 @@
 #include "LaurelEyeEngine/graphics/resources/DataBuffer.h"
 #include "LaurelEyeEngine/graphics/resources/RenderMesh.h"
 #include "LaurelEyeEngine/graphics/resources/RenderResources.h"
+#include "LaurelEyeEngine/graphics/resources/Skeleton.h"
+#include "LaurelEyeEngine/graphics/SkeletonManager.h"
 #include "LaurelEyeEngine/io/Assets.h"
 #include "LaurelEyeEngine/math/Matrix4.h"
 #include <cstdint>
 
 namespace LaurelEye::Graphics {
 
-    MeshManager::MeshManager(RenderResources& _renderResources) : renderResources(_renderResources) {
-    }
+    MeshManager::MeshManager(RenderResources& _renderResources, SkeletonManager& _skeletonManager) : renderResources(_renderResources), skeletonManager(_skeletonManager) {}
 
     MeshManager::~MeshManager() {
         destroyAllMeshes();
@@ -127,37 +128,40 @@ namespace LaurelEye::Graphics {
         mesh.maxBonesPerVertex = maxBonesPerVertex;
 
         // Setup SkinData for buffer
-        struct SkinHeader {
-            uint32_t boneCount;
-            uint32_t _pad[3]; // pad to 16 bytes
-        };
+        {
+            struct SkinHeader {
+                int32_t boneCount;
+                int32_t _pad[3]; // pad to 16 bytes
+            };
 
-        SkinHeader header{};
-        header.boneCount = boneCount;
+            SkinHeader header{};
+            header.boneCount = boneCount;
 
-        std::size_t bufferSize = sizeof(SkinHeader) + boneCount * sizeof(Matrix4);
+            std::size_t bufferSize = sizeof(SkinHeader) + boneCount * sizeof(Matrix4);
 
-        std::vector<std::byte> blob(bufferSize);
+            std::vector<std::byte> blob(bufferSize);
 
-        // copy header
-        std::memcpy(blob.data(), &header, sizeof(SkinHeader));
+            // copy header
+            std::memcpy(blob.data(), &header, sizeof(SkinHeader));
 
-        // copy matrices right after header
-        std::memcpy(blob.data() + sizeof(SkinHeader),
-                    mesh.inverseBindMatrices.data(),
-                    boneCount * sizeof(Matrix4));
+            // copy matrices right after header
+            std::memcpy(blob.data() + sizeof(SkinHeader),
+                        mesh.inverseBindMatrices.data(),
+                        boneCount * sizeof(Matrix4));
 
-        // Create Skin inverseBindMatrices UBO
-        mesh.skinDataBuffer = renderResources.createDataBuffer(
-            name + ":IBM",
-            DataBufferDesc{
-                DataBufferType::SSBO,
-                DataBufferUpdateMode::Static,
-                bufferSize,
-                DataBuffer::InverseBindMatricesBinding},
-            "meshManager:inverseBindMatrices",
-            blob.data()
-        );
+            // Create Skin inverseBindMatrices UBO
+            mesh.skinDataBuffer = renderResources.createDataBuffer(
+                name + ":IBM",
+                DataBufferDesc{
+                    DataBufferType::SSBO,
+                    DataBufferUpdateMode::Static,
+                    bufferSize,
+                    DataBuffer::InverseBindMatricesBinding},
+                "meshManager:inverseBindMatrices",
+                blob.data());
+        }
+
+
 
         mesh.alive = true;
 
@@ -288,7 +292,7 @@ namespace LaurelEye::Graphics {
 
         // layout(location = 3) in vec3 aTangents;
         vaoDesc.attributes.push_back(VertexAttributeDesc{
-            .location = 3,
+            .location = 4,
             .bindingIndex = 0,
             .relativeOffset = static_cast<uint32_t>(offsetof(MeshVertex, tangent)),
             .format = VertexAttribFormat::Float32x3});
@@ -362,21 +366,21 @@ namespace LaurelEye::Graphics {
 
         // layout(location = 3) in vec3 aTangents;
         vaoDesc.attributes.push_back(VertexAttributeDesc{
-            .location = 3,
+            .location = 4,
             .bindingIndex = 0,
-            .relativeOffset = offsetof(MeshVertex, tangent),
+            .relativeOffset = offsetof(SkinnedMeshVertex, tangent),
             .format = VertexAttribFormat::Float32x3});
 
         // layout(location = 3) in vec4 aBoneIndicesEncoded;  // we'll decode ints in shader
         vaoDesc.attributes.push_back(VertexAttributeDesc{
-            .location = 4,
+            .location = 8,
             .bindingIndex = 0,
             .relativeOffset = offsetof(SkinnedMeshVertex, boneIndices),
-            .format = VertexAttribFormat::Uint8x4Norm});
+            .format = VertexAttribFormat::Int32x4});
 
         // layout(location = 4) in vec4 aBoneWeights;
         vaoDesc.attributes.push_back(VertexAttributeDesc{
-            .location = 5,
+            .location = 9,
             .bindingIndex = 0,
             .relativeOffset = offsetof(SkinnedMeshVertex, boneWeights),
             .format = VertexAttribFormat::Float32x4});

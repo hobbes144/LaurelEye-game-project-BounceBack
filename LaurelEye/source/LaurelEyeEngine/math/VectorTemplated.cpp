@@ -218,6 +218,7 @@ namespace LaurelEye {
     template class VectorTemplated<float, 3ul>;
     template class VectorTemplated<double, 3ul>;
     template class VectorTemplated<int, 4ul>;
+    template class VectorTemplated<unsigned int, 4ul>;
     template class VectorTemplated<float, 4ul>;
     template class VectorTemplated<double, 4ul>;
 } // namespace LaurelEye

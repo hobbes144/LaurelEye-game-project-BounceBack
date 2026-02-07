@@ -19,6 +19,7 @@
 #include "LaurelEyeEngine/graphics/RenderStateSaver.h"
 
 // Surface headers
+#include "LaurelEyeEngine/graphics/renderpass/GBufferSkinnedPass.h"
 #include "LaurelEyeEngine/graphics/graphics_components/PointLightComponent.h"
 #include "LaurelEyeEngine/graphics/renderpass/LocalLightsPass.h"
 #include "LaurelEyeEngine/graphics/surface/glfw/LGlfwOpenGLWindowSurface.h"
@@ -123,7 +124,8 @@ namespace LaurelEye::Graphics {
             tempRenderResources->setSurfaceSize(0, windowSurface->getSize());
         }
 
-        gbufferPass = std::make_shared<GBufferPass>();
+        // gbufferPass = std::make_shared<GBufferPass>();
+        gbufferPass = std::make_shared<GBufferSkinnedPass>();
         gbufferPass->setup(*tempRenderResources.get());
 
         deferredRenderPass = std::make_shared<DeferredRenderPass>();
@@ -159,8 +161,8 @@ namespace LaurelEye::Graphics {
 
         tempShadowManager = std::make_unique<ShadowManager>(tempRenderResources.get());
 
-        meshManager = std::make_unique<MeshManager>(*tempRenderResources.get());
         skeletonManager = std::make_unique<SkeletonManager>();
+        meshManager = std::make_unique<MeshManager>(*tempRenderResources.get(), *skeletonManager.get());
     }
 
     void RenderSystem::setCurrentCamera(CameraComponent* currCamera) {
@@ -376,6 +378,8 @@ namespace LaurelEye::Graphics {
                             *(skinnedMeshAsset->skeleton.get()));
                         handle = meshManager->createSkinnedMesh(skinnedMeshAsset.get(), skeletonHandle);
                         skinnedMeshAsset->skeleton = nullptr;
+
+                        // Animator setup
                     }
                     else {
                         handle = meshManager->createMesh(meshAsset.get());
@@ -596,7 +600,7 @@ namespace LaurelEye::Graphics {
     std::shared_ptr<SkydomePass> RenderSystem::retrieveSkydomePass() {
         return bp;
     }
-    std::shared_ptr<GBufferPass> RenderSystem::retrieveGBufferPass() {
+    std::shared_ptr<GBufferSkinnedPass> RenderSystem::retrieveGBufferPass() {
         return gbufferPass;
     }
     std::shared_ptr<DebugDrawRenderPass> RenderSystem::retrieveDebugDrawRenderPass() {

@@ -66,11 +66,13 @@ namespace LaurelEye::Graphics {
         IRenderableComponent& SetMeshTempAttr(
             VertexArrayHandle _vao,
             uint32_t _indexCount,
-            DataBufferHandle _skinDataBuffer = DataBuffer::InvalidDataBuffer) {
+            DataBufferHandle _skinDataBuffer = DataBuffer::InvalidDataBuffer,
+            DataBufferHandle _animationDataBuffer = DataBuffer::InvalidDataBuffer) {
 
             vao = _vao;
             indexCount = _indexCount;
             skinDataBuffer = _skinDataBuffer;
+            //animationDataBuffer = _animationDataBuffer;
 
             return *this;
         }
@@ -111,11 +113,17 @@ namespace LaurelEye::Graphics {
         const std::shared_ptr<IO::ImageAsset> GetImageAsset() { return imageAsset; }
         const PrimitiveMeshType GetMeshPrimitiveType() const { return primitiveType; }
 
+        IRenderableComponent& setAnimationDataBuffer(DataBufferHandle buffer) {
+            animationDataBuffer = buffer;
+            return *this;
+        }
+
         // Temporary until FrameContext properly uses RenderRegistry which
         // stores the actual GPU values.
         VertexArrayHandle vao = VertexArray::InvalidVertexArray;
         uint32_t indexCount = 0;
         DataBufferHandle skinDataBuffer = DataBuffer::InvalidDataBuffer;
+        DataBufferHandle animationDataBuffer = DataBuffer::InvalidDataBuffer;
 
     protected:
         /// @brief Shared pointer to the mesh resource.

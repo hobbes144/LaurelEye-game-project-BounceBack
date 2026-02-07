@@ -43,6 +43,8 @@ shotTimer = 0.0
 
 function onStart()
     log("Player script started")
+    animator = self:findAnimator()
+    animator:changeAnimation("Running")
     -- transform = self:findTransform()
     -- body = self:findPhysics()
     -- local scene = SceneManager:getCurrentScene()
@@ -69,6 +71,7 @@ function onStart()
 end
 
 function onUpdate(dt)
+    
     -- Poll input
     -- local inputX = (Input:isKeyHeld(Key.D) and 1 or 0) +
     --                (Input:isKeyHeld(Key.A) and -1 or 0)

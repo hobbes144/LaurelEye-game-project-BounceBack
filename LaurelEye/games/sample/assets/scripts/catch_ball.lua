@@ -11,7 +11,6 @@ returnSpeed = nil
 function onStart()
     transform = self:findTransform()
     body = self:findPhysics()
-
 end
 
 function onUpdate(dt)

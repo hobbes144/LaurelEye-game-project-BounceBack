@@ -13,6 +13,7 @@
 #include "LaurelEyeEngine/graphics/resources/RenderMesh.h"
 #include "LaurelEyeEngine/io/Assets.h"
 #include "LaurelEyeEngine/io/IAssetImporter.h"
+#include "LaurelEyeEngine/math/Transform.h"
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
@@ -68,7 +69,8 @@ namespace LaurelEye::IO {
         void buildSkeletonRecursive(const aiNode* node,
                                     int parentIndex,
                                     SkeletonAsset& skel,
-                                    const std::unordered_set<std::string>& usedBoneNames);
+                                    Transform accumulatedBindTransform,
+                                    std::unordered_set<std::string>& usedBoneNames);
         std::shared_ptr<SkeletonAsset> buildSkeleton(const std::string& path, const aiScene* scene);
         std::shared_ptr<AnimationAsset> buildAnimation(const std::string& path, const aiScene* scene, const SkeletonAsset& skeleton);
         void addBoneData(SkinnedMeshAsset::SkinnedVertex& vertex, int boneIndex, float boneWeight);

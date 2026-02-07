@@ -18,6 +18,7 @@
 #include "LaurelEyeEngine/physics/PhysicsSystem.h"
 #include "LaurelEyeEngine/scripting/ScriptSystem.h"
 #include "LaurelEyeEngine/transform/TransformSystem.h"
+#include "LaurelEyeEngine/animation/AnimationSystem.h"
 #include "LaurelEyeEngine/UI/UILayoutSystem.h"
 #include <memory>
 
@@ -41,5 +42,7 @@ namespace LaurelEye {
         std::unique_ptr<Audio::AudioSystem> audioSystem;
         std::unique_ptr<Scripting::ScriptSystem> scriptSystem;
         std::unique_ptr<Debug::DebugDrawSystem> debugDrawSystem;
+        std::unique_ptr<Animations::AnimationSystem> animationSystem;
+        // ... add more systems as needed
     };
 } // namespace LaurelEye

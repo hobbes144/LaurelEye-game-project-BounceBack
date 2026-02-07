@@ -22,6 +22,9 @@
 #include "LaurelEyeEngine/UI/UIComponents/UIRenderComponent.h"
 #include "LaurelEyeEngine/UI/UIComponents/UIInteractionComponent.h"
 #include <iostream>
+#include <LaurelEyeEngine/animation/resources/Animation.h>
+#include <LaurelEyeEngine/animation/components/SkeletalAnimationComponent.h>
+#include <LaurelEyeEngine/animation/AnimationManager.h>
 
 namespace LaurelEye {
 
@@ -118,6 +121,9 @@ namespace LaurelEye {
             }
             else if ( compName == "UIInteraction" ) {
                 setupUIInteractionComponent(entity, compData);
+            }
+            else if ( compName == "Animation" ) {
+                setupAnimationComponent(entity, compData);
             }
             else {
                 std::cerr << "Entity Factory: Unknown component type trying to be added to entity: " << entity.getName() << std::endl;
@@ -685,6 +691,82 @@ namespace LaurelEye {
 
     void EntityFactory::setupDebugDrawComponent(Entity& entity, const rapidjson::Value& emitterData) {
     }
+
+    
+    void EntityFactory::setupAnimationComponent(Entity& entity, const rapidjson::Value& animationData) {
+        if ( !animationData.IsObject() )
+            return;
+
+        assert((std::cout << "Setup AnimationComponent\n", true));
+
+        // Create the component
+        auto animComponent = std::make_unique<Animations::SkeletalAnimationComponent>();
+
+        // --- Animation Type ---
+        if ( animationData.HasMember("type") && animationData["type"].IsString() ) {
+            std::string typeStr = animationData["type"].GetString();
+
+            if ( typeStr == "Basic" )
+                animComponent->type = Animations::Animation::Type::Basic;
+            else if ( typeStr == "Skeletal" )
+                animComponent->type = Animations::Animation::Type::Skeletal;
+            else
+                animComponent->type = Animations::Animation::Type::Skeletal;
+            // Add more if needed
+        }
+        //default to be Skeletal/ for now
+        else
+            animComponent->type = Animations::Animation::Type::Skeletal;
+
+        // --- Load Animation Asset ---
+        // temp for now, mutiply Animation loading
+        if ( animationData.HasMember("file") ) {
+            auto& fileNode = animationData["file"];
+
+            std::vector<std::string> animPaths;
+
+            // Case 1: Single string
+            if ( fileNode.IsString() ) {
+                animPaths.push_back(fileNode.GetString());
+            }
+            // Case 2: Array of strings
+            else if ( fileNode.IsArray() ) {
+                for ( auto& v : fileNode.GetArray() ) {
+                    if ( v.IsString() ) {
+                        animPaths.push_back(v.GetString());
+                    }
+                }
+            }
+            else {
+                throw std::runtime_error("EntityFactory::setupAnimationComponent - 'file' must be string or array of strings.");
+            }
+
+            // Process each animation file
+            for ( const auto& animPath : animPaths ) {
+                auto asset = context.getService<IO::AssetManager>()->load(assetPath + animPath);
+                auto skinnedMeshAsset = std::dynamic_pointer_cast<IO::SkinnedMeshAsset>(asset);
+                auto animAsset = std::dynamic_pointer_cast<IO::AnimationAsset>(skinnedMeshAsset->animation);
+
+                if ( !animAsset ) {
+                    throw std::runtime_error("EntityFactory::setupAnimationComponent - Asset '" + animPath + "' is not an AnimationAsset.");
+                }
+
+                assert((std::cout << "Loaded asset " + assetPath + animPath + "\n", true));
+
+                auto animManager = context.getService<Animations::AnimationManager>();
+                Animations::AnimationHandle handle = animManager->createAnimation(animAsset.get());
+
+                // set last animation as default
+                animComponent->currentAnimation = handle;
+                animComponent->isPlaying = true;
+            }
+        }
+
+
+        // Add the component to the entity
+        entity.addComponent<Animations::SkeletalAnimationComponent>(std::move(animComponent));
+    }
+
 
 #pragma endregion
 
