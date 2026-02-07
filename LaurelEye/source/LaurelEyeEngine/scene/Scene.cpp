@@ -4,21 +4,24 @@
 
 // For system initializing
 #include "LaurelEyeEngine/audio/SpeakerComponent.h"
+
 #include "LaurelEyeEngine/graphics/graphics_components/AmbientLightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/CameraComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/DirectionalLightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/LightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/PointLightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/Renderable3DComponent.h"
-#include "LaurelEyeEngine/graphics/graphics_components/UIButtonComponent.h"
-#include "LaurelEyeEngine/graphics/graphics_components/UIComponent.h"
+#include "LaurelEyeEngine/UI/UIComponents/UIRenderComponent.h"
+#include "LaurelEyeEngine/UI/UIComponents/UITransformComponent.h"
+#include "LaurelEyeEngine/UI/UIComponents/UIInteractionComponent.h"
+#include "LaurelEyeEngine/UI/UIComponents/UITextComponent.h"
+
 #include "LaurelEyeEngine/graphics/renderpass/GBufferPass.h"
 #include "LaurelEyeEngine/graphics/renderpass/SkydomePass.h"
 #include "LaurelEyeEngine/particles/ParticleEmitterComponent.h"
 #include "LaurelEyeEngine/physics/PhysicsBodyComponent.h"
 #include "LaurelEyeEngine/scripting/ScriptComponent.h"
 #include "LaurelEyeEngine/transform/TransformComponent.h"
-#include "LaurelEyeEngine/UI/UIElementManager.h"
 
 #include "LaurelEyeEngine/audio/AudioSystem.h"
 #include "LaurelEyeEngine/audio/FModAudioManager.h"
@@ -30,6 +33,8 @@
 #include "LaurelEyeEngine/physics/PhysicsSystem.h"
 #include "LaurelEyeEngine/scripting/ScriptSystem.h"
 #include "LaurelEyeEngine/transform/TransformSystem.h"
+#include "LaurelEyeEngine/UI/UILayoutSystem.h"
+#include "LaurelEyeEngine/UI/UIInteractionSystem.h"
 
 namespace LaurelEye {
 
@@ -83,10 +88,7 @@ namespace LaurelEye {
         }
         if ( auto* t = ctx.getService<TransformSystem>() ) t->update(0.016f);
         if ( auto* p = ctx.getService<Physics::PhysicsSystem>() ) p->registerCollisionEnterListeners();
-        if ( auto* uiM = ctx.getService<UIElementManager>() ) {
-            uiM->initialize();
-            uiM->registerListener();
-        }
+
         active = true;
     }
 
@@ -94,10 +96,6 @@ namespace LaurelEye {
         if ( !active ) return;
 
         if ( auto* p = ctx.getService<Physics::PhysicsSystem>() ) p->deregisterCollisionEnterListeners();
-
-        if ( auto* uiM = ctx.getService<UIElementManager>() ) {
-            uiM->deregisterListener();
-        }
 
         for ( auto& e : entities ) {
             if ( e->getRegistered() ) {
@@ -166,6 +164,7 @@ namespace LaurelEye {
             textureBackground = true;
             colorBackground = false;
         }
+        /*
         if ( settingsValue.HasMember("UIActiveOnLoad") && settingsValue["UIActiveOnLoad"].IsBool() ) {
             if (auto* uiM = ctx.getService<UIElementManager>()) {
                 uiM->setShouldUIBeActiveOnStart(settingsValue["UIActiveOnLoad"].GetBool());
@@ -175,52 +174,7 @@ namespace LaurelEye {
             const auto& uiLayout = settingsValue["UILayout"];
             loadUISettings(uiLayout.GetArray());
         }
-    }
-
-    void Scene::loadUISettings(const rapidjson::GenericArray<true, rapidjson::Value>& uiDatas) {
-        for ( const auto& data : uiDatas ) {
-            auto layout = loadUILayout(data);
-            ctx.getService<UIElementManager>()->registerInputMap(layout);
-        }
-    }
-
-    UILayout* Scene::loadUILayout(const rapidjson::Value& uiJson) {
-        if ( !uiJson.HasMember("name") || !uiJson["name"].IsString() ) {
-            throw std::runtime_error("EntityFactory: UILayout missing 'name' field");
-        }
-
-        std::string name = uiJson["name"].GetString();
-        UILayout* layout = new UILayout();
-        layout->setName(name);
-
-        if ( uiJson.HasMember("mappings") && uiJson["mappings"].IsArray() ) {
-                const auto& mappings = uiJson["mappings"].GetArray();
-                for ( const auto& mappingJson : mappings ) {
-                    if ( !mappingJson.IsObject() ) continue;
-                    auto* mapping = new SingleUIMapping();
-                    if ( mappingJson.HasMember("name") && mappingJson["name"].IsString() ) {
-                        mapping->setCurrent(mappingJson["name"].GetString());
-                    }
-                    if ( mappingJson.HasMember("current") && mappingJson["current"].IsString() ) {
-                        mapping->setCurrent(mappingJson["current"].GetString());
-                    }
-                    if ( mappingJson.HasMember("left") && mappingJson["left"].IsString() ) {
-                        mapping->setLeft(mappingJson["left"].GetString());
-                    }
-                    if ( mappingJson.HasMember("right") && mappingJson["right"].IsString() ) {
-                        mapping->setRight(mappingJson["right"].GetString());
-                    }
-                    if ( mappingJson.HasMember("up") && mappingJson["up"].IsString() ) {
-                        mapping->setUp(mappingJson["up"].GetString());
-                    }
-                    if ( mappingJson.HasMember("down") && mappingJson["down"].IsString() ) {
-                        mapping->setDown(mappingJson["down"].GetString());
-                    }
-                    layout->addMappingUnit(mapping);
-                }
-            }
-
-        return layout;
+        */
     }
 
     Entity* Scene::addEntity(Entity* entityToAdd) {
@@ -344,7 +298,7 @@ namespace LaurelEye {
         auto* scriptingSystem = ctx.getService<Scripting::ScriptSystem>();
         auto* particleSystem = ctx.getService<Particles::ParticleSystem>();
         auto* audioSystem = ctx.getService<Audio::AudioSystem>();
-        auto* uiManager = ctx.getService<UIElementManager>();
+        auto* uiLayoutSystem = ctx.getService<UI::UILayoutSystem>();
 
         for ( auto& comp : entity->getComponents() ) {
             if ( auto* transformComp = dynamic_cast<TransformComponent*>(comp.get()) ) {
@@ -402,14 +356,21 @@ namespace LaurelEye {
                     }
                 }
             }
-            else if ( auto* uiComp = dynamic_cast<Graphics::UIComponent*>(comp.get()) ) {
+            else if ( auto* uirenderComp = dynamic_cast<UI::UIRenderComponent*>(comp.get()) ) {
                 if ( renderSystem ) {
-                    renderSystem->registerUIComponent(uiComp);
+                    renderSystem->registerComponent(uirenderComp);
                 }
-                if ( uiManager ) {
-                    std::cout << "[Scene] Registering UI Element: " << uiComp->GetUIName() << std::endl;
-                    uiManager->registerUIElement(uiComp);
+            }
+            else if ( auto* uitransformComp = dynamic_cast<UI::UITransformComponent*>(comp.get()) ) {
+                if ( uiLayoutSystem ) {
+                    uiLayoutSystem->registerComponent(uitransformComp);
                 }
+            }
+            else if ( auto* uiinteractionComp = dynamic_cast<UI::UIRenderComponent*>(comp.get()) ) {
+
+            }
+            else if ( auto* uitextComp = dynamic_cast<UI::UIRenderComponent*>(comp.get()) ) {
+
             }
             // add more as needed...
         }
@@ -423,7 +384,7 @@ namespace LaurelEye {
         auto* scriptingSystem = ctx.getService<Scripting::ScriptSystem>();
         auto* particleSystem = ctx.getService<Particles::ParticleSystem>();
         auto* audioSystem = ctx.getService<Audio::AudioSystem>();
-        auto* uiManager = ctx.getService<UIElementManager>();
+        auto* uiLayoutSystem = ctx.getService<UI::UILayoutSystem>();
 
         for ( auto& comp : entity->getComponents() ) {
             if ( auto* transformComp = dynamic_cast<TransformComponent*>(comp.get()) ) {
@@ -480,11 +441,19 @@ namespace LaurelEye {
                     speakerComp->stopSound(speakerComp->getAudioName());
                 }
             }
-            else if ( auto* uiComponent = dynamic_cast<Graphics::UIComponent*>(comp.get()) ) {
-                if ( uiManager ) {
-                    uiManager->deregisterUIElement(uiComponent);
-                    renderSystem->deregisterUIComponent(uiComponent);
+            else if ( auto* uirenderComp = dynamic_cast<UI::UIRenderComponent*>(comp.get()) ) {
+                if ( renderSystem ) {
+                    renderSystem->deregisterComponent(uirenderComp);
                 }
+            }
+            else if ( auto* uitransformComp = dynamic_cast<UI::UITransformComponent*>(comp.get()) ) {
+                if ( uiLayoutSystem ) {
+                    uiLayoutSystem->deregisterComponent(uitransformComp);
+                }
+            }
+            else if ( auto* uiinteractionComp = dynamic_cast<UI::UIRenderComponent*>(comp.get()) ) {
+            }
+            else if ( auto* uitextComp = dynamic_cast<UI::UIRenderComponent*>(comp.get()) ) {
             }
             // add more as needed...
         }

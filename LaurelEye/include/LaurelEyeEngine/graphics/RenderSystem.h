@@ -92,11 +92,9 @@ namespace LaurelEye::Graphics {
 
         /// \copydoc ISystem::registerComponent
         void registerComponent(const ComponentPtr component) override;
-        void registerUIComponent(const ComponentPtr component);
 
         /// \copydoc ISystem::deregisterComponent
         void deregisterComponent(const ComponentPtr component) override;
-        void deregisterUIComponent(const ComponentPtr component);
 
         /// @brief Applies configuration settings to the Render System.
         /// @param config The configuration containing backend and window parameters.

@@ -9,6 +9,9 @@ namespace LaurelEye {
         transformSystem = std::make_unique<TransformSystem>();
         transformSystem->setEngineContext(ctx);
 
+        uiLayoutSystem = std::make_unique<UI::UILayoutSystem>();
+        uiLayoutSystem->setEngineContext(ctx);
+
         renderSystem = std::make_unique<Graphics::RenderSystem>();
 
         // Render system setup
@@ -50,6 +53,7 @@ namespace LaurelEye {
         }
 
         ctx.registerService<TransformSystem>(transformSystem.get());
+        ctx.registerService<UI::UILayoutSystem>(uiLayoutSystem.get());
         ctx.registerService<Graphics::RenderSystem>(renderSystem.get());
         ctx.registerService<Physics::PhysicsSystem>(physicsSystem.get());
         ctx.registerService<Particles::ParticleSystem>(particleSystem.get());
@@ -60,6 +64,7 @@ namespace LaurelEye {
     void SystemCoordinator::initialize() {
         std::cout << "Systems Initializing" << std::endl;
         transformSystem->initialize();
+        uiLayoutSystem->initialize();
         renderSystem->initialize();
         physicsSystem->initialize();
         scriptSystem->initialize();
@@ -67,6 +72,7 @@ namespace LaurelEye {
         debugDrawSystem->initialize();
         audioSystem->initialize();
     }
+
     void SystemCoordinator::update(float deltaTime) {
         scriptSystem->update(deltaTime);
         transformSystem->update(deltaTime);
@@ -74,6 +80,7 @@ namespace LaurelEye {
         // itself. We just call it with the real deltaTime and that's enough.
         physicsSystem->update(deltaTime);
         transformSystem->update(deltaTime);
+        uiLayoutSystem->update(deltaTime);
         particleSystem->update(deltaTime);
         audioSystem->update(deltaTime);
         if ( debugDrawSystem ) {
@@ -81,6 +88,7 @@ namespace LaurelEye {
         }
         renderSystem->update(deltaTime);
     }
+
     void SystemCoordinator::updateFixed(float deltaTimeFixed) {
         // transformSystem->update(deltaTimeFixed);
         // physicsSystem->update(deltaTimeFixed);
@@ -92,11 +100,13 @@ namespace LaurelEye {
         scriptSystem->shutdown();
         physicsSystem->shutdown();
         renderSystem->shutdown();
+        uiLayoutSystem->shutdown();
         transformSystem->shutdown();
         debugDrawSystem->shutdown();
         audioSystem->shutdown();
 
         transformSystem.reset();
+        uiLayoutSystem.reset();
         renderSystem.reset();
         physicsSystem.reset();
         particleSystem.reset();

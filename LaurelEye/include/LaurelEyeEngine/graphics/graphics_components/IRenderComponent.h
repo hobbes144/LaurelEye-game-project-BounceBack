@@ -31,6 +31,7 @@ namespace LaurelEye::Graphics {
     enum RenderComponentType {
         Renderable3D,
         Renderable2D,
+        UIRenderable,
         PropertyCamera,
         PropertyLight
     };
@@ -59,13 +60,23 @@ namespace LaurelEye::Graphics {
 
         /// @brief Gets the transform currently bound to this render component.
         /// @return Pointer to the bound `TransformComponent`, or `nullptr` if unbound.
-        TransformComponent* GetBoundTransform() const { return transComp; }
+        TransformComponent* GetBoundTransform() const {
+            if ( rcType == UIRenderable ) {
+                std::cerr << "!! Renderable 2D Component Should not have a 3D World bound transform !!" << std::endl;
+                std::cerr << "!! Try Swithching to Using UITransformComponent Instead !!" << std::endl;
+            }
+            return transComp;
+        }
 
         /// @brief Attempts to bind the component's transform from its owning entity.
         ///
         /// This method looks up the owning entity’s `TransformComponent`
         /// and stores a pointer for later use in rendering.
         virtual void BindTransform() {
+            if ( rcType == UIRenderable ) {
+                std::cerr << "!! UIRenderable Component Should not have a 3D World bound transform !!" << std::endl;
+                std::cerr << "!! Try Swithching to Using UITransformComponent Instead !!" << std::endl;
+            }
             transComp = owner->findComponent<TransformComponent>();
         }
 

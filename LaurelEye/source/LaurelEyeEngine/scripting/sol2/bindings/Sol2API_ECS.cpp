@@ -11,6 +11,8 @@
 #include "LaurelEyeEngine/scripting/ScriptComponent.h"
 #include "LaurelEyeEngine/audio/SpeakerComponent.h"
 #include "LaurelEyeEngine/particles/ParticleEmitterComponent.h"
+#include "LaurelEyeEngine/UI/UIComponents/UITransformComponent.h"
+#include "LaurelEyeEngine/UI/UIComponents/UIRenderComponent.h"
 #include "LaurelEyeEngine/audio/SpeakerComponent.h"
 #include "LaurelEyeEngine/ecs/IComponent.h"
 
@@ -118,6 +120,14 @@ namespace LaurelEye::Scripting {
         }
         else if ( type == "CameraComponent" ) {
             if ( auto* c = e.findComponent<Graphics::CameraComponent>() )
+                return sol::make_object(lua, c);
+        }
+        else if ( type == "UITransformComponent" ) {
+            if ( auto* c = e.findComponent<UI::UITransformComponent>() )
+                return sol::make_object(lua, c);
+        }
+        else if ( type == "UIRenderComponent" ) {
+            if ( auto* c = e.findComponent<UI::UIRenderComponent>() )
                 return sol::make_object(lua, c);
         }
 

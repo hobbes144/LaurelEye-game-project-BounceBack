@@ -5,11 +5,15 @@ namespace LaurelEye::Scripting {
     void Sol2API_Math::setup(sol::state& lua) {
         // Vector2
         setupVec2(lua);
+
         // Vector3
         setupVec3(lua);
 
         // Vector4
         setupVec4(lua);
+
+        //Rect
+        setupRect(lua);
 
         // Matrices
         setupMatrix4(lua);
@@ -104,5 +108,47 @@ namespace LaurelEye::Scripting {
                                sol::meta_function::multiplication, sol::overload([](const Vec4& a, float b) { return a * b; }),
                                sol::meta_function::equal_to, &Vec4::operator==);
     }
+
+    void Sol2API_Math::setupRect(sol::state& lua) {
+        using Rect = LaurelEye::Rect;
+
+        lua.new_usertype<Rect>(
+            "Rect",
+
+            // Constructors
+            sol::constructors<
+                Rect(),
+                Rect(const LaurelEye::Vector2&, const LaurelEye::Vector2&)>(),
+
+            // Fields
+            "center", &Rect::center,
+            "size", &Rect::size,
+
+            // Edges
+            "Left", &Rect::Left,
+            "Top", &Rect::Top,
+            "Right", &Rect::Right,
+            "Bottom", &Rect::Bottom,
+
+            // Corners
+            "TopLeft", &Rect::TopLeft,
+            "TopRight", &Rect::TopRight,
+            "BottomLeft", &Rect::BottomLeft,
+            "BottomRight", &Rect::BottomRight,
+
+            // Center
+            "SetCenter", &Rect::SetCenter,
+
+            // Mutation
+            "Translate", &Rect::Translate,
+            "Inflate", &Rect::Inflate,
+
+            // Queries
+            "Contains", &Rect::Contains,
+            "Intersects", &Rect::Intersects,
+            "IsValid", &Rect::IsValid
+        );
+    }
+
 } // namespace LaurelEye::Scripting
 

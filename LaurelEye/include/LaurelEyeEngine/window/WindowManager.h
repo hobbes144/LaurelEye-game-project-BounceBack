@@ -8,6 +8,7 @@
 #pragma once
 
 #include "LaurelEyeEngine/window/IWindow.h"
+#include "LaurelEyeEngine/math/VectorTemplated.h"
 
 #include <memory>
 #include <vector>
@@ -39,6 +40,8 @@ namespace LaurelEye {
         /// @param id ID of the window.
         /// @return IWindow pointer.
         IWindow* getWindow(int id);
+
+        Vector2 getWindowSize();
 
     private:
         WindowBackend systemType;

@@ -18,7 +18,9 @@
 #include "LaurelEyeEngine/scene/Scene.h"
 #include "LaurelEyeEngine/scripting/ScriptComponent.h"
 #include "LaurelEyeEngine/transform/TransformComponent.h"
-#include "LaurelEyeEngine/UI/UIElementManager.h"
+#include "LaurelEyeEngine/UI/UIComponents/UITransformComponent.h"
+#include "LaurelEyeEngine/UI/UIComponents/UIRenderComponent.h"
+#include "LaurelEyeEngine/UI/UIComponents/UIInteractionComponent.h"
 #include <iostream>
 
 namespace LaurelEye {
@@ -108,14 +110,14 @@ namespace LaurelEye {
             else if ( compName == "DebugDraw" ) {
                 setupDebugDrawComponent(entity, compData);
             }
-            else if ( compName == "UIButton" ) {
-                setupUIButtonComponent(entity, compData);
+            else if ( compName == "UIRender" ) {
+                setupUIRenderComponent(entity, compData);
             }
-            else if ( compName == "UISlider" ) {
-                setupUISliderComponent(entity, compData);
+            else if ( compName == "UITransform" ) {
+                setupUITransformComponent(entity, compData);
             }
-            else if ( compName == "UI" ) {
-                setupUIComponent(entity, compData);
+            else if ( compName == "UIInteraction" ) {
+                setupUIInteractionComponent(entity, compData);
             }
             else {
                 std::cerr << "Entity Factory: Unknown component type trying to be added to entity: " << entity.getName() << std::endl;
@@ -566,111 +568,133 @@ namespace LaurelEye {
         assert(sp != nullptr);
     }
 
-    void EntityFactory::setupUIComponent(Entity& entity, const rapidjson::Value& uiData) {
-        std::unique_ptr<Graphics::UIComponent> renderComponent = std::make_unique<Graphics::UIComponent>();
+    void EntityFactory::setupUITransformComponent(Entity& entity, const rapidjson::Value& uitransformData) {
+        UI::UITransformData t;
 
-        // Since name is the mapping tag, we need to grab it first
-        if ( uiData.HasMember("name") && uiData["name"].IsString() ) {
-            auto uiName = uiData["name"].GetString();
-            renderComponent->SetUIName(uiName);
+        if ( uitransformData.HasMember("anchorMin") ) {
+            const auto& anchorMin = uitransformData["anchorMin"];
+            t.anchorMin = {anchorMin[0].GetFloat(), anchorMin[1].GetFloat()};
         }
+        if ( uitransformData.HasMember("anchorMax") ) {
+            const auto& anchorMax = uitransformData["anchorMax"];
+            t.anchorMax = {anchorMax[0].GetFloat(), anchorMax[1].GetFloat()};
+        }
+        if ( uitransformData.HasMember("pivot") ) {
+            const auto& pivot = uitransformData["pivot"];
+            t.pivot = {pivot[0].GetFloat(), pivot[1].GetFloat()};
+        }
+        if ( uitransformData.HasMember("offset") ) {
+            const auto& offset = uitransformData["offset"];
+            t.localOffset = {offset[0].GetFloat(), offset[1].GetFloat()};
+        }
+        if ( uitransformData.HasMember("size") ) {
+            const auto& size = uitransformData["size"];
+            t.size = {size[0].GetFloat(), size[1].GetFloat()};
+        }
+        std::unique_ptr<UI::UITransformComponent> uitransformComponent = std::make_unique<UI::UITransformComponent>(t);
+        entity.addComponent(std::move(uitransformComponent));
+    }
 
-        auto uiManager = context.getService<UIElementManager>();
+    void EntityFactory::setupUIRenderComponent(Entity& entity, const rapidjson::Value& uirenderData) {
+        std::unique_ptr<UI::UIRenderComponent> uirenderComponent = std::make_unique<UI::UIRenderComponent>();
+
+        // ALWAYS create material
+        auto pMat = std::make_shared<Graphics::Material>();
+        uirenderComponent->SetMaterial(pMat);
 
         //---Material---
-        if ( uiData.HasMember("material") && uiData["material"].IsObject() ) {
-            const auto& material = uiData["material"];
-            auto pMat = std::make_shared<Graphics::Material>();
-            renderComponent->SetMaterial(pMat);
-
-            std::cout << "Creating UI Material for Entity: " << entity.getName() << std::endl;
+        // Default 
+        pMat->setProperty<int>("useTexture", 0);
+        pMat->setProperty<Vector2>("mainTextureScale", Vector2(1.0f));
+        pMat->setProperty<Vector3>("diffuse", Vector3(1, 1, 1));
+        pMat->setProperty<Vector3>("specular", Vector3(0, 0, 0));
+        pMat->setProperty<float>("shininess", 1.0f);
+        pMat->setProperty<int>("layer", 0);
+        // JSON Override
+        if ( uirenderData.HasMember("material") && uirenderData["material"].IsObject() ) {
+            const auto& material = uirenderData["material"];
 
             // TODO: Make this a loop over all properties.
             if ( material.HasMember("texture") && material["texture"].IsString() ) {
                 std::string texturePath = material["texture"].GetString();
                 auto texAsset = context.getService<IO::AssetManager>()->load(assetPath + texturePath);
                 auto imageAsset = std::dynamic_pointer_cast<IO::ImageAsset>(texAsset);
-                renderComponent->SetImageAsset(imageAsset);
-                renderComponent->GetMaterial()->setProperty<int>("useTexture", 1);
+                uirenderComponent->SetImageAsset(imageAsset);
+                uirenderComponent->GetMaterial()->setProperty<int>("useTexture", 1);
             }
             else {
-                renderComponent->GetMaterial()->setProperty<int>("useTexture", 0);
+                uirenderComponent->GetMaterial()->setProperty<int>("useTexture", 0);
             }
 
             if ( material.HasMember("mainTextureScale") && material["mainTextureScale"].IsArray() ) {
                 const auto& scale = material["mainTextureScale"].GetArray();
-                renderComponent->GetMaterial()->setProperty<Vector2>(
+                uirenderComponent->GetMaterial()->setProperty<Vector2>(
                     "mainTextureScale",
                     Vector2(scale[0].GetFloat(), scale[1].GetFloat()));
             }
             else {
-                renderComponent->GetMaterial()->setProperty<Vector2>("mainTextureScale", Vector2(1.0f));
+                uirenderComponent->GetMaterial()->setProperty<Vector2>("mainTextureScale", Vector2(1.0f));
             }
 
-            if ( material.HasMember("transparency") ) {
-                float transparency = material["transparency"].GetFloat();
-                renderComponent->GetMaterial()->setProperty<float>("transparency", transparency);
+            if ( material.HasMember("diffuse") && material["diffuse"].IsArray() ) {
+                const auto& diff = material["diffuse"].GetArray();
+                uirenderComponent->GetMaterial()->setProperty<Vector3>("diffuse", Vector3(diff[0].GetFloat(), diff[1].GetFloat(), diff[2].GetFloat()));
+            }
+            if ( material.HasMember("specular") && material["specular"].IsArray() ) {
+                const auto& spec = material["specular"].GetArray();
+                uirenderComponent->GetMaterial()->setProperty<Vector3>("specular", Vector3(spec[0].GetFloat(), spec[1].GetFloat(), spec[2].GetFloat()));
+            }
+            if ( material.HasMember("shininess") && material["shininess"].IsFloat() ) {
+                float shininess = material["shininess"].GetFloat();
+                uirenderComponent->GetMaterial()->setProperty<float>("shininess", shininess);
+            }
+            if ( material.HasMember("layer") && material["layer"].IsInt() ) {
+                int layer = material["layer"].GetInt();
+                uirenderComponent->GetMaterial()->setProperty<float>("layer", layer);
             }
         }
 
-        entity.addComponent<Graphics::UIComponent>(std::move(renderComponent));
-    }
-
-    void EntityFactory::setupUIButtonComponent(Entity& entity, const rapidjson::Value& uiData) {
-        std::unique_ptr<Graphics::UIButtonComponent> renderComponent = std::make_unique<Graphics::UIButtonComponent>();
-
-        // Since name is the mapping tag, we need to grab it first
-        if ( uiData.HasMember("name") && uiData["name"].IsString() ) {
-            auto uiName = uiData["name"].GetString();
-            renderComponent->SetUIName(uiName);
-        }
-
-        auto uiManager = context.getService<UIElementManager>();
-
-        //---Material---
-        if ( uiData.HasMember("material") && uiData["material"].IsObject() ) {
-            const auto& material = uiData["material"];
-            auto pMat = std::make_shared<Graphics::Material>();
-            renderComponent->SetMaterial(pMat);
-
-            std::cout << "Creating UI Material for Entity: " << entity.getName() << std::endl;
-
-            // TODO: Make this a loop over all properties.
-            if ( material.HasMember("texture") && material["texture"].IsString() ) {
-                std::string texturePath = material["texture"].GetString();
-                auto texAsset = context.getService<IO::AssetManager>()->load(assetPath + texturePath);
-                auto imageAsset = std::dynamic_pointer_cast<IO::ImageAsset>(texAsset);
-                renderComponent->SetImageAsset(imageAsset);
-                renderComponent->GetMaterial()->setProperty<int>("useTexture", 1);
+        // Color
+        if ( uirenderData.HasMember("color") && uirenderData["color"].IsArray() ) {
+            const auto& color = uirenderData["color"].GetArray();
+            if ( color.Size() >= 4 ) {
+                float r = color[0].GetFloat() <= 1 ? color[0].GetFloat() : 1.0;
+                float g = color[1].GetFloat() <= 1 ? color[1].GetFloat() : 1.0;
+                float b = color[2].GetFloat() <= 1 ? color[2].GetFloat() : 1.0;
+                float a = color[3].GetFloat() <= 1 ? color[3].GetFloat() : 1.0;
+                Vector4 c = Vector4(r, g, b, a);
+                uirenderComponent->SetColor(c);
             }
             else {
-                renderComponent->GetMaterial()->setProperty<int>("useTexture", 0);
-            }
-
-            if ( material.HasMember("mainTextureScale") && material["mainTextureScale"].IsArray() ) {
-                const auto& scale = material["mainTextureScale"].GetArray();
-                renderComponent->GetMaterial()->setProperty<Vector2>(
-                    "mainTextureScale",
-                    Vector2(scale[0].GetFloat(), scale[1].GetFloat()));
-            }
-            else {
-                renderComponent->GetMaterial()->setProperty<Vector2>("mainTextureScale", Vector2(1.0f));
-            }
-
-            if ( material.HasMember("transparency") ) {
-                float transparency = material["transparency"].GetFloat();
-                renderComponent->GetMaterial()->setProperty<float>("transparency", transparency);
+                std::cerr << "Color is Not a Vector4\n";
             }
         }
 
-        entity.addComponent<Graphics::UIButtonComponent>(std::move(renderComponent));
+        //Transparency
+        if ( uirenderData.HasMember("transparency") && uirenderData["transparency"].IsFloat() ) {
+            float trans = uirenderData["transparency"].GetFloat();
+            uirenderComponent->SetTransparency(trans);
+        }
+
+        entity.addComponent(std::move(uirenderComponent));
     }
 
-    void EntityFactory::setupUISliderComponent(Entity& entity, const rapidjson::Value& textData) {
-        setupUIComponent(entity, textData);
+    void EntityFactory::setupUIInteractionComponent(Entity& entity, const rapidjson::Value& uiinteractionData) {
+        std::unique_ptr<UI::UIInteractionComponent> uiinteractionComponent = std::make_unique<UI::UIInteractionComponent>();
     }
 
     void EntityFactory::setupDebugDrawComponent(Entity& entity, const rapidjson::Value& emitterData) {
+    }
+
+#pragma endregion
+
+
+#pragma region Helpers
+
+
+
+    Vector2 EntityFactory::ReadVector2(const rapidjson::Value& vectorData) {
+        return {vectorData[0].GetFloat(), vectorData[1].GetFloat()};
     }
 
 #pragma endregion

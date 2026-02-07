@@ -1,8 +1,8 @@
 ﻿defaultDistance = 22.0
 aimDistance = 12.0
 
-defaultShoulder = 6.5 
-aimShoulder = 4.5   
+defaultShoulder = 6.5
+aimShoulder = 4.5
 defaultHeight = 8.5
 aimHeight = 7.8
 zoomLerpSpeed = 12.0
@@ -120,16 +120,6 @@ function onUpdate(dt)
 
     camTransform:setRotation(newRot)
     transform:setWorldTransform(camTransform)
-
-    -- Raycast demo code
-    local shoulderPos = playerPos + right * shoulderOffset
-    local raycastHit = Physics.Raycast(shoulderPos, -forward, distanceBack, {layerMask = Layers.World})
-    if (raycastHit) then
-        print("Raycast result: ", raycastHit.position)
-        print("Raycast target: ", raycastHit.entity:getName())
-    else
-        print("No raycast hit.")
-    end
 
 end
 

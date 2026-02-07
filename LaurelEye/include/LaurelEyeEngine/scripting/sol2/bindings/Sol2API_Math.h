@@ -11,6 +11,7 @@
 #include "LaurelEyeEngine/math/VectorTemplated.h"
 #include "LaurelEyeEngine/math/Matrix4.h"
 #include "LaurelEyeEngine/math/Transform.h"
+#include "LaurelEyeEngine/math/Rect.h"
 #include <cmath>
 #include <sol/sol.hpp>
 
@@ -27,6 +28,7 @@ namespace LaurelEye::Scripting {
         static void setupVec2(sol::state& lua);
         static void setupVec3(sol::state& lua);
         static void setupVec4(sol::state& lua);
+        static void setupRect(sol::state& lua);
         static void setupMatrix4(sol::state& lua);
         static void setupQuaternion(sol::state& lua);
         static void setupTransform(sol::state& lua);

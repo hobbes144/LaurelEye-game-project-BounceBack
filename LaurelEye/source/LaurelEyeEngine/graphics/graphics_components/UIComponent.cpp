@@ -5,6 +5,8 @@
 /// @date    10-30-2025
 /// @brief Implementation of UI component on screen.
 
+/*
+
 #include "LaurelEyeEngine/graphics/graphics_components/UIComponent.h"
 #include "LaurelEyeEngine/graphics/resources/RenderMesh.h"
 
@@ -60,3 +62,5 @@ namespace LaurelEye::Graphics {
         return (mouseX >= xMin && mouseX <= xMax && mouseY >= yMin && mouseY <= yMax);
     }
 } // namespace LaurelEye::Graphics
+
+*/

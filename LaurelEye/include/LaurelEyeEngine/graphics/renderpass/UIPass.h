@@ -6,6 +6,7 @@
 /// @brief Ui render pass definition.
 #pragma once
 #include "LaurelEyeEngine/graphics/renderpass/IRenderPass.h"
+#include "LaurelEyeEngine/graphics/resources/Mesh.h"
 #include "LaurelEyeEngine/graphics/resources/FrameContext.h"
 #include "LaurelEyeEngine/graphics/resources/RenderResources.h"
 #include <glad/glad.h>
@@ -38,6 +39,8 @@ namespace LaurelEye::Graphics {
         }
 
     private:
+        std::shared_ptr<Shader> textShader = nullptr;
+        std::shared_ptr<Mesh> Square;
         BlendFactor blendFactor;
     };
 

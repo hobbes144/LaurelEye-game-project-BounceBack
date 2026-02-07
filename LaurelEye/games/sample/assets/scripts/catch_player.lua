@@ -40,7 +40,8 @@ hasBall = true
 ballCreated = false
 
 --damage variables
-health = 3.0
+maxHealth = 3.0
+currentHealth = maxHealth
 invincible = false
 invincibleTimer = 0
 
@@ -59,7 +60,7 @@ function onStart()
             cameraTransform = cameraEntity:findTransform()
         end
     end
-    
+
     smokeEmitter = self:findParticleEmitter()
 
     if smokeEmitter ~= nil then
@@ -73,28 +74,13 @@ function onStart()
     end
 
     speaker = self:findAudioSpeaker()
-
-    -- Assume there are 3 health UI elements; adjust count as needed
-    for i = 1, 3 do
-        healthUIElements[i] = UIElementManager:findUIComponent("HealthUI" .. i)
-    end
 end
 
 function onUpdate(dt)
     --Check if health = 0
-    if health <= 0 then
+    if currentHealth <= 0 then
         print("Player has died!")
         SceneManager:changeScene("MainMenu")
-    end
-
-    for i, uiElement in ipairs(healthUIElements) do
-        if uiElement then
-            if i <= health then
-                uiElement:setActive(true)
-            else
-                uiElement:setActive(false)
-            end
-        end
     end
 
     if invincible then
@@ -400,8 +386,9 @@ function onCollisionEnter(data)
             jumping = false
         elseif tag == "bullet" then
             if not invincible then
-                health = health - 1.0
+                currentHealth = currentHealth - 1.0
                 invincible = true
+                moveHealthBar()
             end
         elseif tag == "door" then
             changeLevels()
@@ -420,8 +407,9 @@ function onCollisionEnter(data)
             jumping = false
         elseif tag == "bullet" then
             if not invincible then
-                health = health - 1.0
+                currentHealth = currentHealth - 1.0
                 invincible = true
+                moveHealthBar()
             end
         elseif tag == "door" then
             changeLevels()
@@ -458,6 +446,22 @@ function findForward()
     local aimDir = camRot:forward()
     aimDir = aimDir:Normalized()
     return aimDir
+end
+
+function moveHealthBar()
+    local scene = SceneManager:getCurrentScene()
+    if scene == nil then return end
+    local healthBar = scene:findEntityByName("HealthBar")
+    local barTransform = healthBar:findComponent("UITransformComponent")
+    local hSize = barTransform:getSize()
+    local maxSize = 100
+    local percent = currentHealth / maxHealth
+    local newSize = Vector2.new(maxSize * percent, hSize.y)
+    barTransform:setSize(newSize)
+
+    --local barPos = barTransform:getLocalOffset()
+    --local newPos = Vector2.new(barPos.x - 34, barPos.y)
+    --barTransform:setLocalOffset(newPos)
 end
 
 function targetCheck()

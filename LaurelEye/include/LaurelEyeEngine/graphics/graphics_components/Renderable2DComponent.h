@@ -5,6 +5,7 @@
 /// @date   10-07-2025
 /// @brief  2D renderable component for the LaurelEye engine.
 ///
+/// Obsolete (01/21/2026)
 /// This file defines the `Renderable2DComponent` class, which represents
 /// a renderable entity for 2D graphics. It extends the `IRenderableComponent`
 /// base class and is responsible for drawing 2D objects such as sprites,
@@ -39,8 +40,7 @@ namespace LaurelEye::Graphics {
         Renderable2DComponent(RenderableComponentDesc rcd);
 
     private:
-        //Sprite, Texture, Etc
-
+        // Sprite, Texture, Etc
     };
 
-}
+} // namespace LaurelEye::Graphics

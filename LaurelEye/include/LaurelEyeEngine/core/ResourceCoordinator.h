@@ -20,7 +20,6 @@
 #include "LaurelEyeEngine/memory/MemoryManager.h"
 #include "LaurelEyeEngine/platforms/IPlatform.h"
 #include "LaurelEyeEngine/scene/SceneManager.h"
-#include "LaurelEyeEngine/UI/UIElementManager.h"
 #include "LaurelEyeEngine/window/WindowManager.h"
 #include <memory>
 #include <vector>
@@ -44,6 +43,6 @@ namespace LaurelEye {
         std::unique_ptr<SceneManager> sceneManager;
         std::unique_ptr<EventManager> eventManager;
         std::unique_ptr<IPlatform> platformManager;
-        std::unique_ptr<UIElementManager> uiElementManager;
+
     };
 } // namespace LaurelEye

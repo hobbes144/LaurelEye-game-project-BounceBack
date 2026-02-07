@@ -18,6 +18,7 @@
 #include "LaurelEyeEngine/physics/PhysicsSystem.h"
 #include "LaurelEyeEngine/scripting/ScriptSystem.h"
 #include "LaurelEyeEngine/transform/TransformSystem.h"
+#include "LaurelEyeEngine/UI/UILayoutSystem.h"
 #include <memory>
 
 namespace LaurelEye {
@@ -33,6 +34,7 @@ namespace LaurelEye {
         // TODO - determine if this should be generic list
         // for now, add systems that are needed here.
         std::unique_ptr<TransformSystem> transformSystem;
+        std::unique_ptr<UI::UILayoutSystem> uiLayoutSystem;
         std::unique_ptr<Graphics::RenderSystem> renderSystem;
         std::unique_ptr<Particles::ParticleSystem> particleSystem;
         std::unique_ptr<Physics::PhysicsSystem> physicsSystem;

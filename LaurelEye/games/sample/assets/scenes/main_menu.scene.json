@@ -2,34 +2,7 @@
     "settings": {
         "resetOnLoad": true,
         "backgroundTexture": "textures/Tropical_Beach_8k.jpg",
-        "UIActiveOnLoad": true,
-        "UILayout": [
-            {
-                "name": "baseMapping",
-                "mappings": [
-                    {
-                        "name": "Prototype1",
-                        "right": "Prototype2",
-                        "down": "Prototype3"
-                    },
-                    {
-                        "name": "Prototype2",
-                        "left": "Prototype1",
-                        "down": "Quit"
-                    },
-                    {
-                        "name": "Prototype3",
-                        "up": "Prototype1",
-                        "right": "Quit"
-                    },
-                    {
-                        "name": "Quit",
-                        "left": "Prototype3",
-                        "up": "Prototype2"
-                    }
-                ]
-            }
-        ]
+        "UIActiveOnLoad": true
     },
     "entities": [
         {
@@ -80,89 +53,74 @@
             }
         },
         {
-            "name": "Prototype1Button",
+            "name": "Play Button",
             "components": {
-                "Transform": {
-                    "position": [ -0.5, 0.5, 0.0 ],
-                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 300.0, 100.0, 0.0 ]
+                "UITransform": {
+                    "anchorMin": [ 1.0, 1.0 ],
+                    "anchorMax": [ 1.0, 1.0 ],
+                    "pivot": [ 1.0, 1.0 ],
+                    "offset": [ -200, -100 ],
+                    "size": [ 150, 50 ]
                 },
-                "UIButton": {
-                    "name": "Prototype1",
+                "UIRender": {
+                    "material": {
+                        "texture": "textures/PlayButton.jpg",
+                        "layer": 10
+                    }
+                }
+            }
+        },
+        {
+            "name": "Prototype 1 Button",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0.0, 0.0 ],
+                    "anchorMax": [ 0.0, 0.0 ],
+                    "pivot": [ 0.0, 0.0 ],
+                    "offset": [ 200, 350 ],
+                    "size": [ 150, 50 ]
+                },
+                "UIRender": {
                     "material": {
                         "texture": "textures/Prototype1.jpg",
-                        "transparency": 1.0
+                        "layer": 10
                     }
                 }
             }
         },
         {
-            "name": "Prototype2Button",
+            "name": "Prototype 2 Button",
             "components": {
-                "Transform": {
-                    "position": [ 0.5, 0.5, 0.0 ],
-                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 300.0, 100.0, 0.0 ]
+                "UITransform": {
+                    "anchorMin": [ 0.0, 0.0 ],
+                    "anchorMax": [ 0.0, 0.0 ],
+                    "pivot": [ 0.0, 0.0 ],
+                    "offset": [ 200, 225 ],
+                    "size": [ 150, 50 ]
                 },
-                "UIButton": {
-                    "name": "Prototype2",
+                "UIRender": {
                     "material": {
                         "texture": "textures/Prototype2.jpg",
-                        "transparency": 1.0
+                        "layer": 10
                     }
                 }
             }
         },
         {
-            "name": "Prototype3Button",
+            "name": "Quit Button",
             "components": {
-                "Transform": {
-                    "position": [ -0.5, -0.5, 0.0 ],
-                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 300.0, 100.0, 0.0 ]
+                "UITransform": {
+                    "anchorMin": [ 0.0, 0.0 ],
+                    "anchorMax": [ 0.0, 0.0 ],
+                    "pivot": [ 0.0, 0.0 ],
+                    "offset": [ 200, 100 ],
+                    "size": [ 150, 50 ]
                 },
-                "UIButton": {
-                    "name": "Prototype3",
-                    "material": {
-                        "texture": "textures/Prototype3.jpg",
-                        "transparency": 1.0
-                    }
-                }
-            }
-        },
-        {
-            "name": "QuitButton",
-            "components": {
-                "Transform": {
-                    "position": [ 0.5, -0.5, 0.0 ],
-                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 300.0, 100.0, 0.0 ]
-                },
-                "UIButton": {
-                    "name": "Quit",
+                "UIRender": {
                     "material": {
                         "texture": "textures/Quit.jpg",
-                        "transparency": 1.0
+                        "layer": 10
                     }
-                }
-            }
-        },
-        {
-            "name": "DigiPenLogo",
-            "components": {
-                "Transform": {
-                    "position": [ 0.0, 0.0, 0.0 ],
-                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 2000.0, 1000.0, 0.0 ]
-                },
-                "UI": {
-                    "material": {
-                        "texture": "textures/DigiPen_Logo_Large.jpg",
-                        "transparency": 1.0
-                    }
-                },
-                "Script": {
-                    "path": "scripts/delayed_deactivate.lua"
                 }
             }
         },
@@ -171,7 +129,7 @@
             "components": {
                 "Transform": {
                     "position": [ 0.0, 10.0, 0.0 ],
-                    "rotation": [ 180.0, 0.0, 180.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
                     "scale": [ 0.08, 0.08, 0.08 ]
                 },
                 "Script": {

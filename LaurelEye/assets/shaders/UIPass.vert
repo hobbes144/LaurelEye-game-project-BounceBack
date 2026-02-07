@@ -4,27 +4,22 @@
 #version 440
 
 layout(location = 0) in vec4 vertex;
-layout(location = 1) in vec3 vertexNormal;
 layout(location = 2) in vec2 vertexTexture;
-layout(location = 3) in vec3 vertexTangent;
 
-layout (binding = 0) uniform camera
-{
-    mat4 projection;
-    mat4 view;
-    mat4 inverseView;
-    float exposure;
-};
-
-uniform mat4 ModelMatrix;
+uniform mat4 m_Model;
+uniform vec2 u_ScreenSize; // framebuffer size
 
 out vec2 texCoord;
 
 void main()
 {
 
-    // Computes the point projection on the screen
-    gl_Position = ModelMatrix*vertex;
+    vec4 world = m_Model * vertex;
+
+    vec2 ndc = (world.xy / u_ScreenSize) * 2.0 - 1.0;
+
+    gl_Position = vec4(ndc, 0.0, 1.0);
 
     texCoord = vertexTexture;
+
 }

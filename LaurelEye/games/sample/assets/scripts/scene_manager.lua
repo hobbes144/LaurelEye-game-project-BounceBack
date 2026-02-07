@@ -2,23 +2,6 @@
 -- Switches scenes based on key inputs
 
 function onStart()
-    log("Scene Manager script started")
-    UI.onButtonPressed("Prototype1", function(name)
-        log("Button pressed from Lua: " .. name)
-        SceneManager:changeScene("MBPrototype")
-    end)
-    UI.onButtonPressed("Prototype2", function(name)
-        log("Button pressed from Lua: " .. name)
-        SceneManager:changeScene("ZombiePrototype")
-    end)
-    UI.onButtonPressed("Prototype3", function(name)
-        log("Button pressed from Lua: " .. name)
-        SceneManager:changeScene("BulletHellPrototype")
-    end)
-    UI.onButtonPressed("Quit", function(name)
-        log("Button pressed from Lua: " .. name)
-        Engine:stop()
-    end)
 end
 
 function onUpdate(dt)

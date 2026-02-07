@@ -56,4 +56,11 @@ namespace LaurelEye {
         else return nullptr;
     }
 
+    Vector2 WindowManager::getWindowSize() {
+        return {
+            static_cast<float>(getWindow(mainWindowId)->getWidth()),
+            static_cast<float>(getWindow(mainWindowId)->getHeight())
+        };
+    }
+
 } // namespace LaurelEye

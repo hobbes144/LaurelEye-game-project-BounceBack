@@ -62,6 +62,7 @@ namespace LaurelEye::Scripting {
         /* UI */
         Sol2API_UI::setup(lua, ctx);
 
+        /* Spline */
         Sol2API_Spline::setup(lua);
     }
 

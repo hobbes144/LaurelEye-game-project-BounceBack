@@ -46,7 +46,7 @@
 #include "LaurelEyeEngine/graphics/graphics_components/DirectionalLightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/LightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/Renderable3DComponent.h"
-#include "LaurelEyeEngine/graphics/graphics_components/UIComponent.h"
+#include "LaurelEyeEngine/UI/UIComponents/UIRenderComponent.h"
 
 // Render pass Headers
 #include "LaurelEyeEngine/graphics/renderpass/DebugDrawRenderPass.h"
@@ -60,6 +60,7 @@
 // #include "LaurelEyeEngine/graphics/renderpass/SingleBufferedDataPass.h"
 
 #include <memory>
+#include <algorithm>
 #include <stdexcept>
 
 namespace LaurelEye::Graphics {
@@ -285,7 +286,7 @@ namespace LaurelEye::Graphics {
         device->blitFramebuffers(ctx.resources.framebuffer("gbuffer"), 0, true);
         device->bindFramebufferBase(0);
 
-        // Draw the particles.
+        // Draw the DebugDraw.
         if ( runDebugDraw ) {
             // Debug Draw Render Pass
             if ( dbrp ) {
@@ -322,7 +323,7 @@ namespace LaurelEye::Graphics {
             *tempRenderResources.get(),
             uiComponents};
         {
-            RenderStateSaver savedState = RenderStateSaver(device.get());
+            RenderStateSaver test = RenderStateSaver(device.get());
             uiPass->execute(uiCtx);
         }
 
@@ -345,6 +346,8 @@ namespace LaurelEye::Graphics {
     }
 
     void RenderSystem::registerComponent(const ComponentPtr component) {
+        RenderComponentType t = component->GetRenderCompType();
+
 
         switch ( component->GetRenderCompType() ) {
         case RenderComponentType::Renderable3D: {
@@ -402,6 +405,43 @@ namespace LaurelEye::Graphics {
             // implemented this. Will come back to it later.
             ISystem::registerComponent(component);
             break;
+        case RenderComponentType::UIRenderable: {
+            auto* uiRenderComp = static_cast<UI::UIRenderComponent*>(component);
+            assert(uiRenderComp && "ERROR::GRAPHICS::RENDERSYSTEM::INVALID_UI_COMPONENT");
+
+            if ( !uiRenderComp->HasMesh() ) {
+                auto meshHandle = meshManager->createPrimitiveMesh(
+                    PrimitiveMeshType::Square
+                );
+                auto meshResource = meshManager->getMesh(meshHandle);
+
+                uiRenderComp->SetMesh(meshHandle);
+                uiRenderComp->SetMeshTempAttr(
+                    meshResource->gpu.vao,
+                    meshResource->gpu.indexCount
+                );
+            }
+
+            if ( std::shared_ptr<IO::ImageAsset> texAsset = uiRenderComp->GetImageAsset() ) {
+                // Make a texture and assign it to material
+                TextureDesc desc = TextureDesc();
+                desc.width = static_cast<uint32_t>(texAsset->width);
+                desc.height = static_cast<uint32_t>(texAsset->height);
+                if ( texAsset->format == IO::ImageAsset::RGB8 )
+                    desc.format = Graphics::TextureFormat::RGB8;
+                else if ( texAsset->format == IO::ImageAsset::RGBA8 )
+                    desc.format = Graphics::TextureFormat::RGBA8;
+                else
+                    desc.format = Graphics::TextureFormat::RGBA8;
+                TextureHandle handle = tempRenderResources->createTexture(texAsset->getName(), desc, "ImageImporter", texAsset->pixelData.data());
+                uiRenderComp->GetMaterial()->setTexture("mainTexture", handle);
+                uiRenderComp->GetMaterial()->setProperty<int>("useTexture", 1);
+                // renderComponent->SetImageAsset(nullptr);
+            }
+
+            uiComponents.push_back(uiRenderComp);
+            break;
+        }
         case RenderComponentType::PropertyCamera: {
             assert(dynamic_cast<CameraComponent*>(component) && "ERROR::GRAPHICS::RENDERSYSTEM::INVALID_LIGHT");
             // TODO: This is currently updating camera to the new component
@@ -427,71 +467,6 @@ namespace LaurelEye::Graphics {
         default:
             break;
         }
-
-        component->BindTransform();
-        component->rs = this;
-    }
-
-    void RenderSystem::registerUIComponent(const ComponentPtr component) {
-        auto uiComponent = static_cast<UIComponent*>(component);
-        if ( std::shared_ptr<IO::ImageAsset> texAsset = uiComponent->GetImageAsset() ) {
-            // Make a texture and assign it to material
-            TextureDesc desc = TextureDesc();
-            desc.width = static_cast<uint32_t>(texAsset->width);
-            desc.height = static_cast<uint32_t>(texAsset->height);
-            if ( texAsset->format == IO::ImageAsset::RGB8 )
-                desc.format = Graphics::TextureFormat::RGB8;
-            else if ( texAsset->format == IO::ImageAsset::RGBA8 )
-                desc.format = Graphics::TextureFormat::RGBA8;
-            else
-                desc.format = Graphics::TextureFormat::RGBA8;
-            TextureHandle handle = tempRenderResources->createTexture(texAsset->getName(), desc, "ImageImporter", texAsset->pixelData.data());
-            uiComponent->GetMaterial()->setTexture("mainTexture", handle);
-            uiComponent->GetMaterial()->setProperty<int>("useTexture", 1);
-        }
-
-        // Mesh creation
-        // NOTE: Ideally no meshes should be created here, but instead be
-        // created by the scene. That would ensure efficient mesh resource
-        // handling and safer creation and deletion of duplicates.
-        if ( std::shared_ptr<IO::MeshAsset> meshAsset = uiComponent->GetMeshAsset() ) {
-            MeshHandle handle = meshManager->getHandle(meshAsset->getName());
-            if ( !isValidMesh(handle) ) {
-                if ( auto skinnedMeshAsset = std::dynamic_pointer_cast<IO::SkinnedMeshAsset>(meshAsset) ) {
-                    auto skeletonHandle = skeletonManager->createSkeleton(
-                        *(skinnedMeshAsset->skeleton.get()));
-                    handle = meshManager->createSkinnedMesh(skinnedMeshAsset.get(), skeletonHandle);
-                    skinnedMeshAsset->skeleton = nullptr;
-                }
-                else {
-                    handle = meshManager->createMesh(meshAsset.get());
-                }
-            }
-            auto meshResource = meshManager->getMesh(handle);
-
-            uiComponent->SetMesh(handle);
-            uiComponent->SetMeshTempAttr(
-                meshResource->gpu.vao,
-                meshResource->gpu.indexCount,
-                meshResource->skinDataBuffer);
-            // uiComponent->SetMeshAsset(nullptr);
-        }
-        else if ( uiComponent->GetMeshPrimitiveType() != PrimitiveMeshType::Invalid ) {
-            auto meshHandle = meshManager->createPrimitiveMesh(uiComponent->GetMeshPrimitiveType());
-            auto meshResource = meshManager->getMesh(meshHandle);
-
-            uiComponent->SetMesh(meshHandle);
-            uiComponent->SetMeshTempAttr(meshResource->gpu.vao, meshResource->gpu.indexCount);
-        }
-        else {
-            uiComponent->SetMeshPrimitiveType(PrimitiveMeshType::Square);
-            auto meshHandle = meshManager->createPrimitiveMesh(PrimitiveMeshType::Square);
-            auto meshResource = meshManager->getMesh(meshHandle);
-
-            uiComponent->SetMesh(meshHandle);
-            uiComponent->SetMeshTempAttr(meshResource->gpu.vao, meshResource->gpu.indexCount);
-        }
-        uiComponents.push_back(uiComponent);
 
         component->BindTransform();
         component->rs = this;
@@ -523,6 +498,10 @@ namespace LaurelEye::Graphics {
         case RenderComponentType::Renderable2D:
             ISystem::deregisterComponent(component);
             break;
+        case RenderComponentType::UIRenderable:
+            //Remove an Element from a vector
+            uiComponents.erase(std::remove(uiComponents.begin(), uiComponents.end(), component), uiComponents.end());
+            break;
         case RenderComponentType::PropertyCamera: {
             auto it = cameraProperties.find(component->GetRenderID());
             if ( it != cameraProperties.end() ) {
@@ -540,38 +519,6 @@ namespace LaurelEye::Graphics {
         default:
             break;
         }
-    }
-
-    void RenderSystem::deregisterUIComponent(const ComponentPtr component) {
-        auto renderComponent = static_cast<UIComponent*>(component);
-
-        // If the material has a texture, release it from GPU
-
-        // WARNING: Refer to the warning note for meshes, the same applies to
-        // textures.
-        //
-        // auto mat = renderComponent->GetMaterial();
-        // if ( auto texAsset = renderComponent->GetImageAsset() ) {
-        //     const std::string& texName = texAsset->getName();
-        //     if ( tempRenderResources->texture(texName) != InvalidTexture ) {
-        //         tempRenderResources->destroyTexture(texName);
-        //     }
-        // }
-
-        // WARNING: We cannot delete meshes safely with this system if we
-        // want to allow reuse.
-        // This should have been taken care of by the Scene.
-        // Doing this deletion will break due to duplicate meshes using
-        // the same mesh resource.
-        //
-        // if ( renderComponent->GetMeshPrimitiveType() == PrimitiveMeshType::Invalid ) {
-        //     meshManager->destroyMesh(renderComponent->GetMesh());
-        // }
-        renderComponent->SetMesh(RenderMesh::InvalidMesh);
-
-        uiComponents.erase(
-            std::remove(uiComponents.begin(), uiComponents.end(), component),
-            uiComponents.end());
     }
 
     /*!****************************************************************************

@@ -17,7 +17,6 @@
 #include "LaurelEyeEngine/core/EngineContext.h"
 #include "LaurelEyeEngine/io/Assets.h"
 #include "LaurelEyeEngine/math/Vector3.h"
-#include "LaurelEyeEngine/UI/UILayout.h"
 
 namespace LaurelEye {
     class Entity;
@@ -48,9 +47,6 @@ namespace LaurelEye {
         /// @param doc The rapidjson to deserialize
         void deserializeSettings(const rapidjson::Value& settingsValue, const std::string& assetRoot);
         void loadUISettings(const rapidjson::GenericArray<true, rapidjson::Value>& uiDatas);
-
-        // UI Settings
-        UILayout* loadUILayout(const rapidjson::Value& uiJson);
 
         /* Scene monitoring */
         const std::string& getName() const { return name; }
