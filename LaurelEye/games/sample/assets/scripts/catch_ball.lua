@@ -62,11 +62,18 @@ function onCollisionEnter(data)
 
         -- Reflect
         local reflected = vel - normal * (2.0 * vel:Dot(normal))
+        reflected = reflected:Normalized()
 
-        -- Enforce perfect elasticity
-        reflected = reflected:Normalized() * initialSpeed
+        local pos = transform:getWorldPosition()
+        local homingDir, hit = findEnemyDirection(pos, reflected)
+
+        if homingDir ~= nil then
+            reflected = homingDir
+        end
+
+        reflected = reflected * initialSpeed
         body:setLinearVelocity(reflected)
-
+         
         bounceCount = bounceCount + 1
     end
 end
@@ -92,4 +99,45 @@ function destroySelf()
     if destroyed then return end
     destroyed = true
     SceneManager:destroy(self)
+end
+
+function findEnemyDirection(origin, baseDir)
+    local maxDistance = 200.0
+    local coneAngle = math.rad(15)      -- cone half-angle
+    local rings = 3                     -- quality vs cost
+    local raysPerRing = 6
+
+    baseDir = baseDir:Normalized()
+
+    -- Build orthonormal basis
+    local up = Vector3.new(0, 1, 0)
+    if math.abs(baseDir:Dot(up)) > 0.95 then
+        up = Vector3.new(1, 0, 0)
+    end
+
+    local right = baseDir:Cross(up):Normalized()
+    up = right:Cross(baseDir):Normalized()
+
+    for r = 1, rings do
+        local t = r / rings
+        local angle = coneAngle * t
+
+        for i = 1, raysPerRing do
+            local theta = (i / raysPerRing) * math.pi * 2.0
+
+            local offset =
+                right * math.cos(theta) * math.sin(angle) +
+                up    * math.sin(theta) * math.sin(angle)
+
+            local dir = (baseDir * math.cos(angle) + offset):Normalized()
+
+            local hit = Physics.Raycast(origin, dir, maxDistance, { layerMask = Layers.Enemy })
+
+            if hit then
+                return dir, hit
+            end
+        end
+    end
+
+    return nil, nil
 end

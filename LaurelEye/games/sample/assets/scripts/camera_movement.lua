@@ -121,6 +121,11 @@ function onUpdate(dt)
     camTransform:setRotation(newRot)
     transform:setWorldTransform(camTransform)
 
+    -- Raycast demo code
+    local shoulderPos = playerPos + right * currentShoulder
+    local raycastHit = Physics.Raycast(shoulderPos, -forward, currentDistance, {layerMask = Layers.World})
+    
+
 end
 
 function onShutdown()

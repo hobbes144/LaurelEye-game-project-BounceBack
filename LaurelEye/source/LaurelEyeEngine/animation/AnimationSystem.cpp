@@ -125,9 +125,7 @@ namespace LaurelEye::Animations {
 
     void AnimationSystem::deregisterComponent(const ComponentPtr component)
     {
-        components.erase(
-            std::remove(components.begin(), components.end(), component),
-            components.end());
+        ISystem::deregisterComponent(component);
     };
 
     void AnimationSystem::update(float deltaTime) {
@@ -135,6 +133,7 @@ namespace LaurelEye::Animations {
         // Update base elapsed time for all animations.
         for ( auto& comp : components ) {
             if ( !isValidAnimation(comp->currentAnimation) ) continue;
+            if ( !comp->isActive() ) continue;
             comp->elapsedTime += static_cast<double>(deltaTime);
             if ( auto* skeletal = dynamic_cast<SkeletalAnimationComponent*>(comp) ) { updateSkeletalAnimations(deltaTime, skeletal); }
         }

@@ -464,6 +464,12 @@ namespace LaurelEye {
             }
             else if ( auto* uitextComp = dynamic_cast<UI::UIRenderComponent*>(comp.get()) ) {
             }
+            else if ( auto* AnimationComp = dynamic_cast<Animations::AnimationComponent*>(comp.get()) ) {
+                // std::cout << "[Scene] Registering Animation Element " << std::endl;
+                if ( animationSystem ) {
+                    animationSystem->deregisterComponent(AnimationComp);
+                }
+            }
             // add more as needed...
         }
     }

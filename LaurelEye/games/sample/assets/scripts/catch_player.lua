@@ -1,4 +1,4 @@
-maxSpeed       = 200.0
+﻿maxSpeed       = 200.0
 accelGround    = 250.0
 accelAir       = 30.0
 decelGround    = 5.0
@@ -253,8 +253,8 @@ function onUpdate(dt)
             footstepTimer = 0.0
         end
     end
-
-    if hasBall then
+    
+    --[[if hasBall then
         local scene = SceneManager:getCurrentScene()
         if scene == nil then return end
         local ball = scene:findEntityByName("Ball")
@@ -275,7 +275,8 @@ function onUpdate(dt)
             + aimDir * spawnForward
 
         bTransform:setWorldPosition(spawnPos)
-    end
+    end]]--
+    
 
     local anyTargets = targetCheck()
     if not doorSpawned and not anyTargets then
@@ -355,7 +356,7 @@ function shootProjectile()
         + aimDir * spawnForward
 
     -- Instantiate projectile
-    local proj = nil
+    --[[local proj = nil
     if not ballCreated then
         proj = SceneManager:instantiate("prefabs/catch_ball.prefab.json")
         if proj == nil then return end
@@ -363,8 +364,10 @@ function shootProjectile()
     else
         proj = scene:findEntityByName("Ball")
         if proj == nil then return end
-    end
+    end]]--
 
+    proj = SceneManager:instantiate("prefabs/catch_ball.prefab.json")
+    if proj == nil then return end
     local projTransform = proj:findTransform()
     if projTransform == nil then return end
 
@@ -393,7 +396,8 @@ function onCollisionEnter(data)
     local tagsA = data.entityA:getTags()
     for _, tag in pairs(tagsA) do
         if tag == "ball" then
-            catchBall(data.entityB)
+            SceneManager:destroy(data.entityA)
+            hasBall = true
         elseif tag == "ground" then
             if not isGrounded then
                 triggerLandingBurst()
@@ -414,7 +418,8 @@ function onCollisionEnter(data)
     local tagsB = data.entityB:getTags()
     for _, tag in pairs(tagsB) do
         if tag == "ball" then
-            catchBall(data.entityB)
+            SceneManager:destroy(data.entityB)
+            hasBall = true
         elseif tag == "ground" then
             if not isGrounded then
                 triggerLandingBurst()
