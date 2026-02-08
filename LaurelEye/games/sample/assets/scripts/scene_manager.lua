@@ -12,8 +12,8 @@ function onUpdate(dt)
         log("Loading Scene: Level2")
         SceneManager:changeScene("Level2")
     elseif Input:isKeyPressed(Key.Three) then
-        log("Loading Scene: PhysicsScene")
-        SceneManager:changeScene("PhysicsScene")
+        log("Loading Scene: Level3")
+        SceneManager:changeScene("Level3")
     elseif Input:isKeyPressed(Key.Four) then
         log("Loading Scene: ParticleScene")
         SceneManager:changeScene("ParticleScene")

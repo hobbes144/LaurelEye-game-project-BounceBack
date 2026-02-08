@@ -5,11 +5,16 @@ body = nil
 destroyed = false
 
 shotTimer = 0.0
-shootingSpeed = 3.0
+shootingSpeed = 3.0 -- Default value
+minShootingSpeed = 2.5
+maxShootingSpeed = 4.0
 
 function onStart()
     transform = self:findTransform()
     body = self:findPhysics()
+
+    shootingSpeed = math.random(minShootingSpeed * 100, maxShootingSpeed * 100) / 100
+
 
 end
 

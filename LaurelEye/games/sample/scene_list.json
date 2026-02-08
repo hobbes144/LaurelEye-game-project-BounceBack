@@ -40,6 +40,10 @@
         {
             "name": "Level2",
             "path": "scenes/level2.scene.json"
+        },
+        {
+            "name": "Level3",
+            "path": "scenes/level3.scene.json"
         }
     ]
 }
