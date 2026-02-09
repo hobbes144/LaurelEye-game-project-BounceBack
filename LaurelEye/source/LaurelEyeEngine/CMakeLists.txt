@@ -1,6 +1,17 @@
 ﻿# Engine library
 # project (LaurelEyeEngine VERSION 0.0.1 DESCRIPTION "Team Laurel GAM55x Engine")
 
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    # Actions specific to the Debug build type
+    message(STATUS "Debug mode detected. Enabling debug-specific actions.")
+    add_compile_definitions(SOL_ALL_SAFETIES_ON)
+elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+    # Actions specific to the Release build type
+    message(STATUS "Release mode detected.")
+endif()
+
+# Using file GLOB to get all file names in case the file isn't added manually
+# to the add_library call.
 file(GLOB_RECURSE ENGINE_SOURCES CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
 )
@@ -18,7 +29,121 @@ find_package(RapidJSON CONFIG REQUIRED)
 find_package(lua CONFIG REQUIRED)
 find_package(sol2 CONFIG REQUIRED)
 
-add_library(LaurelEyeEngine SHARED ${ENGINE_SOURCES} "graphics/renderpass/ShadowSkinnedPass.cpp" "animation/Component/SkeletalAnimationComponent.cpp" "scripting/sol2/bindings/Sol2API_Animation.cpp")
+add_library(LaurelEyeEngine SHARED
+    "audio/AudioAsset.cpp"
+    "audio/AudioSystem.cpp"
+    "audio/FModAudioManager.cpp"
+    "audio/SpeakerComponent.cpp"
+    "core/Engine.cpp"
+    "core/ResourceCoordinator.cpp"
+    "core/SystemCoordinator.cpp"
+    "debugDraw/DebugDrawSystem.cpp"
+    "ecs/EntityFactory.cpp"
+    "graphics/MeshManagerPrimitives.cpp"
+    "graphics/RenderStateSaver.cpp"
+    "graphics/ShaderManager.cpp"
+    "graphics/device/glfw/LGLDataBufferFactory.cpp"
+    "graphics/device/glfw/LGLFramebufferFactory.cpp"
+    "graphics/device/glfw/LGLRenderDevice.cpp"
+    "graphics/device/glfw/LGLRenderState.cpp"
+    "graphics/device/glfw/LGLTextureFactory.cpp"
+    "graphics/device/glfw/LGLVertexArrayFactory.cpp"
+    "graphics/graphics_components/AmbientLightComponent.cpp"
+    "graphics/graphics_components/DirectionalLightComponent.cpp"
+    "graphics/graphics_components/IRenderComponent.cpp"
+    "graphics/graphics_components/LightComponent.cpp"
+    "graphics/graphics_components/PointLightComponent.cpp"
+    "graphics/graphics_components/Renderable2DComponent.cpp"
+    "graphics/graphics_components/Renderable3DComponent.cpp"
+    "graphics/graphics_components/UISliderComponent.cpp"
+    "graphics/graphics_components/CameraComponent.cpp"
+    "graphics/graphics_components/UIButtonComponent.cpp"
+    "graphics/graphics_components/UIComponent.cpp"
+    "graphics/renderpass/DebugDrawRenderPass.cpp"
+    "graphics/renderpass/DeferredRenderPass.cpp"
+    "graphics/renderpass/GBufferPass.cpp"
+    "graphics/renderpass/IRenderPass.cpp"
+    "graphics/renderpass/LocalLightsPass.cpp"
+    "graphics/renderpass/ParticleRenderPass.cpp"
+    "graphics/renderpass/ShadowPass.cpp"
+    "graphics/renderpass/SingleBufferedDataPass.cpp"
+    "graphics/renderpass/SinglePass.cpp"
+    "graphics/renderpass/SinglePassShadow.cpp"
+    "graphics/renderpass/SkydomePass.cpp"
+    "graphics/renderpass/GBufferSkinnedPass.cpp"
+    "graphics/renderpass/ShadowSkinnedPass.cpp"
+    "graphics/renderpass/UIPass.cpp"
+    "graphics/resources/GeometryBuffer.cpp"
+    "graphics/resources/Material.cpp"
+    "graphics/resources/Mesh.cpp"
+    "graphics/resources/RenderResources.cpp"
+    "graphics/resources/Shader.cpp"
+    "graphics/surface/glfw/LGlfwOpenGLWindowSurface.cpp"
+    "graphics/MeshManager.cpp"
+    "graphics/RenderSystem.cpp"
+    "graphics/ShadowManager.cpp"
+    "graphics/SkeletonManager.cpp"
+    "input/GLFWInput.cpp"
+    "input/InputManager.cpp"
+    "io/AssetManager.cpp"
+    "io/FileSystem.cpp"
+    "io/importers/ImageImporter.cpp"
+    "io/importers/JsonImporter.cpp"
+    "io/importers/ShaderImporter.cpp"
+    "io/importers/TextImporter.cpp"
+    "io/importers/MeshImporter.cpp"
+    "math/ArcLengthTable.cpp"
+    "math/CatmullRomSpline.cpp"
+    "math/EngineMath.cpp"
+    "math/Quaternion.cpp"
+    "math/Spline.cpp"
+    "math/Transform.cpp"
+    "math/Vector3.cpp"
+    "math/Matrix4.cpp"
+    "math/VectorTemplated.cpp"
+    "memory/MemoryManager.cpp"
+    "particles/ParticleEmitterComponent.cpp"
+    "particles/ParticleSystem.cpp"
+    "physics/CollisionManager.cpp"
+    "physics/interfaces/Bullet/BulletBody.cpp"
+    "physics/interfaces/Bullet/BulletShape.cpp"
+    "physics/interfaces/Bullet/BulletWorld.cpp"
+    "physics/PhysicsBodyComponent.cpp"
+    "physics/PhysicsQueryAPI.cpp"
+    "physics/PhysicsSystem.cpp"
+    "platforms/glfw/GlfwPlatform.cpp"
+    "scene/SceneManager.cpp"
+    "scene/Scene.cpp"
+    "scripting/ScriptSystem.cpp"
+    "scripting/sol2/Sol2State.cpp"
+    "scripting/sol2/bindings/Sol2API_Audio.cpp"
+    "scripting/sol2/bindings/Sol2API_Input.cpp"
+    "scripting/sol2/bindings/Sol2API_Lights.cpp"
+    "scripting/sol2/bindings/Sol2API_Particles.cpp"
+    "scripting/sol2/bindings/Sol2API_Renderable.cpp"
+    "scripting/sol2/bindings/Sol2API_Scene.cpp"
+    "scripting/sol2/bindings/Sol2API_Spline.cpp"
+    "scripting/sol2/bindings/Sol2API_Transform.cpp"
+    "scripting/sol2/bindings/Sol2API_Camera.cpp"
+    "scripting/sol2/bindings/Sol2API_Math2.cpp"
+    "scripting/sol2/bindings/Sol2API_Physics.cpp"
+    "scripting/sol2/bindings/Sol2API_Animation.cpp"
+    "scripting/sol2/bindings/Sol2API_ECS.cpp"
+    "scripting/sol2/bindings/Sol2API_Math.cpp"
+    "scripting/sol2/bindings/Sol2API_UI.cpp"
+    "scripting/sol2/Sol2API.cpp"
+    "scripting/sol2/Sol2ScriptInstance.cpp"
+    "transform/TransformSystem.cpp"
+    "window/glfw/LGlfwWindow.cpp"
+    "window/WindowManager.cpp"
+    "UI/UIComponents/UIRenderComponent.cpp"
+    "UI/UIComponents/UITransformComponent.cpp"
+    "UI/UILayoutSystem.cpp"
+    "animation/AnimationManager.cpp"
+    "animation/Component/SkeletalAnimationComponent.cpp"
+    "animation/AnimationSystem.cpp"
+    ${ENGINE_SOURCES}
+)
 
 le_add_fmod(LaurelEyeEngine USE_STUDIO)
 

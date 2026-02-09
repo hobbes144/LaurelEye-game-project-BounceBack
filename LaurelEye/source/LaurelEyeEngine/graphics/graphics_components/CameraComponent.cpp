@@ -9,28 +9,6 @@
 #include "LaurelEyeEngine/graphics/resources/Camera.h"
 #include "LaurelEyeEngine/math/Vector3.h"
 
-#include <source_location>
-
-inline void warn_impl(std::string_view expr,
-                      std::string_view msg = {},
-                      std::source_location loc = std::source_location::current()) {
-    std::cerr << "[warn] " << loc.file_name() << ':' << loc.line()
-              << " in " << loc.function_name()
-              << " — condition '" << expr << "' failed"
-              << (msg.empty() ? "" : ": ") << msg << '\n';
-}
-
-#define WARN_IF(cond, ...)                                             \
-    do {                                                               \
-        if ( (cond) ) warn_impl(#cond, std::string_view{__VA_ARGS__}); \
-    } while ( 0 )
-
-#ifndef NDEBUG
-#define DEBUG_WARN_IF(cond, ...) WARN_IF(cond, __VA_ARGS__)
-#else
-#define DEBUG_WARN_IF(cond, ...) ((void)0)
-#endif
-
 namespace LaurelEye::Graphics {
 
     CameraComponent::CameraComponent()

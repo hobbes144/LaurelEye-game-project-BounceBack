@@ -2,6 +2,7 @@
 #include "LaurelEyeEngine/core/ResourceCoordinator.h"
 #include "LaurelEyeEngine/core/SystemCoordinator.h"
 #include "LaurelEyeEngine/framerate/FramerateController.h"
+#include "LaurelEyeEngine/logging/EngineLog.h"
 
 #include <iostream>
 
@@ -26,6 +27,7 @@ namespace LaurelEye {
 
         while ( isRunning && !currentWindow->shouldClose() ) {
             frameController->startFrame();
+            LaurelEye::Log::set_frame(frameController->getFrameCount());
 
             // --- Fixed timestep physics loop ---
             while ( frameController->shouldUpdatePhysics() ) {

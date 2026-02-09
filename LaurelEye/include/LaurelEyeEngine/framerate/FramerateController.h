@@ -14,7 +14,9 @@
 /// © 2025 DIGIPEN Institute of Technology. All rights reserved.
 #pragma once
 
+#if defined(ENABLE_RATE_CONTROLLERS) || defined(ENABLE_ADDITIONAL_ACCUMULATORS)
 #include <vector>
+#endif
 
 /// \class FramerateController
 /// \brief Controls frame timing and framerate-independent updates.
@@ -35,6 +37,7 @@ public:
     void endFrame();
 
     // Frame info
+    long long getFrameCount() { return frameCount; };
     T getFPS();
     T getRenderTime();
     T getFrameTime();
