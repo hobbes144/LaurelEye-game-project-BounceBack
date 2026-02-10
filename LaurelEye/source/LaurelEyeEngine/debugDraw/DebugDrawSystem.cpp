@@ -138,7 +138,10 @@ namespace LaurelEye::Debug {
             case DebugDrawType::Normal:
                 addLine(attributes, cmd.position, cmd.position + cmd.direction * cmd.size.x, cmd.color);
                 break;
-
+            case DebugDrawType::Capsule:
+                // Call a function to add capsule wireframe lines
+                addCapsule(attributes, cmd.position, cmd.size, cmd.radius, cmd.rotation, cmd.color);
+                break;
             default:
                 break;
             }
@@ -240,4 +243,132 @@ namespace LaurelEye::Debug {
         addLine(attr, end, end - dir.normalized() * 0.2f - up, color);
     }
 
+    // Debug drawing the dark wizard created for capsules so I could see them, have Nick/Anish look at it
+    void DebugDrawSystem::addCapsule(Graphics::GeometryBuffer::ModifiableAttributes& attr,
+                                     const Vector3& center, const Vector3& size, float radius,
+                                     const Quaternion& rotation, const Vector3& color) {
+        if ( currentDebugLines >= MaxDebugLines )
+            return;
+
+        const float PI = 3.14159265358979323846f;
+        const int segments = 16; // around circumference
+        const int latSegs = 6;   // hemisphere latitude slices
+
+        const float cylinderHeight = std::max(0.0f, size.y);
+        const float totalHeight = cylinderHeight + 2.0f * radius;
+
+        // sphere centers are offset from the capsule center by half the cylinder height
+        float sphereCenterOffset = cylinderHeight * 0.5f;
+
+        // sphere centers in world (apply rotation)
+        Vector3 topCenter = center + rotation * Vector3(0.0f, sphereCenterOffset, 0.0f);
+        Vector3 bottomCenter = center - rotation * Vector3(0.0f, sphereCenterOffset, 0.0f);
+
+        // --- Draw circles at top and bottom (equator of each sphere / cylinder caps) ---
+        auto drawCircle = [&](const Vector3& c, float r, bool connectToNextRing, const std::vector<Vector3>* nextRing = nullptr) {
+            // circle in local XZ plane, transformed by rotation
+            std::vector<Vector3> points;
+            points.resize(segments);
+            for ( int i = 0; i < segments; ++i ) {
+                float a = (float)i / (float)segments * 2.0f * PI;
+                Vector3 local = Vector3(std::cos(a) * r, 0.0f, std::sin(a) * r);
+                points[i] = rotation * local + c;
+            }
+            // ring lines
+            for ( int i = 0; i < segments; ++i ) {
+                int ni = (i + 1) % segments;
+                if ( currentDebugLines >= MaxDebugLines ) return;
+                addLine(attr, points[i], points[ni], color);
+            }
+            // connect to next ring if provided (used for connecting lat rings / cylinder)
+            if ( connectToNextRing && nextRing && nextRing->size() == (size_t)segments ) {
+                for ( int i = 0; i < segments; ++i ) {
+                    if ( currentDebugLines >= MaxDebugLines ) return;
+                    addLine(attr, points[i], (*nextRing)[i], color);
+                }
+            }
+        };
+
+        // Precompute ring points per latitude for top hemisphere and bottom hemisphere
+        std::vector<std::vector<Vector3>> topRings;
+        std::vector<std::vector<Vector3>> bottomRings;
+
+        // Equator ring (where cylinder meets spheres)
+        std::vector<Vector3> topEquator(segments), bottomEquator(segments);
+        for ( int i = 0; i < segments; ++i ) {
+            float a = (float)i / (float)segments * 2.0f * PI;
+            Vector3 local = Vector3(std::cos(a) * radius, 0.0f, std::sin(a) * radius);
+            topEquator[i] = rotation * local + topCenter;
+            bottomEquator[i] = rotation * local + bottomCenter;
+        }
+
+        topRings.push_back(topEquator);
+        bottomRings.push_back(bottomEquator);
+
+        // Hemisphere latitude rings (excluding pole) for top and bottom
+        for ( int lat = 1; lat <= latSegs; ++lat ) {
+            float t = (float)lat / (float)latSegs; // 0..1
+            // theta from 0 (equator) -> PI/2 (pole)
+            float theta = t * (PI * 0.5f);
+            float ringR = std::cos(theta) * radius;
+            float yOff = std::sin(theta) * radius; // distance from sphere center to ring along local +Y
+
+            // Top hemisphere ring center is topCenter + (0, yOff, 0)
+            Vector3 ringCenterTop = topCenter + rotation * Vector3(0.0f, yOff, 0.0f);
+            Vector3 ringCenterBottom = bottomCenter - rotation * Vector3(0.0f, yOff, 0.0f);
+
+            std::vector<Vector3> ringTop(segments), ringBottom(segments);
+            for ( int i = 0; i < segments; ++i ) {
+                float a = (float)i / (float)segments * 2.0f * PI;
+                Vector3 local = Vector3(std::cos(a) * ringR, 0.0f, std::sin(a) * ringR);
+                ringTop[i] = rotation * local + ringCenterTop;
+                ringBottom[i] = rotation * local + ringCenterBottom;
+            }
+            topRings.push_back(std::move(ringTop));
+            bottomRings.push_back(std::move(ringBottom));
+        }
+
+        // --- Draw cylinder body: connect topEquator to bottomEquator and draw both rings ---
+        for ( int i = 0; i < segments; ++i ) {
+            if ( currentDebugLines >= MaxDebugLines ) return;
+            int ni = (i + 1) % segments;
+            addLine(attr, topEquator[i], topEquator[ni], color);
+            if ( currentDebugLines >= MaxDebugLines ) return;
+            addLine(attr, bottomEquator[i], bottomEquator[ni], color);
+            // connect top->bottom to show cylinder sides
+            if ( currentDebugLines >= MaxDebugLines ) return;
+            addLine(attr, topEquator[i], bottomEquator[i], color);
+        }
+
+        // --- Draw hemisphere rings and longitudinal connections ---
+        for ( size_t ringIdx = 0; ringIdx + 1 < topRings.size(); ++ringIdx ) {
+            const auto& ringA = topRings[ringIdx];
+            const auto& ringB = topRings[ringIdx + 1];
+            // ring circles
+            for ( int i = 0; i < segments; ++i ) {
+                if ( currentDebugLines >= MaxDebugLines ) return;
+                int ni = (i + 1) % segments;
+                addLine(attr, ringA[i], ringA[ni], color);
+            }
+            // connect corresponding points between consecutive rings (longitudinal lines)
+            for ( int i = 0; i < segments; ++i ) {
+                if ( currentDebugLines >= MaxDebugLines ) return;
+                addLine(attr, ringA[i], ringB[i], color);
+            }
+        }
+
+        for ( size_t ringIdx = 0; ringIdx + 1 < bottomRings.size(); ++ringIdx ) {
+            const auto& ringA = bottomRings[ringIdx];
+            const auto& ringB = bottomRings[ringIdx + 1];
+            for ( int i = 0; i < segments; ++i ) {
+                if ( currentDebugLines >= MaxDebugLines ) return;
+                int ni = (i + 1) % segments;
+                addLine(attr, ringA[i], ringA[ni], color);
+            }
+            for ( int i = 0; i < segments; ++i ) {
+                if ( currentDebugLines >= MaxDebugLines ) return;
+                addLine(attr, ringA[i], ringB[i], color);
+            }
+        }
+    }
 } // namespace LaurelEye::Debug

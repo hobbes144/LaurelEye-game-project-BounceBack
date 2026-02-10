@@ -3,6 +3,7 @@ namespace LaurelEye {
     enum class Key {
         Space,
         Escape,
+        LShift,
 
         arrowDown,
         arrowUp,

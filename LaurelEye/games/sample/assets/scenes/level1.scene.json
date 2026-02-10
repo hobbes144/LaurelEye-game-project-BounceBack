@@ -11,7 +11,7 @@
                 "Transform": {
                     "position": [ 0.0, -1.0, 0.0 ],
                     "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 200.0, 2.0, 200.0 ]
+                    "scale": [ 100.0, 2.0, 100.0 ]
                 },
                 "Render3D": {
                     "mesh": {
@@ -51,9 +51,9 @@
             "tags": [ "ground" ],
             "components": {
                 "Transform": {
-                    "position": [ 0.0, 0.0, 100.0 ],
+                    "position": [ 0.0, 25.0, 50.0 ],
                     "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 200.0, 200.0, 2.0 ]
+                    "scale": [ 100.0, 50.0, 2.0 ]
                 },
                 "Render3D": {
                     "mesh": {
@@ -93,9 +93,9 @@
             "tags": [ "ground" ],
             "components": {
                 "Transform": {
-                    "position": [ 0.0, 0.0, -100.0 ],
+                    "position": [ 0.0, 25.0, -50.0 ],
                     "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 200.0, 200.0, 2.0 ]
+                    "scale": [ 100.0, 50.0, 2.0 ]
                 },
                 "Render3D": {
                     "mesh": {
@@ -135,9 +135,9 @@
             "tags": [ "ground" ],
             "components": {
                 "Transform": {
-                    "position": [ 100.0, 0.0, 0.0 ],
+                    "position": [ 50.0, 25.0, 0.0 ],
                     "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 2.0, 200.0, 200.0 ]
+                    "scale": [ 2.0, 50.0, 100.0 ]
                 },
                 "Render3D": {
                     "mesh": {
@@ -177,9 +177,9 @@
             "tags": [ "ground" ],
             "components": {
                 "Transform": {
-                    "position": [ -100.0, 0.0, 0.0 ],
+                    "position": [ -50.0, 25.0, 0.0 ],
                     "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 2.0, 200.0, 200.0 ]
+                    "scale": [ 2.0, 50.0, 100.0 ]
                 },
                 "Render3D": {
                     "mesh": {
@@ -219,9 +219,9 @@
             "tags": [ "ground" ],
             "components": {
                 "Transform": {
-                    "position": [ 0.0, 80.0, 0.0 ],
+                    "position": [ 0.0, 50.0, 0.0 ],
                     "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 200.0, 2.0, 200.0 ]
+                    "scale": [ 100.0, 2.0, 100.0 ]
                 },
                 "Render3D": {
                     "mesh": {
@@ -261,9 +261,9 @@
             "tags": [ "target" ],
             "components": {
                 "Transform": {
-                    "position": [ -60.0, 30.0, -80.0 ],
+                    "position": [ -20.0, 5.0, -48.0 ],
                     "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 20.0, 20.0, 2.0 ]
+                    "scale": [ 20.0, 10.0, 2.0 ]
                 },
                 "Render3D": {
                     "mesh": {
@@ -306,9 +306,9 @@
             "tags": [ "target" ],
             "components": {
                 "Transform": {
-                    "position": [ 80.0, 30.0, 60.0 ],
+                    "position": [ -48.0, 5.0, 20.0 ],
                     "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 2.0, 20.0, 20.0 ]
+                    "scale": [ 2.0, 10.0, 20.0 ]
                 },
                 "Render3D": {
                     "mesh": {
@@ -351,9 +351,9 @@
             "tags": [ "target" ],
             "components": {
                 "Transform": {
-                    "position": [ 80.0, 30.0, -60.0 ],
+                    "position": [ -48.0, 5.0, -20.0 ],
                     "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 2.0, 20.0, 20.0 ]
+                    "scale": [ 2.0, 10.0, 20.0 ]
                 },
                 "Render3D": {
                     "mesh": {
@@ -396,9 +396,9 @@
             "tags": [ "target" ],
             "components": {
                 "Transform": {
-                    "position": [ 60.0, 30.0, -80.0 ],
+                    "position": [ 20.0, 5.0, -48.0 ],
                     "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 20.0, 20.0, 2.0 ]
+                    "scale": [ 20.0, 10.0, 2.0 ]
                 },
                 "Render3D": {
                     "mesh": {
@@ -437,59 +437,92 @@
             }
         },
         {
-            "name": "HCrosshair",
+            "name": "Target5",
+            "tags": [ "target" ],
             "components": {
-                "UITransform": {
-                    "anchorMin": [ 0.5, 0.5 ],
-                    "anchorMax": [ 0.5, 0.5 ],
-                    "pivot": [ 0.5, 0.5 ],
-                    "offset": [ -50, 0 ],
-                    "size": [ 20, 2 ]
+                "Transform": {
+                    "position": [ 48.0, 5.0, 20.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 2.0, 10.0, 20.0 ]
                 },
-                "UIRender": {
-                    "material": {
-                        "texture": "textures/texture_01_light.png",
-                        "layer": 10
+                "Render3D": {
+                    "mesh": {
+                        "name": "cubeMesh",
+                        "primitiveType": "Cube"
                     },
-                    "transparency": 0.5
+                    "material": {
+                        "texture": "textures/texture_01_purple.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        }
+                    },
+                    "mass": 0.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.5,
+                    "restitution": 0.0,
+                    "collisionGroup": 2,
+                    "collisionMask": 11,
+                    "gravityScale": 0.0
+                },
+                "Script": {
+                    "path": "scripts/target_script.lua"
                 }
             }
         },
         {
-            "name": "VCrosshair",
+            "name": "Target6",
+            "tags": [ "target" ],
             "components": {
-                "UITransform": {
-                    "anchorMin": [ 0.5, 0.5 ],
-                    "anchorMax": [ 0.5, 0.5 ],
-                    "pivot": [ 0.5, 0.5 ],
-                    "offset": [ -50, 0 ],
-                    "size": [ 2, 20 ]
+                "Transform": {
+                    "position": [ 48.0, 5.0, -20.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 2.0, 10.0, 20.0 ]
                 },
-                "UIRender": {
-                    "material": {
-                        "texture": "textures/texture_01_light.png",
-                        "layer": 10
+                "Render3D": {
+                    "mesh": {
+                        "name": "cubeMesh",
+                        "primitiveType": "Cube"
                     },
-                    "transparency": 0.5
-                }
-            }
-        },
-        {
-            "name": "HealthBar",
-            "components": {
-                "UITransform": {
-                    "anchorMin": [ 0.0, 1.0 ],
-                    "anchorMax": [ 0.0, 1.0 ],
-                    "pivot": [ 0.0, 1.0 ],
-                    "offset": [ 50, -50 ],
-                    "size": [ 100, 20 ]
+                    "material": {
+                        "texture": "textures/texture_01_purple.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
                 },
-                "UIRender": {
-                    "material": {
-                        "texture": "textures/texture_01_green.png",
-                        "layer": 10
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
+                        }
                     },
-                    "transparency": 1.0
+                    "mass": 0.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.5,
+                    "restitution": 0.0,
+                    "collisionGroup": 2,
+                    "collisionMask": 11,
+                    "gravityScale": 0.0
+                },
+                "Script": {
+                    "path": "scripts/target_script.lua"
                 }
             }
         },
@@ -540,53 +573,59 @@
             }
         },
         {
-            "name": "HealthUI1",
+            "name": "HCrosshair",
             "components": {
-                "Transform": {
-                    "position": [ -0.9, 0.9, 0.0 ],
-                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 50.0, 50.0, 0.0 ]
+                "UITransform": {
+                    "anchorMin": [ 0.5, 0.5 ],
+                    "anchorMax": [ 0.5, 0.5 ],
+                    "pivot": [ 0.5, 0.5 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 20, 2 ]
                 },
-                "UI": {
-                    "name": "HealthUI1",
+                "UIRender": {
                     "material": {
-                        "texture": "textures/Heart.jpg",
-                        "transparency": 1.0
-                    }
+                        "texture": "textures/texture_01_light.png",
+                        "layer": 10
+                    },
+                    "transparency": 0.5
                 }
             }
         },
         {
-            "name": "HealthUI2",
+            "name": "VCrosshair",
             "components": {
-                "Transform": {
-                    "position": [ -0.8, 0.9, 0.0 ],
-                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 50.0, 50.0, 0.0 ]
+                "UITransform": {
+                    "anchorMin": [ 0.5, 0.5 ],
+                    "anchorMax": [ 0.5, 0.5 ],
+                    "pivot": [ 0.5, 0.5 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 2, 20 ]
                 },
-                "UI": {
-                    "name": "HealthUI2",
+                "UIRender": {
                     "material": {
-                        "texture": "textures/Heart.jpg",
-                        "transparency": 1.0
-                    }
+                        "texture": "textures/texture_01_light.png",
+                        "layer": 10
+                    },
+                    "transparency": 0.5
                 }
             }
         },
         {
-            "name": "HealthUI3",
+            "name": "HealthBar",
             "components": {
-                "Transform": {
-                    "position": [ -0.7, 0.9, 0.0 ],
-                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 50.0, 50.0, 0.0 ]
+                "UITransform": {
+                    "anchorMin": [ 0.0, 1.0 ],
+                    "anchorMax": [ 0.0, 1.0 ],
+                    "pivot": [ 0.0, 1.0 ],
+                    "offset": [ 30, -30 ],
+                    "size": [ 160, 30 ]
                 },
-                "UI": {
-                    "name": "HealthUI3",
+                "UIRender": {
                     "material": {
-                        "texture": "textures/Heart.jpg",
-                        "transparency": 1.0
-                    }
+                        "texture": "textures/texture_01_green.png",
+                        "layer": 10
+                    },
+                    "transparency": 1.0
                 }
             }
         },

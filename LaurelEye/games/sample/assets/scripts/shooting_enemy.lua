@@ -9,6 +9,8 @@ shootingSpeed = 3.0 -- Default value
 minShootingSpeed = 2.5
 maxShootingSpeed = 4.0
 
+active = false
+
 function onStart()
     transform = self:findTransform()
     body = self:findPhysics()
@@ -19,8 +21,12 @@ function onStart()
 end
 
 function onUpdate(dt)
-    rotateTowardsPlayer(dt)
-    autoShootProjectile(dt)
+    if active then
+        rotateTowardsPlayer(dt)
+        autoShootProjectile(dt)
+    else
+        ballCheck()
+    end
 end
 
 function onCollisionEnter(data)
@@ -144,4 +150,13 @@ function destroySelf()
     if destroyed then return end
     destroyed = true
     SceneManager:destroy(self)
+end
+
+function ballCheck()
+    local scene = SceneManager:getCurrentScene()
+    if scene == nil then return end
+    local ball = scene:findEntityByName("Ball")
+    if ball ~= nil then
+        active = true
+    end
 end

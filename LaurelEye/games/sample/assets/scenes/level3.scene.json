@@ -279,14 +279,14 @@
                 "Physics": {
                     "type": "Dynamic",
                     "shapeDefinition": {
-                        "type": "Box",
+                        "type": "Capsule",
                         "size": {
-                            "x": 40.0,
-                            "y": 100.0,
-                            "z": 40.0
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
                         },
-                        "radius": 0.5,
-                        "height": 1.0
+                        "radius": 20.0,
+                        "height": 70.0
                     },
                     "mass": 1.0,
                     "linearVelocity": {
@@ -306,7 +306,7 @@
                     },
                     "centerOfMass": {
                         "x": 0.0,
-                        "y": 4.0,
+                        "y": 4.5,
                         "z": 0.0
                     },
                     "linearDamping": 0.5,
@@ -348,14 +348,14 @@
                 "Physics": {
                     "type": "Dynamic",
                     "shapeDefinition": {
-                        "type": "Box",
+                        "type": "Capsule",
                         "size": {
-                            "x": 40.0,
-                            "y": 100.0,
-                            "z": 40.0
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
                         },
-                        "radius": 0.5,
-                        "height": 1.0
+                        "radius": 20.0,
+                        "height": 70.0
                     },
                     "mass": 1.0,
                     "linearVelocity": {
@@ -375,7 +375,7 @@
                     },
                     "centerOfMass": {
                         "x": 0.0,
-                        "y": 4.0,
+                        "y": 4.5,
                         "z": 0.0
                     },
                     "linearDamping": 0.5,
@@ -425,14 +425,14 @@
                 "Physics": {
                     "type": "Dynamic",
                     "shapeDefinition": {
-                        "type": "Box",
+                        "type": "Capsule",
                         "size": {
-                            "x": 40.0,
-                            "y": 100.0,
-                            "z": 40.0
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
                         },
-                        "radius": 0.5,
-                        "height": 1.0
+                        "radius": 20.0,
+                        "height": 70.0
                     },
                     "mass": 1.0,
                     "linearVelocity": {
@@ -452,7 +452,7 @@
                     },
                     "centerOfMass": {
                         "x": 0.0,
-                        "y": 4.0,
+                        "y": 4.5,
                         "z": 0.0
                     },
                     "linearDamping": 0.5,
@@ -502,14 +502,14 @@
                 "Physics": {
                     "type": "Dynamic",
                     "shapeDefinition": {
-                        "type": "Box",
+                        "type": "Capsule",
                         "size": {
-                            "x": 40.0,
-                            "y": 100.0,
-                            "z": 40.0
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
                         },
-                        "radius": 0.5,
-                        "height": 1.0
+                        "radius": 20.0,
+                        "height": 70.0
                     },
                     "mass": 1.0,
                     "linearVelocity": {
@@ -529,7 +529,7 @@
                     },
                     "centerOfMass": {
                         "x": 0.0,
-                        "y": 4.0,
+                        "y": 4.5,
                         "z": 0.0
                     },
                     "linearDamping": 0.5,
@@ -561,9 +561,9 @@
             "tags": [ "target" ],
             "components": {
                 "Transform": {
-                    "position": [ 60.0, 30.0, -80.0 ],
+                    "position": [ 60.0, 5.0, -98.0 ],
                     "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 20.0, 20.0, 2.0 ]
+                    "scale": [ 20.0, 10.0, 2.0 ]
                 },
                 "Render3D": {
                     "mesh": {
@@ -606,9 +606,9 @@
             "tags": [ "target" ],
             "components": {
                 "Transform": {
-                    "position": [ -60.0, 30.0, -80.0 ],
+                    "position": [ -60.0, 5.0, -98.0 ],
                     "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 20.0, 20.0, 2.0 ]
+                    "scale": [ 20.0, 10.0, 2.0 ]
                 },
                 "Render3D": {
                     "mesh": {
@@ -651,9 +651,9 @@
             "tags": [ "target" ],
             "components": {
                 "Transform": {
-                    "position": [ 0.0, 30.0, -80.0 ],
+                    "position": [ 0.0, 5.0, -98.0 ],
                     "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 20.0, 20.0, 2.0 ]
+                    "scale": [ 20.0, 10.0, 2.0 ]
                 },
                 "Render3D": {
                     "mesh": {
@@ -745,7 +745,7 @@
                     "anchorMin": [ 0.5, 0.5 ],
                     "anchorMax": [ 0.5, 0.5 ],
                     "pivot": [ 0.5, 0.5 ],
-                    "offset": [ -50, 0 ],
+                    "offset": [ 0, 0 ],
                     "size": [ 20, 2 ]
                 },
                 "UIRender": {
@@ -764,7 +764,7 @@
                     "anchorMin": [ 0.5, 0.5 ],
                     "anchorMax": [ 0.5, 0.5 ],
                     "pivot": [ 0.5, 0.5 ],
-                    "offset": [ -50, 0 ],
+                    "offset": [ 0, 0 ],
                     "size": [ 2, 20 ]
                 },
                 "UIRender": {
@@ -783,8 +783,8 @@
                     "anchorMin": [ 0.0, 1.0 ],
                     "anchorMax": [ 0.0, 1.0 ],
                     "pivot": [ 0.0, 1.0 ],
-                    "offset": [ 50, -50 ],
-                    "size": [ 100, 20 ]
+                    "offset": [ 30, -30 ],
+                    "size": [ 160, 30 ]
                 },
                 "UIRender": {
                     "material": {

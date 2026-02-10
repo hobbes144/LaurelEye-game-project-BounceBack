@@ -88,6 +88,9 @@ function isGround(entity)
         if tag == "target" then
             return true
         end
+        if tag == "door" then
+            return true
+        end
         if tag == "player" then
             bounceCount = 0
         end

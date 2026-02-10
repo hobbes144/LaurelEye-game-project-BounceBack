@@ -182,6 +182,8 @@ namespace LaurelEye {
             return GLFW_KEY_SPACE;
         case Key::Escape:
             return GLFW_KEY_ESCAPE;
+        case Key::LShift:
+            return GLFW_KEY_LEFT_SHIFT;
         case Key::arrowDown:
             return GLFW_KEY_DOWN;
         case Key::arrowUp:

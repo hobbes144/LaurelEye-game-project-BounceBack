@@ -11,7 +11,7 @@
                 "Transform": {
                     "position": [ 0.0, -1.0, 0.0 ],
                     "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 200.0, 2.0, 200.0 ]
+                    "scale": [ 150.0, 2.0, 150.0 ]
                 },
                 "Render3D": {
                     "mesh": {
@@ -51,9 +51,9 @@
             "tags": [ "ground" ],
             "components": {
                 "Transform": {
-                    "position": [ 0.0, 0.0, 100.0 ],
+                    "position": [ 0.0, 30.0, 75.0 ],
                     "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 200.0, 200.0, 2.0 ]
+                    "scale": [ 150.0, 60.0, 2.0 ]
                 },
                 "Render3D": {
                     "mesh": {
@@ -93,9 +93,9 @@
             "tags": [ "ground" ],
             "components": {
                 "Transform": {
-                    "position": [ 0.0, 0.0, -100.0 ],
+                    "position": [ 0.0, 30.0, -75.0 ],
                     "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 200.0, 200.0, 2.0 ]
+                    "scale": [ 150.0, 60.0, 2.0 ]
                 },
                 "Render3D": {
                     "mesh": {
@@ -135,9 +135,9 @@
             "tags": [ "ground" ],
             "components": {
                 "Transform": {
-                    "position": [ 100.0, 0.0, 0.0 ],
+                    "position": [ 75.0, 30.0, 0.0 ],
                     "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 2.0, 200.0, 200.0 ]
+                    "scale": [ 2.0, 60.0, 150.0 ]
                 },
                 "Render3D": {
                     "mesh": {
@@ -177,9 +177,9 @@
             "tags": [ "ground" ],
             "components": {
                 "Transform": {
-                    "position": [ -100.0, 0.0, 0.0 ],
+                    "position": [ -75.0, 30.0, 0.0 ],
                     "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 2.0, 200.0, 200.0 ]
+                    "scale": [ 2.0, 60.0, 150.0 ]
                 },
                 "Render3D": {
                     "mesh": {
@@ -219,9 +219,9 @@
             "tags": [ "ground" ],
             "components": {
                 "Transform": {
-                    "position": [ 0.0, 80.0, 0.0 ],
+                    "position": [ 0.0, 60.0, 0.0 ],
                     "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 200.0, 2.0, 200.0 ]
+                    "scale": [ 150.0, 2.0, 150.0 ]
                 },
                 "Render3D": {
                     "mesh": {
@@ -261,7 +261,7 @@
             "tags": [ "target" ],
             "components": {
                 "Transform": {
-                    "position": [ 20.0, 0.0, 0.0 ],
+                    "position": [ 30.0, 0.0, 10.0 ],
                     "rotation": [ 0.0, 0.0, -1.0, 0.0 ],
                     "scale": [ 0.08, 0.08, 0.08 ]
                 },
@@ -279,14 +279,14 @@
                 "Physics": {
                     "type": "Dynamic",
                     "shapeDefinition": {
-                        "type": "Box",
+                        "type": "Capsule",
                         "size": {
-                            "x": 40.0,
-                            "y": 100.0,
-                            "z": 40.0
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
                         },
-                        "radius": 0.5,
-                        "height": 1.0
+                        "radius": 20.0,
+                        "height": 70.0
                     },
                     "mass": 1.0,
                     "linearVelocity": {
@@ -306,7 +306,7 @@
                     },
                     "centerOfMass": {
                         "x": 0.0,
-                        "y": 4.0,
+                        "y": 4.5,
                         "z": 0.0
                     },
                     "linearDamping": 0.5,
@@ -330,7 +330,7 @@
             "tags": [ "target" ],
             "components": {
                 "Transform": {
-                    "position": [ -20.0, 0.0, 0.0 ],
+                    "position": [ -30.0, 0.0, 10.0 ],
                     "rotation": [ 0.0, 0.0, -1.0, 0.0 ],
                     "scale": [ 0.08, 0.08, 0.08 ]
                 },
@@ -348,14 +348,14 @@
                 "Physics": {
                     "type": "Dynamic",
                     "shapeDefinition": {
-                        "type": "Box",
+                        "type": "Capsule",
                         "size": {
-                            "x": 40.0,
-                            "y": 100.0,
-                            "z": 40.0
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
                         },
-                        "radius": 0.5,
-                        "height": 1.0
+                        "radius": 20.0,
+                        "height": 70.0
                     },
                     "mass": 1.0,
                     "linearVelocity": {
@@ -375,7 +375,7 @@
                     },
                     "centerOfMass": {
                         "x": 0.0,
-                        "y": 4.0,
+                        "y": 4.5,
                         "z": 0.0
                     },
                     "linearDamping": 0.5,
@@ -407,7 +407,7 @@
             "tags": [ "target" ],
             "components": {
                 "Transform": {
-                    "position": [ 0.0, 0.0, 20.0 ],
+                    "position": [ 0.0, 0.0, -30.0 ],
                     "rotation": [ 0.0, 0.0, -1.0, 0.0 ],
                     "scale": [ 0.08, 0.08, 0.08 ]
                 },
@@ -425,14 +425,14 @@
                 "Physics": {
                     "type": "Dynamic",
                     "shapeDefinition": {
-                        "type": "Box",
+                        "type": "Capsule",
                         "size": {
-                            "x": 40.0,
-                            "y": 100.0,
-                            "z": 40.0
+                            "x": 1.0,
+                            "y": 1.0,
+                            "z": 1.0
                         },
-                        "radius": 0.5,
-                        "height": 1.0
+                        "radius": 20.0,
+                        "height": 70.0
                     },
                     "mass": 1.0,
                     "linearVelocity": {
@@ -452,7 +452,7 @@
                     },
                     "centerOfMass": {
                         "x": 0.0,
-                        "y": 4.0,
+                        "y": 4.5,
                         "z": 0.0
                     },
                     "linearDamping": 0.5,
@@ -486,7 +486,7 @@
                     "anchorMin": [ 0.5, 0.5 ],
                     "anchorMax": [ 0.5, 0.5 ],
                     "pivot": [ 0.5, 0.5 ],
-                    "offset": [ -50, 0 ],
+                    "offset": [ 0, 0 ],
                     "size": [ 20, 2 ]
                 },
                 "UIRender": {
@@ -505,7 +505,7 @@
                     "anchorMin": [ 0.5, 0.5 ],
                     "anchorMax": [ 0.5, 0.5 ],
                     "pivot": [ 0.5, 0.5 ],
-                    "offset": [ -50, 0 ],
+                    "offset": [ 0, 0 ],
                     "size": [ 2, 20 ]
                 },
                 "UIRender": {
@@ -524,8 +524,8 @@
                     "anchorMin": [ 0.0, 1.0 ],
                     "anchorMax": [ 0.0, 1.0 ],
                     "pivot": [ 0.0, 1.0 ],
-                    "offset": [ 50, -50 ],
-                    "size": [ 100, 20 ]
+                    "offset": [ 30, -30 ],
+                    "size": [ 160, 30 ]
                 },
                 "UIRender": {
                     "material": {
@@ -580,57 +580,6 @@
                     "type": "Ambient",
                     "intensity": 0.3,
                     "color": [ 1.0, 1.0, 1.0 ]
-                }
-            }
-        },
-        {
-            "name": "HealthUI1",
-            "components": {
-                "Transform": {
-                    "position": [ -0.9, 0.9, 0.0 ],
-                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 50.0, 50.0, 0.0 ]
-                },
-                "UI": {
-                    "name": "HealthUI1",
-                    "material": {
-                        "texture": "textures/Heart.jpg",
-                        "transparency": 1.0
-                    }
-                }
-            }
-        },
-        {
-            "name": "HealthUI2",
-            "components": {
-                "Transform": {
-                    "position": [ -0.8, 0.9, 0.0 ],
-                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 50.0, 50.0, 0.0 ]
-                },
-                "UI": {
-                    "name": "HealthUI2",
-                    "material": {
-                        "texture": "textures/Heart.jpg",
-                        "transparency": 1.0
-                    }
-                }
-            }
-        },
-        {
-            "name": "HealthUI3",
-            "components": {
-                "Transform": {
-                    "position": [ -0.7, 0.9, 0.0 ],
-                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 50.0, 50.0, 0.0 ]
-                },
-                "UI": {
-                    "name": "HealthUI3",
-                    "material": {
-                        "texture": "textures/Heart.jpg",
-                        "transparency": 1.0
-                    }
                 }
             }
         },

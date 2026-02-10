@@ -17,6 +17,7 @@ namespace LaurelEye::Scripting {
         lua.new_enum("Key",
                      "Space", Key::Space,
                      "Escape", Key::Escape,
+                     "LShift", Key::LShift,
 
                      "ArrowDown", Key::arrowDown,
                      "ArrowUp", Key::arrowUp,

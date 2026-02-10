@@ -1,4 +1,6 @@
-﻿maxSpeed       = 200.0
+﻿baseSpeed      = 350.0
+sprintSpeed    = 500.0
+moveSpeed      = baseSpeed
 accelGround    = 250.0
 accelAir       = 30.0
 decelGround    = 5.0
@@ -38,15 +40,13 @@ speedThreshold = 2.0  -- when footsteps should begin
 
 hasBall = true
 ballCreated = false
+projectileSpeed = 100.0
 
 --damage variables
 maxHealth = 3.0
 currentHealth = maxHealth
 invincible = false
 invincibleTimer = 0
-
--- Health UI Elements
-healthUIElements = {}
 
 doorSpawned = false
 
@@ -58,6 +58,10 @@ function onStart()
         local cameraEntity = scene:findEntityByName("Camera")
         if cameraEntity ~= nil then
             cameraTransform = cameraEntity:findTransform()
+            local startWall = scene:findEntityByName("Wall1")
+            local wallTrans = startWall:findTransform()
+            local wallPos = wallTrans:getWorldPosition()
+            transform:setWorldPosition(wallPos.x, 0.0, wallPos.z - 25)
         end
     end
 
@@ -81,6 +85,8 @@ function onStart()
 end
 
 function onUpdate(dt)
+    
+
     --Check if health = 0
     if currentHealth <= 0 then
         print("Player has died!")
@@ -93,6 +99,13 @@ function onUpdate(dt)
             invincible = false
             invincibleTimer = 0.0
         end
+    end
+
+    if Input:isKeyPressed(Key.LShift) then
+        moveSpeed = sprintSpeed
+    end
+    if Input:isKeyReleased(Key.LShift) then
+        moveSpeed = baseSpeed
     end
 
     -- Poll input
@@ -142,8 +155,8 @@ function onUpdate(dt)
 
     local vel = body:getLinearVelocity()
     local mass = body:getBodyData().mass
-    local desiredX = moveDir.x * maxSpeed
-    local desiredZ = moveDir.z * maxSpeed
+    local desiredX = moveDir.x * moveSpeed
+    local desiredZ = moveDir.z * moveSpeed
 
     -- horizontal delta velocity
     local dvx = desiredX - vel.x
@@ -278,7 +291,15 @@ function onUpdate(dt)
 
     local anyTargets = targetCheck()
     if not doorSpawned and not anyTargets then
-        SceneManager:instantiate("prefabs/door.prefab.json")
+        local scene = SceneManager:getCurrentScene()
+        if scene == nil then return end
+        local endWall = scene:findEntityByName("Wall2")
+        local wallTrans = endWall:findTransform()
+        local wallPos = wallTrans:getWorldPosition()
+
+        local door = SceneManager:instantiate("prefabs/door.prefab.json")
+        local doorTrans = door:findTransform()
+        doorTrans:setWorldPosition(wallPos.x, 10.0, wallPos.z + 1)
         doorSpawned = true
     end
 end
@@ -331,27 +352,31 @@ function rotateTo(angle, dt)
 end
 
 function shootProjectile()
-    if self == nil then return end
-
     local scene = SceneManager:getCurrentScene()
     if scene == nil then return end
 
-    -- Player transform
     local playerTransform = self:findTransform()
     if playerTransform == nil then return end
 
-    -- Camera transform
-    local aimDir = findForward()
-
-    -- Spawn position
-    local playerPos = playerTransform:getWorldPosition()
+    -- projectile spawn (player / weapon space)
     local spawnHeight = 8.0
     local spawnForward = 4.0
+
+    local playerPos = playerTransform:getWorldPosition()
+    local aimDir = findForward()
 
     local spawnPos =
         playerPos
         + Vector3.new(0, spawnHeight, 0)
         + aimDir * spawnForward
+
+    -- get camera-based aim target
+    local targetPoint = cameraAim(1000.0)
+    if targetPoint == nil then return end
+
+    local shootDir = (targetPoint - spawnPos)
+    if shootDir:Magnitude() <= 0.0001 then return end
+    shootDir = shootDir:Normalized()
 
     -- Instantiate projectile
     --[[local proj = nil
@@ -368,26 +393,13 @@ function shootProjectile()
     if proj == nil then return end
     local projTransform = proj:findTransform()
     if projTransform == nil then return end
+    projTransform:setWorldPosition(spawnPos)
 
-    projTransform:setWorldPosition(spawnPos.x, spawnPos.y, spawnPos.z)
-
-    -- Rotate projectile to face aim direction (yaw only)
-    local flat = Vector3.new(aimDir.x, 0, aimDir.z)
-    if flat:Magnitude() > 0 then
-        flat = flat:Normalized()
-        local yaw = math.atan(-flat.x, -flat.z)
-        projTransform:setWorldRotation(Quaternion.fromEuler(0, yaw, 0))
-    end
-
-    -- Apply velocity
     local projBody = proj:findPhysics()
     if projBody ~= nil then
-        local projectileSpeed = 125.0
-        projBody:setLinearVelocity(aimDir * projectileSpeed)
+        projBody:setLinearVelocity(shootDir * projectileSpeed)
     end
 end
-
-
 
 function onCollisionEnter(data)
     --Check for enemy collision
@@ -473,7 +485,7 @@ function moveHealthBar()
     local healthBar = scene:findEntityByName("HealthBar")
     local barTransform = healthBar:findComponent("UITransformComponent")
     local hSize = barTransform:getSize()
-    local maxSize = 100
+    local maxSize = 160
     local percent = currentHealth / maxHealth
     local newSize = Vector2.new(maxSize * percent, hSize.y)
     barTransform:setSize(newSize)
@@ -505,7 +517,30 @@ function changeLevels()
         SceneManager:changeScene("Level3")
     elseif sceneName == "Level3" then
         print("Alpha Completed!")
+        return
     end
     SceneManager:destroy(data.EntityA)
     doorSpawned = false
+end
+
+function cameraAim(maxDistance)
+    local scene = SceneManager:getCurrentScene()
+    if scene == nil then return nil end
+
+    local cam = scene:findEntityByName("Camera")
+    if cam == nil then return nil end
+
+    local camTransform = cam:findTransform()
+    if camTransform == nil then return nil end
+
+    local camPos = camTransform:getWorldPosition()
+    local forward = camTransform:getWorldRotation():forward():Normalized()
+
+    local hit = Physics.Raycast(camPos, forward, maxDistance, { layerMask = Layers.World | Layers.Enemy })
+
+    if hit ~= nil then
+        return hit.position
+    end
+
+    return camPos + forward * maxDistance
 end
