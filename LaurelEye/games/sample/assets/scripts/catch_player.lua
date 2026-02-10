@@ -172,13 +172,11 @@ function onUpdate(dt)
         body:applyForce(force)
 
         local animName = animator.currentAnimationName
-        print(animName)
         if animName ~= "Running" then
             animator:changeAnimation("Running")
         end
     else
         local animName = animator.currentAnimationName
-        print(animName)
         if animName ~= "Idle" then
             animator:changeAnimation("Idle")
         end

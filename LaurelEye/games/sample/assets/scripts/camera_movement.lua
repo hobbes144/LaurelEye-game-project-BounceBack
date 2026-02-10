@@ -32,6 +32,9 @@ stickSensitivity = 2.0
 
 currentFov = 1.1
 
+lockedPos = nil
+locked = false
+
 function onStart()
     transform = self:findTransform()
     target = findPlayer()
@@ -107,6 +110,28 @@ function onUpdate(dt)
         + right * currentShoulder
         + Vector3.new(0, currentHeight, 0)
 
+    local shoulderPivot =
+    playerPos
+    + right * (currentShoulder - 3.0)
+    + Vector3.new(0, currentHeight, 0)
+
+    local camDir = desiredPos - shoulderPivot
+    local camDist = camDir:Magnitude()
+    camDir = camDir:Normalized()
+
+    local padding = 0.3
+
+    local hit = Physics.Raycast(
+        shoulderPivot,
+        camDir,
+        camDist,
+        { layerMask = Layers.World }
+    )
+
+    if hit then
+        desiredPos = hit.position + hit.normal * padding
+    end
+
     -- Smooth follow
     camPos.x = camPos.x + (desiredPos.x - camPos.x) * lerpSpeed * dt
     camPos.y = camPos.y + (desiredPos.y - camPos.y) * lerpSpeed * dt
@@ -120,12 +145,6 @@ function onUpdate(dt)
 
     camTransform:setRotation(newRot)
     transform:setWorldTransform(camTransform)
-
-    -- Raycast demo code
-    local shoulderPos = playerPos + right * currentShoulder
-    local raycastHit = Physics.Raycast(shoulderPos, -forward, currentDistance, {layerMask = Layers.World})
-    
-
 end
 
 function onShutdown()
