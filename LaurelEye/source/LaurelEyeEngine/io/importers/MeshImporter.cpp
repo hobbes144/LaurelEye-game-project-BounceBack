@@ -181,7 +181,7 @@ namespace LaurelEye::IO {
         aiAnimation* aiAnim = scene->mAnimations[0];
 
         auto anim = std::make_shared<AnimationAsset>(path);
-        anim->animName = std::filesystem::path(path).stem().string();
+        anim->animName = extractName(path);
         anim->duration = aiAnim->mDuration;
         anim->ticksPerSecond = aiAnim->mTicksPerSecond != 0.0 ? aiAnim->mTicksPerSecond : 30.0;
 

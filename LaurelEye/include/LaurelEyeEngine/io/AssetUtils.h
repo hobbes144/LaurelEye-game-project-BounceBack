@@ -9,6 +9,7 @@
 
 #pragma once
 #include <string>
+#include <filesystem>
 
 namespace LaurelEye::IO {
 
@@ -21,9 +22,7 @@ namespace LaurelEye::IO {
         return ext;
     }
     inline std::string extractName(const std::string& path) {
-        auto lastSlash = path.find_last_of("/\\");
-        auto dot = path.find_last_of('.');
-        return path.substr(lastSlash + 1, dot - lastSlash - 1);
+        return std::filesystem::path(path).stem().string();
     }
 
 } // namespace LaurelEye::IO

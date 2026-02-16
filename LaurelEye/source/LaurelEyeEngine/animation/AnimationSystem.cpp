@@ -8,6 +8,7 @@
 #include "LaurelEyeEngine/graphics/MeshManager.h"
 #include "LaurelEyeEngine/io/Assets.h"
 #include <memory>
+#include <LaurelEyeEngine/logging/EngineLog.h>
 
 namespace LaurelEye::Animations {
 
@@ -20,34 +21,22 @@ namespace LaurelEye::Animations {
     }
 
     void AnimationSystem::initialize() {
-        if ( !context ) {
-            std::cerr << "AnimationSystem::initialize - No context available\n";
-            return;
-        }
+        LE_ASSERT("Animation", context, "AnimationSystem::initialize - No context available");
 
         animationManager = context->getService<AnimationManager>();
-        if ( !animationManager ) {
-            std::cerr << "AnimationSystem::initialize - Failed to get AnimationManager\n";
-        }
+        LE_ASSERT("Animation", animationManager, "AnimationSystem::initialize - Failed to get AnimationManager");
 
         // Render System
         auto renderSystem = context->getService<LaurelEye::Graphics::RenderSystem>();
-        if ( !renderSystem ) {
-            std::cerr << "AnimationSystem::initialize - Failed to get RenderSystem\n";
-            return; // cannot continue without it
-        }
+        LE_ASSERT("Animation", animationManager, "AnimationSystem::initialize - Failed to get RenderSystem");
 
         // Skeleton Manager
         skeletonManager = renderSystem->getSkeletonManager();
-        if ( !skeletonManager ) {
-            std::cerr << "AnimationSystem::initialize - Failed to get SkeletonManager\n";
-        }
+        LE_ASSERT("Animation", animationManager, "AnimationSystem::initialize - Failed to get SkeletonManager");
 
         // Render Resources
         renderResources = renderSystem->getRenderResources();
-        if ( !renderResources ) {
-            std::cerr << "AnimationSystem::initialize - Failed to get RenderResources\n";
-        }
+        LE_ASSERT("Animation", animationManager, "AnimationSystem::initialize - Failed to get RenderResources");
     }
 
 
