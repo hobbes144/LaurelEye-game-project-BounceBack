@@ -84,12 +84,22 @@ function onStart()
     speaker = self:findAudioSpeaker()
 end
 
+function onMessage(msg)
+    if msg.topic == "I am shooting you!" then
+        debugLog("Oh no, I'm being shot at!!")
+        local message = Message.new()
+        message.to = player
+        message.topic = "I am being shot at!"
+        Script.broadcast(message)
+    end
+end
+
 function onUpdate(dt)
     
 
     --Check if health = 0
     if currentHealth <= 0 then
-        print("Player has died!")
+        log("Player has died!")
         SceneManager:changeScene("MainMenu")
     end
 
@@ -264,7 +274,7 @@ function onUpdate(dt)
             footstepTimer = 0.0
         end
     end
-    
+
     --[[if hasBall then
         local scene = SceneManager:getCurrentScene()
         if scene == nil then return end
@@ -287,7 +297,7 @@ function onUpdate(dt)
 
         bTransform:setWorldPosition(spawnPos)
     end]]--
-    
+
 
     local anyTargets = targetCheck()
     if not doorSpawned and not anyTargets then
@@ -516,8 +526,7 @@ function changeLevels()
     elseif sceneName == "Level2" then
         SceneManager:changeScene("Level3")
     elseif sceneName == "Level3" then
-        print("Alpha Completed!")
-        return
+        log("Alpha Completed!")
     end
     SceneManager:destroy(data.EntityA)
     doorSpawned = false

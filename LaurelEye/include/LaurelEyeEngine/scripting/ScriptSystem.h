@@ -12,6 +12,7 @@
 #include "LaurelEyeEngine/ecs/ISystem.h"
 #include "LaurelEyeEngine/scripting/ScriptComponent.h"
 #include "LaurelEyeEngine/scripting/IScriptEngineState.h"
+#include "LaurelEyeEngine/scripting/IScriptBroker.h"
 #include <memory>
 
 namespace LaurelEye::Scripting {
@@ -28,8 +29,11 @@ namespace LaurelEye::Scripting {
         void deregisterComponent(const ComponentPtr component) override;
 
         IScriptEngineState* getEngineState() const { return scriptEngineState.get(); }
+        ScriptBroker* getBroker() const { return broker.get(); }
     private:
         ScriptSystemType systemType;
+
+        std::unique_ptr<ScriptBroker> broker;
         std::unique_ptr<IScriptEngineState> scriptEngineState;
     };
 } // namespace LaurelEye

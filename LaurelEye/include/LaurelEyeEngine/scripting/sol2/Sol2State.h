@@ -16,7 +16,7 @@
 #include "LaurelEyeEngine/core/EngineContext.h"
 
 namespace LaurelEye::Scripting {
-    
+
     class Sol2State : public IScriptEngineState{
     public:
         void initialize(EngineContext* ctx) override;

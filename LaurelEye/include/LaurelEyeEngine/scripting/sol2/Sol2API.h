@@ -29,9 +29,11 @@ namespace LaurelEye::Scripting {
         static void shutdown(EngineContext* ctx);
     private:
         // Logging helpers
-        static void log(const std::string& msg);
-        static void logErr(const std::string& msg);
-        static void logWarn(const std::string& msg);
+        static void log(sol::this_state ts, const std::string& msg);
+        static void logErr(sol::this_state ts, const std::string& msg);
+        static void logWarn(sol::this_state ts, const std::string& msg);
+
+        static void registerBrokerState(sol::state& lua, EngineContext* ctx);
     };
 
 } // namespace LaurelEye::Scripting

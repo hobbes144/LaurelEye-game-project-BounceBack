@@ -4,18 +4,22 @@
 ///     alex.humphries@digipen.edu
 /// @date   10-7-2025
 /// @brief Represents an actual Lua script to be used by Sol2 (Sol2 specific)
-/// 
+///
 /// Copyright © 2025 DIGIPEN Institute of Technology. All rights reserved.
 
 #pragma once
-#include <sol/sol.hpp>
+#include "LaurelEyeEngine/ecs/Entity.h"
 #include "LaurelEyeEngine/scripting/IScriptInstance.h"
+#include "LaurelEyeEngine/scripting/sol2/Sol2Message.h"
+#include <sol/sol.hpp>
 
-namespace LaurelEye::Scripting{
+namespace LaurelEye::Scripting {
 
     class Sol2ScriptInstance : public IScriptInstance {
     public:
-        Sol2ScriptInstance(sol::state& luaState, const std::string& scriptPath, LaurelEye::Entity* owner_);
+        Sol2ScriptInstance(
+            sol::state& luaState, const std::string& scriptPath,
+            LaurelEye::Entity* owner_);
         ~Sol2ScriptInstance();
         void onStart() override;
         void onUpdate(float dt) override;
@@ -24,6 +28,8 @@ namespace LaurelEye::Scripting{
         void onCollisionEnter(const Physics::CollisionEventData& data) override;
         void onCollisionStay(const Physics::CollisionEventData& data) override;
         void onCollisionExit(const Physics::CollisionEventData& data) override;
+
+        void onMessage(const SolMessage& message);
 
         /// @brief Gets an active lua variable state from the sol2 environment.
         /// For example, if an int "count" is set from script, this lets us reach
@@ -42,13 +48,16 @@ namespace LaurelEye::Scripting{
                 return std::nullopt;
             }
         }
+
     private:
         sol::state& lua;
         sol::environment env;
-        sol::function startFunc, updateFunc, shutdownFunc, collisionEnterFunc, collisionStayFunc, collisionExitFunc;
+        sol::function startFunc, updateFunc, shutdownFunc;
+        sol::function messageFunc, collisionEnterFunc, collisionStayFunc, collisionExitFunc;
+
         LaurelEye::Entity* owner;
 
         void invalidate();
     };
 
-} // namespace LaurelEye
+} // namespace LaurelEye::Scripting

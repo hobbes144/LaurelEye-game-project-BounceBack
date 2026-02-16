@@ -1,29 +1,35 @@
 ﻿#include "LaurelEyeEngine/scripting/sol2/Sol2API.h"
-#include <iostream>
-#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Math.h"
-#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Transform.h"
+#include "LaurelEyeEngine/scripting/ScriptSystem.h"
+#include "LaurelEyeEngine/scripting/sol2/Sol2Logging.h"
+#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Animation.h"
+#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Audio.h"
+#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Camera.h"
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_ECS.h"
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Input.h"
-#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Time.h"
-#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Physics.h"
-#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Scene.h"
-#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Particles.h"
-#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Audio.h"
-#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_UI.h"
-#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Renderable.h"
-#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Camera.h"
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Lights.h"
+#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Math.h"
+#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Particles.h"
+#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Physics.h"
+#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Renderable.h"
+#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Scene.h"
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Spline.h"
-#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Animation.h"
-
+#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Time.h"
+#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Transform.h"
+#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_UI.h"
+#include "LaurelEyeEngine/scripting/sol2/Sol2ScriptBroker.h"
 
 namespace LaurelEye::Scripting {
 
     void Sol2API::registerState(sol::state& lua, EngineContext* ctx) {
         /* Logging*/
-        lua.set_function("log", log);
-        lua.set_function("logErr", logErr);
-        lua.set_function("logWarn", logWarn);
+        lua.set_function("log", LaurelEye::Log::luaLog);
+        lua.set_function("logWarn", LaurelEye::Log::luaLogWarn);
+        lua.set_function("logError", LaurelEye::Log::luaLogError);
+        lua.set_function("debugLog", LaurelEye::Log::luaDebugLog);
+        lua.set_function("debugLogWarn", LaurelEye::Log::luaDebugLogWarn);
+        lua.set_function("debugLogError", LaurelEye::Log::luaDebugLogError);
+
+        registerBrokerState(lua, ctx);
 
         /* Time */
 
@@ -38,7 +44,7 @@ namespace LaurelEye::Scripting {
 
         /* Scene */
         Sol2API_Scene::setup(lua, ctx);
-        
+
         /* ECS */
         Sol2API_ECS::setup(lua, ctx);
 
@@ -66,7 +72,7 @@ namespace LaurelEye::Scripting {
         /* Spline */
         Sol2API_Spline::setup(lua);
 
-        Sol2API_Animation::setup(lua,ctx);
+        Sol2API_Animation::setup(lua, ctx);
     }
 
     void Sol2API::registerEnvironment(sol::environment& env, LaurelEye::Entity* owner) {
@@ -81,16 +87,9 @@ namespace LaurelEye::Scripting {
         Sol2API_UI::shutdown(ctx);
     }
 
-    void Sol2API::log(const std::string& msg) {
-        std::cout << msg << std::endl;
-    }
-
-    void Sol2API::logErr(const std::string& msg) {
-        std::cerr << "Error: " << msg << std::endl;
-    }
-
-    void Sol2API::logWarn(const std::string& msg) {
-        std::cout << "Warning: " << msg << std::endl;
+    void Sol2API::registerBrokerState(sol::state& lua, EngineContext* ctx) {
+        auto broker = ctx->getService<ScriptSystem>()->getBroker();
+        static_cast<Sol2ScriptBroker*>(broker)->setupAPI(lua);
     }
 
 } // namespace LaurelEye::Scripting

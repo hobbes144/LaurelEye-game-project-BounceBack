@@ -10,7 +10,6 @@
 /// Copyright © 2025 DIGIPEN Institute of Technology. All rights reserved.
 
 #pragma once
-#include "LaurelEyeEngine/ecs/Entity.h"
 
 namespace LaurelEye::Physics {
     struct CollisionEventData;
@@ -32,13 +31,13 @@ namespace LaurelEye::Scripting {
         virtual void onShutdown() = 0;
 
         /// @brief Called when the script's owner collides with another object
-        /// @param data 
+        /// @param data
         virtual void onCollisionEnter(const Physics::CollisionEventData& data) = 0;
         /// @brief Called when the script's owner continues to collide with another object
-        /// @param data 
+        /// @param data
         virtual void onCollisionStay(const Physics::CollisionEventData& data) = 0;
         /// @brief Called when the script's owner stops colliding with another object
-        /// @param data 
+        /// @param data
         virtual void onCollisionExit(const Physics::CollisionEventData& data) = 0;
     };
 

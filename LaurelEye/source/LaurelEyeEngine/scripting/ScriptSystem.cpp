@@ -1,4 +1,5 @@
 ﻿#include "LaurelEyeEngine/scripting/ScriptSystem.h"
+#include "LaurelEyeEngine/scripting/sol2/Sol2ScriptBroker.h"
 #include "LaurelEyeEngine/scripting/sol2/Sol2State.h"
 
 namespace LaurelEye::Scripting {
@@ -10,6 +11,7 @@ namespace LaurelEye::Scripting {
         switch ( systemType ) {
         case ScriptSystemType::Sol2:
             scriptEngineState = std::make_unique<Sol2State>();
+            broker = std::make_unique<Sol2ScriptBroker>();
             break;
         }
         scriptEngineState->initialize(context);
@@ -25,16 +27,19 @@ namespace LaurelEye::Scripting {
         snapshot.insert(snapshot.end(), components.begin(), components.end());
 
         for ( auto* comp : snapshot ) {
-            if ( comp->isActive() && comp->getScriptInstance()) {
+            if ( comp->isActive() && comp->getScriptInstance() ) {
                 comp->getScriptInstance()->onUpdate(deltaTime);
             }
         }
+        broker->flushMessageQueue();
     }
 
     void ScriptSystem::shutdown() {
+        broker->clearMessageQueue();
         for ( auto* comp : components ) {
             if ( comp->getScriptInstance() ) {
                 comp->getScriptInstance()->onShutdown();
+                comp->destroyScriptInstance();
             }
         }
         if ( scriptEngineState ) {
@@ -43,11 +48,13 @@ namespace LaurelEye::Scripting {
         }
     }
 
-     void ScriptSystem::registerComponent(const ComponentPtr comp) {
+    void ScriptSystem::registerComponent(const ComponentPtr comp) {
         if ( !comp->getScriptPath().empty() ) {
             comp->setScriptInstance(scriptEngineState->createInstance(comp->getScriptPath(), comp->getOwner()));
-            if ( comp->getScriptInstance() )
+            if ( comp->getScriptInstance() ) {
+                broker->registerScript(comp->getOwner(), comp->getScriptInstance());
                 comp->getScriptInstance()->onStart();
+            }
         }
         ISystem<ScriptComponent>::registerComponent(comp);
     }
@@ -56,6 +63,7 @@ namespace LaurelEye::Scripting {
         if ( !comp ) return;
         // Clean up Lua instance
         if ( auto* inst = comp->getScriptInstance() ) {
+            broker->deregisterScript(comp->getOwner());
             inst->onShutdown(); // Let the Lua script handle cleanup
             comp->destroyScriptInstance();
         }

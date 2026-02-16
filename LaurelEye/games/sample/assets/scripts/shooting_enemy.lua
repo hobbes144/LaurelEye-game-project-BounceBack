@@ -29,11 +29,17 @@ function onUpdate(dt)
     end
 end
 
+function onMessage(msg)
+    if msg.topic == "I am being shot at!" then
+        debugLog("Violence is the answer.")
+    end
+end
+
 function onCollisionEnter(data)
     local tagsA = data.entityA:getTags()
     for _, tag in pairs(tagsA) do
         if tag == "ball" then
-            print("Collided with Ball!")
+            log("Collided with Ball!")
             destroySelf()
         end
     end
@@ -41,10 +47,10 @@ function onCollisionEnter(data)
     local tagsB = data.entityB:getTags()
     for _, tag in pairs(tagsB) do
         if tag == "ball" then
-            print("Collided with Ball!")
+            log("Collided with Ball!")
             destroySelf()
         end
-    end    
+    end
 end
 
 function onCollisionStay(data) end
@@ -95,6 +101,12 @@ function autoShootProjectile(dt)
     -- Find enemies by tag
     local player = scene:findEntityByName("PlayerPrefab")
     if player == nil then return end
+
+    debugLog("Shooting player!")
+    local message = Message.new()
+    message.to = player
+    message.topic = "I am shooting you!"
+    Script.send(message)
 
     -- Player transform + spawn offset
     local selfTransform = self:findTransform()

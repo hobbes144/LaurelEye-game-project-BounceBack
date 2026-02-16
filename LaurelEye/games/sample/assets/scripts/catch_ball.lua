@@ -18,7 +18,6 @@ function onUpdate(dt)
         local vel = body:getLinearVelocity()
         initialSpeed = vel:Magnitude()
         returnSpeed = initialSpeed + 50.0
-        print(moveSpeed)
     end
     if destroyed then return end
 end
@@ -73,7 +72,7 @@ function onCollisionEnter(data)
 
         reflected = reflected * initialSpeed
         body:setLinearVelocity(reflected)
-         
+
         bounceCount = bounceCount + 1
     end
 end
