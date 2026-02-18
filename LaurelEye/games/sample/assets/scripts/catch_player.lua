@@ -431,6 +431,7 @@ function onCollisionEnter(data)
                 moveHealthBar()
             end
         elseif tag == "door" then
+            SceneManager:destroy(data.entityB)
             changeLevels()
         end
     end
@@ -453,6 +454,7 @@ function onCollisionEnter(data)
                 moveHealthBar()
             end
         elseif tag == "door" then
+            SceneManager:destroy(data.entityB)
             changeLevels()
         end
     end
@@ -528,7 +530,6 @@ function changeLevels()
     elseif sceneName == "Level3" then
         log("Alpha Completed!")
     end
-    SceneManager:destroy(data.EntityA)
     doorSpawned = false
 end
 
