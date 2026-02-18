@@ -103,13 +103,14 @@ namespace LaurelEye::Graphics {
     GLint textureFormatToGLUploadFormat(TextureFormat f) {
         switch ( f ) {
         case TextureFormat::R8:
+        case TextureFormat::RGB8:
+        case TextureFormat::RGBA8:
+            return GL_UNSIGNED_BYTE;
+
         case TextureFormat::R16F:
         case TextureFormat::R32F:
-        case TextureFormat::RGB8:
         case TextureFormat::RGB16F:
         case TextureFormat::RGB32F:
-            return GL_UNSIGNED_BYTE;
-        case TextureFormat::RGBA8:
         case TextureFormat::RGBA16F:
         case TextureFormat::RGBA32F:
             return GL_FLOAT;

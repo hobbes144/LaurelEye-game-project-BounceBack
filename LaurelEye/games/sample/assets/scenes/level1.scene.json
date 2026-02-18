@@ -542,22 +542,6 @@
             }
         },
         {
-            "name": "DirectionalLight",
-            "components": {
-                "Transform": {
-                    "position": [ 0.0, -1.0, 0.0 ],
-                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 1.0, 1.0, 1.0 ]
-                },
-                "Light": {
-                    "type": "Directional",
-                    "direction": [ 0.75, -1.0, 0.75 ],
-                    "intensity": 4.0,
-                    "color": [ 1.0, 1.0, 1.0 ]
-                }
-            }
-        },
-        {
             "name": "AmbientLight",
             "components": {
                 "Transform": {
@@ -569,6 +553,40 @@
                     "type": "Ambient",
                     "intensity": 0.3,
                     "color": [ 1.0, 1.0, 1.0 ]
+                }
+            }
+        },
+        {
+            "name": "RoomLight",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 0.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Light": {
+                    "type": "Point",
+                    "position": [ 0.0, 30.0, 0.0 ],
+                    "intensity": 2000.0,
+                    "color": [ 1.0, 1.0, 1.0 ],
+                    "range": 3000.0
+                }
+            }
+        },
+        {
+            "name": "RoomLight1",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 0.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Light": {
+                    "type": "Point",
+                    "position": [ -10.0, 30.0, 10.0 ],
+                    "intensity": 2000.0,
+                    "color": [ 1.0, 1.0, 1.0 ],
+                    "range": 3000.0
                 }
             }
         },

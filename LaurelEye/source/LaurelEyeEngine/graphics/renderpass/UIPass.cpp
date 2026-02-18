@@ -70,7 +70,7 @@ namespace LaurelEye::Graphics {
             Square->draw(GL_TRIANGLES);
         }
 
-        glBlendFunc(GL_ONE, GL_ZERO);
+        glBlendFunc(GL_ONE, GL_ONE);
         glDisable(GL_BLEND);
         glEnable(GL_DEPTH_TEST);
     }

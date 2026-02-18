@@ -32,7 +32,7 @@ namespace LaurelEye::Graphics {
         glDisable(GL_DEPTH_TEST);
         glDepthMask(GL_FALSE);
         glEnable(GL_BLEND);
-
+        glBlendFunc(GL_ONE, GL_ONE);
         glEnable(GL_CULL_FACE);
         glCullFace(GL_FRONT);
 
