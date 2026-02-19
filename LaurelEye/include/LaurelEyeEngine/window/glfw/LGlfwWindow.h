@@ -38,7 +38,11 @@ namespace LaurelEye {
         /// \copydoc IWindow::setFullscreen
         void setFullscreen(bool flag) override;
 
+        void setCursorMode(CursorMode mode) override;
+
         static void onResizeCallback(GLFWwindow* window, int width, int height);
+        static void onMaximizeCallback(GLFWwindow* window, int maximized);
+        static void onFocusCallback(GLFWwindow* window, int focused);
 
     private:
         GLFWwindow* nativeHandle = nullptr;

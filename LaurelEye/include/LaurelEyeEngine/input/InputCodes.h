@@ -4,6 +4,7 @@ namespace LaurelEye {
         Space,
         Escape,
         LShift,
+        F11,
 
         arrowDown,
         arrowUp,

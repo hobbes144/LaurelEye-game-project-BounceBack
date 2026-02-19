@@ -1,31 +1,26 @@
 ﻿# CMakeList.txt : CMake project for LaurelEyeEngine, include source and define
 # project specific logic here.
 #
+if(BUILD_TESTS)
+    file(GLOB TEST_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 
-file(GLOB TEST_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
+    add_executable(LaurelEyeEngineTest ${TEST_SOURCES})
 
-add_executable(LaurelEyeEngineTest
-    ${TEST_SOURCES}
-)
+    target_link_libraries(LaurelEyeEngineTest PRIVATE LaurelEyeEngine)
 
-target_link_libraries(LaurelEyeEngineTest
-    PRIVATE
-        LaurelEyeEngine
-)
+    target_include_directories(LaurelEyeEngineTest
+        PRIVATE ${PROJECT_SOURCE_DIR}/include
+    )
 
-target_include_directories(LaurelEyeEngineTest
-    PRIVATE
-        ${PROJECT_SOURCE_DIR}/include
-)
+    target_compile_definitions(LaurelEyeEngineTest
+        PRIVATE TEST_MEDIA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/TestMedia"
+    )
 
-target_compile_definitions(LaurelEyeEngineTest
-    PRIVATE TEST_MEDIA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/TestMedia"
-)
+    if (CMAKE_VERSION VERSION_GREATER 3.20)
+        set_property(TARGET LaurelEyeEngineTest PROPERTY CXX_STANDARD 23)
+    endif()
 
-if (CMAKE_VERSION VERSION_GREATER 3.20)
-    set_property(TARGET LaurelEyeEngineTest PROPERTY CXX_STANDARD 23)
+    set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
+
+    # TODO: Add tests and install targets if needed.
 endif()
-
-set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
-
-# TODO: Add tests and install targets if needed.

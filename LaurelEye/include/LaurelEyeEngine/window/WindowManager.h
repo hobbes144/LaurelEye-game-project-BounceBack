@@ -43,6 +43,9 @@ namespace LaurelEye {
 
         Vector2 getWindowSize();
 
+        void setCursorMode(int windowId, CursorMode mode);
+        void setFullscreen(int windowId, bool fullscreen);
+
     private:
         WindowBackend systemType;
         std::vector<std::unique_ptr<IWindow>> managedWindows;

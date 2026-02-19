@@ -6,6 +6,7 @@
 /// @brief Implementation of WindowManager
 
 #include "LaurelEyeEngine/window/WindowManager.h"
+#include "LaurelEyeEngine/logging/EngineLog.h"
 #include "LaurelEyeEngine/window/IWindow.h"
 
 #include "LaurelEyeEngine/window/glfw/LGlfwWindow.h"
@@ -18,7 +19,6 @@ namespace LaurelEye {
     WindowManager::WindowManager(WindowBackend type) {
         systemType = type;
     }
-
 
     // void WindowManager::update(float deltaTime) {
     //     // std::vector<std::unique_ptr<IWindow>> pendingCloseWindows;
@@ -40,7 +40,7 @@ namespace LaurelEye {
         case WindowBackend::GLFW:
             pWindow = std::make_unique<LaurelEye::LGlfwWindow>(wDesc);
 
-            if (mainWindowId == -1) {
+            if ( mainWindowId == -1 ) {
                 glfwMakeContextCurrent((GLFWwindow*)pWindow->getNativeHandle());
                 mainWindowId = 0;
             }
@@ -59,8 +59,17 @@ namespace LaurelEye {
     Vector2 WindowManager::getWindowSize() {
         return {
             static_cast<float>(getWindow(mainWindowId)->getWidth()),
-            static_cast<float>(getWindow(mainWindowId)->getHeight())
-        };
+            static_cast<float>(getWindow(mainWindowId)->getHeight())};
+    }
+
+    void WindowManager::setCursorMode(int windowId, CursorMode mode) {
+        LE_ASSERT("WindowManager", windowId < managedWindows.size(), "Invalid setCursorMode call for nonexistent window " << windowId);
+        managedWindows[windowId]->setCursorMode(mode);
+    }
+
+    void WindowManager::setFullscreen(int windowId, bool fullscreen) {
+        LE_ASSERT("WindowManager", windowId < managedWindows.size(), "Invalid setFullscreen call for nonexistent window " << windowId);
+        managedWindows[windowId]->setFullscreen(fullscreen);
     }
 
 } // namespace LaurelEye

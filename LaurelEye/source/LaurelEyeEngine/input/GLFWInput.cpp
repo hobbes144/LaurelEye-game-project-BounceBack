@@ -55,7 +55,7 @@ namespace LaurelEye {
                 }
             }
         }
-        
+
         if ( glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1) ) {
             GLFWgamepadstate* state = new GLFWgamepadstate;
             if ( glfwGetGamepadState(GLFW_JOYSTICK_1, state) ) {
@@ -184,6 +184,8 @@ namespace LaurelEye {
             return GLFW_KEY_ESCAPE;
         case Key::LShift:
             return GLFW_KEY_LEFT_SHIFT;
+        case Key::F11:
+            return GLFW_KEY_F11;
         case Key::arrowDown:
             return GLFW_KEY_DOWN;
         case Key::arrowUp:

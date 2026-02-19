@@ -1,6 +1,5 @@
 ﻿#include "LaurelEyeEngine/scripting/sol2/Sol2API.h"
 #include "LaurelEyeEngine/scripting/ScriptSystem.h"
-#include "LaurelEyeEngine/scripting/sol2/Sol2Logging.h"
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Animation.h"
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Audio.h"
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Camera.h"
@@ -16,6 +15,8 @@
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Time.h"
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Transform.h"
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_UI.h"
+#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Window.h"
+#include "LaurelEyeEngine/scripting/sol2/Sol2Logging.h"
 #include "LaurelEyeEngine/scripting/sol2/Sol2ScriptBroker.h"
 
 namespace LaurelEye::Scripting {
@@ -48,6 +49,9 @@ namespace LaurelEye::Scripting {
         /* ECS */
         Sol2API_ECS::setup(lua, ctx);
 
+        /* Window */
+        Sol2API_Window::setup(lua, ctx);
+
         /* Renderer*/
         Sol2API_Renderable::setup(lua, ctx);
 
@@ -72,6 +76,7 @@ namespace LaurelEye::Scripting {
         /* Spline */
         Sol2API_Spline::setup(lua);
 
+        /* Animation */
         Sol2API_Animation::setup(lua, ctx);
     }
 

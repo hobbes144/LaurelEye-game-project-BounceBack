@@ -8,6 +8,7 @@
 #include "LaurelEyeEngine/window/glfw/LGlfwWindow.h"
 // We should be using Graphics.h to define valid backends, and init accordingly.
 // #include "LaurelEyeEngine/graphics/Graphics.h"
+#include "LaurelEyeEngine/logging/EngineLog.h"
 #include "LaurelEyeEngine/window/IWindow.h"
 
 #include <cassert>
@@ -18,15 +19,20 @@ namespace LaurelEye {
     LGlfwWindow::LGlfwWindow(const WindowDescription& wDesc) : IWindow() {
         this->attributes = wDesc;
 
-        GLFWmonitor* monitor = nullptr;
+        GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+        const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+
+        glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+        glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+        glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+        glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
 
         if ( this->attributes.mode == WindowMode::Fullscreen ) {
-            monitor = glfwGetPrimaryMonitor();
-            const GLFWvidmode* mode = glfwGetVideoMode(monitor);
             this->attributes.width = mode->width;
             this->attributes.height = mode->height;
         }
         else {
+            monitor = nullptr;
             this->attributes.width = this->attributes.windowedWidth;
             this->attributes.height = this->attributes.windowedHeight;
         }
@@ -72,10 +78,9 @@ namespace LaurelEye {
                              this->attributes.windowedY);
         }
 
-        // TODO: Below need to be implemented:
-        // glfwSetWindowMaximizeCallback(nativeHandle, maximizedCallback);
-        glfwSetFramebufferSizeCallback(nativeHandle, onResizeCallback); // Maybe this should be in the renderer?
-        // glfwSetWindowFocusCallback(nativeHandle, focusCallback);
+        glfwSetWindowMaximizeCallback(nativeHandle, onMaximizeCallback);
+        glfwSetFramebufferSizeCallback(nativeHandle, onResizeCallback);
+        glfwSetWindowFocusCallback(nativeHandle, onFocusCallback);
     }
 
     LGlfwWindow::~LGlfwWindow() {
@@ -95,7 +100,8 @@ namespace LaurelEye {
     }
 
     void LGlfwWindow::setTitle(std::string _title) {
-        // To be implemented here
+        this->attributes.title = _title;
+        glfwSetWindowTitle(nativeHandle, "My Window");
     }
 
     void LGlfwWindow::setWidth(int _width) {
@@ -112,7 +118,61 @@ namespace LaurelEye {
     }
 
     void LGlfwWindow::setFullscreen(bool flag) {
-        assert(false && "LAURELEYE::WINDOW::SETFULLSCREEN::UNIMPLEMENTED");
+        GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+        const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+        if ( flag ) {
+
+            this->attributes.mode = WindowMode::Fullscreen;
+            this->attributes.width = mode->width;
+            this->attributes.height = mode->height;
+
+            glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+            glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+            glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+            glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+
+            glfwSetWindowMonitor(
+                nativeHandle,
+                monitor,
+                0, 0,
+                mode->width, mode->height,
+                mode->refreshRate);
+        }
+        else {
+            this->attributes.width = mode->width;
+            this->attributes.height = mode->height;
+
+            glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+            glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+            glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+            glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+
+            glfwSetWindowMonitor(
+                nativeHandle,
+                nullptr,
+                this->attributes.windowedX,
+                this->attributes.windowedY,
+                this->attributes.windowedWidth,
+                this->attributes.windowedHeight,
+                mode->refreshRate);
+        }
+    }
+
+    void LGlfwWindow::setCursorMode(CursorMode mode) {
+        switch ( mode ) {
+        case CursorMode::Normal:
+            glfwSetInputMode(nativeHandle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            break;
+        case CursorMode::Hidden:
+            glfwSetInputMode(nativeHandle, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+            break;
+        case CursorMode::Disabled:
+            glfwSetInputMode(nativeHandle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            break;
+        case CursorMode::Captured:
+            glfwSetInputMode(nativeHandle, GLFW_CURSOR, GLFW_CURSOR_CAPTURED);
+            break;
+        }
     }
 
     void LGlfwWindow::onResizeCallback(GLFWwindow* window, int width, int height) {
@@ -126,7 +186,27 @@ namespace LaurelEye {
             if ( pWindow->surfaceResizeCallback ) {
                 pWindow->surfaceResizeCallback(pWindow->getNativeHandle(), width, height);
             }
-            std::cout << "Window size: (" << width << ", " << height << ")" << std::endl;
         }
+        LE_DEBUG_INFO("WindowManager", "Window resized: (" << width << ", " << height << ")");
+    }
+
+    void LGlfwWindow::onMaximizeCallback(GLFWwindow* window, int maximized) {
+        auto* pWindow = static_cast<LGlfwWindow*>(glfwGetWindowUserPointer(window));
+        if ( pWindow ) {
+            if ( pWindow->maximizeCallback ) {
+                pWindow->maximizeCallback(pWindow->getNativeHandle(), maximized);
+            }
+        }
+        LE_DEBUG_INFO("WindowManager", "Window maximized state: " << maximized);
+    }
+
+    void LGlfwWindow::onFocusCallback(GLFWwindow* window, int focused) {
+        auto* pWindow = static_cast<LGlfwWindow*>(glfwGetWindowUserPointer(window));
+        if ( pWindow ) {
+            if ( pWindow->focusCallback ) {
+                pWindow->focusCallback(pWindow->getNativeHandle(), focused);
+            }
+        }
+        LE_DEBUG_INFO("WindowManager", "Window focus state: " << focused);
     }
 } // namespace LaurelEye

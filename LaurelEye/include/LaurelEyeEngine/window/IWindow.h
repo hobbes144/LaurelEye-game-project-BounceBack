@@ -17,9 +17,24 @@ namespace LaurelEye {
     // even when not necessary.
     using NativeWindowHandle = void*;
 
-    enum WindowMode { Fullscreen,
+    enum class WindowMode { Fullscreen,
                       Windowed,
                       Borderless };
+
+    /// @brief Cursor Mode
+    ///
+    /// - Normal: Usual mouse mode.
+    /// - Hidden: Cursor is hidden but mouse can still move. Use if you have a
+    /// custom cursor.
+    /// - Disabled: Cursor is hidden and mouse is fixed at the center. This is
+    /// what we use when the camera is to be controlled with the mouse.
+    /// - Captured: Cursor is visible but is fixed at the center.
+    enum class CursorMode {
+        Normal,
+        Hidden,
+        Disabled,
+        Captured
+    };
 
     /// @class WindowDescription
     /// @brief Window description used to create the window.
@@ -119,6 +134,8 @@ namespace LaurelEye {
             return float(attributes.width) / float(attributes.height);
         }
 
+        virtual void setCursorMode(CursorMode mode) = 0;
+
         virtual void setSurfaceResizeCallback(
             std::function<void(NativeWindowHandle, int, int)> callback) {
             surfaceResizeCallback = callback;
@@ -135,7 +152,9 @@ namespace LaurelEye {
         /// Window attributes for this window
         WindowDescription attributes;
 
-        std::function<void(NativeWindowHandle, int, int)> surfaceResizeCallback;
+        [[maybe_unused]] std::function<void(NativeWindowHandle, int, int)> surfaceResizeCallback;
+        [[maybe_unused]] std::function<void(NativeWindowHandle, int)> maximizeCallback;
+        [[maybe_unused]] std::function<void(NativeWindowHandle, int)> focusCallback;
     };
 
 } // namespace LaurelEye

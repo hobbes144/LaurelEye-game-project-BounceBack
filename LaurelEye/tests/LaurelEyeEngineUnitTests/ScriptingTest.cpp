@@ -45,6 +45,10 @@ namespace LaurelEye {
         void setFullscreen(bool flag) override {
             // attributes.fullscreen = flag;
         }
+
+        void setCursorMode(CursorMode mode) override {
+            return;
+        }
     };
     void scriptingBasicTest() {
         using namespace Scripting;

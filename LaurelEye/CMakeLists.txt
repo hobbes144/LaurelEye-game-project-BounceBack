@@ -47,6 +47,8 @@ set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_CLEAN_FILES
 
 # Include sub-projects.
 add_subdirectory("source/LaurelEyeEngine")
+
+option(BUILD_TESTS "Build Engine Tests" OFF)
 add_subdirectory("tests/LaurelEyeEngineUnitTests")
 add_subdirectory("games")
 
