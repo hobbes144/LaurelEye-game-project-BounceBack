@@ -7,6 +7,8 @@
 
 #include "LaurelEyeEngine/graphics/resources/Shader.h"
 
+#include "LaurelEyeEngine/graphics/resources/Texture.h"
+#include "LaurelEyeEngine/logging/EngineLog.h"
 #include "LaurelEyeEngine/math/Matrix4.h"
 #include "LaurelEyeEngine/math/Vector3.h"
 
@@ -356,10 +358,11 @@ namespace LaurelEye::Graphics {
     void Shader::bindTexture(
         unsigned int textureUnit,
         const std::string& name,
-        TextureHandle texHandle) const {
+        TextureHandle texHandle, TextureType type) const {
 
         // Validate texture unit against device limits to avoid GL_INVALID_ENUM.
         GLint maxUnits = 0;
+        // LE_ASSERT("Graphics", textureUnit < 10, "Texture " << name << " bound here");
         glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxUnits);
         if ( static_cast<GLint>(textureUnit) >= maxUnits ) {
             std::cout << "Poopoo Peepee" << std::endl;
@@ -367,16 +370,46 @@ namespace LaurelEye::Graphics {
         }
         glActiveTexture(GL_TEXTURE0 + textureUnit);
         // always 2D textures for now
-        glBindTexture(GL_TEXTURE_2D, texHandle);
+        switch ( type ) {
+        case TextureType::Texture2D:
+            glBindTexture(GL_TEXTURE_2D, texHandle);
+            break;
+        case TextureType::TextureCube:
+            glBindTexture(GL_TEXTURE_CUBE_MAP, texHandle);
+            break;
+        case TextureType::Texture3D:
+            glBindTexture(GL_TEXTURE_3D, texHandle);
+            break;
+        case TextureType::TextureStorage2D:
+            break;
+        }
         // set the sampler uniform to the texture unit index
         setInt(name, static_cast<int>(textureUnit));
     }
 
-     void Shader::unbindTexture(unsigned int textureUnit) const
-     {
-       glActiveTexture(GL_TEXTURE0 + textureUnit);
-         glBindTexture(GL_TEXTURE_2D, 0);
-     }
+     void Shader::unbindTexture(
+        unsigned int textureUnit,
+        TextureType type) const {
+        glActiveTexture(GL_TEXTURE0 + textureUnit);
+
+        switch ( type ) {
+        case TextureType::Texture2D:
+            glBindTexture(GL_TEXTURE_2D, 0);
+            break;
+
+        case TextureType::TextureCube:
+            glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+            break;
+
+        case TextureType::Texture3D:
+            glBindTexture(GL_TEXTURE_3D, 0);
+            break;
+        case TextureType::TextureStorage2D:
+            break;
+        }
+    }
+
+
 
     // void Shader::bindImageTexture(
     //   unsigned int bindingUnit,

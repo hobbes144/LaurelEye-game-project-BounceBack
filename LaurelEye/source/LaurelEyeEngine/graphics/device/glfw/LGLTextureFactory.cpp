@@ -56,6 +56,11 @@ namespace LaurelEye::Graphics {
         case TextureFormat::RGBA16F:
         case TextureFormat::RGBA32F:
             return GL_RGBA;
+        //case TextureFormat::DEPTH16:
+        case TextureFormat::DEPTH24:
+        case TextureFormat::DEPTH32F:
+            return GL_DEPTH_COMPONENT;
+
         default:
             // TODO: Replace this with proper warning logging.
 #if !defined(NDEBUG)
@@ -113,6 +118,12 @@ namespace LaurelEye::Graphics {
         case TextureFormat::RGB32F:
         case TextureFormat::RGBA16F:
         case TextureFormat::RGBA32F:
+            return GL_FLOAT;
+        //case TextureFormat::DEPTH16:
+            //return GL_UNSIGNED_SHORT;
+        case TextureFormat::DEPTH24:
+            return GL_UNSIGNED_INT;
+        case TextureFormat::DEPTH32F:
             return GL_FLOAT;
         default:
             // TODO: Replace this with proper warning logging.
@@ -186,43 +197,78 @@ namespace LaurelEye::Graphics {
         TextureHandle h;
 
         assert(
-            d.type == TextureType::Texture2D &&
+            d.type == TextureType::Texture2D || d.type == TextureType::TextureCube &&
             "ERROR::RENDERSYSTEM::TEXTUREFACTORY::CREATE::INVALIDTYPE::Texture3D not supported");
 
         glGenTextures(1, &h);
 
         textures[h] = d;
 
-        if ( d.samples == SampleCount::X1 ) {
-            glBindTexture(GL_TEXTURE_2D, h);
-            glTexImage2D(
-                GL_TEXTURE_2D, 0,
-                textureFormatToGLFormat(d.format),
-                d.width, d.height, 0,
-                textureFormatToGLBaseFormat(d.format),
-                textureFormatToGLUploadFormat(d.format), init);
+        switch ( d.type )
+        {
+            case TextureType::Texture2D:
+            {
+                if ( d.samples == SampleCount::X1 ) {
+                    glBindTexture(GL_TEXTURE_2D, h);
+                    glTexImage2D(
+                        GL_TEXTURE_2D, 0,
+                        textureFormatToGLFormat(d.format),
+                        d.width, d.height, 0,
+                        textureFormatToGLBaseFormat(d.format),
+                        textureFormatToGLUploadFormat(d.format), init);
 
-            if ( init != nullptr && d.mipMode == TextureMipMode::AutoGenerate )
-                glGenerateMipmap(GL_TEXTURE_2D);
-            else {
+                    if ( init != nullptr && d.mipMode == TextureMipMode::AutoGenerate )
+                        glGenerateMipmap(GL_TEXTURE_2D);
+                    else {
+                        // Reasonable defaults (you’ll likely use separate samplers anyway)
+                        glTextureParameteri(h, GL_TEXTURE_COMPARE_MODE, GL_NONE); // Required for Shadows
+                        glTextureParameteri(h, GL_TEXTURE_MIN_FILTER, d.mipLevels > 1 ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
+                        glTextureParameteri(h, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                        glTextureParameteri(h, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                        glTextureParameteri(h, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+                    }
+                    glBindTexture(GL_TEXTURE_2D, 0);
+                }
+                else {
+                    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, h);
+                    glTexImage2DMultisample(
+                        GL_TEXTURE_2D_MULTISAMPLE,
+                        (GLsizei)getSampleIntFromSampleCount(d.samples),
+                        textureFormatToGLFormat(d.format),
+                        d.width, d.height,
+                        GL_TRUE // or GL_FALSE for variable sample locations
+                    );
+                    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+                }
+                break;
+            }
+            case TextureType::TextureCube:
+            {
+                glBindTexture(GL_TEXTURE_CUBE_MAP, h);
+                // Allocate 6 faces
+                for ( int face = 0; face < 6; face++ ) {
+                    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, 0,
+                                 textureFormatToGLFormat(d.format), d.width, d.height,
+                                 0, textureFormatToGLBaseFormat(d.format), textureFormatToGLUploadFormat(d.format), nullptr);
+                }
                 // Reasonable defaults (you’ll likely use separate samplers anyway)
                 glTextureParameteri(h, GL_TEXTURE_COMPARE_MODE, GL_NONE); // Required for Shadows
-                glTextureParameteri(h, GL_TEXTURE_MIN_FILTER, d.mipLevels > 1 ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
+                // Cube map sampling rules
+                glTextureParameteri(h, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
                 glTextureParameteri(h, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
                 glTextureParameteri(h, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
                 glTextureParameteri(h, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+                glTextureParameteri(h, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+                // For shadow cube maps:
+                // add if we do hardware compare(not recomment for cubemap)
+                // glTextureParameteri(h, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+                // glTextureParameteri(h, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+                glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+                break;
             }
-        }
-        else {
-            glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, h);
-            glTexImage2DMultisample(
-                GL_TEXTURE_2D_MULTISAMPLE,
-                (GLsizei)getSampleIntFromSampleCount(d.samples),
-                textureFormatToGLFormat(d.format),
-                d.width, d.height,
-                GL_TRUE // or GL_FALSE for variable sample locations
-            );
-            glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+            case TextureType::Texture3D:
+            case TextureType::TextureStorage2D:
+            break;
         }
 
         return h;

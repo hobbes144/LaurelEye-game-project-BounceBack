@@ -16,20 +16,20 @@ namespace LaurelEye::Graphics {
     struct FrameContext;
     class RenderResources;
 
-    /// @class ShadowPass
+    /// @class PointShadowSkinnedPass
     /// @brief Concrete implementation of a shadow render pass.
     ///
     /// The `ShadowPass` is used to write the depth to a framebuffer.
     /// Note that it does not handle transparent objects. They are treated as
     /// opaque.
-    class ShadowSkinnedPass : public IRenderPass {
+    class PointShadowSkinnedPass : public IRenderPass {
     public:
         struct Properties {
             Matrix4 ProjViewMatrix;
         };
 
         /// @brief Default constructor.
-        ShadowSkinnedPass() : IRenderPass() {}
+        PointShadowSkinnedPass() : IRenderPass() {}
 
         /// \copydoc IRenderPass::setup
         void setup(RenderResources& rs) override;
@@ -40,7 +40,7 @@ namespace LaurelEye::Graphics {
 
     private:
         void drawSkinnedRenderables(const FrameContext& ctx, std::shared_ptr<Shader> shader);
-        //void drawSkinnedRenderablesOnly(const FrameContext& ctx, std::shared_ptr<Shader> shader);
+        // void drawSkinnedRenderablesOnly(const FrameContext& ctx, std::shared_ptr<Shader> shader);
 
     protected:
         Properties properties;

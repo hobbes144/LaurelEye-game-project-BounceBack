@@ -54,7 +54,7 @@ namespace LaurelEye::Graphics {
         float intensity;
         Vector3 color;
         float range;
-        uint32_t shadowIndex = Shadow::NoShadow;
+        uint32_t shadowIndex = Shadow::ShadowPending;
         int32_t active = (int32_t)false;
         // Struct size is 36, so we need to pad after to align next struct to 16 byte
         // boundary.

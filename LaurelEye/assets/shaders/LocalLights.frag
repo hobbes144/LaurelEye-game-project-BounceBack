@@ -7,6 +7,7 @@
 #version 440
 
 const float pi = 3.14159265358979323846;
+const int MAX_SHADOWS = 16;
 
 layout (binding = 0) uniform camera
 {
@@ -33,6 +34,9 @@ layout(std430, binding = 2) buffer LightBuffer {
     Light lights[];
 };
 
+// upgrade to samplerCube array if you want
+uniform samplerCube shadowCubeMaps[MAX_SHADOWS];
+
 uniform uint lightIndex;
 
 uniform uint height, width;
@@ -43,6 +47,32 @@ uniform sampler2D gbuffer_diffuse;
 uniform sampler2D gbuffer_specular;
 
 out vec3 FragColor;
+
+// from learn opengl
+// https://learnopengl.com/Advanced-Lighting/Shadows/Point-Shadows
+float computePointShadow(uint shadowIdx, vec3 fragPos, vec3 lightPos, vec3 N)
+{
+    // get vector between fragment position and light position
+    vec3 L = fragPos - lightPos;
+
+    // get current linear depth as the length between the fragment and light position
+    float currentDepth = length(L);
+
+    vec3 dir = normalize(L);
+
+    // use the light to fragment vector to sample from the depth map
+    // Sample depth from cube map
+    float closestDepth = texture(shadowCubeMaps[shadowIdx], dir).r;
+
+    // it is currently in linear range between [0,1]. Re-transform back to original value
+    // Scale back to world units
+    closestDepth *= lights[lightIndex].radius; // or farPlane if you store it
+
+    // now test for shadows
+    float bias = max(0.5 * (1.0 - dot(normalize(fragPos - lightPos), N)), 0.005);
+
+    return (currentDepth - bias > closestDepth) ? 1.0 : 0.0;
+}
 
 void main()
 {
@@ -97,6 +127,15 @@ void main()
 
 
     FragColor *= attenuation;
+
+
+    // Shadow
+    float shadow = 0.0;
+    if (light.shadowIndex != 0xFFFFFFFFu) {
+        shadow = computePointShadow(light.shadowIndex, worldPos, light.position,N);
+    }
+
+    FragColor *= (1.0 - shadow);
 
     if ( lights[lightIndex].isActive == false || lightDistance > radius  || texture(gbuffer_diffuse, gBufferPosition).w == 0.0f )
       discard;

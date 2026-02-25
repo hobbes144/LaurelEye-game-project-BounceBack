@@ -111,9 +111,10 @@ namespace LaurelEye::Graphics {
         void bindTexture(
              unsigned int textureUnit,
              const std::string& name,
-             TextureHandle textureID) const;
+             TextureHandle textureID,
+            TextureType type = TextureType::Texture2D) const;
         void unbindTexture(
-             unsigned int textureUnit) const;
+            unsigned int textureUnit, TextureType type = TextureType::Texture2D) const;
 
         //Image Textures
         /*void bindImageTexture(

@@ -60,6 +60,7 @@ namespace LaurelEye::Graphics {
 
             sphereMesh->draw(GL_TRIANGLES);
             glDepthMask(GL_TRUE);
+            shader->unbindTexture(10);
         }
         shader->setInt("isSkydome", 0);
 

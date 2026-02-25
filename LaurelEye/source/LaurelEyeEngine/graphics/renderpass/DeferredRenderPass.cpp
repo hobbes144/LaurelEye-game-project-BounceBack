@@ -73,6 +73,8 @@ namespace LaurelEye::Graphics {
 
         shader->unuse();
 
+        if ( isValidTexture(sunShadowTex) ) shader->unbindTexture(10);
+
         glDepthMask(GL_TRUE);
         glEnable(GL_DEPTH_TEST);
 

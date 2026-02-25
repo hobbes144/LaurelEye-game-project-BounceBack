@@ -16,8 +16,10 @@
 #include "LaurelEyeEngine/math/Matrix4.h"
 #include "LaurelEyeEngine/math/Vector3.h"
 
+
 #include "LaurelEyeEngine/graphics/renderpass/ShadowPass.h"
 #include "LaurelEyeEngine/graphics/renderpass/ShadowSkinnedPass.h"
+#include "LaurelEyeEngine/graphics/renderpass/PointShadowSkinnedPass.h"
 #include <cstdint>
 // #include "MomentShadowMapPass.h"
 
@@ -81,6 +83,7 @@ namespace LaurelEye::Graphics {
         const ShadowInfo& getShadow(ShadowHandle h) const { return shadows[h]; }
         const std::vector<ShadowResource>& getShadowResources() const { return shadowResources; }
         const ShadowResource& getShadowResource(ShadowHandle h) const { return shadowResources[h]; }
+        void removeAllShadows();
 
         // void setMomentWidth(int width);
         // void updateMomentShadowMap(ShadowInfo& shadow);
@@ -102,6 +105,7 @@ namespace LaurelEye::Graphics {
 
         // ShadowPass shadowPass;
         ShadowSkinnedPass shadowPass;
+        PointShadowSkinnedPass pointShadowPass;
         // MomentShadowMapPass momentShadowMapPass;
 
         // void calculateMomentWeights(int width);

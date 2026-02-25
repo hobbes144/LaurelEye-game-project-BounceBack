@@ -699,6 +699,10 @@ namespace LaurelEye::Graphics {
                 break;
             }
             lightProperties.erase(it);
+            if ( lightProperties.size() == 0 ) {
+                tempShadowManager->removeAllShadows();
+                localLights.pointLights.clear();
+            }
         }
     }
 
@@ -736,8 +740,14 @@ namespace LaurelEye::Graphics {
             if ( pointLightMapping.contains(light.second->GetRenderID()) ) {
                 auto pointLight = static_cast<PointLightComponent*>(light.second);
                 auto& lightData = pointLight->getLightData();
-                lightData.active = pointLight->isActive();
-                localLights.pointLights[pointLightMapping[pointLight->GetRenderID()]] = lightData;
+                auto& dst = localLights.pointLights[pointLightMapping[pointLight->GetRenderID()]];
+
+                // Only update dynamic fields
+                dst.active = pointLight->isActive();
+                dst.position = lightData.position;
+                dst.color = lightData.color;
+                dst.range = lightData.range;
+                dst.intensity = dst.intensity;
             }
         }
         device->updateDataBufferSubData(

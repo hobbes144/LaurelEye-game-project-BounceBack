@@ -1,6 +1,6 @@
 ﻿/*!****************************************************************************
  * \file   ShadowManager.cpp
- * \author Anish Murthy (anish.murthy@digipen.edu)
+ * \author Anish Murthy (anish.murthy@digipen.edu) Martin Chow
  * \date   04-21-2025
  *
  * Copyright © 2025 DIGIPEN Institute of Technology. All rights reserved.
@@ -27,8 +27,9 @@
 
 namespace LaurelEye::Graphics {
 
-    ShadowManager::ShadowManager(RenderResources* _rs) : rs(_rs), shadows(), shadowPass(ShadowSkinnedPass()) {
+    ShadowManager::ShadowManager(RenderResources* _rs) : rs(_rs), shadows(), shadowPass(ShadowSkinnedPass()), pointShadowPass(PointShadowSkinnedPass()) {
         shadowPass.setup(*rs);
+        pointShadowPass.setup(*rs);
         DataBufferDesc d{
             DataBufferType::SSBO,
             DataBufferUpdateMode::Dynamic,
@@ -54,10 +55,11 @@ namespace LaurelEye::Graphics {
         for ( uint32_t i = 0; i < lights->pointLights.size(); ++i ) {
             const PointLight& light = lights->pointLights[i];
             if ( !isNoShadow(light.shadowIndex) ) {
+                // Todo: filter out the light that too far base on camera position.
+
                 // Init lights if they don't already exist.
                 if ( isShadowPending(light.shadowIndex) ) {
                     const uint32_t shadowIndex = addShadow(i, &lights->pointLights[i], ShadowDesc());
-
                     updateShadow(ctx, light.shadowIndex, light.position);
                     // updateMomentShadowMap(shadows[shadowIndex]);
                 }
@@ -83,7 +85,8 @@ namespace LaurelEye::Graphics {
         // Creating the Shadow FBOs
         TextureDesc shadowTexture;
         shadowTexture.debugName = "shadow_" + std::to_string(handle);
-        shadowTexture.format = TextureFormat::RGBA32F;
+        shadowTexture.type = TextureType::TextureCube;
+        shadowTexture.format = TextureFormat::DEPTH24;
         shadowTexture.width = d.resolution.width;
         shadowTexture.height = d.resolution.height;
         shadowTexture.mipMode = TextureMipMode::None;
@@ -93,17 +96,13 @@ namespace LaurelEye::Graphics {
             shadowTexture,
             shadow.tag);
 
-        FramebufferAttachmentDesc shadowTexAttachment;
-        shadowTexAttachment.texture = r.texture;
-        shadowTexAttachment.type = FramebufferAttachmentType::Color;
-
         FramebufferAttachmentDesc shadowDepthAttachment;
         shadowDepthAttachment.type = FramebufferAttachmentType::Depth;
+        shadowDepthAttachment.texture = r.texture;
         // shadowDepthAttachment.format = TextureFormat::DEPTH32F;
         shadowDepthAttachment.format = TextureFormat::DEPTH24;
 
         FramebufferDesc shadowFramebuffer;
-        shadowFramebuffer.attachments.push_back(shadowTexAttachment);
         shadowFramebuffer.attachments.push_back(shadowDepthAttachment);
         shadowFramebuffer.size = d.resolution;
 
@@ -178,32 +177,106 @@ namespace LaurelEye::Graphics {
         ShadowInfo& shadow = shadows[h];
         ShadowResource& r = shadowResources[h];
 
-        device->bindFramebufferBase(r.framebuffer);
-
         glViewport(0, 0, shadow.desc.resolution.width, shadow.desc.resolution.height);
-        GLfloat bkColor[4];
-        glGetFloatv(GL_COLOR_CLEAR_VALUE, bkColor);
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-        device->clear();
-        glClearColor(bkColor[0], bkColor[1], bkColor[2], bkColor[3]);
+
+        // Directions and ups for each cube face
+        // note that it is static const so it only create once
+        static const Vector3 directions[6] = {
+            Vector3(1.0f, 0.0f, 0.0f),  // +X
+            Vector3(-1.0f, 0.0f, 0.0f), // -X
+            Vector3(0.0f, 1.0f, 0.0f),  // +Y
+            Vector3(0.0f, -1.0f, 0.0f), // -Y
+            Vector3(0.0f, 0.0f, 1.0f),  // +Z
+            Vector3(0.0f, 0.0f, -1.0f)  // -Z
+        };
+
+        static const Vector3 ups[6] = {
+            Vector3(0.0f, -1.0f, 0.0f), // +X
+            Vector3(0.0f, -1.0f, 0.0f), // -X
+            Vector3(0.0f, 0.0f, 1.0f),  // +Y
+            Vector3(0.0f, 0.0f, -1.0f), // -Y
+            Vector3(0.0f, -1.0f, 0.0f), // +Z
+            Vector3(0.0f, -1.0f, 0.0f)  // -Z
+        };
 
         if ( shadow.source == ShadowSourceType::Point ) {
-            const Matrix4 viewMatrix = Matrix4::lookAt(
-                posDir,
-                posDir - Vector3(0.0f, 1.0f, 0.0f),
-                Vector3(0.0f, 0.0f, -1.0f));
+
+            device->bindFramebufferBase(r.framebuffer);
+
+            glEnable(GL_DEPTH_TEST);
+            glDepthMask(GL_TRUE);
+            glDisable(GL_BLEND);
+            glEnable(GL_CULL_FACE);
+            glCullFace(GL_FRONT);
+            glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+
+            glDrawBuffer(GL_NONE);
+            glReadBuffer(GL_NONE);
+
+            // cube map need 90 degree fov and aspect ratio of 1
             const Matrix4 projectionMatrix = Matrix4::perspective(
-                45.0f * 3.14159f / 180.0f,
-                1.0f,
+                90.0f * 3.14159f / 180.0f, 1.0f,
                 params.near,
                 params.far);
-            shadowPass.setProperties(
-                ShadowSkinnedPass::Properties{projectionMatrix * viewMatrix});
-            r.shadowMatrix =
-                Matrix4::translation(0.5f) * Matrix4::scale(0.5f) *
-                projectionMatrix * viewMatrix;
+
+            for ( int face = 0; face < 6; ++face )
+            {
+                glFramebufferTexture2D(
+                    GL_FRAMEBUFFER,
+                    GL_DEPTH_ATTACHMENT,
+                    GL_TEXTURE_CUBE_MAP_POSITIVE_X + face,
+                    r.texture, 0);
+
+                glClear(GL_DEPTH_BUFFER_BIT);
+
+                const Matrix4 viewMatrix = Matrix4::lookAt(
+                    posDir,
+                    posDir + directions[face],
+                    ups[face]);
+
+                pointShadowPass.setProperties(
+                    PointShadowSkinnedPass::Properties{projectionMatrix * viewMatrix});
+                r.shadowMatrix =
+                    Matrix4::translation(0.5f) * Matrix4::scale(0.5f) *
+                    projectionMatrix * viewMatrix;
+                pointShadowPass.execute(ctx);
+            }
+
+            // move all below this to state handle if need
+            // Restore state after rendering to shadow map
+
+            // Restore color writes
+            glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+
+            // Restore depth state
+            glEnable(GL_DEPTH_TEST);
+            glDepthMask(GL_TRUE);
+            glDepthFunc(GL_LESS);
+
+            // Restore culling
+            glDisable(GL_CULL_FACE);
+
+            // Restore blending
+            glDisable(GL_BLEND);
+
+            // Unbind framebuffer to return to default framebuffer
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+            // Restore draw/read buffers
+            glDrawBuffer(GL_BACK);
+            glReadBuffer(GL_BACK);
+
         }
         else {
+            // normal directional shadow mapping, orthographic projection from sun direction
+            device->bindFramebufferBase(r.framebuffer);
+
+            GLfloat bkColor[4];
+            glGetFloatv(GL_COLOR_CLEAR_VALUE, bkColor);
+            glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+            device->clear();
+            glClearColor(bkColor[0], bkColor[1], bkColor[2], bkColor[3]);
+
             const Matrix4 viewMatrix = Matrix4::lookAt(
                 (-posDir) * 100.0f,
                 0.0f,
@@ -218,14 +291,26 @@ namespace LaurelEye::Graphics {
             r.shadowMatrix =
                 Matrix4::translation(0.5f) * Matrix4::scale(0.5f) *
                 projectionMatrix * viewMatrix;
+            shadowPass.execute(ctx);
         }
-        shadowPass.execute(ctx);
+
 
         rs->getRenderDevice().updateDataBufferSubData(shadowResourcesBuffer, sizeof(ShadowResource) * h, sizeof(ShadowResource), &r);
     }
 
     void ShadowManager::bindShadowBuffer() const {
         rs->getRenderDevice().bindDataBufferBase(shadowResourcesBuffer);
+    }
+
+    void ShadowManager::removeAllShadows() {
+        for ( auto shadow : shadows ) {
+            int handle = shadow.handle;
+            std::string name = "shadow_" + std::to_string(handle);
+            rs->destroyFramebuffer(name);
+            rs->destroyTexture(name);
+        }
+        shadows.clear();
+        shadowResources.clear();
     }
 
     // void ShadowManager::calculateMomentWeights(int width) {

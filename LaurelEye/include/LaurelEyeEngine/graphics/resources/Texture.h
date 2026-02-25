@@ -47,7 +47,8 @@ namespace LaurelEye::Graphics {
     enum class TextureType {
         Texture2D,
         Texture3D,
-        TextureStorage2D
+        TextureStorage2D,
+        TextureCube
     };
 
     /// @enum TextureMipMode

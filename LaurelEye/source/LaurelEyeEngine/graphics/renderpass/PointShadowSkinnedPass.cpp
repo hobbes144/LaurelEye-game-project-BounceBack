@@ -5,12 +5,12 @@
 /// @date    10-14-2025
 /// @brief Implementation of SinglePass render pass
 
-#include "LaurelEyeEngine/graphics/renderpass/ShadowSkinnedPass.h"
+#include "LaurelEyeEngine/graphics/renderpass/PointShadowSkinnedPass.h"
 
 #include "LaurelEyeEngine/graphics/graphics_components/IRenderableComponent.h"
 #include "LaurelEyeEngine/graphics/resources/DataBuffer.h"
-#include "LaurelEyeEngine/graphics/resources/Mesh.h"
 #include "LaurelEyeEngine/graphics/resources/FrameContext.h"
+#include "LaurelEyeEngine/graphics/resources/Mesh.h"
 #include "LaurelEyeEngine/graphics/resources/RenderResources.h"
 #include "LaurelEyeEngine/graphics/resources/Shader.h"
 #include "LaurelEyeEngine/graphics/ShaderManager.h"
@@ -19,17 +19,17 @@
 
 namespace LaurelEye::Graphics {
 
-    void ShadowSkinnedPass::setup(RenderResources& rs) {
-        shader = ShaderManager::getInstance().loadFile("../../../assets/shaders/Shadows.frag\n../../../assets/shaders/ShadowsSkinned.vert");
+    void PointShadowSkinnedPass::setup(RenderResources& rs) {
+        shader = ShaderManager::getInstance().loadFile("../../../assets/shaders/PointShadow.frag\n../../../assets/shaders/ShadowsSkinned.vert");
 
         DataBufferDesc shadowDataBuffer{};
         shadowDataBuffer.type = DataBufferType::UBO;
         shadowDataBuffer.sizeBytes = sizeof(Properties);
         shadowDataBuffer.bindingPoint = DataBuffer::CameraDataBinding;
-        propertiesHandle = rs.createDataBuffer("shadow_pass_properties", shadowDataBuffer, "shadow");
+        propertiesHandle = rs.createDataBuffer("point_shadow_pass_properties", shadowDataBuffer, "pointShadow");
     }
 
-    void ShadowSkinnedPass::execute(const FrameContext& ctx) {
+    void PointShadowSkinnedPass::execute(const FrameContext& ctx) {
 
         shader->use();
 
@@ -46,13 +46,12 @@ namespace LaurelEye::Graphics {
         drawSkinnedRenderables(ctx, shader);
     }
 
-    void ShadowSkinnedPass::setProperties(Properties _properties) {
+    void PointShadowSkinnedPass::setProperties(Properties _properties) {
         properties = _properties;
         propertiesDirty = true;
     }
 
-
-    void ShadowSkinnedPass::drawSkinnedRenderables(const FrameContext& ctx, std::shared_ptr<Shader> shader) {
+    void PointShadowSkinnedPass::drawSkinnedRenderables(const FrameContext& ctx, std::shared_ptr<Shader> shader) {
         if ( isValidDataBuffer(propertiesHandle) ) ctx.device.bindDataBufferBase(propertiesHandle);
 
         for ( const auto& icomponent : ctx.objects ) {
