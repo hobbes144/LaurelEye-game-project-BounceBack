@@ -2,7 +2,7 @@
 aimDistance = 12.0
 
 defaultShoulder = 6.5
-aimShoulder = 4.5
+aimShoulder = 8.5
 defaultHeight = 8.5
 aimHeight = 7.8
 zoomLerpSpeed = 12.0
@@ -35,9 +35,11 @@ currentFov = 1.1
 lockedPos = nil
 locked = false
 
+pivotPos = nil
 function onStart()
     transform = self:findTransform()
     target = findPlayer()
+    pivotPos = target:getWorldPosition()
 end
 
 function onUpdate(dt)
@@ -46,7 +48,7 @@ function onUpdate(dt)
         if target == nil then return end
     end
 
-    -- Mouse + controller look (FPS-style)
+    -- Mouse + controller look
     local dx, dy = Input:getMouseDelta()
 
     local rStickX = Input:getGamepadAxis(GamepadAxes.RStickX)
@@ -60,16 +62,19 @@ function onUpdate(dt)
 
     pitch = math.max(pitchMin, math.min(pitchMax, pitch))
 
+
     local playerPos = target:getWorldPosition()
     local camTransform = transform:getWorldTransform()
-    local camPos = camTransform:getPosition()
 
+    -- Check if aiming
     local isAiming = Input:isMouseButtonHeld(MouseButton.Right)
 
+    -- Set up base values
     local targetDistance = defaultDistance
     local targetShoulder = defaultShoulder
     local targetHeight = defaultHeight
 
+    -- Get entities for reference
     local scene = SceneManager:getCurrentScene()
     local cameraEntity = scene:findEntityByName("Camera")
     local cameraComponent = cameraEntity:findComponent("CameraComponent")
@@ -79,7 +84,6 @@ function onUpdate(dt)
         targetDistance = aimDistance
         targetShoulder = aimShoulder
         targetHeight = aimHeight
-
         targetFov = 0.6
     end
 
@@ -98,52 +102,43 @@ function onUpdate(dt)
     currentHeight =
         currentHeight + (targetHeight - currentHeight) * zoomLerpSpeed * dt
 
-    -- Build camera basis
+    -- Build rotation basis
     local rotQuat = Quaternion.fromEuler(pitch, yaw, 0)
     local forward = rotQuat:forward()
     local right = rotQuat:right()
 
-    -- Desired camera position (over-the-shoulder)
-    local desiredPos =
+    -- Target pivot follows player
+    local cameraPivot =
         playerPos
-        - forward * currentDistance
-        + right * currentShoulder
         + Vector3.new(0, currentHeight, 0)
 
-    local shoulderPivot =
-    playerPos
-    + right * (currentShoulder - 3.0)
-    + Vector3.new(0, currentHeight, 0)
+    pivotPos = pivotPos + (cameraPivot - pivotPos) * lerpSpeed * dt
 
-    local camDir = desiredPos - shoulderPivot
+    -- Camera position derived from pivot
+    local desiredPos =
+        pivotPos
+        - forward * currentDistance
+        + right * (currentShoulder - 3.0)
+
+    local camDir = desiredPos - pivotPos
     local camDist = camDir:Magnitude()
     camDir = camDir:Normalized()
 
-    local padding = 0.3
-
+    -- Raycasting to prevent clipping
     local hit = Physics.Raycast(
-        shoulderPivot,
+        pivotPos,
         camDir,
         camDist,
         { layerMask = Layers.World }
     )
 
+    local padding = 0.3
     if hit then
         desiredPos = hit.position + hit.normal * padding
     end
 
-    -- Smooth follow
-    camPos.x = camPos.x + (desiredPos.x - camPos.x) * lerpSpeed * dt
-    camPos.y = camPos.y + (desiredPos.y - camPos.y) * lerpSpeed * dt
-    camPos.z = camPos.z + (desiredPos.z - camPos.z) * lerpSpeed * dt
-    camTransform:setPosition(camPos)
-
-    -- Camera looks forward (aim direction), not directly at player
-    local targetRot = Quaternion.fromEuler(pitch, yaw, 0)
-    local currentRot = camTransform:getRotation()
-    local newRot = Quaternion.slerp(currentRot, targetRot, dt * lerpSpeed)
-
-    camTransform:setRotation(newRot)
+    camTransform:setPosition(desiredPos)
+    camTransform:setRotation(rotQuat)
     transform:setWorldTransform(camTransform)
 end
 

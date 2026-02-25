@@ -1,14 +1,8 @@
-﻿baseSpeed      = 350.0
-sprintSpeed    = 500.0
+﻿baseSpeed      = 50.0
+sprintSpeed    = 75.0
 moveSpeed      = baseSpeed
-accelGround    = 250.0
-accelAir       = 30.0
-decelGround    = 5.0
-jumpVelocity   = 60.5
-jumpCut        = 0.45
+dashSpeed      = 150.0
 turnSpeed      = 10.0
-dustTimer = 0.0
-dustInterval = 0.05
 timeToReachGround = 0.12   -- seconds to reach desired speed on ground (tweak)
 timeToReachAir    = 0.25   -- seconds to reach desired speed in air
 dvDeadzone        = 0.05   -- ignore tiny dv values to avoid jitter
@@ -46,9 +40,14 @@ projectileSpeed = 100.0
 maxHealth = 3.0
 currentHealth = maxHealth
 invincible = false
-invincibleTimer = 0
+invincibleTimer = 0.0
+invincibleDuration = 1.5
 
 doorSpawned = false
+
+dashDuration = 0.25
+dashTimer = 0.0
+isDashing = false
 
 function onStart()
     transform = self:findTransform()
@@ -117,198 +116,112 @@ function onUpdate(dt)
 
     if invincible then
         invincibleTimer = invincibleTimer + dt
-        if invincibleTimer >= 1.5 then
+        if invincibleTimer >= invincibleDuration then
             invincible = false
-            invincibleTimer = 0.0
         end
     end
 
-    if Input:isKeyPressed(Key.LShift) then
-        moveSpeed = sprintSpeed
-    end
-    if Input:isKeyReleased(Key.LShift) then
-        moveSpeed = baseSpeed
+    if isDashing then
+        dashTimer = dashTimer + dt
+        if dashTimer >= dashDuration then
+            isDashing = false
+
+            -- Only disable if not in damage invincibility
+            if invincibleTimer >= dashDuration then
+                invincible = false
+            end
+        end
     end
 
-    -- Poll input
+    moveSpeed = Input:isKeyHeld(Key.LShift) and sprintSpeed or baseSpeed
+
+    -- Input
     local lStickX = Input:getGamepadAxis(GamepadAxes.LStickX)
     local lStickY = Input:getGamepadAxis(GamepadAxes.LStickY)
 
-    if lStickX < 0.5 and lStickX > -0.5 then
-        lStickX = 0.0
-    end
-    if lStickY < 0.5 and lStickY > -0.5 then
-        lStickY = 0.0
-    end
-    local inputX = lStickX +
-                   (Input:isKeyHeld(Key.D) and 1 or 0) +
-                   (Input:isKeyHeld(Key.A) and -1 or 0)
+    -- Deadzone
+    if math.abs(lStickX) < 0.5 then lStickX = 0 end
+    if math.abs(lStickY) < 0.5 then lStickY = 0 end
 
-    local inputZ = -lStickY +
-                   (Input:isKeyHeld(Key.S) and -1 or 0) +
-                   (Input:isKeyHeld(Key.W) and 1 or 0)
+    local inputX =
+        lStickX +
+        (Input:isKeyHeld(Key.D) and 1 or 0) -
+        (Input:isKeyHeld(Key.A) and 1 or 0)
 
-    -- Clamp input to [-1, 1] range
-    inputX = math.max(-1, math.min(1, inputX))
-    inputZ = math.max(-1, math.min(1, inputZ))
+    local inputZ =
+        -lStickY +
+        (Input:isKeyHeld(Key.W) and 1 or 0) -
+        (Input:isKeyHeld(Key.S) and 1 or 0)
 
-    if hasBall and Input:isMouseButtonPressed(MouseButton.Left) then
-        shootProjectile()
-        hasBall = false
+    -- Normalize input
+    local inputMag = math.sqrt(inputX * inputX + inputZ * inputZ)
+    if inputMag > 1 then
+        inputX = inputX / inputMag
+        inputZ = inputZ / inputMag
     end
 
-    local mag = math.sqrt(inputX*inputX + inputZ*inputZ)
-    if mag > 0 then
-        inputX = inputX / mag
-        inputZ = inputZ / mag
-    end
-
+    -- Camera Movement
     local moveDir = getCameraRelativeMovement(inputX, inputZ)
-    local m = math.sqrt(moveDir.x*moveDir.x + moveDir.z*moveDir.z)
 
-    -- Normalize
-    if m < 0.0001 then
-        moveDir.x = 0
-        moveDir.z = 0
-    else
-        moveDir.x = moveDir.x / m
-        moveDir.z = moveDir.z / m
-    end
-
+    -- Physics Movement
     local vel = body:getLinearVelocity()
     local mass = body:getBodyData().mass
+
     local desiredX = moveDir.x * moveSpeed
     local desiredZ = moveDir.z * moveSpeed
 
-    -- horizontal delta velocity
     local dvx = desiredX - vel.x
     local dvz = desiredZ - vel.z
-    local dvMag = math.sqrt(dvx*dvx + dvz*dvz)
+    local dvMag = math.sqrt(dvx * dvx + dvz * dvz)
 
-    -- small deadzone to avoid jitter
     if dvMag > dvDeadzone then
-        -- choose time constant depending on grounded state
+
         local timeToReach = isGrounded and timeToReachGround or timeToReachAir
 
-        -- desired acceleration to reach the target within timeToReach
-        local accelReqX = dvx / math.max(timeToReach, 0.0001)
-        local accelReqZ = dvz / math.max(timeToReach, 0.0001)
-        local accelReqMag = math.sqrt(accelReqX*accelReqX + accelReqZ*accelReqZ)
+        local accelX = dvx / math.max(timeToReach, 0.0001)
+        local accelZ = dvz / math.max(timeToReach, 0.0001)
 
-        -- clamp to maximum allowed acceleration (ground/air)
-        local maxAccel = isGrounded and accelGround or accelAir
-        if accelReqMag > maxAccel then
-            accelReqX = accelReqX / accelReqMag * maxAccel
-            accelReqZ = accelReqZ / accelReqMag * maxAccel
-        end
+        local accelMag = math.sqrt(accelX * accelX + accelZ * accelZ)
 
-        -- force = mass * accel (physics: F = m * a)
-        local force = Vector3.new(accelReqX * mass, 0, accelReqZ * mass)
-        body:applyForce(force)
 
-        local animName = animator.currentAnimationName
-        if animName ~= "Running" then
+
+        body:applyForce(Vector3.new(accelX * mass, 0, accelZ * mass))
+
+        if animator.currentAnimationName ~= "Running" then
             animator:changeAnimation("Running")
         end
     else
-        local animName = animator.currentAnimationName
-        if animName ~= "Idle" then
+        if animator.currentAnimationName ~= "Idle" then
             animator:changeAnimation("Idle")
         end
     end
 
-    -- Jump check
-    if isGrounded and (Input:isKeyPressed(Key.Space) or Input:isButtonPressed(GamepadButton.A)) then
-        local mass = body:getBodyData().mass
-        body:applyImpulse(Vector3.new(0, jumpVelocity * mass, 0))
-        jumping = true
-        isGrounded = false
+    -- Rotation
+    if inputMag > 0 then
+        local angle = math.atan(moveDir.x, moveDir.z)
+        rotateTo(angle, dt)
     end
 
-    -- Jump cut
-    if jumping and not (Input:isKeyHeld(Key.Space) or Input:isButtonHeld(GamepadButton.A)) and vel.y > 0 then
-        vel.y = vel.y * jumpCut
-        body:setLinearVelocity(vel)
-        jumping = false
+    if Input:isMouseButtonPressed(MouseButton.Left) and hasBall then
+        shootProjectile()
+        hasBall = false
     end
 
-    -- Rotate
-    if mag > 0 then
-    local angle = math.atan(moveDir.x, moveDir.z)
-    rotateTo(angle, dt)
+    if Input:isKeyPressed(Key.Space) then
+        isDashing = true
+        dashTimer = 0.0
+
+        invincible = true
+        invincibleTimer = 0.0
+
+        local dashX = moveDir.x * dashSpeed
+        local dashZ = moveDir.z * dashSpeed
+
+        local dx = dashX - vel.x
+        local dz = dashZ - vel.z
+
+        body:applyImpulse(Vector3.new(dx * mass, 0, dz * mass)) 
     end
-
-    -- Dust + Landing Plume
-    local v = body:getLinearVelocity()
-
-    if smokeEmitter ~= nil and not inLandingBurst then
-        local horizontalSpeed = math.sqrt(v.x*v.x + v.z*v.z)
-
-        if isGrounded and horizontalSpeed > 50.0 then
-            dustTimer = dustTimer - dt
-            if dustTimer <= 0.0 then
-                smokeEmitter:play()
-                dustTimer = dustInterval
-            end
-        else
-            dustTimer = dustInterval
-            smokeEmitter:pause()
-        end
-    end
-
-    if inLandingBurst then
-        landingBurstTimer = landingBurstTimer - dt
-        if landingBurstTimer <= 0 then
-            local data = smokeEmitter:getEmitterData()
-            data.emissionRate = defaultEmissionRate
-            data.startSize = defaultStartSize
-            data.endSize = defaultEndSize
-            data.spreadAngle = defaultSpreadAngle
-            inLandingBurst = false
-        end
-    end
-
-    if speaker ~= nil then
-        local horizontalSpeed = math.sqrt(v.x*v.x + v.z*v.z)
-
-        if isGrounded and horizontalSpeed > walkSoundMinSpeed then
-            footstepTimer = footstepTimer + dt
-            if footstepTimer >= stepInterval then
-                footstepTimer = 0.0
-
-                if speaker then
-                    speaker:stop()
-                    speaker:play()
-                end
-            end
-        else
-            -- stopped or slow: reset timer
-            footstepTimer = 0.0
-        end
-    end
-
-    --[[if hasBall then
-        local scene = SceneManager:getCurrentScene()
-        if scene == nil then return end
-        local ball = scene:findEntityByName("Ball")
-        if ball == nil then return end
-        local bTransform = ball:findTransform()
-        if bTransform == nil then return end
-        local aimDir = findForward()
-
-        local playerTransform = self:findTransform()
-        if playerTransform == nil then return end
-        local playerPos = playerTransform:getWorldPosition()
-        local spawnHeight = 4.0
-        local spawnForward = 4.0
-
-        local spawnPos =
-            playerPos
-            + Vector3.new(0, spawnHeight, 0)
-            + aimDir * spawnForward
-
-        bTransform:setWorldPosition(spawnPos)
-    end]]--
 
 
     local anyTargets = targetCheck()
@@ -496,10 +409,6 @@ function moveHealthBar()
     local percent = currentHealth / maxHealth
     local newSize = Vector2.new(maxSize * percent, hSize.y)
     barTransform:setSize(newSize)
-
-    --local barPos = barTransform:getLocalOffset()
-    --local newPos = Vector2.new(barPos.x - 34, barPos.y)
-    --barTransform:setLocalOffset(newPos)
 end
 
 function targetCheck()

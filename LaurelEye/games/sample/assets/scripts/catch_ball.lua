@@ -26,17 +26,12 @@ function onUpdate(dt)
         initialSpeed = vel:Magnitude()
         returnSpeed = initialSpeed + 50.0
     end
-    if destroyed then return end
 end
 
 function onTriggerEnter(data)
-    if destroyed then return end
     if body == nil then return end
 
     if (isGround(data.entityA) or isGround(data.entityB)) then
-
-        print("Ball Has Hit Ground")
-
         -- After 2 bounces, home to player
         if bounceCount >= 2 then
 
@@ -54,28 +49,20 @@ function onTriggerEnter(data)
         end
 
         local vel = body:getLinearVelocity()
-        if vel:Magnitude() == 0 then return end
-
-        -- Get collision normal
-        local normal =
-            data.normal or
-            data.contactNormal or
-            Vector3.new(0, 1, 0)
+        local normal = data.normal or data.contactNormal
+        if normal == nil then return end
 
         normal = normal:Normalized()
 
-        -- Reflect
         local reflected = vel - normal * (2.0 * vel:Dot(normal))
-        reflected = reflected:Normalized()
 
+        -- optional homing
         local pos = transform:getWorldPosition()
-        local homingDir, hit = findEnemyDirection(pos, reflected)
-
+        local homingDir = findEnemyDirection(pos, reflected)
         if homingDir ~= nil then
-            reflected = homingDir
+            reflected = homingDir * reflected:Magnitude()
         end
 
-        reflected = reflected * initialSpeed
         --print("Reflected To " + reflected)
         body:setLinearVelocity(reflected)
 
@@ -116,7 +103,7 @@ function destroySelf()
 end
 
 function findEnemyDirection(origin, baseDir)
-    local maxDistance = 200.0
+    local maxDistance = 75.0
     local coneAngle = math.rad(15)      -- cone half-angle
     local rings = 3                     -- quality vs cost
     local raysPerRing = 6
