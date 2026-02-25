@@ -13,6 +13,9 @@
 #include <btBulletDynamicsCommon.h>
 
 #include "LaurelEyeEngine/physics/interfaces/IPhysicsWorld.h"
+#include "LaurelEyeEngine/physics/interfaces/Bullet/BulletRigidBody.h"
+#include "LaurelEyeEngine/physics/interfaces/Bullet/BulletGhostBody.h"
+//#include "LaurelEyeEngine/physics/interfaces/Bullet/BulletShape.h"
 
 namespace LaurelEye::Physics {
     class BulletWorld : public IPhysicsWorld {
@@ -22,9 +25,13 @@ namespace LaurelEye::Physics {
 
         void StepSimulation(float dt, int maxSubSteps = 1, float fixedTimeStep = 1.0f/60.0f) override;
 
-        std::shared_ptr<IBody> CreateBody(const PhysicsBodyData& data) override;
+        std::shared_ptr<IRigidBody> CreateRigidBody(const PhysicsBodyData& data) override;
+        //void RemoveBody(std::shared_ptr<IRigidBody> body);
 
-        void RemoveBody(std::shared_ptr<IBody> body) override;
+        std::shared_ptr<IGhostBody> CreateGhostBody(const PhysicsBodyData& data) override;
+        //void RemoveGhost(std::shared_ptr<IGhostBody> ghost);
+
+        void RemoveObject(std::shared_ptr<ICollider> body) override;
 
         std::shared_ptr<ICollisionShape> CreateShape(
             const CollisionShapePhys& csPhys) override;
@@ -37,6 +44,7 @@ namespace LaurelEye::Physics {
                            const RaycastParams& params) const override;
 
     private:
+        //std::vector<std::shared_ptr<BulletGhostBody>> ghosts;
         std::vector<std::shared_ptr<btDefaultMotionState>> motions;
 
         std::unique_ptr<btConstraintSolver> solver;

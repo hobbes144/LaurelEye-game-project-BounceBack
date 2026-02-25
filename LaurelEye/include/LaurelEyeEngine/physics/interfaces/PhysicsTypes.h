@@ -24,7 +24,7 @@ namespace LaurelEye::Physics {
 
     /// @brief The type of body
     enum class BodyType {
-        Static, Dynamic, Kinematic
+        Static, Dynamic, Kinematic, Ghost
     };
 
     enum CollisionLayer : uint32_t {
@@ -34,6 +34,7 @@ namespace LaurelEye::Physics {
         World = 1 << 2,
         Projectile = 1 << 3,
         Trigger = 1 << 4,
+        Sensor = 1 << 5,
         All = 0xFFFFFFFFu
     };
 
@@ -117,6 +118,61 @@ namespace LaurelEye::Physics {
             d.mass = (type == BodyType::Static ? 0.0f : mass);
             return d;
         }
+
+        static PhysicsBodyData TriggerBox(const Vector3& halfExtents) {
+            PhysicsBodyData d;
+            d.type = BodyType::Static;
+            d.shapeDefinition.type = CollisionShapePhys::ShapeType::Box;
+            d.shapeDefinition.size = halfExtents;
+            d.mass = 0.0f;
+
+            d.collisionGroup = CollisionLayer::Trigger;
+            d.collisionMask = CollisionLayer::Player |
+                              CollisionLayer::Enemy |
+                              CollisionLayer::Projectile;
+
+            d.friction = 0.0f;
+            d.restitution = 0.0f;
+            return d;
+        }
+
+        static PhysicsBodyData TriggerSphere(float radius) {
+            PhysicsBodyData d;
+            d.type = BodyType::Static;
+            d.shapeDefinition.type = CollisionShapePhys::ShapeType::Sphere;
+            d.shapeDefinition.radius = radius;
+            d.mass = 0.0f;
+
+            d.collisionGroup = CollisionLayer::Trigger;
+            d.collisionMask = CollisionLayer::Player;
+
+            d.friction = 0.0f;
+            d.restitution = 0.0f;
+            return d;
+        }
+
+        static PhysicsBodyData SensorCapsule(float radius, float height) {
+            PhysicsBodyData d;
+            d.type = BodyType::Kinematic;
+            d.shapeDefinition.type = CollisionShapePhys::ShapeType::Capsule;
+            d.shapeDefinition.radius = radius;
+            d.shapeDefinition.height = height;
+            d.mass = 0.0f;
+
+            d.collisionGroup = CollisionLayer::Sensor;
+            d.collisionMask = CollisionLayer::Player | CollisionLayer::Enemy;
+
+            d.friction = 0.0f;
+            d.restitution = 0.0f;
+            return d;
+        }
+
+        static PhysicsBodyData TriggerBoxPlayerOnly(const Vector3& halfExtents) {
+            auto d = TriggerBox(halfExtents);
+            d.collisionMask = CollisionLayer::Player;
+            return d;
+        }
+
     };
 
     /// @class RaycastHit

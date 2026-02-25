@@ -1,4 +1,4 @@
-﻿#include "LaurelEyeEngine/physics/interfaces/Bullet/BulletBody.h"
+﻿#include "LaurelEyeEngine/physics/interfaces/Bullet/BulletRigidBody.h"
 #include "LaurelEyeEngine/transform/TransformComponent.h"
 
 namespace LaurelEye::Physics {
@@ -16,62 +16,64 @@ namespace LaurelEye::Physics {
         return {q.w(), q.x(), q.y(), q.z()};
     }
 
-    BulletBody::BulletBody(std::shared_ptr<btRigidBody> body, std::shared_ptr<BulletShape> s, std::shared_ptr<btDefaultMotionState> motion)
+    BulletRigidBody::BulletRigidBody(std::shared_ptr<btRigidBody> body, std::shared_ptr<BulletShape> s, std::shared_ptr<btDefaultMotionState> motion)
         : btRB(std::move(body)), shape(std::move(s)), motionState(std::move(motion)){}
 
-    BulletBody::~BulletBody() {}
+    BulletRigidBody::~BulletRigidBody() {}
 
-    void BulletBody::ApplyForce(const Vector3& f) {
+    void BulletRigidBody::ApplyForce(const Vector3& f) {
         btRB->activate(true);
         btRB->applyCentralForce(ToBt(f));
     }
 
-    void BulletBody::ApplyImpulse(const Vector3& i) {
+    void BulletRigidBody::ApplyImpulse(const Vector3& i) {
         btRB->activate(true);
         btRB->applyCentralImpulse(ToBt(i));
     }
 
-    void BulletBody::BindTransform(LaurelEye::TransformComponent* t) {
+    void BulletRigidBody::BindTransform(LaurelEye::TransformComponent* t) {
         boundTransform = t;
     }
 
-    LaurelEye::TransformComponent* BulletBody::GetBoundTransform() const {
+    LaurelEye::TransformComponent* BulletRigidBody::GetBoundTransform() const {
         return boundTransform;
     }
 
-    void BulletBody::BindPhysicsBodyComponent(PhysicsBodyComponent* pbc) {
+    /*
+    void BulletRigidBody::BindPhysicsBodyComponent(PhysicsBodyBaseComponent* pbc) {
         btRB->setUserPointer(pbc);
     }
+    */
 
-    void BulletBody::SetLinearVelocity(const Vector3& v) {
+    void BulletRigidBody::SetLinearVelocity(const Vector3& v) {
         btRB->activate(true);
         btRB->setLinearVelocity(ToBt(v));
     }
 
-    Vector3 BulletBody::GetLinearVelocity() const {
+    Vector3 BulletRigidBody::GetLinearVelocity() const {
         return FromBt(btRB->getLinearVelocity());
     }
 
-    void BulletBody::SetAngularVelocity(const Vector3& v) {
+    void BulletRigidBody::SetAngularVelocity(const Vector3& v) {
         btRB->activate(true);
         btRB->setAngularVelocity(ToBt(v));
     }
 
-    Vector3 BulletBody::GetAngularVelocity() const {
+    Vector3 BulletRigidBody::GetAngularVelocity() const {
         return FromBt(btRB->getAngularVelocity());
     }
 
-    void BulletBody::SetMass(float m) {
+    void BulletRigidBody::SetMass(float m) {
         btVector3 inertia(0, 0, 0);
         btRB->getCollisionShape()->calculateLocalInertia(m, inertia);
         btRB->setMassProps(m, inertia);
     }
 
-    float BulletBody::GetMass() const {
+    float BulletRigidBody::GetMass() const {
         return 1.0f / btRB->getInvMass();
     }
 
-    void BulletBody::pushTransformToPhysics() {
+    void BulletRigidBody::pushTransformToPhysics() {
         if ( !btRB || !boundTransform ) return;
         const auto& pos = boundTransform->getWorldTransform().getPosition();
         const auto& rot = boundTransform->getWorldTransform().getRotation();
@@ -81,7 +83,7 @@ namespace LaurelEye::Physics {
         btRB->getMotionState()->setWorldTransform(btTrans);
     }
 
-    void BulletBody::updateTransformFromPhysics() {
+    void BulletRigidBody::updateTransformFromPhysics() {
         if ( !btRB || !boundTransform ) return;
         btTransform btTrans = btRB->getWorldTransform();
         btVector3 pos = btTrans.getOrigin();
@@ -91,5 +93,14 @@ namespace LaurelEye::Physics {
         //boundTransform->setWorldRotation(Quaternion(rot.w(), rot.x(), rot.y(), rot.z()));
         boundTransform->setAbsoluteWorldPosRot(Vector3(pos.x(), pos.y(), pos.z()), Quaternion(rot.w(), rot.x(), rot.y(), rot.z()));
     }
+
+    void* BulletRigidBody::GetUserData() const {
+        return btRB->getUserPointer();
+    }
+
+    void BulletRigidBody::SetUserData(void* ptr) {
+        btRB->setUserPointer(ptr);
+    }
+
 
 }

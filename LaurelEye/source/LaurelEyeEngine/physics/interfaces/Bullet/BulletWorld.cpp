@@ -1,6 +1,7 @@
 ﻿#include "LaurelEyeEngine/physics/interfaces/Bullet/BulletWorld.h"
-#include "LaurelEyeEngine/physics/interfaces/Bullet/BulletBody.h"
-#include "LaurelEyeEngine/physics/PhysicsBodyComponent.h"
+#include "LaurelEyeEngine/physics/interfaces/Bullet/BulletRigidBody.h"
+#include "LaurelEyeEngine/physics/PhysicsBodyBaseComponent.h"
+#include "LaurelEyeEngine/physics/GhostBodyComponent.h"
 
 namespace LaurelEye::Physics {
 
@@ -11,12 +12,13 @@ namespace LaurelEye::Physics {
         solver = std::make_unique<btSequentialImpulseConstraintSolver>();
         world = std::make_unique<btDiscreteDynamicsWorld>(
             dispatcher.get(), broadphase.get(), solver.get(), config.get());
+        world->getBroadphase()->getOverlappingPairCache()->setInternalGhostPairCallback(new btGhostPairCallback());
         world->setGravity(btVector3(0, -9.81f, 0));
     }
 
     BulletWorld::~BulletWorld() {
         for ( auto& body : bodies ) {
-            auto b = std::dynamic_pointer_cast<BulletBody>(body);
+            auto b = std::dynamic_pointer_cast<BulletRigidBody>(body);
             if ( b && b->GetInternal() ) world->removeRigidBody(b->GetInternal().get());
         }
 
@@ -37,9 +39,13 @@ namespace LaurelEye::Physics {
     void BulletWorld::StepSimulation(float dt, int maxSubSteps, float fixedTimeStep) {
         //Run Simlation
         world->stepSimulation(dt, maxSubSteps, fixedTimeStep);
+        world->getDispatcher()->dispatchAllCollisionPairs(
+            world->getBroadphase()->getOverlappingPairCache(),
+            world->getDispatchInfo(),
+            world->getDispatcher());
     }
 
-    std::shared_ptr<IBody> BulletWorld::CreateBody(const PhysicsBodyData& data) {
+    std::shared_ptr<IRigidBody> BulletWorld::CreateRigidBody(const PhysicsBodyData& data) {
 
         //Shape
         auto bulletShape = std::dynamic_pointer_cast<BulletShape>(CreateShape(data.shapeDefinition));
@@ -132,26 +138,145 @@ namespace LaurelEye::Physics {
         }
 
         //Save
-        auto newBody = std::make_shared<BulletBody>(body, bulletShape, motion);
+        auto newBody = std::make_shared<BulletRigidBody>(body, bulletShape, motion);
         bodies.push_back(newBody);
 
         return newBody;
     }
 
-    void BulletWorld::RemoveBody(std::shared_ptr<IBody> body) {
-        if ( !body ) return;
-        auto bulletBody = std::dynamic_pointer_cast<BulletBody>(body);
-        if ( !bulletBody ) return;
+    std::shared_ptr<IGhostBody> BulletWorld::CreateGhostBody(const PhysicsBodyData& data) {
 
-        auto internal = bulletBody->GetInternal();
-        if ( internal ) world->removeRigidBody(internal.get());
+        auto bulletShape =
+            std::dynamic_pointer_cast<BulletShape>(
+                CreateShape(data.shapeDefinition));
+        if ( !bulletShape ) throw std::runtime_error("Failed to create BulletShape");
+
+        // Apply local scaling from transform
+        if ( data.transformRef ) {
+            Vector3 scale = data.transformRef->getWorldScale();
+            btVector3 dim = bulletShape->GetInternal()->getLocalScaling();
+            bulletShape->GetInternal()->setLocalScaling(btVector3(scale.x * dim.x(), scale.y * dim.y(), scale.z) * dim.z());
+        }
+
+        // Start Transform
+        btTransform btStart;
+        btStart.setOrigin(btVector3(
+            data.transformRef->getWorldPosition().x,
+            data.transformRef->getWorldPosition().y,
+            data.transformRef->getWorldPosition().z));
+        btStart.setRotation(btQuaternion(
+            data.transformRef->getWorldRotation().x(),
+            data.transformRef->getWorldRotation().y(),
+            data.transformRef->getWorldRotation().z(),
+            data.transformRef->getWorldRotation().w()));
+
+        // Mass & Inertia
+        float mass = (data.type == BodyType::Dynamic || data.type == BodyType::Ghost) ? data.mass : 0.0f;
+
+        // Center of Mass
+        btCollisionShape* shape = bulletShape->GetInternal();
+        if ( !(data.centerOfMass == Vector3(0, 0, 0)) ) {
+            btCompoundShape* compound = new btCompoundShape();
+
+            btTransform offset;
+            offset.setIdentity();
+            offset.setOrigin(btVector3(
+                data.centerOfMass.x,
+                data.centerOfMass.y,
+                data.centerOfMass.z));
+
+            compound->addChildShape(offset, shape);
+
+            // Replace internal shape
+            bulletShape->SetInternal(compound);
+            shape = compound;
+        }
+
+        btVector3 linearVelocity(data.linearVelocity.x, data.linearVelocity.y, data.linearVelocity.z);
+        btVector3 angularVelocity(data.angularVelocity.x, data.angularVelocity.y, data.angularVelocity.z);
+
+        btVector3 inertia(0, 0, 0);
+        if ( mass > 0.0f ) bulletShape->GetInternal()->calculateLocalInertia(mass, inertia);
+        if ( !(data.inertia == Vector3(0, 0, 0)) ) {
+            inertia = btVector3(data.inertia.x, data.inertia.y, data.inertia.z);
+        }
+
+        // Motion State
+        auto motion = std::make_shared<btDefaultMotionState>(btStart);
+        motions.push_back(motion); // keep alive
+
+        // Body Info
+        btRigidBody::btRigidBodyConstructionInfo rbGhostInfo(
+            mass,
+            motion.get(),
+            bulletShape->GetInternal(),
+            inertia);
+        rbGhostInfo.m_linearDamping = data.linearDamping;
+        rbGhostInfo.m_angularDamping = data.angularDamping;
+        rbGhostInfo.m_friction = data.friction;
+        rbGhostInfo.m_restitution = data.restitution;
+
+        auto ghost = std::make_shared<btRigidBody>(rbGhostInfo);
+        ghost->setLinearVelocity(btVector3(data.linearVelocity.x, data.linearVelocity.y, data.linearVelocity.z));
+        ghost->setAngularVelocity(btVector3(data.angularVelocity.x, data.angularVelocity.y, data.angularVelocity.z));
+        ghost->setFriction(data.friction);
+        ghost->setRestitution(data.restitution);
+
+        ghost->setCollisionFlags(
+            ghost->getCollisionFlags() |
+            btCollisionObject::CF_NO_CONTACT_RESPONSE);
+
+        ghost->setCollisionShape(bulletShape->GetInternal());
+
+        btTransform start;
+        start.setIdentity();
+        ghost->setWorldTransform(start);
+
+        world->addRigidBody(ghost.get(), data.collisionGroup, data.collisionMask);
+
+        // Continuous Collision Detection
+        if ( data.useCCD ) {
+            ghost->setCcdMotionThreshold(data.ccdMotionThreshold);
+            ghost->setCcdSweptSphereRadius(data.ccdSweptSphereRadius);
+        }
+
+        // Gravity Scale
+        if ( data.gravityScale != 1.0f ) {
+            btVector3 worldGravity = world->getGravity();
+            ghost->setGravity(worldGravity * data.gravityScale);
+        }
+
+        auto newGhost =
+            std::make_shared<BulletGhostBody>(ghost, bulletShape);
+
+        ghosts.push_back(newGhost);
+        return newGhost;
+
+    }
+    
+    void BulletWorld::RemoveObject(std::shared_ptr<ICollider> body) {
+        if ( !body ) return;
+
+        auto bulletRigidBody = std::dynamic_pointer_cast<BulletRigidBody>(body);
+        if ( bulletRigidBody ) {
+
+            auto internal = bulletRigidBody->GetInternal();
+            if ( internal ) world->removeRigidBody(internal.get());
+        }
+
+        auto bulletGhostBody = std::dynamic_pointer_cast<BulletGhostBody>(body);
+        if ( bulletGhostBody ) {
+            auto internal = bulletGhostBody->GetInternal();
+            if ( internal ) world->removeCollisionObject(internal.get());
+        }
 
         // Erase body
         bodies.erase(
             std::remove_if(bodies.begin(), bodies.end(),
-                           [&](const std::shared_ptr<IBody>& b) { return b == body; }),
+                           [&](const std::shared_ptr<ICollider>& b) { return b == body; }),
             bodies.end());
     }
+
 
     std::shared_ptr<ICollisionShape> BulletWorld::CreateShape(const CollisionShapePhys& csp) {
         btCollisionShape* btShape = nullptr;
@@ -175,37 +300,74 @@ namespace LaurelEye::Physics {
     }
 
     void BulletWorld::GatherCollisions(CollisionManager& cm) {
+        // -------- PASS 1: Real collisions --------
         int numManifolds = dispatcher->getNumManifolds();
         for ( int i = 0; i < numManifolds; i++ ) {
             btPersistentManifold* manifold = dispatcher->getManifoldByIndexInternal(i);
             const btCollisionObject* obj0 = manifold->getBody0();
             const btCollisionObject* obj1 = manifold->getBody1();
 
-            auto body0 = static_cast<PhysicsBodyComponent*>(obj0->getUserPointer());
-            auto body1 = static_cast<PhysicsBodyComponent*>(obj1->getUserPointer());
+            auto body0 = static_cast<PhysicsBodyBaseComponent*>(obj0->getUserPointer());
+            auto body1 = static_cast<PhysicsBodyBaseComponent*>(obj1->getUserPointer());
             if ( !body0 || !body1 ) continue;
 
-            int numContacts = manifold->getNumContacts();
-            for ( int j = 0; j < numContacts; ++j ) {
-                btManifoldPoint& pt = manifold->getContactPoint(0);
-                Vector3 contactPoint(pt.getPositionWorldOnB().x(),
-                                     pt.getPositionWorldOnB().y(),
-                                     pt.getPositionWorldOnB().z());
-                Vector3 normal(pt.m_normalWorldOnB.x(),
-                               pt.m_normalWorldOnB.y(),
-                               pt.m_normalWorldOnB.z());
+            if ( body0->getOwner()->getId() == body1->getOwner()->getId() ) continue;
+
+            CollisionEventData::Interaction inter = CollisionEventData::Interaction::Collision;
+            if ( body0->GetBodyData().type == BodyType::Ghost || body1->GetBodyData().type == BodyType::Ghost ) {
+                inter = CollisionEventData::Interaction::Trigger;
+            }
+
+            if ( manifold->getNumContacts() == 0 ) continue;
+
+            btManifoldPoint& pt = manifold->getContactPoint(0);
+
+            Vector3 contactPoint(
+                pt.getPositionWorldOnB().x(),
+                pt.getPositionWorldOnB().y(),
+                pt.getPositionWorldOnB().z());
+
+            Vector3 normal(
+                pt.m_normalWorldOnB.x(),
+                pt.m_normalWorldOnB.y(),
+                pt.m_normalWorldOnB.z());
+
+            cm.registerContact(
+                body0->GetCollider()->GetBodyID(),
+                body1->GetCollider()->GetBodyID(),
+                inter,
+                contactPoint,
+                normal,
+                body0->getOwner(),
+                body1->getOwner());
+        }
+        /*
+        // -------- PASS 2: Ghost overlaps --------
+        for ( auto ghostBody : ghosts ) {
+            //btGhostObject* ghost = ghostBody->GetOverlaps();
+            //int count = ghost->getNumOverlappingObjects();
+            auto overlaps = ghostBody->GetOverlaps();
+
+            for ( ICollider* other : overlaps ) {
+
+                auto gbOwner = ghostBody->GetBoundTransform()->getOwner();
+                auto oOwner = other->GetBoundTransform()->getOwner();
+
+                if ( gbOwner == oOwner ) continue;
 
                 cm.registerContact(
-                    body0->GetBodyRef()->GetBodyID(),
-                    body1->GetBodyRef()->GetBodyID(),
-                    contactPoint,
-                    normal,
-                    body0->getOwner(),
-                    body1->getOwner()
-                );
+                    ghostBody->GetBodyID(),
+                    other->GetBodyID(),
+                    CollisionEventData::Interaction::Trigger,
+                    {},
+                    {},
+                    gbOwner,
+                    oOwner);
             }
         }
+        */
     }
+
 
     RaycastHit BulletWorld::Raycast(const Vector3& origin,
                                     const Vector3& direction,
@@ -236,7 +398,7 @@ namespace LaurelEye::Physics {
         out.distance = maxDistance * cb.m_closestHitFraction;
 
         const btCollisionObject* obj = cb.m_collisionObject;
-        auto body = static_cast<PhysicsBodyComponent*>(obj->getUserPointer());
+        auto body = static_cast<PhysicsBodyBaseComponent*>(obj->getUserPointer());
         out.entityRef = body->getOwner();
 
         return out;

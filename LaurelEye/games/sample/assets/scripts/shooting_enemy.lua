@@ -13,7 +13,7 @@ active = false
 
 function onStart()
     transform = self:findTransform()
-    body = self:findPhysics()
+    body = self:findRigidBody()
 
     shootingSpeed = math.random(minShootingSpeed * 100, maxShootingSpeed * 100) / 100
 
@@ -102,12 +102,6 @@ function autoShootProjectile(dt)
     local player = scene:findEntityByName("PlayerPrefab")
     if player == nil then return end
 
-    debugLog("Shooting player!")
-    local message = Message.new()
-    message.to = player
-    message.topic = "I am shooting you!"
-    Script.send(message)
-
     -- Player transform + spawn offset
     local selfTransform = self:findTransform()
     if selfTransform == nil then return end
@@ -151,7 +145,7 @@ function autoShootProjectile(dt)
         dir = forward -- fallback
     end
 
-    local projBody = proj:findPhysics()
+    local projBody = proj:findGhostBody()
     if projBody ~= nil then
         local projectileSpeed = 100.0 -- tune as needed
         projBody:setLinearVelocity(dir * projectileSpeed)

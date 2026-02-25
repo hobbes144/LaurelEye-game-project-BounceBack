@@ -92,7 +92,7 @@ function onUpdate(deltaTime)
                     local vy = 0.0
                     local vz = dirZ * blockSpeed
 
-                    local phys = entity:findPhysics()
+                    local phys = entity:findRigidBody()
                     if phys then
                         phys:setLinearVelocity(vx, vy, vz)
                     end

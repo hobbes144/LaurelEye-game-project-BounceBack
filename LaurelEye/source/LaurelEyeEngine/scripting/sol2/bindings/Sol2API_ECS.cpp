@@ -7,7 +7,9 @@
 #include "LaurelEyeEngine/graphics/graphics_components/DirectionalLightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/AmbientLightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/PointLightComponent.h"
-#include "LaurelEyeEngine/physics/PhysicsBodyComponent.h"
+#include "LaurelEyeEngine/physics/PhysicsBodyBaseComponent.h"
+#include "LaurelEyeEngine/physics/RigidBodyComponent.h"
+#include "LaurelEyeEngine/physics/GhostBodyComponent.h"
 #include "LaurelEyeEngine/scripting/ScriptComponent.h"
 #include "LaurelEyeEngine/audio/SpeakerComponent.h"
 #include "LaurelEyeEngine/particles/ParticleEmitterComponent.h"
@@ -60,7 +62,9 @@ namespace LaurelEye::Scripting {
         entityType.set_function("findDirectionalLight", &safeFindComponent<Graphics::DirectionalLightComponent>);
         entityType.set_function("findAmbientLight", &safeFindComponent<Graphics::AmbientLightComponent>);
         entityType.set_function("findPointLight", &safeFindComponent<Graphics::PointLightComponent>);
-        entityType.set_function("findPhysics", &safeFindComponent<Physics::PhysicsBodyComponent>);
+        entityType.set_function("findRigidBody", &safeFindComponent<Physics::RigidBodyComponent>);
+        entityType.set_function("findGhostBody", &safeFindComponent<Physics::GhostBodyComponent>);
+        //entityType.set_function("findPhysics", &safeFindComponent<Physics::PhysicsBodyBaseComponent>);
         entityType.set_function("findScript", &safeFindComponent<ScriptComponent>);
         entityType.set_function("findSpeaker", &safeFindComponent<Audio::SpeakerComponent>);
         entityType.set_function("findParticleEmitter", &safeFindComponent<Particles::ParticleEmitterComponent>);
@@ -97,7 +101,7 @@ namespace LaurelEye::Scripting {
                 return sol::make_object(lua, c);
         }
         else if ( type == "PhysicsBodyComponent" ) {
-            if ( auto* c = e.findComponent<Physics::PhysicsBodyComponent>() )
+            if ( auto* c = e.findComponent<Physics::PhysicsBodyBaseComponent>() )
                 return sol::make_object(lua, c);
         }
         else if ( type == "ParticleEmitterComponent" ) {

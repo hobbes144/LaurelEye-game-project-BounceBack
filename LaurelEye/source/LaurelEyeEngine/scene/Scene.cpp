@@ -20,7 +20,7 @@
 #include "LaurelEyeEngine/graphics/renderpass/GBufferSkinnedPass.h"
 #include "LaurelEyeEngine/graphics/renderpass/SkydomePass.h"
 #include "LaurelEyeEngine/particles/ParticleEmitterComponent.h"
-#include "LaurelEyeEngine/physics/PhysicsBodyComponent.h"
+#include "LaurelEyeEngine/physics/PhysicsBodyBaseComponent.h"
 #include "LaurelEyeEngine/scripting/ScriptComponent.h"
 #include "LaurelEyeEngine/transform/TransformComponent.h"
 
@@ -311,7 +311,7 @@ namespace LaurelEye {
                     // transformSystem->update(0.016f);
                 }
             }
-            else if ( auto* physComp = dynamic_cast<Physics::PhysicsBodyComponent*>(comp.get()) ) {
+            else if ( auto* physComp = dynamic_cast<Physics::PhysicsBodyBaseComponent*>(comp.get()) ) {
                 if ( physicsSystem ) {
                     physicsSystem->registerComponent(physComp);
                 }
@@ -401,7 +401,7 @@ namespace LaurelEye {
                     transformSystem->deregisterComponent(transformComp);
                 }
             }
-            else if ( auto* physComp = dynamic_cast<Physics::PhysicsBodyComponent*>(comp.get()) ) {
+            else if ( auto* physComp = dynamic_cast<Physics::PhysicsBodyBaseComponent*>(comp.get()) ) {
                 if ( physicsSystem ) {
                     physicsSystem->deregisterComponent(physComp);
                 }

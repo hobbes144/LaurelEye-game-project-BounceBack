@@ -8,9 +8,16 @@ bounceCount = 0.0
 
 returnSpeed = nil
 
+scene = nil
+playerEntity = nil
+playerTransform = nil
+
 function onStart()
     transform = self:findTransform()
-    body = self:findPhysics()
+    body = self:findGhostBody()
+    scene = SceneManager:getCurrentScene()
+    playerEntity = scene:findEntityByName("PlayerPrefab")
+    playerTransform = playerEntity and playerEntity:findTransform()
 end
 
 function onUpdate(dt)
@@ -22,28 +29,26 @@ function onUpdate(dt)
     if destroyed then return end
 end
 
-function onCollisionEnter(data)
+function onTriggerEnter(data)
     if destroyed then return end
     if body == nil then return end
 
     if (isGround(data.entityA) or isGround(data.entityB)) then
+
+        print("Ball Has Hit Ground")
+
         -- After 2 bounces, home to player
         if bounceCount >= 2 then
-            local scene = SceneManager:getCurrentScene()
-            if scene == nil then return nil end
-            local playerEntity = scene:findEntityByName("PlayerPrefab")
-            if playerEntity == nil then return nil end
-            local player = playerEntity:findTransform()
-            if player ~= nil then
-                local ballPos = transform:getWorldPosition()
-                local playerPos = player:getWorldPosition()
 
-                local dir = playerPos - ballPos
+            local ballPos = transform:getWorldPosition()
+            local playerPos = playerTransform:getWorldPosition()
+            playerPos = Vector3.new(playerPos.x, 4.5, playerPos.z)
 
-                if dir:Magnitude() > 0 then
-                    dir = dir:Normalized()
-                    body:setLinearVelocity(dir * returnSpeed)
-                end
+            local dir = playerPos - ballPos
+
+            if dir:Magnitude() > 0 then
+                dir = dir:Normalized()
+                body:setLinearVelocity(dir * returnSpeed)
             end
             return
         end
@@ -71,8 +76,10 @@ function onCollisionEnter(data)
         end
 
         reflected = reflected * initialSpeed
+        --print("Reflected To " + reflected)
         body:setLinearVelocity(reflected)
 
+        print("Ball Has Bounced")
         bounceCount = bounceCount + 1
     end
 end
@@ -85,13 +92,18 @@ function isGround(entity)
             return true
         end
         if tag == "target" then
+            SceneManager:destroy(entity)
             return true
         end
         if tag == "door" then
             return true
         end
         if tag == "player" then
-            bounceCount = 0
+            local message = Message.new()
+            message.to = playerEntity
+            message.topic = "Catch Me!"
+            Script.send(message)
+            SceneManager:destroy(self)
         end
     end
     return false

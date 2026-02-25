@@ -9,7 +9,7 @@ speaker = nil
 
 function onStart()
     transform = self:findTransform()
-    body = self:findPhysics()
+    body = self:findGhostBody()
 
     speaker = self:findAudioSpeaker()
     if speaker ~= nil then
@@ -29,11 +29,20 @@ function onUpdate(dt)
     end
 end
 
-function onCollisionEnter(data)
+function onTriggerEnter(data)
     local tagsA = data.entityA:getTags()
     for _, tag in pairs(tagsA) do
         if tag == "ground" then
             destroySelf()
+        elseif tag == "player" then
+            local scene = SceneManager:getCurrentScene()
+            local player = scene:findEntityByName("PlayerPrefab")
+            if player == nil then return end
+            local message = Message.new()
+            message.to = player
+            message.topic = "Get Hit!"
+            Script.send(message)
+            SceneManager:destroy(self)
         end
     end
 
@@ -41,6 +50,15 @@ function onCollisionEnter(data)
     for _, tag in pairs(tagsB) do
         if tag == "ground" then
             destroySelf()
+        elseif tag == "player" then
+            local scene = SceneManager:getCurrentScene()
+            local player = scene:findEntityByName("PlayerPrefab")
+            if player == nil then return end
+            local message = Message.new()
+            message.to = player
+            message.topic = "Get Hit!"
+            Script.send(message)
+            SceneManager:destroy(self)
         end
     end
 

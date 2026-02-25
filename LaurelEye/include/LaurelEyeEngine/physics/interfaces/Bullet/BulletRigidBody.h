@@ -1,16 +1,16 @@
 ﻿#pragma once
 
-#include "LaurelEyeEngine/physics/interfaces/IBody.h"
+#include "LaurelEyeEngine/physics/interfaces/IRigidBody.h"
 #include "LaurelEyeEngine/physics/interfaces/Bullet/BulletShape.h"
 
 #include <btBulletDynamicsCommon.h>
 #include <memory>
 
 namespace LaurelEye::Physics {
-    class BulletBody : public IBody {
+    class BulletRigidBody final : public IRigidBody {
     public:
-        BulletBody(std::shared_ptr<btRigidBody> body, std::shared_ptr<BulletShape> s, std::shared_ptr<btDefaultMotionState> motion);
-        ~BulletBody() override;
+        BulletRigidBody(std::shared_ptr<btRigidBody> body, std::shared_ptr<BulletShape> s, std::shared_ptr<btDefaultMotionState> motion);
+        ~BulletRigidBody() override;
 
         void ApplyForce(const Vector3& f) override;
         void ApplyImpulse(const Vector3& i) override;
@@ -18,7 +18,13 @@ namespace LaurelEye::Physics {
         void BindTransform(LaurelEye::TransformComponent* t) override;
         LaurelEye::TransformComponent* GetBoundTransform() const override;
 
-        void BindPhysicsBodyComponent(PhysicsBodyComponent* pbc) override;
+        void pushTransformToPhysics() override;
+        void updateTransformFromPhysics() override;
+
+        void* GetUserData() const override;
+        void SetUserData(void*) override;
+
+        //void BindPhysicsBodyComponent(RigidBodyComponent* pbc) override;
 
         void SetLinearVelocity(const Vector3& v) override;
         Vector3 GetLinearVelocity() const override;
@@ -31,9 +37,6 @@ namespace LaurelEye::Physics {
 
         std::shared_ptr<btRigidBody> GetInternal() { return btRB; }
         std::shared_ptr<BulletShape> GetShape() { return shape; }
-
-        void pushTransformToPhysics() override;
-        void updateTransformFromPhysics() override;
 
     private:
         std::shared_ptr<btRigidBody> btRB;

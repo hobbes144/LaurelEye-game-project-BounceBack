@@ -1,8 +1,10 @@
 ﻿#include "LaurelEyeEngine/physics/PhysicsSystem.h"
+#include "LaurelEyeEngine/physics/GhostBodyComponent.h"
+#include "LaurelEyeEngine/physics/interfaces/PhysicsTypes.h"
 #include "LaurelEyeEngine/physics/interfaces/Bullet/BulletWorld.h"
 #include "LaurelEyeEngine/events/CollisionEvent.h"
+#include "LaurelEyeEngine/events/TriggerEvent.h"
 #include "LaurelEyeEngine/events/EventManager.h"
-#include "LaurelEyeEngine/physics/interfaces/PhysicsTypes.h"
 #include "LaurelEyeEngine/scripting/ScriptComponent.h"
 #include <cassert>
 
@@ -24,7 +26,7 @@ namespace LaurelEye::Physics {
     void PhysicsSystem::update(float dt) {
         // Sync Transforms to Physics Simulation
         for ( auto* comp : components ) {
-            comp->GetBodyRef()->pushTransformToPhysics();
+            comp->SyncToPhysics();
         }
 
         isSteppingPhysics = true;
@@ -33,7 +35,7 @@ namespace LaurelEye::Physics {
 
         //Sync Physics to Transforms
         for ( auto* comp : components ) {
-            comp->GetBodyRef()->updateTransformFromPhysics();
+            comp->SyncFromPhysics();
         }
 
         //Collision Manager
@@ -48,39 +50,22 @@ namespace LaurelEye::Physics {
     }
 
     void PhysicsSystem::registerComponent(const ComponentPtr component) {
-        // Call base
-        LaurelEye::ISystem<PhysicsBodyComponent>::registerComponent(component);
 
-        // Create Physics Body
-        auto newBody = CreateBody(component->GetBodyData());
+        LaurelEye::ISystem<PhysicsBodyBaseComponent>::registerComponent(component);
 
-        // Bind the Body to its Component
-        component->SetBodyRef(newBody);
-        newBody->BindPhysicsBodyComponent(component);
-        newBody->BindTransform(component->GetBodyData().transformRef);
+        //Create in world
+        component->CreateInWorld(*this);
+
     }
 
     void PhysicsSystem::deregisterComponent(const ComponentPtr component) {
+
         if ( !component ) return;
 
-        // Get body ref
-        auto bodyRef = component->GetBodyRef();
-        if ( bodyRef ) {
-            // Unbind from component and transform
-            bodyRef->BindPhysicsBodyComponent(nullptr);
-            bodyRef->BindTransform(nullptr);
+        component->RemoveFromWorld(*this);
 
-            // Remove from world
-            if ( world ) {
-                world->RemoveBody(bodyRef);
-            }
+        LaurelEye::ISystem<PhysicsBodyBaseComponent>::deregisterComponent(component);
 
-            // Reset the component's body reference
-            component->SetBodyRef(nullptr);
-        }
-
-        // Finally remove from active list
-        ISystem<PhysicsBodyComponent>::deregisterComponent(component);
     }
 
     void PhysicsSystem::registerCollisionEnterListeners() {
@@ -92,6 +77,7 @@ namespace LaurelEye::Physics {
                 const auto& data = event.GetData();
                 assert(data.entityARef && data.entityBRef);
 
+                std::cout << "[EnterCollisioner] Listener is Run" << std::endl;
                 // Forward to Lua if either entity has a script
                 if ( auto* scriptA = data.entityARef->findComponent<Scripting::ScriptComponent>() ) {
                     if ( auto* instance = scriptA->getScriptInstance() ) {
@@ -105,7 +91,6 @@ namespace LaurelEye::Physics {
                     }
                 }
 
-                std::cout << "[Enter] " << data << std::endl;
             });
 
         stayListener = eventManager->addListener<CollisionStayEvent>(
@@ -145,6 +130,69 @@ namespace LaurelEye::Physics {
 
                 std::cout << "[Exit] " << data << std::endl;
             });
+
+        enterTriggerListener = eventManager->addListener<TriggerEnterEvent>(
+            [&](const TriggerEnterEvent& event) {
+                const auto& data = event.GetData();
+                assert(data.entityARef && data.entityBRef);
+
+                std::cout << "[EnterTrigger] Listener is Run" << std::endl;
+                if ( auto* scriptA = data.entityARef->findComponent<Scripting::ScriptComponent>() ) {
+                    if ( auto* instance = scriptA->getScriptInstance() ) {
+                        instance->onTriggerEnter(data);
+                    }
+                };
+
+                if ( auto* scriptB = data.entityBRef->findComponent<Scripting::ScriptComponent>() ) {
+                    if ( auto* instance = scriptB->getScriptInstance() ) {
+                        instance->onTriggerEnter(data);
+                    }
+                }
+
+            }
+        );
+
+        stayTriggerListener = eventManager->addListener<TriggerStayEvent>(
+            [&](const TriggerStayEvent& event) {
+                const auto& data = event.GetData();
+                assert(data.entityARef && data.entityBRef);
+
+                if ( auto* scriptA = data.entityARef->findComponent<Scripting::ScriptComponent>() ) {
+                    if ( auto* instance = scriptA->getScriptInstance() ) {
+                        instance->onTriggerStay(data);
+                    }
+                };
+
+                if ( auto* scriptB = data.entityBRef->findComponent<Scripting::ScriptComponent>() ) {
+                    if ( auto* instance = scriptB->getScriptInstance() ) {
+                        instance->onTriggerStay(data);
+                    }
+                }
+
+                //std::cout << "[StayTrigger] " << data << std::endl;
+            }
+        );
+
+        exitTriggerListener = eventManager->addListener<TriggerExitEvent>(
+            [&](const TriggerExitEvent& event) {
+                const auto& data = event.GetData();
+                assert(data.entityARef && data.entityBRef);
+
+                if ( auto* scriptA = data.entityARef->findComponent<Scripting::ScriptComponent>() ) {
+                    if ( auto* instance = scriptA->getScriptInstance() ) {
+                        instance->onTriggerExit(data);
+                    }
+                };
+
+                if ( auto* scriptB = data.entityBRef->findComponent<Scripting::ScriptComponent>() ) {
+                    if ( auto* instance = scriptB->getScriptInstance() ) {
+                        instance->onTriggerExit(data);
+                    }
+                }
+
+                //std::cout << "[ExitTrigger] " << data << std::endl;
+            }
+        );
     }
 
     void PhysicsSystem::deregisterCollisionEnterListeners() {
@@ -153,10 +201,34 @@ namespace LaurelEye::Physics {
         eventManager->removeListener<CollisionEnterEvent>(enterListener);
         eventManager->removeListener<CollisionStayEvent>(stayListener);
         eventManager->removeListener<CollisionExitEvent>(exitListener);
+        eventManager->removeListener<TriggerEnterEvent>(enterTriggerListener);
+        eventManager->removeListener<TriggerStayEvent>(stayTriggerListener);
+        eventManager->removeListener<TriggerExitEvent>(exitTriggerListener);
     }
 
-    std::shared_ptr<IBody> PhysicsSystem::CreateBody(const PhysicsBodyData& data) {
-        return world ? world->CreateBody(data) : nullptr;
+    std::shared_ptr<ICollider> PhysicsSystem::CreateCollider(const PhysicsBodyData& data) {
+
+        if ( !world ) return nullptr;
+
+        //TODO: Creation Logic
+        switch ( data.type ) {
+        case BodyType::Static:
+            return world->CreateRigidBody(data);
+            break;
+        case BodyType::Dynamic:
+            return world->CreateRigidBody(data);
+            break;
+        case BodyType::Kinematic:
+            return world->CreateRigidBody(data);
+            break;
+        case BodyType::Ghost:
+            return world->CreateGhostBody(data);
+            break;
+        default:
+            return nullptr;
+            break;
+        }
+
     }
 
     std::shared_ptr<ICollisionShape> PhysicsSystem::CreateShape(const CollisionShapePhys& desc) {
@@ -169,18 +241,18 @@ namespace LaurelEye::Physics {
 
     void PhysicsSystem::populateWireFrameCommands(std::vector<Debug::DebugDrawCommand>& commands) const {
 
-        for ( PhysicsBodyComponent* const pbc : components ) {
-            std::shared_ptr<IBody> body = pbc->GetBodyRef();
+        for ( PhysicsBodyBaseComponent* const pbbc : components ) {
+            std::shared_ptr<ICollider> body = pbbc->GetCollider();
             if ( !body ) continue;
 
             LaurelEye::TransformComponent* transform = body->GetBoundTransform();
             if ( !transform ) continue;
 
-            const Vector3 pos = transform->getWorldPosition() + pbc->GetBodyData().centerOfMass;
+            const Vector3 pos = transform->getWorldPosition() + pbbc->GetBodyData().centerOfMass;
             const Quaternion rot = transform->getWorldRotation();
             const Vector3 scale = transform->getWorldScale();
 
-            PhysicsBodyData bodyData = pbc->GetBodyData();
+            PhysicsBodyData bodyData = pbbc->GetBodyData();
             CollisionShapePhys shapeDef = bodyData.shapeDefinition;
 
             // --- Shape wireframe ---
@@ -216,21 +288,41 @@ namespace LaurelEye::Physics {
                     break;
             }
 
-            commands.push_back(cmd);
-            //Do This Next
-            /*
-            // --- Velocity Vector ---
-            const Vector3 velocity = body->GetLinearVelocity();
-            if ( velocity.magnitudSquared() > 0.0001f ) {
-                Debug::DebugDrawCommand velCmd;
-                velCmd.type = Debug::DebugDrawType::VelocityVector;
-                velCmd.position = pos;
-                velCmd.direction = velocity.normalized();
-                velCmd.size = {velocity.magnitude(), 0.0f, 0.0f};
-                velCmd.color = {1.0f, 0.0f, 0.0f}; // Red for velocity
-                commands.push_back(velCmd);
+            switch ( bodyData.type ) {
+            case BodyType::Static:
+                cmd.color = {1.0f, 1.0f, 0.0f};
+                break;
+            case BodyType::Kinematic:
+                cmd.color = {0.25f, 0.75f, 0.0f};
+                break;
+            case BodyType::Dynamic:
+                cmd.color = {0.0f, 1.0f, 0.0f};
+                break;
+            case BodyType::Ghost:
+                cmd.color = {0.0f, 0.5f, 0.5f};
+                break;
+            default:
+                cmd.color = {1.0f, 1.0f, 1.0f};
+                break;
             }
 
+            commands.push_back(cmd);
+            //Do This Next
+            // --- Velocity Vector ---
+            if ( auto rigid = std::dynamic_pointer_cast<IRigidBody>(body) ) {
+                const Vector3 velocity = rigid->GetLinearVelocity();
+                if ( velocity.magnitudSquared() > 0.0001f ) {
+                    Debug::DebugDrawCommand velCmd;
+                    velCmd.type = Debug::DebugDrawType::VelocityVector;
+                    velCmd.position = pos;
+                    velCmd.direction = velocity.normalized();
+                    velCmd.size = {velocity.magnitude(), 0.0f, 0.0f};
+                    velCmd.color = {1.0f, 0.0f, 0.0f}; // Red for velocity
+                    commands.push_back(velCmd);
+                }
+            }
+
+            /*
             // --- Force Vector (if available) ---
             if ( body->HasAppliedForces() ) {
                 Vector3 totalForce = body->GetAccumulatedForce();
@@ -261,16 +353,17 @@ namespace LaurelEye::Physics {
                 }
             }
             */
+
         }
+    
     }
 
-
-    void PhysicsSystem::dispatchCollisionEvents() {
-        const auto& events = collisionManager.getEvents();
+    void PhysicsSystem::dispatchCollisionEvents() const {
         if ( !context ) {
             //There is no Context and Therefore cannot generate Events
             return;
         }
+        const auto& events = collisionManager.getEvents();
         auto* eventManager = context->getService<EventManager>();
         if ( !eventManager )
             throw std::runtime_error("No Event Manager");
@@ -280,30 +373,67 @@ namespace LaurelEye::Physics {
             // to Dispatch the events
 
             //create collision event
-            std::shared_ptr<CollisionEvent> eventPtr = nullptr;
+            //std::shared_ptr<CollisionEvent> eventPtr = nullptr;
 
-            switch ( evt.type ) {
-            case CollisionEventData::Type::Enter: {
-                CollisionEnterEvent enterEvent(evt);
-                eventManager->broadcastEvent(enterEvent); // pass by const reference
+            switch ( evt.interaction ) {
+            case CollisionEventData::Interaction::Collision:
+
+                switch ( evt.type ) {
+                    case CollisionEventData::Type::Enter: {
+                        CollisionEnterEvent enterEvent(evt);
+                        eventManager->broadcastEvent(enterEvent); // pass by const reference
+                        break;
+                    }
+                    case CollisionEventData::Type::Stay: {
+                        CollisionStayEvent stayEvent(evt);
+                        eventManager->broadcastEvent(stayEvent); // pass by const reference
+                        break;
+                    }
+                    case CollisionEventData::Type::Exit: {
+                        CollisionExitEvent exitEvent(evt);
+                        eventManager->broadcastEvent(exitEvent); // pass by const reference
+                        break;
+                    }
+                    default:
+                        throw std::runtime_error("Unknown collision event type!");
+                }
+
                 break;
-            }
-            case CollisionEventData::Type::Stay: {
-                CollisionStayEvent stayEvent(evt);
-                eventManager->broadcastEvent(stayEvent); // pass by const reference
+            case CollisionEventData::Interaction::Trigger:
+
+                switch ( evt.type ) {
+                case CollisionEventData::Type::Enter: {
+                    TriggerEnterEvent enterEvent(evt);
+                    eventManager->broadcastEvent(enterEvent); // pass by const reference
+                    break;
+                }
+                case CollisionEventData::Type::Stay: {
+                    TriggerStayEvent stayEvent(evt);
+                    eventManager->broadcastEvent(stayEvent); // pass by const reference
+                    break;
+                }
+                case CollisionEventData::Type::Exit: {
+                    TriggerExitEvent exitEvent(evt);
+                    eventManager->broadcastEvent(exitEvent); // pass by const reference
+                    break;
+                }
+                default:
+                    throw std::runtime_error("Unknown collision event type!");
+                }
+
                 break;
-            }
-            case CollisionEventData::Type::Exit: {
-                CollisionExitEvent exitEvent(evt);
-                eventManager->broadcastEvent(exitEvent); // pass by const reference
+
+            case CollisionEventData::Interaction::ERROR:
+                throw std::runtime_error("ERROR Unknown collision Interaction event type!");
                 break;
-            }
             default:
-                throw std::runtime_error("Unknown collision event type!");
+                throw std::runtime_error("Unknown collision Interaction event type!");
+                break;
             }
 
             //std::cout << evt << std::endl;
         }
     }
+
 
 }

@@ -46,7 +46,7 @@ function onStart()
     animator = self:findAnimator()
     animator:changeAnimation("Running")
     -- transform = self:findTransform()
-    -- body = self:findPhysics()
+    -- body = self:findRigidBody()
     -- local scene = SceneManager:getCurrentScene()
     -- if scene ~= nil then
     --     local cameraEntity = scene:findEntityByName("Camera")
@@ -283,7 +283,7 @@ function shootProjectile()
     -- projTransform:setWorldRotation(selfRotation)
     --
     -- -- optional: give the projectile an initial velocity in facing direction
-    -- local projBody = proj:findPhysics()
+    -- local projBody = proj:findRigidBody()
     -- if projBody ~= nil then
     --     local projectileSpeed = -100.0 -- adjust as needed
     --     projBody:setLinearVelocity(forward * projectileSpeed)
@@ -372,7 +372,7 @@ function autoShootProjectile(dt)
     --     projTransform:setWorldRotation(selfRotation)
     -- end
     --
-    -- local projBody = proj:findPhysics()
+    -- local projBody = proj:findRigidBody()
     -- if projBody ~= nil then
     --     local projectileSpeed = 100.0 -- tune as needed
     --     projBody:setLinearVelocity(dir * projectileSpeed)

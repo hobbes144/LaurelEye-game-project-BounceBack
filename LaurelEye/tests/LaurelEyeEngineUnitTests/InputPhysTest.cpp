@@ -60,14 +60,14 @@ namespace LaurelEye {
             // assert(cubeWorld.getPosition().y >= 0.5f - 0.0001f);
 
             // Debug Printing of Bullet Simulation Body
-            auto bulletBody = dynamic_cast<LaurelEye::Physics::BulletBody*>(cubePB->GetBodyRef().get());
+            auto bulletBody = dynamic_cast<LaurelEye::Physics::BulletRigidBody*>(cubePB->GetBodyRef().get());
             if ( bulletBody ) {
                 btTransform btTrans = bulletBody->GetInternal()->getWorldTransform();
                 btVector3 pos = btTrans.getOrigin();
                 //    std::cout << " Cube Bullet Y: " << pos.getY() << std::endl;
             }
             else {
-                std::cout << "Cube body is not a BulletBody!" << std::endl;
+                std::cout << "Cube body is not a BulletRigidBody!" << std::endl;
             }
 
             std::cout << " Cube: " << cubeT->getWorldTransform().getPosition() << std::endl;

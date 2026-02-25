@@ -20,15 +20,15 @@
             }
         },
         "Physics": {
-            "type": "Dynamic",
+            "type": "Ghost",
             "shapeDefinition": {
                 "type": "Sphere",
                 "size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
+                    "x": 1.25,
+                    "y": 1.25,
+                    "z": 1.25
                 },
-                "radius": 1.0,
+                "radius": 1.5,
                 "height": 1.0
             },
             "mass": 1.0,
@@ -52,6 +52,23 @@
             "ccdMotionThreshold": 0.01,
             "ccdSweptSphereRadius": 1.0,
             "gravityScale": 0.0
+        },
+        "ParticleEmitter": {
+            "emissionRate": 60.0,
+            "spreadAngle": 15.0,
+            "particleLifetime": 0.15,
+            "lifetimeVariation": 0.2,
+            "initialSpeed": 2.5,
+            "speedVariation": 0.5,
+            "startSize": 8.55,
+            "endSize": 1.05,
+            "sizeVariation": 0.05,
+            "usePhysics": false,
+
+            "startColor": [ 1.0, 0.1, 0.1, 1.0 ],
+            "endColor": [ 1.0, 0.412, 0.706, 0.0 ],
+
+            "maxParticles": 300
         },
         "Script": {
             "path": "scripts/catch_ball.lua"

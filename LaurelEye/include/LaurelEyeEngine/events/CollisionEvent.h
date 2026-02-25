@@ -14,7 +14,9 @@ namespace LaurelEye {
     class CollisionEvent : public IEvent {
     public:
         explicit CollisionEvent(const LaurelEye::Physics::CollisionEventData& cd)
-            : collisionData(cd) {}
+            : collisionData(cd) {
+            //std::cout << "[CollisionEvent] CollisionEvent Created: " << cd << std::endl;
+        }
 
         virtual ~CollisionEvent() = default;
 

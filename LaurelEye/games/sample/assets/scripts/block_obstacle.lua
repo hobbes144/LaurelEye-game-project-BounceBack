@@ -9,7 +9,7 @@ speaker = nil
 
 function onStart()
     transform = self:findTransform()
-    body = self:findPhysics()
+    body = self:findRigidBody()
     speaker = self:findAudioSpeaker()
 end
 
@@ -45,8 +45,8 @@ function onCollisionEnter(data)
 
     -- Perfect elastic collision between two projectile-tagged bodies
     if isProjA and isProjB then
-        local bodyA = a:findPhysics()
-        local bodyB = b:findPhysics()
+        local bodyA = a:findRigidBody()
+        local bodyB = b:findRigidBody()
         if not bodyA or not bodyB then return end
 
         -- Get THEIR velocities before collision impulse

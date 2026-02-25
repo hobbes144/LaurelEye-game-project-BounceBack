@@ -22,12 +22,18 @@ namespace LaurelEye::Physics {
     struct CollisionEventData {
         /// @brief Type of Collision Event (Enter, Stay, Exit)
         enum class Type {
+            ERROR,
             Enter,
             Stay,
-            Exit,
-            ERROR
+            Exit
+        };
+        enum class Interaction {
+            ERROR,
+            Collision,
+            Trigger
         };
         Type type = Type::ERROR;
+        Interaction interaction = Interaction::ERROR;
         unsigned int entityAID = 0;
         unsigned int entityBID = 0;
         Entity* entityARef = nullptr;
@@ -46,6 +52,7 @@ namespace LaurelEye::Physics {
         /// @param aRef A Reference to EntityA
         /// @param bRef A Reference to EntityB
         CollisionEventData(Type t,
+                           Interaction i,
                            unsigned int aID,
                            unsigned int bID,
                            const Vector3& point,
@@ -53,6 +60,7 @@ namespace LaurelEye::Physics {
                            Entity* aRef = nullptr,
                            Entity* bRef = nullptr)
             : type(t),
+              interaction(i),
               entityAID(aID),
               entityBID(bID),
               contactPoint(point),
@@ -67,11 +75,13 @@ namespace LaurelEye::Physics {
         /// @param aRef A Reference to EntityA
         /// @param bRef A Reference to EntityB
         CollisionEventData(Type t,
+                           Interaction i,
                            unsigned int aID,
                            unsigned int bID,
                            Entity* aRef = nullptr,
                            Entity* bRef = nullptr)
             : type(t),
+              interaction(i),
               entityAID(aID),
               entityBID(bID),
               entityARef(aRef),
@@ -80,8 +90,25 @@ namespace LaurelEye::Physics {
 
     /// @brief Inline osrtream<< Operator for ease of printing CollisionEventData and documentation for debugging
     inline std::ostream& operator<<(std::ostream& os, const CollisionEventData& c) {
-        os << "CollisionContact { "
-            << "Type: ";
+        os << "PhysicsContact { "
+
+           << "Interaction: ";
+
+        switch ( c.interaction ) {
+        case CollisionEventData::Interaction::Collision:
+            os << "Collision, ";
+            break;
+        case CollisionEventData::Interaction::Trigger:
+            os << "Trigger, ";
+            break;
+        case CollisionEventData::Interaction::ERROR:
+            os << "ERROR, ";
+            break;
+        default:
+            break;
+        }
+
+        os << "Type: ";
 
         switch ( c.type ) {
         case CollisionEventData::Type::Enter:
@@ -126,6 +153,7 @@ namespace LaurelEye::Physics {
         void registerContact(
             unsigned int id1,
             unsigned int id2,
+            CollisionEventData::Interaction interaction,
             const Vector3& point = Vector3(),
             const Vector3& normal = Vector3(),
             const Entity* e1 = nullptr,
@@ -150,6 +178,10 @@ namespace LaurelEye::Physics {
         std::map<std::pair<unsigned int, unsigned int>,
                  std::pair<const Entity*, const Entity*>>
             contactEntityCache;
+
+        std::map<std::pair<unsigned int, unsigned int>,
+                 CollisionEventData::Interaction>
+            interactionCache;
 
         std::vector<CollisionEventData> events;
     };

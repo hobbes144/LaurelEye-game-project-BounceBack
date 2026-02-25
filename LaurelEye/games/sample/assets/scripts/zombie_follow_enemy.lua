@@ -14,7 +14,7 @@ speaker = nil
 
 function onStart()
     transform = self:findTransform()
-    body = self:findPhysics()
+    body = self:findRigidBody()
 
     speaker = self:findAudioSpeaker()
     if speaker ~= nil then

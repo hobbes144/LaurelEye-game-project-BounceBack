@@ -39,6 +39,16 @@ namespace LaurelEye::Scripting {
         /// @brief Called when the script's owner stops colliding with another object
         /// @param data
         virtual void onCollisionExit(const Physics::CollisionEventData& data) = 0;
+
+        /// @brief Called when the script's owner ghost collides with another object
+        /// @param data
+        virtual void onTriggerEnter(const Physics::CollisionEventData& data) = 0;
+        /// @brief Called when the script's owner ghost continues to collide with another object
+        /// @param data
+        virtual void onTriggerStay(const Physics::CollisionEventData& data) = 0;
+        /// @brief Called when the script's owner ghost stops colliding with another object
+        /// @param data
+        virtual void onTriggerExit(const Physics::CollisionEventData& data) = 0;
     };
 
 } // namespace LaurelEye

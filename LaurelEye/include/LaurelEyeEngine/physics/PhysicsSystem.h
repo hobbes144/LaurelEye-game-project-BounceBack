@@ -13,8 +13,8 @@
 #include <memory>
 
 #include "LaurelEyeEngine/physics/interfaces/IPhysicsWorld.h"
+#include "LaurelEyeEngine/physics/PhysicsBodyBaseComponent.h"
 #include "LaurelEyeEngine/physics/CollisionManager.h"
-#include "LaurelEyeEngine/physics/PhysicsBodyComponent.h"
 #include "LaurelEyeEngine/debugDraw/DebugDrawSystem.h"
 #include "LaurelEyeEngine/ecs/ISystem.h"
 
@@ -33,7 +33,7 @@ namespace LaurelEye::Physics {
     /// @brief This system manages the lifecycle of the physics simulation
     /// (initialize, update, shutdown), provides creation methods for collision
     /// shapes and physics bodies, and acts as a bridge between ECS and Physics Backend
-    class PhysicsSystem : public ISystem<PhysicsBodyComponent> {
+    class PhysicsSystem : public ISystem<PhysicsBodyBaseComponent> {
     public:
         /// @brief Construct a new physics system
         /// @param type Physics backend type to be used (default: Bullet)
@@ -52,12 +52,13 @@ namespace LaurelEye::Physics {
 
         void registerCollisionEnterListeners();
         void deregisterCollisionEnterListeners();
+
         /// @brief Create a physics body and add it to the world
         /// @param type The body type (dynamic, static, kinematic)
         /// @param shapeDesc The collision shape descriptor for the body
         /// @param transform Initial transform
         /// @return A shared pointer to the created IBody
-        std::shared_ptr<IBody> CreateBody(const PhysicsBodyData& data);
+        std::shared_ptr<ICollider> CreateCollider(const PhysicsBodyData& data);
 
         /// @brief Create a collision shape based on the provided descriptor
         /// @param desc Collision shape descriptor
@@ -110,6 +111,7 @@ namespace LaurelEye::Physics {
         bool IsSteppingPhysics() const { return isSteppingPhysics; };
 
     private:
+
         /// @brief Selected physics backend
         PhysicsSystemType systemType;
         /// @brief Unique pointer to world instance
@@ -122,7 +124,12 @@ namespace LaurelEye::Physics {
         uint32_t stayListener;
         uint32_t exitListener;
 
-        void dispatchCollisionEvents();
+        uint32_t enterTriggerListener;
+        uint32_t stayTriggerListener;
+        uint32_t exitTriggerListener;
+
+        void dispatchCollisionEvents() const;
+        //void gatherTriggerEvents();
 
     };
 

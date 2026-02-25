@@ -14,7 +14,8 @@
 #include "LaurelEyeEngine/memory/MemoryManager.h"
 #include "LaurelEyeEngine/particles/ParticleEmitterComponent.h"
 #include "LaurelEyeEngine/physics/interfaces/PhysicsTypes.h"
-#include "LaurelEyeEngine/physics/PhysicsBodyComponent.h"
+#include "LaurelEyeEngine/physics/RigidBodyComponent.h"
+#include "LaurelEyeEngine/physics/GhostBodyComponent.h"
 #include "LaurelEyeEngine/scene/Scene.h"
 #include "LaurelEyeEngine/scripting/ScriptComponent.h"
 #include "LaurelEyeEngine/transform/TransformComponent.h"
@@ -390,6 +391,7 @@ namespace LaurelEye {
             if ( typeStr == "Static" ) data.type = BodyType::Static;
             else if ( typeStr == "Dynamic" ) data.type = BodyType::Dynamic;
             else if ( typeStr == "Kinematic" ) data.type = BodyType::Kinematic;
+            else if ( typeStr == "Ghost" ) data.type = BodyType::Ghost;
         }
 
         // --- Collision Shape ---
@@ -469,7 +471,17 @@ namespace LaurelEye {
         if ( physicsData.HasMember("gravityScale") ) data.gravityScale = physicsData["gravityScale"].GetFloat();
 
         // --- Assign to component ---
-        auto physicsComp = entity.addComponent<PhysicsBodyComponent>(data);
+        if ( data.type == BodyType::Dynamic ||
+             data.type == BodyType::Static ||
+             data.type == BodyType::Kinematic ) {
+            auto* physicsComp = entity.addComponent<Physics::RigidBodyComponent>(data);
+        }
+        else if ( data.type == BodyType::Ghost ) {
+            auto* physicsComp = entity.addComponent<Physics::GhostBodyComponent>(data);
+        }
+        else {
+            std::cerr << "[EntityFactory::setupPhysicsComponent] INVALID BODY TYPE\n";
+        }
     }
 
     void EntityFactory::setupScriptComponent(Entity& entity, const rapidjson::Value& scriptData) {
@@ -691,7 +703,6 @@ namespace LaurelEye {
 
     void EntityFactory::setupDebugDrawComponent(Entity& entity, const rapidjson::Value& emitterData) {
     }
-
     
     void EntityFactory::setupAnimationComponent(Entity& entity, const rapidjson::Value& animationData) {
         if ( !animationData.IsObject() )

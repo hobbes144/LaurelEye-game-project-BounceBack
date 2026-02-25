@@ -52,7 +52,7 @@ doorSpawned = false
 
 function onStart()
     transform = self:findTransform()
-    body = self:findPhysics()
+    body = self:findRigidBody()
     local scene = SceneManager:getCurrentScene()
     if scene ~= nil then
         local cameraEntity = scene:findEntityByName("Camera")
@@ -91,6 +91,18 @@ function onMessage(msg)
         message.to = player
         message.topic = "I am being shot at!"
         Script.broadcast(message)
+    end
+
+    if msg.topic == "Catch Me!" then
+        hasBall = true
+    end
+
+    if msg.topic == "Get Hit!" then
+        if not invincible then
+            currentHealth = currentHealth - 1.0
+            invincible = true
+            moveHealthBar()
+        end
     end
 end
 
@@ -405,8 +417,9 @@ function shootProjectile()
     if projTransform == nil then return end
     projTransform:setWorldPosition(spawnPos)
 
-    local projBody = proj:findPhysics()
+    local projBody = proj:findGhostBody()
     if projBody ~= nil then
+        print("Shooting Projectile")
         projBody:setLinearVelocity(shootDir * projectileSpeed)
     end
 end
@@ -415,21 +428,12 @@ function onCollisionEnter(data)
     --Check for enemy collision
     local tagsA = data.entityA:getTags()
     for _, tag in pairs(tagsA) do
-        if tag == "ball" then
-            SceneManager:destroy(data.entityA)
-            hasBall = true
-        elseif tag == "ground" then
+        if tag == "ground" then
             if not isGrounded then
                 triggerLandingBurst()
             end
             isGrounded = true
             jumping = false
-        elseif tag == "bullet" then
-            if not invincible then
-                currentHealth = currentHealth - 1.0
-                invincible = true
-                moveHealthBar()
-            end
         elseif tag == "door" then
             SceneManager:destroy(data.entityB)
             changeLevels()
@@ -438,21 +442,12 @@ function onCollisionEnter(data)
 
     local tagsB = data.entityB:getTags()
     for _, tag in pairs(tagsB) do
-        if tag == "ball" then
-            SceneManager:destroy(data.entityB)
-            hasBall = true
-        elseif tag == "ground" then
+        if tag == "ground" then
             if not isGrounded then
                 triggerLandingBurst()
             end
             isGrounded = true
             jumping = false
-        elseif tag == "bullet" then
-            if not invincible then
-                currentHealth = currentHealth - 1.0
-                invincible = true
-                moveHealthBar()
-            end
         elseif tag == "door" then
             SceneManager:destroy(data.entityB)
             changeLevels()
@@ -469,7 +464,7 @@ function onCollisionExit(data)
 end
 
 function catchBall(ball)
-    local ballBody = ball:findPhysics()
+    local ballBody = ball:findGhostBody()
     ballBody:setLinearVelocity(0.0, 0.0, 0.0)
     hasBall = true
 end

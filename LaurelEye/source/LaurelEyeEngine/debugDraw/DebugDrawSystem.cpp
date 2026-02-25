@@ -142,6 +142,12 @@ namespace LaurelEye::Debug {
                 // Call a function to add capsule wireframe lines
                 addCapsule(attributes, cmd.position, cmd.size, cmd.radius, cmd.rotation, cmd.color);
                 break;
+            case DebugDrawType::Sphere:
+                //Ensure there is enough room
+                if ( currentDebugLines >= MaxDebugLines - 80 ) break;
+
+                addSphere(attributes, cmd.position, cmd.radius, cmd.rotation, cmd.color);
+                break;
             default:
                 break;
             }
@@ -231,17 +237,28 @@ namespace LaurelEye::Debug {
     void DebugDrawSystem::addArrow(Graphics::GeometryBuffer::ModifiableAttributes& attr,
                                    const Vector3& start, const Vector3& dir,
                                    const Vector3& color) {
+        if ( dir.magnitudSquared() < 1e-6f )
+            return; // nothing to draw
+
+        Vector3 forward = dir.normalized();
         Vector3 end = start + dir;
         addLine(attr, start, end, color);
 
-        // Small arrowhead
-        Vector3 right = dir.normalized().cross({0, 1, 0}).normalized() * 0.1f;
-        Vector3 up = right.cross(dir.normalized()) * 0.1f;
-        addLine(attr, end, end - dir.normalized() * 0.2f + right, color);
-        addLine(attr, end, end - dir.normalized() * 0.2f - right, color);
-        addLine(attr, end, end - dir.normalized() * 0.2f + up, color);
-        addLine(attr, end, end - dir.normalized() * 0.2f - up, color);
+        // Pick a safe up vector
+        Vector3 upRef = std::abs(forward.y) > 0.99f ? Vector3(1, 0, 0)
+                                                    : Vector3(0, 1, 0);
+
+        Vector3 right = forward.cross(upRef).normalized() * 0.1f;
+        Vector3 up = right.cross(forward).normalized() * 0.1f;
+
+        Vector3 back = forward * 0.2f;
+
+        addLine(attr, end, end - back + right, color);
+        addLine(attr, end, end - back - right, color);
+        addLine(attr, end, end - back + up, color);
+        addLine(attr, end, end - back - up, color);
     }
+
 
     // Debug drawing the dark wizard created for capsules so I could see them, have Nick/Anish look at it
     void DebugDrawSystem::addCapsule(Graphics::GeometryBuffer::ModifiableAttributes& attr,
@@ -371,4 +388,72 @@ namespace LaurelEye::Debug {
             }
         }
     }
+
+    void DebugDrawSystem::addSphere(Graphics::GeometryBuffer::ModifiableAttributes& attr,
+                                    const Vector3& center, float radius,
+                                    const Quaternion& rotation, const Vector3& color) {
+        if ( currentDebugLines >= MaxDebugLines )
+            return;
+
+        const float PI = 3.14159265358979323846f;
+        const int latSegs = 5; // horizontal slices
+        const int lonSegs = 8; // vertical slices
+
+        // Latitude rings (Y axis)
+        for ( int lat = 0; lat <= latSegs; ++lat ) {
+            float v = (float)lat / (float)latSegs; // 0..1
+            float theta = v * PI;                  // 0..PI
+
+            float y = std::cos(theta) * radius;
+            float ringR = std::sin(theta) * radius;
+
+            std::vector<Vector3> ring(lonSegs);
+
+            for ( int lon = 0; lon < lonSegs; ++lon ) {
+                float u = (float)lon / (float)lonSegs;
+                float phi = u * 2.0f * PI;
+
+                Vector3 local(
+                    std::cos(phi) * ringR,
+                    y,
+                    std::sin(phi) * ringR);
+
+                ring[lon] = rotation * local + center;
+            }
+
+            // Connect ring
+            for ( int i = 0; i < lonSegs; ++i ) {
+                if ( currentDebugLines >= MaxDebugLines ) return;
+                int ni = (i + 1) % lonSegs;
+                addLine(attr, ring[i], ring[ni], color);
+            }
+        }
+
+        // Longitude rings (around Y axis)
+        for ( int lon = 0; lon < lonSegs; ++lon ) {
+            float u = (float)lon / (float)lonSegs;
+            float phi = u * 2.0f * PI;
+
+            std::vector<Vector3> ring(latSegs + 1);
+
+            for ( int lat = 0; lat <= latSegs; ++lat ) {
+                float v = (float)lat / (float)latSegs;
+                float theta = v * PI;
+
+                Vector3 local(
+                    std::cos(phi) * std::sin(theta) * radius,
+                    std::cos(theta) * radius,
+                    std::sin(phi) * std::sin(theta) * radius);
+
+                ring[lat] = rotation * local + center;
+            }
+
+            for ( int i = 0; i < latSegs; ++i ) {
+                if ( currentDebugLines >= MaxDebugLines ) return;
+                addLine(attr, ring[i], ring[i + 1], color);
+            }
+        }
+    }
+
+
 } // namespace LaurelEye::Debug

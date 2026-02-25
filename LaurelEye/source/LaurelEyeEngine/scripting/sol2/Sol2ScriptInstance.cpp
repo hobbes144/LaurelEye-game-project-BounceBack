@@ -38,9 +38,15 @@ namespace LaurelEye::Scripting {
 
         messageFunc = env["onMessage"];
 
+        //Collision Event Bindings
         collisionEnterFunc = env["onCollisionEnter"];
         collisionStayFunc = env["onCollisionStay"];
         collisionExitFunc = env["onCollisionExit"];
+
+        //Trigger Event Bindings
+        triggerEnterFunc = env["onTriggerEnter"];
+        triggerStayFunc = env["onTriggerStay"];
+        triggerExitFunc = env["onTriggerExit"];
     }
 
     Sol2ScriptInstance::~Sol2ScriptInstance() {
@@ -118,6 +124,37 @@ namespace LaurelEye::Scripting {
         }
     }
 
+    //Trigger Functions
+    void Sol2ScriptInstance::onTriggerEnter(const Physics::CollisionEventData& data) {
+        if ( triggerEnterFunc.valid() ) {
+            auto result = triggerEnterFunc(data);
+            if ( !result.valid() ) {
+                sol::error err = result;
+                LE_DEBUG_ASSERT("Scripting", false, "[Lua onTriggerEnter Error] " << err.what());
+            }
+        }
+    }
+
+    void Sol2ScriptInstance::onTriggerStay(const Physics::CollisionEventData& data) {
+        if ( triggerStayFunc.valid() ) {
+            auto result = triggerStayFunc(data);
+            if ( !result.valid() ) {
+                sol::error err = result;
+                LE_DEBUG_ASSERT("Scripting", false, "[Lua onTriggerStay Error] " << err.what());
+            }
+        }
+    }
+
+    void Sol2ScriptInstance::onTriggerExit(const Physics::CollisionEventData& data) {
+        if ( triggerExitFunc.valid() ) {
+            auto result = triggerExitFunc(data);
+            if ( !result.valid() ) {
+                sol::error err = result;
+                LE_DEBUG_ASSERT("Scripting", false, "[Lua onTriggerExit Error] " << err.what());
+            }
+        }
+    }
+
     void Sol2ScriptInstance::invalidate() {
         startFunc = sol::nil;
         updateFunc = sol::nil;
@@ -125,6 +162,9 @@ namespace LaurelEye::Scripting {
         collisionEnterFunc = sol::nil;
         collisionStayFunc = sol::nil;
         collisionExitFunc = sol::nil;
+        triggerEnterFunc = sol::nil;
+        triggerStayFunc = sol::nil;
+        triggerExitFunc = sol::nil;
         env = sol::nil;
         owner = nullptr;
     }

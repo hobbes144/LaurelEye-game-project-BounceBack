@@ -125,7 +125,7 @@ function shootProjectile()
     projTransform:setWorldPosition(pos)
     projTransform:setWorldRotation(blasterTransform:getWorldRotation())
 
-    local projBody = proj:findPhysics()
+    local projBody = proj:findRigidBody()
     if projBody then
         projBody:setLinearVelocity(dir * 200.0)
     end

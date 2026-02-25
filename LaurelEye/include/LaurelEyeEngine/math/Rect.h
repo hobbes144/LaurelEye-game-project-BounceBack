@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "LaurelEyeEngine/math/VectorTemplated.h";
+#include "LaurelEyeEngine/math/VectorTemplated.h"
 
 namespace LaurelEye {
 

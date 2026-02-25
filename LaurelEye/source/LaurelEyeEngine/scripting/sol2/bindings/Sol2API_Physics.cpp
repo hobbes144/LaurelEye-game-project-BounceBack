@@ -1,41 +1,79 @@
 ﻿#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Physics.h"
 #include "LaurelEyeEngine/math/Vector3.h"
 #include "LaurelEyeEngine/physics/PhysicsSystem.h"
+#include "LaurelEyeEngine/physics/RigidBodyComponent.h"
+#include "LaurelEyeEngine/physics/GhostBodyComponent.h"
 
 namespace LaurelEye::Scripting {
     void Sol2API_Physics::setup(sol::state& lua, EngineContext* ctx) {
-        // physics body component
-        lua.new_usertype<Physics::PhysicsBodyComponent>(
-            "PhysicsBodyComponent",
+        //--Rigid Body Component--
+        lua.new_usertype<Physics::RigidBodyComponent>(
+            "RigidBodyComponent",
             // Constructors
-            sol::constructors<
-            Physics::PhysicsBodyComponent(),
-            Physics::PhysicsBodyComponent(const Physics::PhysicsBodyData&)>(),
-            "applyForce", sol::overload(static_cast<void (Physics::PhysicsBodyComponent::*)(Vector3)>(&Physics::PhysicsBodyComponent::ApplyForce),
-                [](Physics::PhysicsBodyComponent& self, float x, float y, float z) {
+            sol::no_constructor,
+            "applyForce", sol::overload(static_cast<void (Physics::RigidBodyComponent::*)(Vector3)>(&Physics::RigidBodyComponent::ApplyForce),
+                [](Physics::RigidBodyComponent& self, float x, float y, float z) {
                 self.ApplyForce(Vector3(x, y, z));
             }),
-            "applyImpulse", sol::overload(static_cast<void (Physics::PhysicsBodyComponent::*)(Vector3)>(&Physics::PhysicsBodyComponent::ApplyImpulse),
-                [](Physics::PhysicsBodyComponent& self, float x, float y, float z) {
+            "applyImpulse", sol::overload(static_cast<void (Physics::RigidBodyComponent::*)(Vector3)>(&Physics::RigidBodyComponent::ApplyImpulse),
+                [](Physics::RigidBodyComponent& self, float x, float y, float z) {
                 self.ApplyImpulse(Vector3(x, y, z));
             }),
 
-            "getLinearVelocity", &Physics::PhysicsBodyComponent::GetLinearVelocity,
-            "setLinearVelocity", sol::overload(static_cast<void (Physics::PhysicsBodyComponent::*)(Vector3)>(&Physics::PhysicsBodyComponent::SetLinearVeloctiy), [](Physics::PhysicsBodyComponent& self, float x, float y, float z) {
+            "getLinearVelocity", &Physics::RigidBodyComponent::GetLinearVelocity,
+            "setLinearVelocity", sol::overload(static_cast<void (Physics::RigidBodyComponent::*)(Vector3)>(&Physics::RigidBodyComponent::SetLinearVeloctiy), [](Physics::RigidBodyComponent& self, float x, float y, float z) {
                 self.SetLinearVeloctiy(Vector3(x, y, z));
             }),
-            "getAngularVelocity", &Physics::PhysicsBodyComponent::GetAngularVelocity,
-            "setAngularVelocity", sol::overload(static_cast<void (Physics::PhysicsBodyComponent::*)(Vector3)>(&Physics::PhysicsBodyComponent::SetAngularVelocity), [](Physics::PhysicsBodyComponent& self, float x, float y, float z) {
+            "getAngularVelocity", &Physics::RigidBodyComponent::GetAngularVelocity,
+            "setAngularVelocity", sol::overload(static_cast<void (Physics::RigidBodyComponent::*)(Vector3)>(&Physics::RigidBodyComponent::SetAngularVelocity), [](Physics::RigidBodyComponent& self, float x, float y, float z) {
                 self.SetAngularVelocity(Vector3(x, y, z));
             }),
 
             // --- Data Access ---
-            "getBodyData", &Physics::PhysicsBodyComponent::GetBodyData,
-            "setBodyData", &Physics::PhysicsBodyComponent::SetBodyData,
+            "getBodyData", &Physics::RigidBodyComponent::GetBodyData,
+            "setBodyData", &Physics::RigidBodyComponent::SetBodyData,
 
             // --- Body Reference Access (optional, may be hidden from scripts) ---
-            "getBodyRef", &Physics::PhysicsBodyComponent::GetBodyRef,
-            "setBodyRef", &Physics::PhysicsBodyComponent::SetBodyRef);
+            "getCollider", &Physics::RigidBodyComponent::GetCollider
+            /*
+            "getBodyRef", &Physics::RigidBodyComponent::GetBodyRef,
+            "setBodyRef", &Physics::RigidBodyComponent::SetBodyRef
+            */
+            );
+
+        // -- Ghost Body Component --
+        lua.new_usertype<Physics::GhostBodyComponent>(
+            "GhostBodyComponent",
+            sol::no_constructor,
+
+            "setLinearVelocity", sol::overload(static_cast<void (Physics::GhostBodyComponent::*)(Vector3)>(&Physics::GhostBodyComponent::SetLinearVeloctiy), [](Physics::GhostBodyComponent& self, float x, float y, float z) {
+                self.SetLinearVeloctiy(Vector3(x, y, z));
+            }),
+
+            "getLinearVelocity", &Physics::GhostBodyComponent::GetLinearVelocity,
+
+            "setAngularVelocity", sol::overload(static_cast<void (Physics::GhostBodyComponent::*)(Vector3)>(&Physics::GhostBodyComponent::SetAngularVelocity), [](Physics::GhostBodyComponent& self, float x, float y, float z) {
+                self.SetAngularVelocity(Vector3(x, y, z));
+            }),
+
+            "getAngularVelocity", &Physics::GhostBodyComponent::GetAngularVelocity,
+
+            "applyForce", &Physics::GhostBodyComponent::ApplyForce,
+
+            "applyImpulse", &Physics::GhostBodyComponent::ApplyImpulse,
+
+            "getBodyData", &Physics::GhostBodyComponent::GetBodyData,
+
+            "setBodyData", &Physics::GhostBodyComponent::SetBodyData,
+
+            // --- Data Access ---
+            "getBodyData", &Physics::GhostBodyComponent::GetBodyData,
+            "setBodyData", &Physics::GhostBodyComponent::SetBodyData,
+
+            // --- Body Reference Access (optional, may be hidden from scripts) ---
+            "getCollider", &Physics::GhostBodyComponent::GetCollider
+            );
+
 
         // --- Bind PhysicsBodyData ---
         lua.new_usertype<Physics::PhysicsBodyData>(
@@ -90,7 +128,23 @@ namespace LaurelEye::Scripting {
                 [](float radius, float height, float mass) {
                     return Physics::PhysicsBodyData::Capsule(radius, height, mass); },
                     [](float radius, float height) {
-                        return Physics::PhysicsBodyData::Capsule(radius, height); }));
+                        return Physics::PhysicsBodyData::Capsule(radius, height); }),
+            // --- Trigger / Sensor Helpers ---
+            "TriggerBox", sol::overload([](const Vector3& halfExtents) {
+                return Physics::PhysicsBodyData::TriggerBox(halfExtents); },
+                [](float x, float y, float z) {
+                    return Physics::PhysicsBodyData::TriggerBox(Vector3(x, y, z)); }),
+            "TriggerSphere", sol::overload([](float radius) {
+                return Physics::PhysicsBodyData::TriggerSphere(radius);
+            }),
+            "SensorCapsule", sol::overload([](float radius, float height) {
+                return Physics::PhysicsBodyData::SensorCapsule(radius, height);
+            }),
+            "TriggerBoxPlayerOnly", sol::overload([](const Vector3& halfExtents) {
+                return Physics::PhysicsBodyData::TriggerBoxPlayerOnly(halfExtents); },
+                [](float x, float y, float z) {
+                    return Physics::PhysicsBodyData::TriggerBoxPlayerOnly(Vector3(x, y, z)); })
+        );
 
         // Bind collision event data
         lua.new_usertype<Physics::CollisionEventData>("CollisionEventData",

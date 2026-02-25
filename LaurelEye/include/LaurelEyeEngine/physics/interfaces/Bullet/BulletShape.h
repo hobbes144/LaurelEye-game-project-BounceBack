@@ -25,8 +25,6 @@ namespace LaurelEye::Physics {
         }
         btCollisionShape* GetInternal() { return shape; }
 
-
-
     private:
         CollisionShapePhys collisionShapePhys;
         btCollisionShape* shape;

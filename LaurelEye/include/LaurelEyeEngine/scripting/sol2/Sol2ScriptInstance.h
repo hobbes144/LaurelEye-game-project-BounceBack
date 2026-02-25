@@ -8,7 +8,7 @@
 /// Copyright © 2025 DIGIPEN Institute of Technology. All rights reserved.
 
 #pragma once
-#include "LaurelEyeEngine/ecs/Entity.h"
+
 #include "LaurelEyeEngine/scripting/IScriptInstance.h"
 #include "LaurelEyeEngine/scripting/sol2/Sol2Message.h"
 #include <sol/sol.hpp>
@@ -25,11 +25,17 @@ namespace LaurelEye::Scripting {
         void onUpdate(float dt) override;
         void onShutdown() override;
 
+        //Collision Event Functions
         void onCollisionEnter(const Physics::CollisionEventData& data) override;
         void onCollisionStay(const Physics::CollisionEventData& data) override;
         void onCollisionExit(const Physics::CollisionEventData& data) override;
 
         void onMessage(const SolMessage& message);
+
+        //Trigger Event Functions
+        void onTriggerEnter(const Physics::CollisionEventData& data) override;
+        void onTriggerStay(const Physics::CollisionEventData& data) override;
+        void onTriggerExit(const Physics::CollisionEventData& data) override;
 
         /// @brief Gets an active lua variable state from the sol2 environment.
         /// For example, if an int "count" is set from script, this lets us reach
@@ -52,9 +58,10 @@ namespace LaurelEye::Scripting {
     private:
         sol::state& lua;
         sol::environment env;
-        sol::function startFunc, updateFunc, shutdownFunc;
-        sol::function messageFunc, collisionEnterFunc, collisionStayFunc, collisionExitFunc;
-
+        sol::function startFunc, updateFunc, shutdownFunc,
+                      messageFunc,
+                      collisionEnterFunc, collisionStayFunc, collisionExitFunc,
+                      triggerEnterFunc, triggerStayFunc, triggerExitFunc;
         LaurelEye::Entity* owner;
 
         void invalidate();

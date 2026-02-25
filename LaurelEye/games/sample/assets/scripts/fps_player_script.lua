@@ -49,7 +49,7 @@ healthUIElements = {}
 
 function onStart()
     transform = self:findTransform()
-    body = self:findPhysics()
+    body = self:findRigidBody()
     local scene = SceneManager:getCurrentScene()
     if scene ~= nil then
         local cameraEntity = scene:findEntityByName("Camera")

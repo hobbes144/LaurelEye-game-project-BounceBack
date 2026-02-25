@@ -13,12 +13,14 @@
 
 #include "LaurelEyeEngine/math/Vector3.h"
 #include "LaurelEyeEngine/physics/interfaces/PhysicsTypes.h"
-#include "LaurelEyeEngine/physics/interfaces/IBody.h"
+#include "LaurelEyeEngine/physics/interfaces/ICollider.h"
 #include "LaurelEyeEngine/physics/CollisionManager.h"
+//#include "LaurelEyeEngine/physics/interfaces/IRigidBody.h"
 
 namespace LaurelEye::Physics {
-    class IBody;
     class ICollisionShape;
+    class IRigidBody;
+    class IGhostBody;
 
     /// @brief Interface for a physics simulation world.
     /// Provides a generic abstraction layer for physics engines.
@@ -33,14 +35,19 @@ namespace LaurelEye::Physics {
         /// @param dt Delta time in seconds since the last update.
         virtual void StepSimulation(float dt, int maxSubSteps = 1, float fixedTimeStep = 1.0f/60.0f) = 0;
 
-        /// @brief Create a new physics body.
+        /// @brief Create a new physics rigid body.
         /// @param type The type of body (static, dynamic, kinematic).
         /// @param shapeDesc Description of the collision shape to attach.
         /// @param start Initial transform for the body.
         /// @return A shared pointer to the created body.
-        virtual std::shared_ptr<IBody> CreateBody(const PhysicsBodyData& data) = 0;
+        virtual std::shared_ptr<IRigidBody> CreateRigidBody(const PhysicsBodyData& data) = 0;
 
-        virtual void RemoveBody(std::shared_ptr<IBody> body) = 0;
+        /// @brief Create a new physics ghost body
+        /// @param The Physics Body Data of the 
+        /// @return A shared pointer to the created Ghost body.
+        virtual std::shared_ptr<IGhostBody> CreateGhostBody(const PhysicsBodyData& data) = 0;
+
+        virtual void RemoveObject(std::shared_ptr<ICollider> body) = 0;
 
         /// @brief Create a new collision shape.
         /// @param csPhys Collision shape description.
@@ -57,9 +64,9 @@ namespace LaurelEye::Physics {
 
     protected:
         //TODO: Track Physics Bodies in a more efficient manner
-
+        std::vector<std::shared_ptr<IGhostBody>> ghosts;
         /// @brief Active physics bodies tracked by this world.
-        std::vector<std::shared_ptr<IBody>> bodies;
+        std::vector<std::shared_ptr<ICollider>> bodies;
         /// @brief Collision shapes tracked by this world.
         std::vector<std::shared_ptr<ICollisionShape>> shapes;
     };

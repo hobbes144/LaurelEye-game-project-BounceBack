@@ -110,6 +110,12 @@ namespace LaurelEye::Debug {
                         const Vector3& center, const Vector3& size, float radius,
                         const Quaternion& rotation, const Vector3& color);
 
+        void addSphere(Graphics::GeometryBuffer::ModifiableAttributes& attr,
+                       const Vector3& center, float radius,
+                       const Quaternion& rotation, const Vector3& color);
+
+
+
     };
 
 }

@@ -12,7 +12,7 @@ destroyed = false
 
 function onStart()
     transform = self:findTransform()
-    body = self:findPhysics()
+    body = self:findRigidBody()
 end
 
 function onUpdate(dt)
