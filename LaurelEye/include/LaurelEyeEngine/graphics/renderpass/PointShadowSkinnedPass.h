@@ -37,10 +37,12 @@ namespace LaurelEye::Graphics {
         void execute(const FrameContext& ctx) override;
 
         void setProperties(Properties _properties);
+        void setFarPlane(float farPlane);
 
     private:
         void drawSkinnedRenderables(const FrameContext& ctx, std::shared_ptr<Shader> shader);
         // void drawSkinnedRenderablesOnly(const FrameContext& ctx, std::shared_ptr<Shader> shader);
+        float farPlane = 2000.0f;
 
     protected:
         Properties properties;

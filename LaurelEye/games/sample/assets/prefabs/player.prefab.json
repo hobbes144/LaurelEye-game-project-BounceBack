@@ -9,7 +9,7 @@
         },
         "Render3D": {
             "mesh": {
-                "file": "models/roman_D.fbx"
+                "file": "models/StickMan_Idle.fbx"
             },
             "material": {
                 "texture": "textures/roman_blue_D_texture.jpg",

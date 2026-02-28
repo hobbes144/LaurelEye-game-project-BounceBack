@@ -233,12 +233,13 @@ namespace LaurelEye::Graphics {
                     posDir,
                     posDir + directions[face],
                     ups[face]);
-
+                pointShadowPass.setFarPlane(params.far);
                 pointShadowPass.setProperties(
                     PointShadowSkinnedPass::Properties{projectionMatrix * viewMatrix});
                 r.shadowMatrix =
                     Matrix4::translation(0.5f) * Matrix4::scale(0.5f) *
                     projectionMatrix * viewMatrix;
+                
                 pointShadowPass.execute(ctx);
             }
 

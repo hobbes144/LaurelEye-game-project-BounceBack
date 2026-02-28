@@ -52,8 +52,11 @@ out vec3 FragColor;
 // https://learnopengl.com/Advanced-Lighting/Shadows/Point-Shadows
 float computePointShadow(uint shadowIdx, vec3 fragPos, vec3 lightPos, vec3 N)
 {
+    float normalBiasAmount = 0.2;
+    vec3 biasedPos = fragPos + N * normalBiasAmount;
+
     // get vector between fragment position and light position
-    vec3 L = fragPos - lightPos;
+    vec3 L = biasedPos - lightPos;
 
     // get current linear depth as the length between the fragment and light position
     float currentDepth = length(L);
@@ -69,8 +72,10 @@ float computePointShadow(uint shadowIdx, vec3 fragPos, vec3 lightPos, vec3 N)
     closestDepth *= lights[lightIndex].radius; // or farPlane if you store it
 
     // now test for shadows
-    float bias = max(0.5 * (1.0 - dot(normalize(fragPos - lightPos), N)), 0.005);
-
+    vec3 lightDir = normalize(lightPos - fragPos);
+    float bias = max(lights[lightIndex].radius * 0.005 * (1.0 - dot(N, lightDir)), 
+                 lights[lightIndex].radius * 0.0005);
+    //float offset = 2.1; // tune this - push in world units
     return (currentDepth - bias > closestDepth) ? 1.0 : 0.0;
 }
 
@@ -121,11 +126,11 @@ void main()
 
 //    float attenuation =
 //      1.0 / (constant + linear * lightDistance + quadratic * (lightDistance * lightDistance));
+//
+//    float attenuation =
+//      (1/pow(lightDistance, 2) - 1/pow(radius, 2));
 
-    float attenuation =
-      (1/pow(lightDistance, 2) - 1/pow(radius, 2));
-
-
+    float attenuation = max(0.0, 1.0/pow(lightDistance,2) - 1.0/pow(radius,2));
     FragColor *= attenuation;
 
 

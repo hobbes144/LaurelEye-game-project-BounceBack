@@ -43,6 +43,7 @@ namespace LaurelEye::Graphics {
         ctx.device.bindDataBufferBase(propertiesHandle);
 
         // Action
+        shader->setFloat("farPlane", farPlane);
         drawSkinnedRenderables(ctx, shader);
     }
 
@@ -67,7 +68,7 @@ namespace LaurelEye::Graphics {
                 component->GetMaterial()->setProperty(
                     "InvModelMatrix",
                     component->GetBoundTransform()->getWorldTransform().getInverseLocalMatrix());
-
+                
                 component->GetMaterial()->apply(shader);
 
                 if ( !isValidDataBuffer(component->skinDataBuffer) || !isValidDataBuffer(component->animationDataBuffer) ) {
@@ -83,5 +84,8 @@ namespace LaurelEye::Graphics {
                 glDrawElements(GL_TRIANGLES, component->indexCount, GL_UNSIGNED_INT, 0);
             }
         }
+    }
+    void PointShadowSkinnedPass::setFarPlane(float farPlane) {
+        this->farPlane = farPlane;
     }
 } // namespace LaurelEye::Graphics

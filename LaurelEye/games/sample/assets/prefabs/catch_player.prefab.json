@@ -3,16 +3,16 @@
     "tags": [ "player" ],
     "components": {
         "Transform": {
-            "position": [ 0.0, 0.0, 100.0 ],
+            "position": [ 0.0, 0.0, 10.0 ],
             "rotation": [ 0.0, 0.0, -1.0, 0.0 ],
-            "scale": [ 0.08, 0.08, 0.08 ]
+            "scale": [ 0.01, 0.01, 0.01 ]
         },
         "Render3D": {
             "mesh": {
-                "file": "models/Idle.fbx"
+                "file": "models/StickMan_Idle.fbx"
             },
             "material": {
-                "texture": "textures/roman_blue_D_texture.jpg",
+                "texture": "textures/texture_01_light.png",
                 "diffuse": [ 10.0, 1.0, 1.0 ],
                 "specular": [ 0.2, 0.2, 0.2 ],
                 "shininess": 32.0
@@ -23,9 +23,9 @@
             "shapeDefinition": {
                 "type": "Box",
                 "size": {
-                    "x": 30.0,
-                    "y": 113.0,
-                    "z": 30.0
+                    "x": 300.0,
+                    "y": 930.0,
+                    "z": 300.0
                 },
                 "radius": 0.5,
                 "height": 0.5
@@ -90,7 +90,7 @@
         },
         "Animation": {
             "type": "Skeletal",
-            "file": [ "models/Running.fbx", "models/Idle.fbx" ]
+            "file": [ "models/StickMan_Running.fbx", "models/StickMan_Idle.fbx" ]
         },
         "Script": {
             "path": "scripts/catch_player.lua"

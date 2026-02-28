@@ -66,7 +66,7 @@ function onStart()
 
     animator = self:findAnimator()
     if animator == nil then return end
-    animator:changeAnimation("Idle")
+    animator:changeAnimation("StickMan_Idle")
 
     smokeEmitter = self:findParticleEmitter()
 
@@ -183,16 +183,15 @@ function onUpdate(dt)
 
         local accelMag = math.sqrt(accelX * accelX + accelZ * accelZ)
 
-
-
         body:applyForce(Vector3.new(accelX * mass, 0, accelZ * mass))
-
-        if animator.currentAnimationName ~= "Running" then
-            animator:changeAnimation("Running")
+        local animName = animator.currentAnimationName
+        if animName ~= "StickMan_Running" then
+            animator:changeAnimation("StickMan_Running")
         end
     else
-        if animator.currentAnimationName ~= "Idle" then
-            animator:changeAnimation("Idle")
+        local animName = animator.currentAnimationName
+        if animName ~= "StickMan_Idle" then
+            animator:changeAnimation("StickMan_Idle")
         end
     end
 
