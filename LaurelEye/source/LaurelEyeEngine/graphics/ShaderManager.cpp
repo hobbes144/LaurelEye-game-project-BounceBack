@@ -10,11 +10,11 @@
 
 namespace LaurelEye::Graphics {
 
-    std::shared_ptr<Shader> ShaderManager::loadFile(const std::string& filePath) {
+    std::shared_ptr<Shader> ShaderManager::loadFile(const std::string& name, const std::string& filePath) {
         if ( loadedFiles.contains(filePath) )
             return loadedFiles[filePath];
 
-        loadedFiles[filePath] = std::shared_ptr<Shader>(new Shader(filePath));
+        loadedFiles[filePath] = std::shared_ptr<Shader>(new Shader(name, filePath));
         return loadedFiles[filePath];
     }
 

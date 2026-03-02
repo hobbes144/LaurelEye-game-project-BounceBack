@@ -19,7 +19,7 @@
 namespace LaurelEye::Graphics {
 
     void DebugDrawRenderPass::setup(RenderResources& rs) {
-        shader = ShaderManager::getInstance().loadFile("../../../assets/shaders/DebugDraw.frag\n../../../assets/shaders/DebugDraw.vert");
+        shader = ShaderManager::getInstance().loadFile("DebugDrawRenderPass", "../../../assets/shaders/DebugDraw.frag\n../../../assets/shaders/DebugDraw.vert");
 
         // Query once at init
         glGetFloatv(GL_ALIASED_LINE_WIDTH_RANGE, lineWidthRange); // e.g., returns {1.0f, 1.0f}

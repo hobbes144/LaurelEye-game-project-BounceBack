@@ -85,6 +85,7 @@ namespace LaurelEye::Graphics {
         ///
         /// @param shader Shared pointer to the target shader.
         virtual void apply(std::shared_ptr<Shader> shader) const;
+        virtual void unbindTextures(std::shared_ptr<Shader> shader) const;
 
         /// @brief Static material registry used as a factory for basic materials.
         ///

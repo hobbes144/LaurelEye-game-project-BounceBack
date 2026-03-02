@@ -9,18 +9,16 @@
 
 #include "LaurelEyeEngine/graphics/graphics_components/IRenderableComponent.h"
 #include "LaurelEyeEngine/graphics/resources/DataBuffer.h"
-#include "LaurelEyeEngine/graphics/resources/Mesh.h"
 #include "LaurelEyeEngine/graphics/resources/FrameContext.h"
 #include "LaurelEyeEngine/graphics/resources/RenderResources.h"
 #include "LaurelEyeEngine/graphics/resources/Shader.h"
 #include "LaurelEyeEngine/graphics/ShaderManager.h"
 #include "LaurelEyeEngine/math/Matrix4.h"
-#include "LaurelEyeEngine/math/Vector3.h"
 
 namespace LaurelEye::Graphics {
 
     void ShadowSkinnedPass::setup(RenderResources& rs) {
-        shader = ShaderManager::getInstance().loadFile("../../../assets/shaders/Shadows.frag\n../../../assets/shaders/ShadowsSkinned.vert");
+        shader = ShaderManager::getInstance().loadFile("ShadowSkinnedPass", "../../../assets/shaders/Shadows.frag\n../../../assets/shaders/ShadowsSkinned.vert");
 
         DataBufferDesc shadowDataBuffer{};
         shadowDataBuffer.type = DataBufferType::UBO;

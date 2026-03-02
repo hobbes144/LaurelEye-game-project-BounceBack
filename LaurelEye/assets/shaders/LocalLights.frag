@@ -4,7 +4,7 @@
 // Copyright ? 2025 DIGIPEN Institute of Technology. All rights reserved.
 //
 ///////////////////////////////////////////////////////////////////////////////
-#version 440
+#version 450
 
 const float pi = 3.14159265358979323846;
 const int MAX_SHADOWS = 16;
@@ -34,17 +34,15 @@ layout(std430, binding = 2) buffer LightBuffer {
     Light lights[];
 };
 
-// upgrade to samplerCube array if you want
-uniform samplerCube shadowCubeMaps[MAX_SHADOWS];
-
-uniform uint lightIndex;
 
 uniform uint height, width;
+uniform uint lightIndex;
 
-uniform sampler2D gbuffer_position;
-uniform sampler2D gbuffer_normal;
-uniform sampler2D gbuffer_diffuse;
-uniform sampler2D gbuffer_specular;
+layout(binding = 0) uniform sampler2D gbuffer_position;
+layout(binding = 1) uniform sampler2D gbuffer_normal;
+layout(binding = 2) uniform sampler2D gbuffer_diffuse;
+layout(binding = 3) uniform sampler2D gbuffer_specular;
+layout(binding = 10) uniform samplerCube shadowCubeMaps[MAX_SHADOWS];
 
 out vec3 FragColor;
 
@@ -73,7 +71,7 @@ float computePointShadow(uint shadowIdx, vec3 fragPos, vec3 lightPos, vec3 N)
 
     // now test for shadows
     vec3 lightDir = normalize(lightPos - fragPos);
-    float bias = max(lights[lightIndex].radius * 0.005 * (1.0 - dot(N, lightDir)), 
+    float bias = max(lights[lightIndex].radius * 0.005 * (1.0 - dot(N, lightDir)),
                  lights[lightIndex].radius * 0.0005);
     //float offset = 2.1; // tune this - push in world units
     return (currentDepth - bias > closestDepth) ? 1.0 : 0.0;

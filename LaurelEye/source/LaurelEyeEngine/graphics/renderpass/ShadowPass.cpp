@@ -13,12 +13,11 @@
 #include "LaurelEyeEngine/graphics/resources/Shader.h"
 #include "LaurelEyeEngine/graphics/ShaderManager.h"
 #include "LaurelEyeEngine/math/Matrix4.h"
-#include "LaurelEyeEngine/math/Vector3.h"
 
 namespace LaurelEye::Graphics {
 
     void ShadowPass::setup(RenderResources& rs) {
-        shader = ShaderManager::getInstance().loadFile("../../../assets/shaders/Shadows.frag\n../../../assets/shaders/Shadows.vert");
+        shader = ShaderManager::getInstance().loadFile("ShadowPass", "../../../assets/shaders/Shadows.frag\n../../../assets/shaders/Shadows.vert");
 
         DataBufferDesc shadowDataBuffer{};
         shadowDataBuffer.type = DataBufferType::UBO;

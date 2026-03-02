@@ -122,4 +122,21 @@ namespace LaurelEye::Graphics {
         }
     }
 
+    void Material::unbindTextures(std::shared_ptr<Shader> shader) const {
+        unsigned int textureUnit = 0;
+        // GLint maxUnits = 0;
+        // glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxUnits);
+        for ( const auto& [name, textureID] : textureBindings ) {
+            if ( textureID != 0 ) {
+                // if ( static_cast<GLint>(textureUnit) >= maxUnits ) {
+                //     std::cout << "Peepee poopoo" << std::endl;
+                //     continue;
+                //
+                // }
+                shader->unbindTexture(textureUnit);
+                ++textureUnit;
+            }
+        }
+    }
+
 } // namespace LaurelEye::Graphics

@@ -19,7 +19,7 @@
 namespace LaurelEye::Graphics {
 
     void ParticleRenderPass::setup(RenderResources& rs) {
-        shader = ShaderManager::getInstance().loadFile("../../../assets/shaders/ParticleRenderPass.frag\n../../../assets/shaders/ParticleRenderPass.vert");
+        shader = ShaderManager::getInstance().loadFile("ParticleRenderPass", "../../../assets/shaders/ParticleRenderPass.frag\n../../../assets/shaders/ParticleRenderPass.vert");
     }
 
     void ParticleRenderPass::execute(const FrameContext& ctx) {

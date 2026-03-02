@@ -33,7 +33,7 @@ namespace LaurelEye::Graphics {
      *
      * \param shaderFilePaths String with shader file paths separated by newline.
      *****************************************************************************/
-    Shader::Shader(const std::string& shaderFilePaths) {
+    Shader::Shader(const std::string& name, const std::string& shaderFilePaths) {
         std::istringstream pathsStream(shaderFilePaths);
         std::string shaderFilePath;
 
@@ -45,6 +45,8 @@ namespace LaurelEye::Graphics {
 
         linkShaders();
         cacheUniforms();
+
+        glObjectLabel(GL_PROGRAM, programID, name.size(), name.c_str());
 
         for ( const auto& [key, ids] : shaderIDs ) {
             for ( const auto& id : ids ) {
@@ -116,10 +118,7 @@ namespace LaurelEye::Graphics {
      *****************************************************************************/
     std::string Shader::readShaderFile(std::string path) {
         std::ifstream shaderFile(path);
-        if ( !shaderFile.is_open() ) {
-            std::cerr << "ERROR::SHADER::FILE::FILE_OPEN_FAILED::" << path << std::endl;
-            throw std::runtime_error("ERROR::SHADER::FILE::FILE_OPEN_FAILED");
-        }
+        LE_ASSERT("graphics", shaderFile.is_open(), "Shader " << name << ": Unable to open shader file at path: " << path);
 
         std::stringstream buffer;
         buffer << shaderFile.rdbuf();
@@ -148,9 +147,8 @@ namespace LaurelEye::Graphics {
 
         glGetShaderiv(shaderId, GL_COMPILE_STATUS, &success);
         if ( !success ) {
-            glGetShaderInfoLog(shaderId, 512, NULL, infoLog);
-            std::cerr << "ERROR::SHADER::" << shaderTypeToString(type) << "::COMPILATION_FAILED\n"
-                      << infoLog << std::endl;
+            glGetProgramInfoLog(programID, 512, NULL, infoLog);
+            LE_ASSERT("graphics", success, "Shader " << name << ": " << shaderTypeToString(type) << " shader compilation failed, error: " << infoLog);
         }
 
         return shaderId;
@@ -186,8 +184,7 @@ namespace LaurelEye::Graphics {
         glGetProgramiv(programID, GL_LINK_STATUS, &success);
         if ( !success ) {
             glGetProgramInfoLog(programID, 512, NULL, infoLog);
-            std::cerr << "ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n"
-                      << infoLog << std::endl;
+            LE_ASSERT("graphics", success, "Shader " << name << ": Shader program compilation failed, error: " << infoLog);
         }
     }
 
@@ -215,6 +212,20 @@ namespace LaurelEye::Graphics {
                                      static_cast<GLsizei>(nameData.size()), NULL, &nameData[0]);
             std::string name(nameData.begin(), nameData.end() - 1);
             uniformLocationCache[name] = values[3];
+
+            glUseProgram(programID);
+            switch ( values[1] ) {
+            case GL_SAMPLER_CUBE:
+                glUniform1i(values[3], InvalidSamplerCubeBinding);
+                break;
+            case GL_SAMPLER_2D:
+                glUniform1i(values[3], InvalidSampler2DBinding);
+                break;
+            case GL_SAMPLER_3D:
+                glUniform1i(values[3], InvalidSampler3DBinding);
+                break;
+            }
+            glUseProgram(0);
         }
     }
 
@@ -253,11 +264,7 @@ namespace LaurelEye::Graphics {
         }
         GLint location = glGetUniformLocation(programID, name.c_str());
         uniformLocationCache[name] = location;
-#if !defined(NDEBUG)
-        if ( location == -1 ) {
-            std::cerr << "ERROR::SHADER::UNIFORM::NOT_EXISTS::" << name << std::endl;
-        }
-#endif
+        LE_DEBUG_WARN_IF("graphics", location >= 0, "Shader " << name << ": Uniform " << name << " requested but doesn't exist.");
 
         return location;
     }
@@ -266,8 +273,7 @@ namespace LaurelEye::Graphics {
         unsigned int uniformBlockIndex =
             glGetUniformBlockIndex(programID, name.c_str());
         glUniformBlockBinding(programID, uniformBlockIndex, blockBinding);
-        // TODO: Change this to warning logs
-        std::cout << "UBO initialized at: " << uniformBlockIndex << std::endl;
+        LE_DEBUG_INFO("graphics", "Shader " << name << ": UBO initialized at "<< uniformBlockIndex << ".");
     }
 
     /*!****************************************************************************
@@ -358,58 +364,46 @@ namespace LaurelEye::Graphics {
     void Shader::bindTexture(
         unsigned int textureUnit,
         const std::string& name,
-        TextureHandle texHandle, TextureType type) const {
+        TextureHandle textureID, TextureType type) const {
 
+#if !defined(NDEBUG)
         // Validate texture unit against device limits to avoid GL_INVALID_ENUM.
         GLint maxUnits = 0;
         // LE_ASSERT("Graphics", textureUnit < 10, "Texture " << name << " bound here");
         glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxUnits);
-        if ( static_cast<GLint>(textureUnit) >= maxUnits ) {
-            std::cout << "Poopoo Peepee" << std::endl;
+        if ( static_cast<GLint>(textureID) >= maxUnits ) {
+            LE_ASSERT("graphics", static_cast<GLint>(textureID) >= maxUnits, "Shader " << name << ": Invalid texture unit being bound!");
             return;
         }
-        glActiveTexture(GL_TEXTURE0 + textureUnit);
-        // always 2D textures for now
-        switch ( type ) {
-        case TextureType::Texture2D:
-            glBindTexture(GL_TEXTURE_2D, texHandle);
-            break;
-        case TextureType::TextureCube:
-            glBindTexture(GL_TEXTURE_CUBE_MAP, texHandle);
-            break;
-        case TextureType::Texture3D:
-            glBindTexture(GL_TEXTURE_3D, texHandle);
-            break;
-        case TextureType::TextureStorage2D:
-            break;
-        }
-        // set the sampler uniform to the texture unit index
+#endif
+
+        glBindTextureUnit(textureUnit, textureID);
         setInt(name, static_cast<int>(textureUnit));
     }
 
-     void Shader::unbindTexture(
+    void Shader::bindTexture(
         unsigned int textureUnit,
-        TextureType type) const {
-        glActiveTexture(GL_TEXTURE0 + textureUnit);
+        TextureHandle textureID) const {
 
-        switch ( type ) {
-        case TextureType::Texture2D:
-            glBindTexture(GL_TEXTURE_2D, 0);
-            break;
-
-        case TextureType::TextureCube:
-            glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-            break;
-
-        case TextureType::Texture3D:
-            glBindTexture(GL_TEXTURE_3D, 0);
-            break;
-        case TextureType::TextureStorage2D:
-            break;
+#if !defined(NDEBUG)
+        // Validate texture unit against device limits to avoid GL_INVALID_ENUM.
+        GLint maxUnits = 0;
+        // LE_ASSERT("Graphics", textureUnit < 10, "Texture " << name << " bound here");
+        glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxUnits);
+        if ( static_cast<GLint>(textureID) >= maxUnits ) {
+            LE_ASSERT("graphics", static_cast<GLint>(textureID) >= maxUnits, "Shader " << name << ": Invalid texture unit being bound!");
+            return;
         }
+#endif
+
+        glBindTextureUnit(textureUnit, textureID);
     }
 
-
+    void Shader::unbindTexture(
+        unsigned int textureUnit,
+        TextureType type) const {
+        glBindTextureUnit(textureUnit, 0);
+    }
 
     // void Shader::bindImageTexture(
     //   unsigned int bindingUnit,

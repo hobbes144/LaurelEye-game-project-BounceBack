@@ -16,7 +16,7 @@
 namespace LaurelEye::Graphics {
 
     void SinglePassShadow::setup(RenderResources& rs) {
-        shader = ShaderManager::getInstance().loadFile("../../../assets/shaders/SinglePassShadow.frag\n../../../assets/shaders/SinglePassShadow.vert");
+        shader = ShaderManager::getInstance().loadFile("SinglePassShadow", "../../../assets/shaders/SinglePassShadow.frag\n../../../assets/shaders/SinglePassShadow.vert");
     }
 
     void SinglePassShadow::execute(const FrameContext& ctx) {

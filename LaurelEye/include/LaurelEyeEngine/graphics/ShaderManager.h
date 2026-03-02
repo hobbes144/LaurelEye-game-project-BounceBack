@@ -46,7 +46,7 @@ namespace LaurelEye::Graphics {
         ///
         /// @param filePath Path to the shader source file.
         /// @return Shared pointer to the loaded shader object.
-        std::shared_ptr<Shader> loadFile(const std::string& filePath);
+        std::shared_ptr<Shader> loadFile(const std::string& name, const std::string& filePath);
         /// @brief Unloads a specific shader instance.
         ///
         /// This method removes a shader from the cache if it matches the specified instance.

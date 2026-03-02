@@ -17,7 +17,7 @@
 
 namespace LaurelEye::Graphics {
     void SkydomePass::setup(RenderResources& rs) {
-        shader = ShaderManager::getInstance().loadFile("../../../assets/shaders/Skydome.frag\n../../../assets/shaders/Skydome.vert");
+        shader = ShaderManager::getInstance().loadFile("SkydomePass", "../../../assets/shaders/Skydome.frag\n../../../assets/shaders/Skydome.vert");
 
         sphereMesh = (Mesh::createSphereMesh("sphere", 32));
         scale = (Matrix4::scale(Vector3(2000.0f)));

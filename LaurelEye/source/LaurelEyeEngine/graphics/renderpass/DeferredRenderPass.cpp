@@ -17,7 +17,7 @@
 
 namespace LaurelEye::Graphics {
     void DeferredRenderPass::setup(RenderResources& rs) {
-        shader = ShaderManager::getInstance().loadFile("../../../assets/shaders/DeferredRender.frag\n../../../assets/shaders/DeferredRender.vert");
+        shader = ShaderManager::getInstance().loadFile("DeferredRenderPass", "../../../assets/shaders/DeferredRender.frag\n../../../assets/shaders/DeferredRender.vert");
 
         screenQuad = (Mesh::createSquareMesh("screenQuad", 1.0f));
     }

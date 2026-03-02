@@ -21,7 +21,7 @@
 namespace LaurelEye::Graphics {
 
     void GBufferSkinnedPass::setup(RenderResources& rs) {
-        shader = ShaderManager::getInstance().loadFile("../../../assets/shaders/GBuffer.frag\n../../../assets/shaders/GBufferSkinned.vert");
+        shader = ShaderManager::getInstance().loadFile("GBufferSkinnedPass", "../../../assets/shaders/GBuffer.frag\n../../../assets/shaders/GBufferSkinned.vert");
         sphereMesh = (Mesh::createSphereMesh("sphere", 32));
 
         gbufferMultisampled = rs.createScreenSizeFramebuffer(

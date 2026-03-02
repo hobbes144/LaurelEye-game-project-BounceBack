@@ -7,7 +7,6 @@
 
 #include "LaurelEyeEngine/graphics/renderpass/LocalLightsPass.h"
 
-#include "LaurelEyeEngine/graphics/RenderStateSaver.h"
 #include "LaurelEyeEngine/graphics/resources/FrameContext.h"
 #include "LaurelEyeEngine/graphics/resources/GeometryBuffer.h"
 #include "LaurelEyeEngine/graphics/resources/Mesh.h"
@@ -23,8 +22,24 @@
 namespace LaurelEye::Graphics {
 
     void LocalLightsPass::setup(RenderResources& rs) {
-        shader = ShaderManager::getInstance().loadFile("../../../assets/shaders/LocalLights.frag\n../../../assets/shaders/LocalLights.vert");
+        shader = ShaderManager::getInstance().loadFile("LocalLightsPass", "../../../assets/shaders/LocalLights.frag\n../../../assets/shaders/LocalLights.vert");
         lightSphere = (Mesh::createSphereMesh("sphere", 32));
+
+        gbufferPosition = rs.texture("gbuffer_position");
+        LE_ASSERT("graphics", isValidTexture(gbufferPosition), "Deferred Render Pass: GBuffer Position Missing");
+        gbufferNormal = rs.texture("gbuffer_normal");
+        LE_ASSERT("graphics", isValidTexture(gbufferPosition), "Deferred Render Pass: GBuffer Normal Missing");
+        gbufferDiffuse = rs.texture("gbuffer_diffuse");
+        LE_ASSERT("graphics", isValidTexture(gbufferPosition), "Deferred Render Pass: GBuffer Diffuse Missing");
+        gbufferSpecular = rs.texture("gbuffer_specular");
+        LE_ASSERT("graphics", isValidTexture(gbufferPosition), "Deferred Render Pass: GBuffer Specular Missing");
+
+        shader->use();
+        for ( uint32_t i = 0; i < MAX_SHADOWS; ++i ) {
+            localShadowTex[i] = InvalidTexture;
+            shader->setInt("shadowCubeMaps[" + std::to_string(i) + "]", InvalidSamplerCubeBinding);
+        }
+        shader->unuse();
     }
 
     void LocalLightsPass::execute(const FrameContext& ctx) {
@@ -43,35 +58,10 @@ namespace LaurelEye::Graphics {
         shader->setUInt("width", size.width);
         shader->setUInt("height", size.height);
 
-        if ( !isValidTexture(gbufferPosition) ) {
-            gbufferPosition = ctx.resources.texture("gbuffer_position");
-            assert(isValidTexture(gbufferPosition) &&
-                   "LAURELEYE::RENDER_SYSTEM::DEFERRED_RENDER_PASS::GBUFFER_POSITION_MISSING");
-        }
-        if ( !isValidTexture(gbufferNormal) ) {
-            gbufferNormal = ctx.resources.texture("gbuffer_normal");
-            assert(isValidTexture(gbufferNormal) &&
-                   "LAURELEYE::RENDER_SYSTEM::DEFERRED_RENDER_PASS::GBUFFER_NORMAL_MISSING");
-        }
-        if ( !isValidTexture(gbufferDiffuse) ) {
-            gbufferDiffuse = ctx.resources.texture("gbuffer_diffuse");
-            assert(isValidTexture(gbufferDiffuse) &&
-                   "LAURELEYE::RENDER_SYSTEM::DEFERRED_RENDER_PASS::GBUFFER_DIFFUSE_MISSING");
-        }
-        if ( !isValidTexture(gbufferSpecular) ) {
-            gbufferSpecular = ctx.resources.texture("gbuffer_specular");
-            assert(isValidTexture(gbufferSpecular) &&
-                   "LAURELEYE::RENDER_SYSTEM::DEFERRED_RENDER_PASS::GBUFFER_SPECULAR_MISSING");
-        }
-
         shader->bindTexture(0, "gbuffer_position", gbufferPosition);
         shader->bindTexture(1, "gbuffer_normal", gbufferNormal);
         shader->bindTexture(2, "gbuffer_diffuse", gbufferDiffuse);
         shader->bindTexture(3, "gbuffer_specular", gbufferSpecular);
-
-        // clean up shadow textures
-        for ( uint32_t i = 0; i < MAX_SHADOWS; ++i )
-            localShadowTex[i] = InvalidTexture;
 
         uint32_t shadowSlot = 0;
         for ( const auto& shadow : ctx.shadowManager->getShadows() ) {
@@ -95,18 +85,11 @@ namespace LaurelEye::Graphics {
             }
         }
 
-
         for ( size_t lightIndex = 0; lightIndex < lightCount; ++lightIndex ) {
             uint32_t uiLightIndex = static_cast<uint32_t>(lightIndex);
             shader->setUInt("lightIndex", uiLightIndex);
-            lightSphere->draw(GL_TRIANGLES);
-        }
 
-        for ( uint32_t i = 0; i < shadowSlot; ++i ) {
-            if ( isValidTexture(localShadowTex[i]) ) {
-                shader->unbindTexture(
-                    11 + i, TextureType::TextureCube);
-            }
+            lightSphere->draw(GL_TRIANGLES);
         }
 
         glDisable(GL_CULL_FACE);

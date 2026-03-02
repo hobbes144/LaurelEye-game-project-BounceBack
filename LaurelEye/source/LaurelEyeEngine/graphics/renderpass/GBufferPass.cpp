@@ -19,7 +19,7 @@
 namespace LaurelEye::Graphics {
 
     void GBufferPass::setup(RenderResources& rs) {
-        shader = ShaderManager::getInstance().loadFile("../../../assets/shaders/GBuffer.frag\n../../../assets/shaders/GBuffer.vert");
+        shader = ShaderManager::getInstance().loadFile("GBufferPass", "../../../assets/shaders/GBuffer.frag\n../../../assets/shaders/GBuffer.vert");
         sphereMesh = (Mesh::createSphereMesh("sphere", 32));
 
         gbufferMultisampled = rs.createScreenSizeFramebuffer(

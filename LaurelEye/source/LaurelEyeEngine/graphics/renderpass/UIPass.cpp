@@ -16,7 +16,7 @@
 namespace LaurelEye::Graphics {
 
     void UIPass::setup(RenderResources& rs) {
-        shader = ShaderManager::getInstance().loadFile("../../../assets/shaders/UIPass.frag\n../../../assets/shaders/UIPass.vert");
+        shader = ShaderManager::getInstance().loadFile("UIPass", "../../../assets/shaders/UIPass.frag\n../../../assets/shaders/UIPass.vert");
         //textShader = ShaderManager::getInstance().loadFile("../../../assets/shaders/UIPass.frag\n../../../assets/shaders/UIPass.vert");
         Square = Mesh::createSquareMesh("Square", 1.0f);
     }

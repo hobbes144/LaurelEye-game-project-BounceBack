@@ -105,6 +105,19 @@ namespace LaurelEye::Graphics {
                   << "Message: " << message << std::endl;
     }
 
+    void openglShaderCheckError(GLint programID) {
+        // Validation checks if the program can execute given the current OpenGL state
+        glValidateProgram(programID);
+        GLint isValid = 0;
+        glGetProgramiv(programID, GL_VALIDATE_STATUS, &isValid);
+
+        if ( isValid == GL_FALSE ) {
+            char message[512];
+            glGetProgramInfoLog(programID, 512, NULL, message);
+            printf("Program Validation Failed: %s\n", message);
+        }
+    }
+
     LGLRenderDevice::LGLRenderDevice() = default;
     LGLRenderDevice::~LGLRenderDevice() = default;
 

@@ -113,6 +113,9 @@ namespace LaurelEye::Graphics {
              const std::string& name,
              TextureHandle textureID,
             TextureType type = TextureType::Texture2D) const;
+        void bindTexture(
+             unsigned int textureUnit,
+             TextureHandle textureID) const;
         void unbindTexture(
             unsigned int textureUnit, TextureType type = TextureType::Texture2D) const;
 
@@ -141,7 +144,7 @@ namespace LaurelEye::Graphics {
     private:
         /// @brief Private constructor used internally by ShaderManager.
         /// @param shaderFilePaths Paths to the shader files to load.
-        Shader(const std::string& shaderFilePaths);
+        Shader(const std::string& name, const std::string& shaderFilePaths);
         /// @brief Map of shader types to their respective compiled IDs.
         std::unordered_map<GLenum, std::vector<GLuint>> shaderIDs;
         /// @brief Cache for uniform locations to reduce glGetUniformLocation calls.
@@ -151,6 +154,8 @@ namespace LaurelEye::Graphics {
         GLuint programID;
         /// @brief The draw mode for this shader (e.g., GL_TRIANGLES, GL_LINES).
         GLenum drawMode = 0;
+
+        std::string name;
 
         // ---------------------------------------------------------------------
         // Internal helpers

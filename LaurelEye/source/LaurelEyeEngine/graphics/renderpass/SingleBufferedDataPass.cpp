@@ -13,7 +13,7 @@
 namespace LaurelEye::Graphics {
 
     void SingleBufferedDataPass::setup(RenderResources& rs) {
-        shader = ShaderManager::getInstance().loadFile("../../../assets/shaders/SinglePassWithBuffers.frag\n../../../assets/shaders/SinglePassWithBuffers.vert");
+        shader = ShaderManager::getInstance().loadFile("SingleBufferedDataPass", "../../../assets/shaders/SinglePassWithBuffers.frag\n../../../assets/shaders/SinglePassWithBuffers.vert");
     }
 
     void SingleBufferedDataPass::execute(const FrameContext& ctx) {

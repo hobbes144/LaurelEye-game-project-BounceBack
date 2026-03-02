@@ -84,6 +84,9 @@ namespace LaurelEye::Graphics {
     /// @brief Numeric handle used to reference a texture.
     using TextureHandle = uint32_t;
     static constexpr TextureHandle InvalidTexture = UINT32_MAX;
+    static constexpr TextureHandle InvalidSampler2DBinding = 31;
+    static constexpr TextureHandle InvalidSampler3DBinding = 30;
+    static constexpr TextureHandle InvalidSamplerCubeBinding = 29;
     inline bool isValidTexture(TextureHandle h) noexcept {
         return h != InvalidTexture;
     }
