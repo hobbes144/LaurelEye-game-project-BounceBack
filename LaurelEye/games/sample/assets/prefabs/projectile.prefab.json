@@ -51,7 +51,7 @@
             "useCCD": true,
             "ccdMotionThreshold": 0.01,
             "ccdSweptSphereRadius": 1.0,
-            "gravityScale": 0.0
+            "gravityScale": 1.5
         },
         "Speaker": {
             "audioName": "laser",

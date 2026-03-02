@@ -1,5 +1,5 @@
 ﻿{
-    "initialScene": "Level1",
+    "initialScene": "Level3",
     "scenes": [
         {
             "name": "MainMenu",

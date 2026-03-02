@@ -7,6 +7,8 @@ body = nil
 
 speaker = nil
 
+bounceCount = 0
+
 function onStart()
     transform = self:findTransform()
     body = self:findGhostBody()
@@ -33,7 +35,29 @@ function onTriggerEnter(data)
     local tagsA = data.entityA:getTags()
     for _, tag in pairs(tagsA) do
         if tag == "ground" then
-            destroySelf()
+            if bounceCount > 2 then
+                destroySelf()
+            else
+                local vel = body:getLinearVelocity()
+                local normal = data.normal or data.contactNormal
+                if normal == nil then return end
+
+                normal = normal:Normalized()
+
+                local reflected = vel - normal * (2.0 * vel:Dot(normal))
+
+                -- optional homing
+                local pos = transform:getWorldPosition()
+                if homingDir ~= nil then
+                    reflected = homingDir * reflected:Magnitude()
+                end
+
+                --print("Reflected To " + reflected)
+                body:setLinearVelocity(reflected)
+
+                print("Ball Has Bounced")
+                bounceCount = bounceCount + 1
+            end
         elseif tag == "player" then
             local scene = SceneManager:getCurrentScene()
             local player = scene:findEntityByName("PlayerPrefab")
@@ -49,7 +73,29 @@ function onTriggerEnter(data)
     local tagsB = data.entityB:getTags()
     for _, tag in pairs(tagsB) do
         if tag == "ground" then
-            destroySelf()
+            if bounceCount > 2 then
+                destroySelf()
+            else
+                local vel = body:getLinearVelocity()
+                local normal = data.normal or data.contactNormal
+                if normal == nil then return end
+
+                normal = normal:Normalized()
+
+                local reflected = vel - normal * (2.0 * vel:Dot(normal))
+
+                -- optional homing
+                local pos = transform:getWorldPosition()
+                if homingDir ~= nil then
+                    reflected = homingDir * reflected:Magnitude()
+                end
+
+                --print("Reflected To " + reflected)
+                body:setLinearVelocity(reflected)
+
+                print("Ball Has Bounced")
+                bounceCount = bounceCount + 1
+            end
         elseif tag == "player" then
             local scene = SceneManager:getCurrentScene()
             local player = scene:findEntityByName("PlayerPrefab")

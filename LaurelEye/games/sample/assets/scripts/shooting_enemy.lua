@@ -145,6 +145,12 @@ function autoShootProjectile(dt)
         dir = forward -- fallback
     end
 
+    local arcAngle = 0.15
+    dir.y = math.tan(arcAngle)
+    if dir:Magnitude() > 0 then
+        dir = dir:Normalized()
+    end
+
     local projBody = proj:findGhostBody()
     if projBody ~= nil then
         local projectileSpeed = 100.0 -- tune as needed
