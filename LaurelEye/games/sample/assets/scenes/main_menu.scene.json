@@ -15,9 +15,6 @@
                 },
                 "Camera": {
 
-                },
-                "Script": {
-                    "path": "scripts/camera_movement.lua"
                 }
             }
         },
