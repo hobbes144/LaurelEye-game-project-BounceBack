@@ -22,26 +22,6 @@ function onUpdate(dt)
         log("Loading Scene: Level3")
         Window.setCursorMode(0, Window.CursorMode.Disabled)
         SceneManager:changeScene("Level3")
-    elseif Input:isKeyPressed(Key.Four) then
-        log("Loading Scene: ParticleScene")
-        Window.setCursorMode(0, Window.CursorMode.Disabled)
-        SceneManager:changeScene("ParticleScene")
-    elseif Input:isKeyPressed(Key.Five) then
-        log("Loading Scene: SpawnerScene")
-        Window.setCursorMode(0, Window.CursorMode.Disabled)
-        SceneManager:changeScene("SpawnerScene")
-    elseif Input:isKeyPressed(Key.Six) then
-        log("Reloading Current Scene")
-        Window.setCursorMode(0, Window.CursorMode.Disabled)
-    elseif Input:isKeyPressed(Key.Eight) then
-        log("Loading Scene: BulletHellPrototype")
-        Window.setCursorMode(0, Window.CursorMode.Disabled)
-        SceneManager:changeScene("BulletHellPrototype")
-        SceneManager:reloadCurrentScene()
-    elseif Input:isKeyPressed(Key.Seven) then
-        log("Loading Scene: MBPrototype")
-        Window.setCursorMode(0, Window.CursorMode.Disabled)
-        SceneManager:changeScene("MBPrototype")
     elseif Input:isKeyPressed(Key.Escape) then
         Window.setCursorMode(0, Window.CursorMode.Normal)
         SceneManager:changeScene("MainMenu")

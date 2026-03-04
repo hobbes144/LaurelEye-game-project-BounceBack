@@ -43,8 +43,6 @@ invincible = false
 invincibleTimer = 0.0
 invincibleDuration = 1.5
 
-doorSpawned = false
-
 dashDuration = 0.25
 dashTimer = 0.0
 isDashing = false
@@ -52,17 +50,6 @@ isDashing = false
 function onStart()
     transform = self:findTransform()
     body = self:findRigidBody()
-    local scene = SceneManager:getCurrentScene()
-    if scene ~= nil then
-        local cameraEntity = scene:findEntityByName("Camera")
-        if cameraEntity ~= nil then
-            cameraTransform = cameraEntity:findTransform()
-            local startWall = scene:findEntityByName("Wall1")
-            local wallTrans = startWall:findTransform()
-            local wallPos = wallTrans:getWorldPosition()
-            transform:setWorldPosition(wallPos.x, 0.0, wallPos.z - 25)
-        end
-    end
 
     animator = self:findAnimator()
     if animator == nil then return end
@@ -84,14 +71,6 @@ function onStart()
 end
 
 function onMessage(msg)
-    if msg.topic == "I am shooting you!" then
-        debugLog("Oh no, I'm being shot at!!")
-        local message = Message.new()
-        message.to = player
-        message.topic = "I am being shot at!"
-        Script.broadcast(message)
-    end
-
     if msg.topic == "Catch Me!" then
         hasBall = true
     end
@@ -106,7 +85,17 @@ function onMessage(msg)
 end
 
 function onUpdate(dt)
-    
+    if cameraTransform == nil then
+        local scene = SceneManager:getCurrentScene()
+        if scene ~= nil then
+            local cameraEntity = scene:findEntityByName("Camera")
+            if cameraEntity ~= nil then
+                print("Camera Entity: ", cameraEntity)
+                cameraTransform = cameraEntity:findTransform()
+                print("Camera Transform: ", cameraTransform)
+            end
+        end
+    end
 
     --Check if health = 0
     if currentHealth <= 0 then
@@ -221,21 +210,6 @@ function onUpdate(dt)
 
         body:applyImpulse(Vector3.new(dx * mass, 0, dz * mass)) 
     end
-
-
-    local anyTargets = targetCheck()
-    if not doorSpawned and not anyTargets then
-        local scene = SceneManager:getCurrentScene()
-        if scene == nil then return end
-        local endWall = scene:findEntityByName("Wall2")
-        local wallTrans = endWall:findTransform()
-        local wallPos = wallTrans:getWorldPosition()
-
-        local door = SceneManager:instantiate("prefabs/door.prefab.json")
-        local doorTrans = door:findTransform()
-        doorTrans:setWorldPosition(wallPos.x, 10.0, wallPos.z + 1)
-        doorSpawned = true
-    end
 end
 
 function triggerLandingBurst()
@@ -312,17 +286,6 @@ function shootProjectile()
     if shootDir:Magnitude() <= 0.0001 then return end
     shootDir = shootDir:Normalized()
 
-    -- Instantiate projectile
-    --[[local proj = nil
-    if not ballCreated then
-        proj = SceneManager:instantiate("prefabs/catch_ball.prefab.json")
-        if proj == nil then return end
-        ballCreated = true
-    else
-        proj = scene:findEntityByName("Ball")
-        if proj == nil then return end
-    end]]--
-
     proj = SceneManager:instantiate("prefabs/catch_ball.prefab.json")
     if proj == nil then return end
     local projTransform = proj:findTransform()
@@ -368,13 +331,6 @@ function onCollisionEnter(data)
 
 end
 
-function onCollisionExit(data)
-    local name = data.entityB:getName()
-    if name == "Ground" then
-        isGrounded = false
-    end
-end
-
 function catchBall(ball)
     local ballBody = ball:findGhostBody()
     ballBody:setLinearVelocity(0.0, 0.0, 0.0)
@@ -410,18 +366,6 @@ function moveHealthBar()
     barTransform:setSize(newSize)
 end
 
-function targetCheck()
-    local scene = SceneManager:getCurrentScene()
-    if scene == nil then return end
-
-    local targetList = scene:findEntitiesWithTag("target")
-    if #targetList == 0 then
-        return false
-    end
-
-    return true
-end
-
 function changeLevels()
     local scene = SceneManager:getCurrentScene()
     if scene == nil then return end
@@ -433,7 +377,6 @@ function changeLevels()
     elseif sceneName == "Level3" then
         log("Alpha Completed!")
     end
-    doorSpawned = false
 end
 
 function cameraAim(maxDistance)

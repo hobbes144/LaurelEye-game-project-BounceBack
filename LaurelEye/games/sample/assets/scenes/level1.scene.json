@@ -257,233 +257,6 @@
             }
         },
         {
-            "name": "Target1",
-            "tags": [ "target" ],
-            "components": {
-                "Transform": {
-                    "position": [ -20.0, 25.0, -48.0 ],
-                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 20.0, 10.0, 2.0 ]
-                },
-                "Render3D": {
-                    "mesh": {
-                        "name": "cubeMesh",
-                        "primitiveType": "Cube"
-                    },
-                    "material": {
-                        "texture": "textures/texture_01_purple.png",
-                        "diffuse": [ 1.0, 10.0, 1.0 ],
-                        "specular": [ 0.2, 0.2, 0.2 ],
-                        "shininess": 32.0
-                    }
-                },
-                "Physics": {
-                    "type": "Static",
-                    "shapeDefinition": {
-                        "type": "Box",
-                        "size": {
-                            "x": 1.0,
-                            "y": 1.0,
-                            "z": 1.0
-                        }
-                    },
-                    "mass": 0.0,
-                    "linearDamping": 0.0,
-                    "angularDamping": 0.0,
-                    "friction": 0.5,
-                    "restitution": 0.0,
-                    "collisionGroup": 2,
-                    "collisionMask": 11,
-                    "gravityScale": 0.0
-                },
-                "Script": {
-                    "path": "scripts/target_script.lua"
-                }
-            }
-        },
-        {
-            "name": "Target2",
-            "tags": [ "target" ],
-            "components": {
-                "Transform": {
-                    "position": [ 20.0, 25.0, -48.0 ],
-                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 20.0, 10.0, 2.0 ]
-                },
-                "Render3D": {
-                    "mesh": {
-                        "name": "cubeMesh",
-                        "primitiveType": "Cube"
-                    },
-                    "material": {
-                        "texture": "textures/texture_01_purple.png",
-                        "diffuse": [ 1.0, 10.0, 1.0 ],
-                        "specular": [ 0.2, 0.2, 0.2 ],
-                        "shininess": 32.0
-                    }
-                },
-                "Physics": {
-                    "type": "Static",
-                    "shapeDefinition": {
-                        "type": "Box",
-                        "size": {
-                            "x": 1.0,
-                            "y": 1.0,
-                            "z": 1.0
-                        }
-                    },
-                    "mass": 0.0,
-                    "linearDamping": 0.0,
-                    "angularDamping": 0.0,
-                    "friction": 0.5,
-                    "restitution": 0.0,
-                    "collisionGroup": 2,
-                    "collisionMask": 11,
-                    "gravityScale": 0.0
-                },
-                "Script": {
-                    "path": "scripts/target_script.lua"
-                }
-            }
-        },
-        {
-            "name": "Target3",
-            "tags": [ "target" ],
-            "components": {
-                "Transform": {
-                    "position": [ 0.0, 10.0, -48.0 ],
-                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 20.0, 10.0, 2.0 ]
-                },
-                "Render3D": {
-                    "mesh": {
-                        "name": "cubeMesh",
-                        "primitiveType": "Cube"
-                    },
-                    "material": {
-                        "texture": "textures/texture_01_purple.png",
-                        "diffuse": [ 1.0, 10.0, 1.0 ],
-                        "specular": [ 0.2, 0.2, 0.2 ],
-                        "shininess": 32.0
-                    }
-                },
-                "Physics": {
-                    "type": "Static",
-                    "shapeDefinition": {
-                        "type": "Box",
-                        "size": {
-                            "x": 1.0,
-                            "y": 1.0,
-                            "z": 1.0
-                        }
-                    },
-                    "mass": 0.0,
-                    "linearDamping": 0.0,
-                    "angularDamping": 0.0,
-                    "friction": 0.5,
-                    "restitution": 0.0,
-                    "collisionGroup": 2,
-                    "collisionMask": 11,
-                    "gravityScale": 0.0
-                },
-                "Script": {
-                    "path": "scripts/target_script.lua"
-                }
-            }
-        },
-        {
-            "name": "Enemy1",
-            "tags": [ "target" ],
-            "components": {
-                "Transform": {
-                    "position": [ 0.0, 0.0, -20.0 ],
-                    "rotation": [ 0.0, 0.0, -1.0, 0.0 ],
-                    "scale": [ 0.08, 0.08, 0.08 ]
-                },
-                "Render3D": {
-                    "mesh": {
-                        "file": "models/viking_C.fbx"
-                    },
-                    "material": {
-                        "texture": "textures/viking_blue_C_texture.jpg",
-                        "diffuse": [ 10.0, 1.0, 1.0 ],
-                        "specular": [ 0.2, 0.2, 0.2 ],
-                        "shininess": 32.0
-                    }
-                },
-                "Physics": {
-                    "type": "Dynamic",
-                    "shapeDefinition": {
-                        "type": "Capsule",
-                        "size": {
-                            "x": 1.0,
-                            "y": 1.0,
-                            "z": 1.0
-                        },
-                        "radius": 20.0,
-                        "height": 70.0
-                    },
-                    "mass": 1.0,
-                    "linearVelocity": {
-                        "x": 1.0,
-                        "y": 1.0,
-                        "z": 1.0
-                    },
-                    "angularVelocity": {
-                        "x": 0.0,
-                        "y": 5.0,
-                        "z": 0.0
-                    },
-                    "inertia": {
-                        "x": 0.0,
-                        "y": 0.0,
-                        "z": 0.0
-                    },
-                    "centerOfMass": {
-                        "x": 0.0,
-                        "y": 4.5,
-                        "z": 0.0
-                    },
-                    "linearDamping": 0.5,
-                    "angularDamping": 2.0,
-                    "friction": 2.5,
-                    "restitution": 0.1,
-                    "collisionGroup": 2,
-                    "collisionMask": 13,
-                    "useCCD": false,
-                    "ccdMotionThreshold": 0.01,
-                    "ccdSweptSphereRadius": 1.0,
-                    "gravityScale": 8.0
-                },
-                "Speaker": {
-                    "audioName": "explosion",
-                    "audioPath": "audio/explosionCrunch_000.mp3",
-                    "volume": 0.2,
-                    "loop": false,
-                    "3D": false,
-                    "playOnLoad": false
-                },
-                "Script": {
-                    "path": "scripts/shooting_enemy.lua"
-                }
-            }
-        },
-        {
-            "name": "Camera",
-            "components": {
-                "Transform": {
-                    "position": [ 0.0, 15.0, 40.0 ],
-                    "rotation": [ -0.261799, 0.0, 0.0 ],
-                    "scale": [ 1.0, 1.0, 1.0 ]
-                },
-                "Camera": {
-                },
-                "Script": {
-                    "path": "scripts/camera_movement.lua"
-                }
-            }
-        },
-        {
             "name": "AmbientLight",
             "components": {
                 "Transform": {
@@ -590,8 +363,24 @@
             }
         },
         {
-            "name": "Player",
-            "prefab": "prefabs/catch_player.prefab.json"
+            "name": "DoorSpawn",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 10.0, -49.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 0.08, 0.08, 0.08 ]
+                }
+            }
+        },
+        {
+            "name": "SpawnPoint",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 0.0, 25.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 0.08, 0.08, 0.08 ]
+                }
+            }
         },
         {
             "name": "SceneManager",
@@ -603,6 +392,19 @@
                 },
                 "Script": {
                     "path": "scripts/scene_manager.lua"
+                }
+            }
+        },
+        {
+            "name": "LevelInstantiator",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 10.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 0.08, 0.08, 0.08 ]
+                },
+                "Script": {
+                    "path": "scripts/level_setup.lua"
                 }
             }
         },

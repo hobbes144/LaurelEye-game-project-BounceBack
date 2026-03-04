@@ -1,10 +1,10 @@
 ﻿{
-    "name": "FollowingEnemyPrefab",
-    "tags": [ "enemy" ],
+    "name": "Enemy1",
+    "tags": [ "target" ],
     "components": {
         "Transform": {
-            "position": [ 20.0, 0.0, 20.0 ],
-            "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+            "position": [ 0.0, 0.0, -20.0 ],
+            "rotation": [ 0.0, 0.0, -1.0, 0.0 ],
             "scale": [ 0.08, 0.08, 0.08 ]
         },
         "Render3D": {
@@ -21,14 +21,14 @@
         "Physics": {
             "type": "Dynamic",
             "shapeDefinition": {
-                "type": "Box",
+                "type": "Capsule",
                 "size": {
-                    "x": 40.0,
-                    "y": 100.0,
-                    "z": 40.0
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
                 },
-                "radius": 0.5,
-                "height": 1.0
+                "radius": 20.0,
+                "height": 70.0
             },
             "mass": 1.0,
             "linearVelocity": {
@@ -48,27 +48,19 @@
             },
             "centerOfMass": {
                 "x": 0.0,
-                "y": 4.0,
+                "y": 4.5,
                 "z": 0.0
             },
             "linearDamping": 0.5,
             "angularDamping": 2.0,
             "friction": 2.5,
             "restitution": 0.1,
-            "collisionGroup": 1,
-            "collisionMask": 4294967295,
+            "collisionGroup": 2,
+            "collisionMask": 13,
             "useCCD": false,
             "ccdMotionThreshold": 0.01,
             "ccdSweptSphereRadius": 1.0,
             "gravityScale": 8.0
-        },
-        "Speaker": {
-            "audioName": "explosion",
-            "audioPath": "audio/explosionCrunch_000.mp3",
-            "volume": 0.2,
-            "loop": false,
-            "3D": false,
-            "playOnLoad": false
         },
         "Script": {
             "path": "scripts/shooting_enemy.lua"
