@@ -48,6 +48,8 @@ namespace LaurelEye::Physics {
         virtual void ApplyForce(Vector3 f) = 0;
         virtual void ApplyImpulse(Vector3 i) = 0;
 
+        virtual Vector3 getGravityScale() = 0;
+        virtual void setGravityScale(Vector3 nv) = 0;
 
     protected:
         PhysicsBodyData data;

@@ -35,6 +35,9 @@ namespace LaurelEye::Physics {
         void SetMass(float m) override;
         float GetMass() const override;
 
+        Vector3 GetGravityScale() const override;
+        void SetGravityScale(Vector3 nv) override;
+
         std::shared_ptr<btRigidBody> GetInternal() { return btRB; }
         std::shared_ptr<BulletShape> GetShape() { return shape; }
 

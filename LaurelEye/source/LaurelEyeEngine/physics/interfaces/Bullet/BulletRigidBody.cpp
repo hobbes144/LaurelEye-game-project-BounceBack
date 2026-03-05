@@ -73,6 +73,14 @@ namespace LaurelEye::Physics {
         return 1.0f / btRB->getInvMass();
     }
 
+    Vector3 BulletRigidBody::GetGravityScale() const {
+        return FromBt(btRB->getGravity());
+    }
+
+    void BulletRigidBody::SetGravityScale(Vector3 nv) {
+        btRB->setGravity(ToBt(nv));
+    }
+
     void BulletRigidBody::pushTransformToPhysics() {
         if ( !btRB || !boundTransform ) return;
         const auto& pos = boundTransform->getWorldTransform().getPosition();

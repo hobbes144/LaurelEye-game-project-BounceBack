@@ -51,6 +51,10 @@ namespace LaurelEye::Physics {
         /// @return The velocity vector.
         virtual Vector3 GetAngularVelocity() const = 0;
 
+        virtual Vector3 GetGravityScale() const = 0;
+
+        virtual void SetGravityScale(Vector3 nv) = 0;
+
         // Collider Override
         unsigned int GetBodyID() const override { return bodyId; }
 

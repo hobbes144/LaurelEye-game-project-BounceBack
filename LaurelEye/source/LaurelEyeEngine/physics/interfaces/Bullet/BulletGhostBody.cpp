@@ -131,4 +131,12 @@ namespace LaurelEye::Physics {
         return ghost;
     }
 
+    Vector3 BulletGhostBody::GetGravityScale() const {
+        return FromBt(ghost->getGravity());
+    }
+
+    void BulletGhostBody::SetGravityScale(Vector3 nv) {
+        ghost->setGravity(ToBt(nv));
+    }
+
 }

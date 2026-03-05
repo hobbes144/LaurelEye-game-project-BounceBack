@@ -53,6 +53,10 @@ namespace LaurelEye::Physics {
         /// @return The velocity vector.
         Vector3 GetAngularVelocity() const override;
 
+        Vector3 GetGravityScale() const override;
+
+        void SetGravityScale(Vector3 nv) override;
+
         std::vector<ICollider*> GetOverlaps() const override;
         int GetNumberOverlappingObjects() const override;
 

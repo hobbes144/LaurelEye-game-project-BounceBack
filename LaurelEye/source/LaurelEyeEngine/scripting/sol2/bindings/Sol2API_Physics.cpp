@@ -60,6 +60,10 @@ namespace LaurelEye::Scripting {
 
             "applyForce", &Physics::GhostBodyComponent::ApplyForce,
 
+            "getGravityScale", &Physics::GhostBodyComponent::getGravityScale,
+
+            "setGravityScale", &Physics::GhostBodyComponent::setGravityScale,
+
             "applyImpulse", &Physics::GhostBodyComponent::ApplyImpulse,
 
             "getBodyData", &Physics::GhostBodyComponent::GetBodyData,

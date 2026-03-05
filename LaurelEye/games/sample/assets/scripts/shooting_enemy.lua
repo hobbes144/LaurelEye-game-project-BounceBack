@@ -145,7 +145,7 @@ function autoShootProjectile(dt)
         dir = forward -- fallback
     end
 
-    local arcAngle = 0.15
+    local arcAngle = 0.05
     dir.y = math.tan(arcAngle)
     if dir:Magnitude() > 0 then
         dir = dir:Normalized()

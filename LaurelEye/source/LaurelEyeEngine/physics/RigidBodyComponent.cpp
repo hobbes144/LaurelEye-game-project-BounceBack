@@ -95,4 +95,12 @@ namespace LaurelEye::Physics {
         rigidBody->ApplyImpulse(i);
     }
 
+    Vector3 RigidBodyComponent::getGravityScale() {
+        return rigidBody->GetGravityScale();
+    }
+
+    void RigidBodyComponent::setGravityScale(Vector3 nv) {
+        rigidBody->SetGravityScale(nv);
+    }
+
 }

@@ -82,4 +82,11 @@ namespace LaurelEye::Physics {
         LE_DEBUG_WARN("Physics", "Cannot apply Impulse to GhostBody");
     }
 
+    Vector3 GhostBodyComponent::getGravityScale() {
+        return ghost->GetGravityScale();
+    }
+    void GhostBodyComponent::setGravityScale(Vector3 nv) {
+        ghost->SetGravityScale(nv);
+    }
+
 }

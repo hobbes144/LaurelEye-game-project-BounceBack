@@ -46,6 +46,9 @@ namespace LaurelEye::Physics {
         void ApplyForce(Vector3 f) override;
         void ApplyImpulse(Vector3 i) override;
 
+        Vector3 getGravityScale() override;
+        void setGravityScale(Vector3 nv) override;
+
     private:
         std::shared_ptr<IRigidBody> rigidBody;
 

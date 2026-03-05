@@ -2,6 +2,10 @@
     "initialScene": "Level1",
     "scenes": [
         {
+            "name": "MainMenu",
+            "path": "scenes/main_menu.scene.json"
+        },
+        {
             "name": "Level1",
             "path": "scenes/level1.scene.json"
         },

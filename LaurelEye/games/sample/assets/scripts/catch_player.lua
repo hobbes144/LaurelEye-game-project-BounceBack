@@ -34,7 +34,8 @@ speedThreshold = 2.0  -- when footsteps should begin
 
 hasBall = true
 ballCreated = false
-projectileSpeed = 100.0
+baseProjSpeed = 75.0
+projectileSpeed = baseProjSpeed
 
 --damage variables
 maxHealth = 3.0
@@ -72,7 +73,12 @@ end
 
 function onMessage(msg)
     if msg.topic == "Catch Me!" then
+        projectileSpeed = baseProjSpeed
         hasBall = true
+        local scene = SceneManager:getCurrentScene()
+        local ballInd = scene:findEntityByName("BallIndicator")
+        local uiRender = ballInd:findComponent("UIRenderComponent")
+        uiRender:setTransparency(1.0)
     end
 
     if msg.topic == "Get Hit!" then
@@ -142,8 +148,21 @@ function onUpdate(dt)
         (Input:isKeyHeld(Key.W) and 1 or 0) -
         (Input:isKeyHeld(Key.S) and 1 or 0)
 
-    -- Normalize input
-    local inputMag = math.sqrt(inputX * inputX + inputZ * inputZ)
+    if Input:isMouseButtonPressed(MouseButton.Left) then
+        if hasBall then 
+            shootProjectile()
+            local scene = SceneManager:getCurrentScene()
+            local ballInd = scene:findEntityByName("BallIndicator")
+            local uiRender = ballInd:findComponent("UIRenderComponent")
+            uiRender:setTransparency(0.0)
+            hasBall = false
+        else
+            kickBack()
+        end
+
+    end
+
+    local inputMag = math.sqrt(inputX*inputX + inputZ*inputZ)
     if inputMag > 1 then
         inputX = inputX / inputMag
         inputZ = inputZ / inputMag
@@ -399,4 +418,43 @@ function cameraAim(maxDistance)
     end
 
     return camPos + forward * maxDistance
+end
+
+function kickBack()
+    local scene = SceneManager:getCurrentScene()
+    if scene == nil then return end
+
+    local ball = scene:findEntityByName("Ball")
+    if ball == nil then return end
+
+    local initialPos = transform:getWorldPosition()
+    local playerPos = Vector3.new(initialPos.x, 4.5, initialPos.z)
+    local ballTransform = ball:findTransform()
+    local ballPos = ballTransform:getWorldPosition()
+
+    local distVec = ballPos - playerPos
+    local dist = distVec:Magnitude()
+    print(dist)
+    if dist < 20.0 then
+        print("Kicked Back!")
+        -- Get the camera's aim direction (reusing your existing cameraAim logic)
+        local targetPoint = cameraAim(1000.0)
+        if targetPoint == nil then return end
+
+        local ballBody = ball:findGhostBody()
+        if ballBody == nil then return end
+
+        local kickDir = (targetPoint - ballPos)
+        if kickDir:Magnitude() <= 0.0001 then return end
+        kickDir = kickDir:Normalized()
+
+        projectileSpeed = projectileSpeed + 30.0 -- faster than a normal shot
+        ballBody:setLinearVelocity(kickDir * projectileSpeed)
+
+        -- Reset the ball's bounce count so it behaves as a fresh kick
+    local message = Message.new()
+        message.to = ball
+        message.topic = "I am kicking you!"
+        Script.send(message)
+    end
 end

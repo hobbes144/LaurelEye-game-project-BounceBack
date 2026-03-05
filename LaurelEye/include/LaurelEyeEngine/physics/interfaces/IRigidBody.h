@@ -74,6 +74,10 @@ namespace LaurelEye::Physics {
         /// @return The mass value.
         virtual float GetMass() const = 0;
 
+        virtual Vector3 GetGravityScale() const = 0;
+
+        virtual void SetGravityScale(Vector3 nv) = 0;
+
         //virtual std::any GetInternal() = 0; Potential Optimization, Ignore for now
 
         unsigned int GetBodyID() const override { return bodyId; }

@@ -261,9 +261,9 @@
             "tags": [ "ground" ],
             "components": {
                 "Transform": {
-                    "position": [ 60.0, 4.0, -20.0 ],
+                    "position": [ 60.0, 3.0, -20.0 ],
                     "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 80.0, 8.0, 2.0 ]
+                    "scale": [ 80.0, 6.0, 2.0 ]
                 },
                 "Render3D": {
                     "mesh": {
@@ -303,9 +303,9 @@
             "tags": [ "ground" ],
             "components": {
                 "Transform": {
-                    "position": [ -60.0, 4.0, -20.0 ],
+                    "position": [ -60.0, 3.0, -20.0 ],
                     "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 80.0, 8.0, 2.0 ]
+                    "scale": [ 80.0, 6.0, 2.0 ]
                 },
                 "Render3D": {
                     "mesh": {
@@ -368,6 +368,25 @@
                     "type": "Ambient",
                     "intensity": 0.3,
                     "color": [ 1.0, 1.0, 1.0 ]
+                }
+            }
+        },
+        {
+            "name": "BallIndicator",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0.0, 1.0 ],
+                    "anchorMax": [ 0.0, 1.0 ],
+                    "pivot": [ 0.5, 0.5 ],
+                    "offset": [ 45, -100 ],
+                    "size": [ 30, 30 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "textures/texture_01_red.png",
+                        "layer": 10
+                    },
+                    "transparency": 1.0
                 }
             }
         },

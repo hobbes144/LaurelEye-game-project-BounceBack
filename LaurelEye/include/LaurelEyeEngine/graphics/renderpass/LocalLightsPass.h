@@ -30,7 +30,7 @@ namespace LaurelEye::Graphics {
         std::shared_ptr<Mesh> lightSphere;
         uint32_t lightCount = 0;
 
-        static const size_t MAX_SHADOWS = 16uz;
+        static const size_t MAX_SHADOWS = 16;
         TextureHandle localShadowTex[MAX_SHADOWS];
 
         TextureHandle gbufferPosition = InvalidTexture;

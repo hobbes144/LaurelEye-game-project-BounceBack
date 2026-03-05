@@ -4,13 +4,17 @@ transform = nil
 body = nil
 
 initialSpeed = nil
-bounceCount = 0.0
+bounceCount = 0
 
 returnSpeed = nil
 
 scene = nil
 playerEntity = nil
 playerTransform = nil
+
+gravityDisabled = false
+homingTimer = nil        -- tracks time since homing started
+HOMING_TIMEOUT = 2.0     -- seconds before giving up and sending "Catch Me!"
 
 function onStart()
     transform = self:findTransform()
@@ -20,11 +24,38 @@ function onStart()
     playerTransform = playerEntity and playerEntity:findTransform()
 end
 
+function onMessage(msg)
+    if msg.topic == "I am kicking you!" then
+        print("Bouncing Away!")
+        bounceCount = 0
+        gravityDisabled = false
+        homingTimer = nil
+
+        -- restore gravity if needed
+        local data = body:getBodyData()
+        data.gravityScale = 1.0
+        body:setBodyData(data)
+    end
+end
+
 function onUpdate(dt)
     if initialSpeed == nil then
         local vel = body:getLinearVelocity()
         initialSpeed = vel:Magnitude()
-        returnSpeed = initialSpeed + 50.0
+        returnSpeed = initialSpeed + 25.0
+    end
+
+    -- Count down the homing timeout
+    if homingTimer ~= nil then
+        homingTimer = homingTimer + dt
+        if homingTimer >= HOMING_TIMEOUT then
+            print("Homing timeout! Sending Catch Me!")
+            local message = Message.new()
+            message.to = playerEntity
+            message.topic = "Catch Me!"
+            Script.send(message)
+            destroySelf()
+        end
     end
 end
 
@@ -32,12 +63,15 @@ function onTriggerEnter(data)
     if body == nil then return end
 
     if (isGround(data.entityA) or isGround(data.entityB)) then
+        
         -- After 2 bounces, home to player
         if bounceCount >= 2 then
 
             local ballPos = transform:getWorldPosition()
             local playerPos = playerTransform:getWorldPosition()
             playerPos = Vector3.new(playerPos.x, 4.5, playerPos.z)
+            local newGrav = Vector3.new(0.0, 0.0, 0.0)
+            body:setGravityScale(newGrav)
 
             local dir = playerPos - ballPos
 
@@ -45,6 +79,12 @@ function onTriggerEnter(data)
                 dir = dir:Normalized()
                 body:setLinearVelocity(dir * returnSpeed)
             end
+
+            -- Start the homing timer if not already running
+            if homingTimer == nil then
+                homingTimer = 0.0
+            end
+
             return
         end
 
@@ -53,20 +93,16 @@ function onTriggerEnter(data)
         if normal == nil then return end
 
         normal = normal:Normalized()
-
         local reflected = vel - normal * (2.0 * vel:Dot(normal))
 
-        -- optional homing
         local pos = transform:getWorldPosition()
         local homingDir = findEnemyDirection(pos, reflected)
         if homingDir ~= nil then
             reflected = homingDir * reflected:Magnitude()
         end
 
-        --print("Reflected To " + reflected)
         body:setLinearVelocity(reflected)
 
-        print("Ball Has Bounced")
         bounceCount = bounceCount + 1
     end
 end
@@ -104,13 +140,12 @@ end
 
 function findEnemyDirection(origin, baseDir)
     local maxDistance = 75.0
-    local coneAngle = math.rad(15)      -- cone half-angle
-    local rings = 3                     -- quality vs cost
+    local coneAngle = math.rad(15)
+    local rings = 3
     local raysPerRing = 6
 
     baseDir = baseDir:Normalized()
 
-    -- Build orthonormal basis
     local up = Vector3.new(0, 1, 0)
     if math.abs(baseDir:Dot(up)) > 0.95 then
         up = Vector3.new(1, 0, 0)
