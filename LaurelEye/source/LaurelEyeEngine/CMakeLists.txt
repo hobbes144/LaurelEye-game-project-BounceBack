@@ -147,7 +147,7 @@ add_library(LaurelEyeEngine SHARED
     "window/glfw/LGlfwWindow.cpp"
     "window/WindowManager.cpp"
     ${ENGINE_SOURCES}
-)
+ "graphics/renderpass/LocalLightsToonPass.cpp")
 
 le_add_fmod(LaurelEyeEngine USE_STUDIO)
 

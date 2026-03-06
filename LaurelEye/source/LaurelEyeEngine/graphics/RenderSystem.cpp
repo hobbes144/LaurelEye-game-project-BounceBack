@@ -59,6 +59,7 @@
 #include "LaurelEyeEngine/graphics/renderpass/SkydomePass.h"
 #include "LaurelEyeEngine/graphics/renderpass/UIPass.h"
 // #include "LaurelEyeEngine/graphics/renderpass/SingleBufferedDataPass.h"
+#include "LaurelEyeEngine/graphics/renderpass/LocalLightsToonPass.h"
 
 #include <memory>
 #include <algorithm>
@@ -131,7 +132,7 @@ namespace LaurelEye::Graphics {
         deferredRenderPass = std::make_shared<DeferredRenderPass>();
         deferredRenderPass->setup(*tempRenderResources.get());
 
-        localLightsPass = std::make_shared<LocalLightsPass>();
+        localLightsPass = std::make_shared<LocalLightsToonPass>();
         localLightsPass->setup(*tempRenderResources.get());
 
         // sp = std::make_shared<SinglePass>();

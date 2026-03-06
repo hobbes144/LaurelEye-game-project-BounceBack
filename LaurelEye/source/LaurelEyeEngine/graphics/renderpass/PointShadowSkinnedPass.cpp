@@ -70,6 +70,7 @@ namespace LaurelEye::Graphics {
                 component->GetMaterial()->apply(shader);
 
                 if ( !isValidDataBuffer(component->skinDataBuffer) || !isValidDataBuffer(component->animationDataBuffer) ) {
+                    if ( component->GetMeshPrimitiveType() != PrimitiveMeshType::Sphere ) continue;
                     shader->setInt("isSkinned", 0);
                 }
                 else {

@@ -42,7 +42,7 @@ namespace LaurelEye::Graphics {
     private:
         void drawSkinnedRenderables(const FrameContext& ctx, std::shared_ptr<Shader> shader);
         // void drawSkinnedRenderablesOnly(const FrameContext& ctx, std::shared_ptr<Shader> shader);
-        float farPlane = 2000.0f;
+        float farPlane = 3000.0f;
 
     protected:
         Properties properties;

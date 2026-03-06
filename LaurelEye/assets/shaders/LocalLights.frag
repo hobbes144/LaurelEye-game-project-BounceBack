@@ -73,8 +73,30 @@ float computePointShadow(uint shadowIdx, vec3 fragPos, vec3 lightPos, vec3 N)
     vec3 lightDir = normalize(lightPos - fragPos);
     float bias = max(lights[lightIndex].radius * 0.005 * (1.0 - dot(N, lightDir)),
                  lights[lightIndex].radius * 0.0005);
-    //float offset = 2.1; // tune this - push in world units
-    return (currentDepth - bias > closestDepth) ? 1.0 : 0.0;
+
+    // PCF sample directions
+    vec3 sampleOffsetDirections[20] = vec3[](
+        vec3( 1,  1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1,  1,  1), 
+        vec3( 1,  1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1,  1, -1),
+        vec3( 1,  1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1,  1,  0),
+        vec3( 1,  0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1,  0, -1),
+        vec3( 0,  1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0,  1, -1)
+    );
+
+    // Scale disk radius by distance so shadows soften further from light
+    float diskRadius = (1.0 + (currentDepth / lights[lightIndex].radius)) / 200.0;
+
+    float shadow = 0.0;
+    int samples = 20;
+    for(int i = 0; i < samples; ++i)
+    {
+        float closestDepth = texture(shadowCubeMaps[shadowIdx], dir + sampleOffsetDirections[i] * diskRadius).r;
+        closestDepth *= lights[lightIndex].radius;
+        if(currentDepth - bias > closestDepth)
+            shadow += 1.0;
+    }
+
+    return shadow / float(samples);
 }
 
 void main()

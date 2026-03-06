@@ -60,7 +60,7 @@ namespace LaurelEye::Graphics {
 
         struct ShadowManagerParams {
             float near = 1.0f;
-            float far = 2000.0f;
+            float far = 3000.0f;
             ShadowType defaultType = ShadowType::Simple;
         };
 

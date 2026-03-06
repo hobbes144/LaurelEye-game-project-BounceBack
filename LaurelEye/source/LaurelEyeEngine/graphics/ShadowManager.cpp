@@ -36,6 +36,7 @@ namespace LaurelEye::Graphics {
             sizeof(ShadowResource) * 100,
             DataBuffer::ShaderDataBinding};
         shadowResourcesBuffer = rs->createDataBuffer("shadowResources", d, "shadow");
+        glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
     }
 
     void ShadowManager::update(const FrameContext& ctx, GlobalLights* globalLights, LocalLights* lights) {

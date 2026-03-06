@@ -90,7 +90,7 @@
         },
         "Animation": {
             "type": "Skeletal",
-            "file": [ "models/StickMan_Running.fbx", "models/StickMan_Idle.fbx" ]
+            "file": [ "animations/Running.fbx", "animations/Idle.fbx" ]
         },
         "Script": {
             "path": "scripts/catch_player.lua"

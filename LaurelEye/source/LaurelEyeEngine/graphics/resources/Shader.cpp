@@ -264,7 +264,7 @@ namespace LaurelEye::Graphics {
         }
         GLint location = glGetUniformLocation(programID, name.c_str());
         uniformLocationCache[name] = location;
-        LE_DEBUG_WARN_IF("graphics", location >= 0, "Shader " << name << ": Uniform " << name << " requested but doesn't exist.");
+        LE_DEBUG_WARN_IF("graphics", location == GL_INVALID_VALUE, "Shader " << name << ": Uniform " << name << " requested but doesn't exist.");
 
         return location;
     }

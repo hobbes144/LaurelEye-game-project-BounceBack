@@ -45,7 +45,7 @@ namespace LaurelEye::Graphics {
     class GBufferPass;
     class GBufferSkinnedPass;
     class DeferredRenderPass;
-    class LocalLightsPass;
+    class LocalLightsToonPass;
     class SinglePass;
     class SingleBufferedDataPass;
     class SinglePassShadow;
@@ -204,7 +204,7 @@ namespace LaurelEye::Graphics {
         // std::shared_ptr<GBufferPass> gbufferPass;
         std::shared_ptr<GBufferSkinnedPass> gbufferPass;
         std::shared_ptr<DeferredRenderPass> deferredRenderPass;
-        std::shared_ptr<LocalLightsPass> localLightsPass;
+        std::shared_ptr<LocalLightsToonPass> localLightsPass;
         std::shared_ptr<SinglePassShadow> sp;
         std::shared_ptr<SkydomePass> bp;
         // std::shared_ptr<SingleBufferedDataPass> sp;
