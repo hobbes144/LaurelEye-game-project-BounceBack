@@ -141,6 +141,8 @@ namespace LaurelEye::Graphics {
         /// @param blockBinding The binding point index.
         void initializeUBO(const std::string& name, unsigned int blockBinding);
 
+        void openglShaderCheckError();
+
     private:
         /// @brief Private constructor used internally by ShaderManager.
         /// @param shaderFilePaths Paths to the shader files to load.

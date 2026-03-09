@@ -12,6 +12,7 @@
 #include "LaurelEyeEngine/graphics/resources/FrameContext.h"
 #include "LaurelEyeEngine/graphics/resources/GeometryBuffer.h"
 #include "LaurelEyeEngine/graphics/resources/RenderMesh.h"
+#include "LaurelEyeEngine/graphics/resources/Shader.h"
 
 #include <memory>
 

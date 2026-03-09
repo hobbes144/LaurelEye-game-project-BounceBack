@@ -69,6 +69,7 @@ end
 
 function onUpdate(dt)
     -- Poll input
+    
     local inputX = (Input:isKeyHeld(Key.D) and 1 or 0) +
                    (Input:isKeyHeld(Key.A) and -1 or 0)
 

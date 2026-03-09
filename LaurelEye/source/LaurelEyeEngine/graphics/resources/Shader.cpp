@@ -25,6 +25,19 @@ namespace LaurelEye::Graphics {
         return drawMode;
     }
 
+    void Shader::openglShaderCheckError() {
+        // Validation checks if the program can execute given the current OpenGL state
+        glValidateProgram(programID);
+        GLint isValid = 0;
+        glGetProgramiv(programID, GL_VALIDATE_STATUS, &isValid);
+
+        if ( isValid == GL_FALSE ) {
+            char message[512];
+            glGetProgramInfoLog(programID, 512, NULL, message);
+            printf("Program Validation Failed: %s\n", message);
+        }
+    }
+
     /*!****************************************************************************
      * \brief Shader constructor
      *

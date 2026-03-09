@@ -63,7 +63,7 @@
             "gravityScale": 8.0
         },
         "Script": {
-            "path": "scripts/shooting_enemy.lua"
+            "path": "scripts/AISystem/enemyExample.lua"
         }
     }
 }

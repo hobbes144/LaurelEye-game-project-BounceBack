@@ -57,7 +57,8 @@ namespace LaurelEye::Graphics {
         // Pick a legal width (>0 and within range)
         // float wanted = 2.0f;                                                    // example
         // float legal = std::clamp(wanted, lineWidthRange[0], lineWidthRange[1]); // likely 1.0f
-        // glLineWidth((GLfloat)2.0f); // legal);                                                     // avoid INVALID_VALUE
+        // glLineWidth((GLfloat)2.0f); // legal);
+        // avoid INVALID_VALUE
 
         GLsizei vertexCount = numLines * 2;
         glDrawArrays(GL_LINES, 0, vertexCount);

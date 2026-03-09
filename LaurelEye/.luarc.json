@@ -1,0 +1,14 @@
+{
+    "Lua.runtime.version": "LuaJIT",
+    "Lua.workspace.checkThirdParty": false,
+    "Lua.workspace.library": [
+        "./lua-stubs"
+    ],
+    "Lua.diagnostics.globals": [
+        "Globals",
+        "Types",
+        "Script",
+        "Window",
+        "Physics"
+    ]
+}

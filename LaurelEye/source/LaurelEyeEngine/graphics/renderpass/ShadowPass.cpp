@@ -17,7 +17,7 @@
 namespace LaurelEye::Graphics {
 
     void ShadowPass::setup(RenderResources& rs) {
-        shader = ShaderManager::getInstance().loadFile("ShadowPass", "../../../assets/shaders/Shadows.frag\n../../../assets/shaders/Shadows.vert");
+        shader = ShaderManager::getInstance().loadFile("ShadowPass", "assets/shaders/Shadows.frag\n../../../assets/shaders/Shadows.vert");
 
         DataBufferDesc shadowDataBuffer{};
         shadowDataBuffer.type = DataBufferType::UBO;

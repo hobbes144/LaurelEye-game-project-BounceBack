@@ -1,4 +1,5 @@
 ﻿#include "LaurelEyeEngine/core/Engine.h"
+#include "LaurelEyeEngine/io/Paths.h"
 #include "LaurelEyeEngine/core/ResourceCoordinator.h"
 #include "LaurelEyeEngine/core/SystemCoordinator.h"
 #include "LaurelEyeEngine/framerate/FramerateController.h"
