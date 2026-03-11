@@ -1,11 +1,16 @@
-﻿--State machine core system 
---By: Salam Sibai
+﻿--State machine core system
+--By: Salam Sibai, Anish Murthy
 --GAM551
 
+---@class StateMachine
+---@field states table<string, State>
+---@field current_state State|nil
+---@field pending_transition Transition|nil
 local StateMachine = {}
 StateMachine.__index = StateMachine
 local State = require("State")
 
+---@return StateMachine
 function StateMachine.new()
     local self = setmetatable({}, StateMachine)
 
@@ -15,11 +20,13 @@ function StateMachine.new()
     return self
 end
 
+---@param state State
 function StateMachine:addState(state)
     self.states[state.name] = state
     state.StateMachine = self
 end
 
+---@param state_name string
 function StateMachine:setInitialState(state_name)
     self.current_state = self.states[state_name]
     if self.current_state and self.current_state.onEnter then
@@ -29,7 +36,7 @@ end
 
 --function StateMachine:forceTransition(transition_name) --forces transition to a specific transition that exists in the state machine
 --    local transition = self.current_state:getTransitionByName(transition_name)
-    
+
 --    if transition then
 --        self.pending_transition = transition
 --    else
@@ -37,6 +44,7 @@ end
 --    end
 --end
 
+---@param state_name string
 function StateMachine:forceTransition(state_name)
     local dest = self.states[state_name]
     if dest then
@@ -50,7 +58,7 @@ function StateMachine:forceTransition(state_name)
     end
 end
 
-
+---@param dt number
 function StateMachine:update(dt)
     if not self.current_state then return end
 
@@ -76,6 +84,7 @@ function StateMachine:update(dt)
     end
 end
 
+---@param transition Transition
 function StateMachine:_executeTransition(transition)
     if self.current_state and self.current_state.onExit then
         self.current_state.onExit()
