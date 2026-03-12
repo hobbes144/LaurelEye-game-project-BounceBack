@@ -442,6 +442,12 @@ namespace LaurelEye {
             data.centerOfMass.y = c.HasMember("y") ? c["y"].GetFloat() : 0.0f;
             data.centerOfMass.z = c.HasMember("z") ? c["z"].GetFloat() : 0.0f;
         }
+        if ( physicsData.HasMember("rotationOfCenter") && physicsData["rotationOfCenter"].IsObject() ) {
+            const auto& c = physicsData["rotationOfCenter"];
+            data.rotationOfCenter.x = c.HasMember("x") ? c["x"].GetFloat() : 0.0f;
+            data.rotationOfCenter.y = c.HasMember("y") ? c["y"].GetFloat() : 0.0f;
+            data.rotationOfCenter.z = c.HasMember("z") ? c["z"].GetFloat() : 0.0f;
+        }
 
         if ( physicsData.HasMember("linearDamping") ) data.linearDamping = physicsData["linearDamping"].GetFloat();
         if ( physicsData.HasMember("angularDamping") ) data.angularDamping = physicsData["angularDamping"].GetFloat();

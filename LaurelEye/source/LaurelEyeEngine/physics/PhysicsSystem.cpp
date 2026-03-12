@@ -242,18 +242,26 @@ namespace LaurelEye::Physics {
     void PhysicsSystem::populateWireFrameCommands(std::vector<Debug::DebugDrawCommand>& commands) const {
 
         for ( PhysicsBodyBaseComponent* const pbbc : components ) {
+
             std::shared_ptr<ICollider> body = pbbc->GetCollider();
             if ( !body ) continue;
 
             LaurelEye::TransformComponent* transform = body->GetBoundTransform();
             if ( !transform ) continue;
 
-            const Vector3 pos = transform->getWorldPosition() + pbbc->GetBodyData().centerOfMass;
-            const Quaternion rot = transform->getWorldRotation();
-            const Vector3 scale = transform->getWorldScale();
-
             PhysicsBodyData bodyData = pbbc->GetBodyData();
             CollisionShapePhys shapeDef = bodyData.shapeDefinition;
+
+            const Vector3 objectPos = transform->getWorldPosition();
+            const Quaternion objectRot = transform->getWorldRotation();
+            const Vector3 scale = transform->getWorldScale();
+
+            // --- Apply compound offset transform ---
+            const Vector3 offset = bodyData.centerOfMass;
+            const Vector3 offsetRot = bodyData.rotationOfCenter;
+
+            Vector3 pos = objectPos + (objectRot * offset);
+            Quaternion rot = objectRot * Quaternion::fromEuler(offsetRot);
 
             // --- Shape wireframe ---
             Debug::DebugDrawCommand cmd;
@@ -284,7 +292,7 @@ namespace LaurelEye::Physics {
                 }
                 case CollisionShapePhys::ShapeType::Mesh:
                 default:
-                    assert(false && "ERROR::LAURELEYE::PHYSICS_SYSTEM::POPULATE_WIRE_FRAME_COMMANDS::INVALID_SHAPE");
+                    LE_ASSERT("Physics", false , "ERROR::LAURELEYE::PHYSICS_SYSTEM::POPULATE_WIRE_FRAME_COMMANDS::INVALID_SHAPE");
                     break;
             }
 

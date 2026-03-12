@@ -33,7 +33,7 @@ function setupLevel1()
     print("STARTING SETUP FOR LEVEL 1")
     local player = SceneManager:instantiate("prefabs/catch_player.prefab.json")
     local playerTransform = player:findTransform()
-
+    
     local scene = SceneManager:getCurrentScene()
     if scene == nil then return end
     local spawnPoint = scene:findEntityByName("SpawnPoint")
@@ -47,20 +47,20 @@ function setupLevel1()
     --Enemy setup
     local enemy = SceneManager:instantiate("prefabs/shooting_enemy.prefab.json")
     local enemyTransform = enemy:findTransform()
-    enemyTransform:setWorldPosition(0.0, 0.0, -20.0)
+    enemyTransform:setWorldPosition(30.0, 0.0, -30.0)
 
     --Target setup
-    local t1 = SceneManager:instantiate("prefabs/generator.prefab.json")
-    local t1Transform = t1:findTransform()
-    t1Transform:setWorldPosition(-20.0, 25.0, -48.0)
+ --   local t1 = SceneManager:instantiate("prefabs/generator.prefab.json")
+ --   local t1Transform = t1:findTransform()
+ --   t1Transform:setWorldPosition(-20.0, 25.0, -48.0)
 
-    local t2 = SceneManager:instantiate("prefabs/generator.prefab.json")
-    local t2Transform = t2:findTransform()
-    t2Transform:setWorldPosition(20.0, 25.0, -48.0)
+ --   local t2 = SceneManager:instantiate("prefabs/generator.prefab.json")
+ --   local t2Transform = t2:findTransform()
+ --   t2Transform:setWorldPosition(20.0, 25.0, -48.0)
 
-    local t3 = SceneManager:instantiate("prefabs/generator.prefab.json")
-    local t3Transform = t3:findTransform()
-    t3Transform:setWorldPosition(0.0, 10.0, -48.0)
+ --   local t3 = SceneManager:instantiate("prefabs/generator.prefab.json")
+ --   local t3Transform = t3:findTransform()
+ --   t3Transform:setWorldPosition(0.0, 10.0, -48.0)
 end
 
 function setupLevel2()

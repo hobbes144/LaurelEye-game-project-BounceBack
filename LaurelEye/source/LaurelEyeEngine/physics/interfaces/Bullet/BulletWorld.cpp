@@ -55,7 +55,7 @@ namespace LaurelEye::Physics {
         if ( data.transformRef ) {
             Vector3 scale = data.transformRef->getWorldScale();
             btVector3 dim = bulletShape->GetInternal()->getLocalScaling();
-            bulletShape->GetInternal()->setLocalScaling(btVector3(scale.x * dim.x(), scale.y * dim.y(), scale.z)*dim.z());
+            bulletShape->GetInternal()->setLocalScaling(btVector3(scale.x * dim.x(), scale.y * dim.y(), scale.z*dim.z()));
         }
 
         //Start Transform
@@ -75,23 +75,23 @@ namespace LaurelEye::Physics {
 
         //Center of Mass
         btCollisionShape* shape = bulletShape->GetInternal();
-        if ( !(data.centerOfMass == Vector3(0, 0, 0)) ) {
-            btCompoundShape* compound = new btCompoundShape();
 
-            btTransform offset;
-            offset.setIdentity();
-            offset.setOrigin(btVector3(
+        // Apply center offset + rotation offset
+        shape = ApplyShapeOffset(
+            shape,
+            btVector3(
                 data.centerOfMass.x,
                 data.centerOfMass.y,
-                data.centerOfMass.z));
+                data.centerOfMass.z),
+            btQuaternion(
+                data.rotationOfCenter.x,
+                data.rotationOfCenter.y,
+                data.rotationOfCenter.z));
 
-            compound->addChildShape(offset, shape);
-
-            // Replace internal shape
-            bulletShape->SetInternal(compound);
-            shape = compound;
+        // If offset created a compound shape, store it
+        if ( shape != bulletShape->GetInternal() ) {
+            bulletShape->SetInternal(shape);
         }
-
 
         btVector3 linearVelocity(data.linearVelocity.x, data.linearVelocity.y, data.linearVelocity.z);
         btVector3 angularVelocity(data.angularVelocity.x, data.angularVelocity.y, data.angularVelocity.z);
@@ -155,7 +155,7 @@ namespace LaurelEye::Physics {
         if ( data.transformRef ) {
             Vector3 scale = data.transformRef->getWorldScale();
             btVector3 dim = bulletShape->GetInternal()->getLocalScaling();
-            bulletShape->GetInternal()->setLocalScaling(btVector3(scale.x * dim.x(), scale.y * dim.y(), scale.z) * dim.z());
+            bulletShape->GetInternal()->setLocalScaling(btVector3(scale.x * dim.x(), scale.y * dim.y(), scale.z * dim.z()));
         }
 
         // Start Transform
@@ -175,21 +175,22 @@ namespace LaurelEye::Physics {
 
         // Center of Mass
         btCollisionShape* shape = bulletShape->GetInternal();
-        if ( !(data.centerOfMass == Vector3(0, 0, 0)) ) {
-            btCompoundShape* compound = new btCompoundShape();
 
-            btTransform offset;
-            offset.setIdentity();
-            offset.setOrigin(btVector3(
+        // Apply center offset + rotation offset
+        shape = ApplyShapeOffset(
+            shape,
+            btVector3(
                 data.centerOfMass.x,
                 data.centerOfMass.y,
-                data.centerOfMass.z));
+                data.centerOfMass.z),
+            btQuaternion(
+                data.rotationOfCenter.x,
+                data.rotationOfCenter.y,
+                data.rotationOfCenter.z));
 
-            compound->addChildShape(offset, shape);
-
-            // Replace internal shape
-            bulletShape->SetInternal(compound);
-            shape = compound;
+        // If offset created a compound shape, store it
+        if ( shape != bulletShape->GetInternal() ) {
+            bulletShape->SetInternal(shape);
         }
 
         btVector3 linearVelocity(data.linearVelocity.x, data.linearVelocity.y, data.linearVelocity.z);
@@ -368,6 +369,26 @@ namespace LaurelEye::Physics {
         */
     }
 
+    btCollisionShape* BulletWorld::ApplyShapeOffset(
+        btCollisionShape* shape,
+        const btVector3& pos,
+        const btQuaternion& rot) {
+        const btQuaternion identity(0, 0, 0, 1);
+
+        if ( pos.isZero() && rot == identity )
+            return shape;
+
+        btCompoundShape* compound = new btCompoundShape();
+
+        btTransform t;
+        t.setIdentity();
+        t.setOrigin(pos);
+        t.setRotation(rot);
+
+        compound->addChildShape(t, shape);
+
+        return compound;
+    }
 
     RaycastHit BulletWorld::Raycast(const Vector3& origin,
                                     const Vector3& direction,

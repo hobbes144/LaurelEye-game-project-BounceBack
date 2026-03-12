@@ -55,6 +55,7 @@ namespace LaurelEye::Physics {
         LaurelEye::TransformComponent* transformRef = nullptr;
         // Physical properties
         Vector3 centerOfMass = {0, 0, 0};
+        Vector3 rotationOfCenter = {0, 0, 0};
         Vector3 linearVelocity = {0, 0, 0};
         Vector3 angularVelocity = {0, 0, 0};
         Vector3 inertia = {0, 0, 0};

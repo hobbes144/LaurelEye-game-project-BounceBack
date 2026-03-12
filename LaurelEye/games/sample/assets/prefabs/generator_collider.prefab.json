@@ -1,0 +1,30 @@
+﻿{
+    "name": "GeneratorCollider",
+    "tags": [ "target" ],
+    "components": {
+        "Transform": {
+            "position": [ 0.0, 0.0, 0.0 ],
+            "rotation": [ 0.0, 1.5708, -1.0472 ],
+            "scale": [ 2.0, 10.0, 20.0 ]
+        },
+        "Physics": {
+            "type": "Static",
+            "shapeDefinition": {
+                "type": "Box",
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                }
+            },
+            "mass": 0.0,
+            "linearDamping": 0.0,
+            "angularDamping": 0.0,
+            "friction": 0.5,
+            "restitution": 0.0,
+            "collisionGroup": 2,
+            "collisionMask": 11,
+            "gravityScale": 0.0
+        }
+    }
+}

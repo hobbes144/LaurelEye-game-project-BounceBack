@@ -23,6 +23,10 @@ function onStart()
     body = self:findRigidBody()
     shootingSpeed = math.random(minShootingSpeed * 100, maxShootingSpeed * 100) / 100
 
+    animator = self:findAnimator()
+    if animator == nil then return end
+    animator:changeAnimation("StickManBadge_Idle")
+
     -- Setup state machine
     setupStateMachine()
 end

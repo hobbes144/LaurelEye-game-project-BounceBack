@@ -7,7 +7,7 @@
         },
         {
             "name": "Level1",
-            "path": "scenes/level1.scene.json"
+            "path": "scenes/level1_complete.scene.json"
         },
         {
             "name": "Level2",

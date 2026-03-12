@@ -38,12 +38,18 @@ namespace LaurelEye::Physics {
 
         void GatherCollisions(CollisionManager& cm) override;
 
+
         RaycastHit Raycast(const Vector3& origin,
                            const Vector3& direction,
                            float maxDistance,
                            const RaycastParams& params) const override;
 
     private:
+        btCollisionShape* ApplyShapeOffset(
+            btCollisionShape* shape,
+            const btVector3& pos,
+            const btQuaternion& rot);
+
         //std::vector<std::shared_ptr<BulletGhostBody>> ghosts;
         std::vector<std::shared_ptr<btDefaultMotionState>> motions;
 
