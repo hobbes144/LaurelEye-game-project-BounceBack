@@ -116,6 +116,9 @@ function isGround(entity)
         end
         if tag == "target" then
             SceneManager:destroy(entity)
+            GameManager:addGeneratorDestroyed(1)
+            local gensDestroyed = GameManager:getGeneratorsDestroyed()
+            print(gensDestroyed)
             return true
         end
         if tag == "door" then

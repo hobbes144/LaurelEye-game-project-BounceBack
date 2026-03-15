@@ -39,7 +39,7 @@ projectileSpeed = baseProjSpeed
 
 --damage variables
 maxHealth = 3.0
-currentHealth = maxHealth
+currentHealth = nil
 invincible = false
 invincibleTimer = 0.0
 invincibleDuration = 1.5
@@ -69,6 +69,9 @@ function onStart()
     end
 
     speaker = self:findAudioSpeaker()
+
+    currentHealth = GameManager:getPlayerHealth()
+    moveHealthBar()
 end
 
 function onMessage(msg)
@@ -83,7 +86,8 @@ function onMessage(msg)
 
     if msg.topic == "Get Hit!" then
         if not invincible then
-            currentHealth = currentHealth - 1.0
+            currentHealth = currentHealth - 1
+            GameManager:setPlayerHealth(currentHealth)
             invincible = true
             moveHealthBar()
         end

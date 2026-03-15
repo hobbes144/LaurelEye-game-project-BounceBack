@@ -16,6 +16,7 @@
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Transform.h"
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_UI.h"
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Window.h"
+#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_GameManager.h"
 #include "LaurelEyeEngine/scripting/sol2/Sol2Logging.h"
 #include "LaurelEyeEngine/scripting/sol2/Sol2ScriptBroker.h"
 
@@ -78,6 +79,9 @@ namespace LaurelEye::Scripting {
 
         /* Animation */
         Sol2API_Animation::setup(lua, ctx);
+
+        /* Game Manager */
+        Sol2API_GameManager::setup(lua, ctx);
     }
 
     void Sol2API::registerEnvironment(sol::environment& env, LaurelEye::Entity* owner) {
