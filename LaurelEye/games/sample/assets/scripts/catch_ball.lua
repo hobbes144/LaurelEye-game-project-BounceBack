@@ -128,6 +128,13 @@ function isGround(entity)
             Script.send(message)
             SceneManager:destroy(self)
         end
+        if tag == "generator" then
+            local message = Message.new()
+            message.to = entity
+            message.topic = "Get Destroyed!"
+            Script.send(message)
+            return true
+        end
     end
     return false
 end

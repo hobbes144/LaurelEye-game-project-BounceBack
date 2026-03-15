@@ -46,7 +46,6 @@
                 }
             }
         },
-
         {
             "name": "AmbientLight",
             "components": {
@@ -432,6 +431,5 @@
                 }
             }
         }
-
     ]
 }

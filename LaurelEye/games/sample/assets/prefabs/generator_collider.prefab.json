@@ -1,6 +1,6 @@
 ﻿{
     "name": "GeneratorCollider",
-    "tags": [ "target" ],
+    "tags": [ "generator" ],
     "components": {
         "Transform": {
             "position": [ 0.0, 0.0, 0.0 ],
@@ -25,6 +25,9 @@
             "collisionGroup": 2,
             "collisionMask": 11,
             "gravityScale": 0.0
+        },
+        "Script": {
+            "path": "scripts/collider_script.lua"
         }
     }
 }

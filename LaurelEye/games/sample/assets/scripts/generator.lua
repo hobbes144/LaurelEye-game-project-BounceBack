@@ -3,26 +3,52 @@
 
 
 local collider = nil
+brokenMat = nil
 
 function onStart()
+
     collider = SceneManager:instantiate("prefabs/generator_collider.prefab.json")
+
+    print("Collider: ", collider)
+    local message = Message.new()
+    message.to = collider
+    message.from = self
+    message.topic = "Tis I!"
+    Script.send(message)
+
+
     local colliderTransform = collider:findTransform()
     local selfTransform = self:findTransform()
-    local selfPos =  selfTransform:getWorldPosition()
+
+    local selfPos = selfTransform:getWorldPosition()
     local selfRot = selfTransform:getWorldRotation()
 
     local colOffset = Vector3.new(0, 8.6, 0)
-    local rotOffsett = selfRot * colOffset;
+    local rotOffset = selfRot * colOffset
 
-    colliderTransform:setWorldPosition(selfPos + rotOffsett)
+    colliderTransform:setWorldPosition(selfPos + rotOffset)
 
     local colliderRotOffset = Quaternion.new(-0.6235061, -0.3335269, 0.6235061, 0.3335269)
-
     colliderTransform:setWorldRotation(selfRot * colliderRotOffset)
 
-                                            
+    local scene = SceneManager:getCurrentScene()
+    local brokenGen = scene:findEntityByName("brokenGen")
+
+    local brokenRender = brokenGen:findComponent("Renderable3DComponent")
+
+    brokenMat = brokenRender:getMaterial()
+
 end
 
+function onMessage(msg)
+    if msg.topic == "Change Texture!" then
+        print("I am getting destroyed")
+        local renderComp = self:findComponent("Renderable3DComponent")
+
+        renderComp:setMaterial(brokenMat)
+    end
+
+end
 
 --Continue fenerator collision situation here
 
