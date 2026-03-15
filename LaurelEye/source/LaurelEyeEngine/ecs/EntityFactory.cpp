@@ -705,6 +705,51 @@ namespace LaurelEye {
 
     void EntityFactory::setupUIInteractionComponent(Entity& entity, const rapidjson::Value& uiinteractionData) {
         std::unique_ptr<UI::UIInteractionComponent> uiinteractionComponent = std::make_unique<UI::UIInteractionComponent>();
+
+        // ---- Core Flags ----
+        if ( uiinteractionData.HasMember("isInteractable") &&
+             uiinteractionData["isInteractable"].IsBool() ) {
+            uiinteractionComponent->setInteractable(uiinteractionData["isInteractable"].GetBool());
+        }
+
+        if ( uiinteractionData.HasMember("blockRaycast") &&
+             uiinteractionData["blockRaycast"].IsBool() ) {
+            uiinteractionComponent->setBlockingRaycasts(uiinteractionData["blockRaycast"].GetBool());
+        }
+
+        // ---- Interaction Types ----
+        if ( uiinteractionData.HasMember("receiveHover") &&
+             uiinteractionData["receiveHover"].IsBool() ) {
+            uiinteractionComponent->setReceiveHover(uiinteractionData["receiveHover"].GetBool());
+        }
+
+        if ( uiinteractionData.HasMember("receiveClick") &&
+             uiinteractionData["receiveClick"].IsBool() ) {
+            uiinteractionComponent->setReceiveClick(uiinteractionData["receiveClick"].GetBool());
+        }
+
+        if ( uiinteractionData.HasMember("receiveDrag") &&
+             uiinteractionData["receiveDrag"].IsBool() ) {
+            uiinteractionComponent->setReceiveDrag(uiinteractionData["receiveDrag"].GetBool());
+        }
+
+        if ( uiinteractionData.HasMember("dragThreshold") &&
+             uiinteractionData["dragThreshold"].IsFloat() ) {
+            uiinteractionComponent->setDragThreshold(uiinteractionData["dragThreshold"].GetFloat());
+        }
+
+        if ( uiinteractionData.HasMember("focusable") &&
+             uiinteractionData["focusable"].IsBool() ) {
+            uiinteractionComponent->setFocusable(uiinteractionData["focusable"].GetBool());
+        }
+
+        // ---- Priority ----
+        if ( uiinteractionData.HasMember("interactionPriority") &&
+             uiinteractionData["interactionPriority"].IsInt() ) {
+            uiinteractionComponent->setInteractionPriority(uiinteractionData["interactionPriority"].GetInt());
+        }
+
+        entity.addComponent(std::move(uiinteractionComponent));
     }
 
     void EntityFactory::setupDebugDrawComponent(Entity& entity, const rapidjson::Value& emitterData) {

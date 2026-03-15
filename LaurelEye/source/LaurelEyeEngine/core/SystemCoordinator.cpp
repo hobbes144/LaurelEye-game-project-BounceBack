@@ -12,6 +12,9 @@ namespace LaurelEye {
         uiLayoutSystem = std::make_unique<UI::UILayoutSystem>();
         uiLayoutSystem->setEngineContext(ctx);
 
+        uiInteractionSystem = std::make_unique<UI::UIInteractionSystem>();
+        uiInteractionSystem->setEngineContext(ctx);
+
         renderSystem = std::make_unique<Graphics::RenderSystem>();
 
         // Render system setup
@@ -57,6 +60,7 @@ namespace LaurelEye {
 
         ctx.registerService<TransformSystem>(transformSystem.get());
         ctx.registerService<UI::UILayoutSystem>(uiLayoutSystem.get());
+        ctx.registerService<UI::UIInteractionSystem>(uiInteractionSystem.get());
         ctx.registerService<Graphics::RenderSystem>(renderSystem.get());
         ctx.registerService<Physics::PhysicsSystem>(physicsSystem.get());
         ctx.registerService<Particles::ParticleSystem>(particleSystem.get());
@@ -69,6 +73,7 @@ namespace LaurelEye {
         std::cout << "Systems Initializing" << std::endl;
         transformSystem->initialize();
         uiLayoutSystem->initialize();
+        uiInteractionSystem->initialize();
         renderSystem->initialize();
         physicsSystem->initialize();
         scriptSystem->initialize();
@@ -86,6 +91,7 @@ namespace LaurelEye {
         physicsSystem->update(deltaTime);
         transformSystem->update(deltaTime);
         uiLayoutSystem->update(deltaTime);
+        uiInteractionSystem->update(deltaTime);
         particleSystem->update(deltaTime);
         audioSystem->update(deltaTime);
         if ( debugDrawSystem ) {
@@ -108,12 +114,14 @@ namespace LaurelEye {
         physicsSystem->shutdown();
         renderSystem->shutdown();
         uiLayoutSystem->shutdown();
+        uiInteractionSystem->shutdown();
         transformSystem->shutdown();
         debugDrawSystem->shutdown();
         audioSystem->shutdown();
 
         transformSystem.reset();
         uiLayoutSystem.reset();
+        uiInteractionSystem.reset();
         renderSystem.reset();
         physicsSystem.reset();
         particleSystem.reset();

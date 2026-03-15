@@ -15,14 +15,14 @@
 #include "LaurelEyeEngine/UI/UIComponents/UITransformComponent.h"
 #include "LaurelEyeEngine/UI/UIComponents/UIInteractionComponent.h"
 #include "LaurelEyeEngine/UI/UIComponents/UITextComponent.h"
-
-#include "LaurelEyeEngine/graphics/renderpass/GBufferPass.h"
-#include "LaurelEyeEngine/graphics/renderpass/GBufferSkinnedPass.h"
-#include "LaurelEyeEngine/graphics/renderpass/SkydomePass.h"
 #include "LaurelEyeEngine/particles/ParticleEmitterComponent.h"
 #include "LaurelEyeEngine/physics/PhysicsBodyBaseComponent.h"
 #include "LaurelEyeEngine/scripting/ScriptComponent.h"
 #include "LaurelEyeEngine/transform/TransformComponent.h"
+
+#include "LaurelEyeEngine/graphics/renderpass/GBufferPass.h"
+#include "LaurelEyeEngine/graphics/renderpass/GBufferSkinnedPass.h"
+#include "LaurelEyeEngine/graphics/renderpass/SkydomePass.h"
 
 #include "LaurelEyeEngine/audio/AudioSystem.h"
 #include "LaurelEyeEngine/audio/FModAudioManager.h"
@@ -38,6 +38,8 @@
 #include "LaurelEyeEngine/animation/AnimationSystem.h"
 #include "LaurelEyeEngine/UI/UILayoutSystem.h"
 #include "LaurelEyeEngine/UI/UIInteractionSystem.h"
+
+#include "LaurelEyeEngine/math/VectorTemplated.h"
 
 namespace LaurelEye {
 
@@ -91,6 +93,7 @@ namespace LaurelEye {
         }
         if ( auto* t = ctx.getService<TransformSystem>() ) t->update(0.016f);
         if ( auto* p = ctx.getService<Physics::PhysicsSystem>() ) p->registerCollisionEnterListeners();
+        if ( auto* uiI = ctx.getService<UI::UIInteractionSystem>() ) uiI->registerInteractionEventListeners();
 
         active = true;
     }
@@ -99,6 +102,7 @@ namespace LaurelEye {
         if ( !active ) return;
 
         if ( auto* p = ctx.getService<Physics::PhysicsSystem>() ) p->deregisterCollisionEnterListeners();
+        if ( auto* uiI = ctx.getService<UI::UIInteractionSystem>() ) uiI->deregisterInteractionEventListeners();
 
         for ( auto& e : entities ) {
             if ( e->getRegistered() ) {
@@ -303,6 +307,7 @@ namespace LaurelEye {
         auto* audioSystem = ctx.getService<Audio::AudioSystem>();
         auto* animationSystem = ctx.getService<Animations::AnimationSystem>();
         auto* uiLayoutSystem = ctx.getService<UI::UILayoutSystem>();
+        auto* uiInteractionSystem = ctx.getService<UI::UIInteractionSystem>();
 
         for ( auto& comp : entity->getComponents() ) {
             if ( auto* transformComp = dynamic_cast<TransformComponent*>(comp.get()) ) {
@@ -370,16 +375,16 @@ namespace LaurelEye {
                     uiLayoutSystem->registerComponent(uitransformComp);
                 }
             }
+            else if ( auto* uiinteractionComp = dynamic_cast<UI::UIInteractionComponent*>(comp.get()) ) {
+                if ( uiInteractionSystem ) {
+                    uiInteractionSystem->registerComponent(uiinteractionComp);
+                }
+            }
             else if ( auto* AnimationComp = dynamic_cast<Animations::AnimationComponent*>(comp.get()) ) {
                 //std::cout << "[Scene] Registering Animation Element " << std::endl;
                 animationSystem->registerComponent(AnimationComp);
             }
-            else if ( auto* uiinteractionComp = dynamic_cast<UI::UIRenderComponent*>(comp.get()) ) {
-
-            }
-            else if ( auto* uitextComp = dynamic_cast<UI::UIRenderComponent*>(comp.get()) ) {
-
-            }
+            
             // add more as needed...
         }
     }
@@ -394,6 +399,7 @@ namespace LaurelEye {
         auto* audioSystem = ctx.getService<Audio::AudioSystem>();
         auto* animationSystem = ctx.getService<LaurelEye::Animations::AnimationSystem>();
         auto* uiLayoutSystem = ctx.getService<UI::UILayoutSystem>();
+        auto* uiInteractionSystem = ctx.getService<UI::UIInteractionSystem>();
 
         for ( auto& comp : entity->getComponents() ) {
             if ( auto* transformComp = dynamic_cast<TransformComponent*>(comp.get()) ) {
@@ -460,9 +466,10 @@ namespace LaurelEye {
                     uiLayoutSystem->deregisterComponent(uitransformComp);
                 }
             }
-            else if ( auto* uiinteractionComp = dynamic_cast<UI::UIRenderComponent*>(comp.get()) ) {
-            }
-            else if ( auto* uitextComp = dynamic_cast<UI::UIRenderComponent*>(comp.get()) ) {
+            else if ( auto* uiinteractionComp = dynamic_cast<UI::UIInteractionComponent*>(comp.get()) ) {
+                if ( uiInteractionSystem ) {
+                    uiInteractionSystem->deregisterComponent(uiinteractionComp);
+                }
             }
             else if ( auto* AnimationComp = dynamic_cast<Animations::AnimationComponent*>(comp.get()) ) {
                 // std::cout << "[Scene] Registering Animation Element " << std::endl;

@@ -11,6 +11,10 @@
 
 #pragma once
 
+namespace LaurelEye::UI {
+    struct UIInteractionEventData;
+}
+
 namespace LaurelEye::Physics {
     struct CollisionEventData;
 }
@@ -49,6 +53,29 @@ namespace LaurelEye::Scripting {
         /// @brief Called when the script's owner ghost stops colliding with another object
         /// @param data
         virtual void onTriggerExit(const Physics::CollisionEventData& data) = 0;
+
+        virtual void onHoverEnter(const UI::UIInteractionEventData& data) = 0;
+
+        virtual void onHoverExit(const UI::UIInteractionEventData& data) = 0;
+
+        virtual void onPressed(const UI::UIInteractionEventData& data) = 0;
+
+        virtual void onHeld(const UI::UIInteractionEventData& data) = 0;
+
+        virtual void onReleased(const UI::UIInteractionEventData& data) = 0;
+
+        virtual void onClicked(const UI::UIInteractionEventData& data) = 0;
+
+        virtual void onDragStart(const UI::UIInteractionEventData& data) = 0;
+
+        virtual void onDragging(const UI::UIInteractionEventData& data) = 0;
+
+        virtual void onDragEnd(const UI::UIInteractionEventData& data) = 0;
+
+        virtual void onFocusGained(const UI::UIInteractionEventData& data) = 0;
+
+        virtual void onFocusLost(const UI::UIInteractionEventData& data) = 0;
+
     };
 
 } // namespace LaurelEye

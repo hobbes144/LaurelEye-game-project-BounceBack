@@ -16,7 +16,7 @@
 namespace LaurelEye {
 
     struct Rect {
-        Vector2 center = {0.0f, 0.0f}; // Top Left
+        Vector2 center = {0.0f, 0.0f}; // Center
         Vector2 size = {0.0f, 0.0f};     // Width Height
 
         Rect() = default;
@@ -66,5 +66,20 @@ namespace LaurelEye {
             return size[0] >= 0.0f && size[1] >= 0.0f;
         }
     };
+
+
+        inline std::ostream& operator<<(std::ostream& os, const Rect& rect) {
+            os << "Rect { "
+               << "Center: " << rect.center
+               << ", Size: " << rect.size
+               << ", LRTB: ["
+               << rect.Left() << ", "
+               << rect.Right() << ", "
+               << rect.Top() << ", "
+               << rect.Bottom()
+               << "] }";
+            return os;
+        }
+
 
 } // namespace LaurelEye

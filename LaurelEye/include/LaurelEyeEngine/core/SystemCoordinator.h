@@ -20,6 +20,7 @@
 #include "LaurelEyeEngine/transform/TransformSystem.h"
 #include "LaurelEyeEngine/animation/AnimationSystem.h"
 #include "LaurelEyeEngine/UI/UILayoutSystem.h"
+#include "LaurelEyeEngine/UI/UIInteractionSystem.h"
 #include <memory>
 
 namespace LaurelEye {
@@ -36,6 +37,7 @@ namespace LaurelEye {
         // for now, add systems that are needed here.
         std::unique_ptr<TransformSystem> transformSystem;
         std::unique_ptr<UI::UILayoutSystem> uiLayoutSystem;
+        std::unique_ptr<UI::UIInteractionSystem> uiInteractionSystem;
         std::unique_ptr<Graphics::RenderSystem> renderSystem;
         std::unique_ptr<Particles::ParticleSystem> particleSystem;
         std::unique_ptr<Physics::PhysicsSystem> physicsSystem;

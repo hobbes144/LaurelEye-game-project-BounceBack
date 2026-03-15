@@ -186,6 +186,10 @@ namespace LaurelEye {
             return GLFW_KEY_LEFT_SHIFT;
         case Key::F11:
             return GLFW_KEY_F11;
+        case Key::LCtrl:
+            return GLFW_KEY_LEFT_CONTROL;
+        case Key::LAlt :
+            return GLFW_KEY_LEFT_ALT;
         case Key::arrowDown:
             return GLFW_KEY_DOWN;
         case Key::arrowUp:

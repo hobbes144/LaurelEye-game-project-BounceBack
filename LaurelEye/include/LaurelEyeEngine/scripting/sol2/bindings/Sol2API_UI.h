@@ -23,6 +23,7 @@ namespace LaurelEye::Scripting {
     private:
         static void setupUIRenderComponent(sol::state& lua);
         static void setupUITransformComponent(sol::state& lua);
+        static void setupUIInteractionComponent(sol::state& lua);
         //static void setupButtonCallbacks(sol::state& lua);
         //static void setupEventListener(sol::state& lua, EventManager* eventManager);
 

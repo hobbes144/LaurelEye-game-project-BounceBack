@@ -30,6 +30,18 @@ namespace LaurelEye::Scripting {
         void onCollisionStay(const Physics::CollisionEventData& data) override;
         void onCollisionExit(const Physics::CollisionEventData& data) override;
 
+        void onHoverEnter(const UI::UIInteractionEventData& data) override;
+        void onHoverExit(const UI::UIInteractionEventData& data) override;
+        void onPressed(const UI::UIInteractionEventData& data) override;
+        void onHeld(const UI::UIInteractionEventData& data) override;
+        void onReleased(const UI::UIInteractionEventData& data) override;
+        void onClicked(const UI::UIInteractionEventData& data) override;
+        void onDragStart(const UI::UIInteractionEventData& data) override;
+        void onDragging(const UI::UIInteractionEventData& data) override;
+        void onDragEnd(const UI::UIInteractionEventData& data) override;
+        void onFocusGained(const UI::UIInteractionEventData& data) override;
+        void onFocusLost(const UI::UIInteractionEventData& data) override;
+
         void onMessage(const SolMessage& message);
 
         //Trigger Event Functions
@@ -62,6 +74,11 @@ namespace LaurelEye::Scripting {
                       messageFunc,
                       collisionEnterFunc, collisionStayFunc, collisionExitFunc,
                       triggerEnterFunc, triggerStayFunc, triggerExitFunc;
+
+        sol::function hoverEnterFunc, HoverExitFunc,
+                      pressedFunc, heldFunc, releasedFunc, clickedFunc,
+                      dragStartFunc, draggingFunc, dragEndFunc,
+                      focusGainedFunc, focusLostFunc;
         LaurelEye::Entity* owner;
 
         void invalidate();

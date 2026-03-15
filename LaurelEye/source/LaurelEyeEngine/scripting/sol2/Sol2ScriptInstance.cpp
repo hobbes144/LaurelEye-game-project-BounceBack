@@ -3,6 +3,7 @@
 #include "LaurelEyeEngine/scripting/sol2/Sol2API.h"
 #include "LaurelEyeEngine/io/FileSystem.h"
 #include "LaurelEyeEngine/physics/CollisionManager.h"
+#include "LaurelEyeEngine/UI/UIComponents/UIInteractionComponent.h"
 #include "LaurelEyeEngine/ecs/Entity.h"
 #include <cassert>
 #include <sol/protected_function_result.hpp>
@@ -47,6 +48,20 @@ namespace LaurelEye::Scripting {
         triggerEnterFunc = env["onTriggerEnter"];
         triggerStayFunc = env["onTriggerStay"];
         triggerExitFunc = env["onTriggerExit"];
+
+        //UI Interaction Bindings
+        hoverEnterFunc = env["onHoverEnter"];
+        HoverExitFunc = env["onHoverExit"];
+        pressedFunc = env["onPressed"];
+        heldFunc = env["onHeld"];
+        releasedFunc = env["onReleased"];
+        clickedFunc = env["onClicked"];
+        dragStartFunc = env["onDragStart"];
+        draggingFunc = env["onDragging"];
+        dragEndFunc = env["onDragEnd"];
+        focusGainedFunc = env["onFocusGained"];
+        focusLostFunc = env["onFocusLost"];
+
     }
 
     Sol2ScriptInstance::~Sol2ScriptInstance() {
@@ -126,9 +141,9 @@ namespace LaurelEye::Scripting {
 
     //Trigger Functions
     void Sol2ScriptInstance::onTriggerEnter(const Physics::CollisionEventData& data) {
-        if ( triggerEnterFunc.valid() ) {
+        if (triggerEnterFunc.valid()) {
             auto result = triggerEnterFunc(data);
-            if ( !result.valid() ) {
+            if (!result.valid()) {
                 sol::error err = result;
                 LE_DEBUG_ASSERT("Scripting", false, "[Lua onTriggerEnter Error] " << err.what());
             }
@@ -136,9 +151,9 @@ namespace LaurelEye::Scripting {
     }
 
     void Sol2ScriptInstance::onTriggerStay(const Physics::CollisionEventData& data) {
-        if ( triggerStayFunc.valid() ) {
+        if (triggerStayFunc.valid()) {
             auto result = triggerStayFunc(data);
-            if ( !result.valid() ) {
+            if (!result.valid()) {
                 sol::error err = result;
                 LE_DEBUG_ASSERT("Scripting", false, "[Lua onTriggerStay Error] " << err.what());
             }
@@ -146,11 +161,111 @@ namespace LaurelEye::Scripting {
     }
 
     void Sol2ScriptInstance::onTriggerExit(const Physics::CollisionEventData& data) {
-        if ( triggerExitFunc.valid() ) {
+        if (triggerExitFunc.valid()) {
             auto result = triggerExitFunc(data);
-            if ( !result.valid() ) {
+            if (!result.valid()) {
                 sol::error err = result;
                 LE_DEBUG_ASSERT("Scripting", false, "[Lua onTriggerExit Error] " << err.what());
+            }
+        }
+    }
+    
+    void Sol2ScriptInstance::onHoverEnter(const UI::UIInteractionEventData& data) {
+        if ( hoverEnterFunc.valid() ) {
+            auto result = hoverEnterFunc(data);
+            if ( !result.valid() ) {
+                sol::error err = result;
+                LE_DEBUG_ASSERT("Scripting", false, "[Lua onHoverEnter Error] " << err.what());
+            }
+        }
+    }
+    void Sol2ScriptInstance::onHoverExit(const UI::UIInteractionEventData& data) {
+        if ( HoverExitFunc.valid() ) {
+            auto result = HoverExitFunc(data);
+            if ( !result.valid() ) {
+                sol::error err = result;
+                LE_DEBUG_ASSERT("Scripting", false, "[Lua onHoverExit Error] " << err.what());
+            }
+        }
+    }
+    void Sol2ScriptInstance::onPressed(const UI::UIInteractionEventData& data) {
+        if ( pressedFunc.valid() ) {
+            auto result = pressedFunc(data);
+            if ( !result.valid() ) {
+                sol::error err = result;
+                LE_DEBUG_ASSERT("Scripting", false, "[Lua onPressed Error] " << err.what());
+            }
+        }
+    }
+    void Sol2ScriptInstance::onHeld(const UI::UIInteractionEventData& data) {
+        if ( heldFunc.valid() ) {
+            auto result = heldFunc(data);
+            if ( !result.valid() ) {
+                sol::error err = result;
+                LE_DEBUG_ASSERT("Scripting", false, "[Lua onHeld Error] " << err.what());
+            }
+        }
+    }
+    void Sol2ScriptInstance::onReleased(const UI::UIInteractionEventData& data) {
+        if ( releasedFunc.valid() ) {
+            auto result = releasedFunc(data);
+            if ( !result.valid() ) {
+                sol::error err = result;
+                LE_DEBUG_ASSERT("Scripting", false, "[Lua onReleased Error] " << err.what());
+            }
+        }
+    }
+    void Sol2ScriptInstance::onClicked(const UI::UIInteractionEventData& data) {
+        if ( clickedFunc.valid() ) {
+            auto result = clickedFunc(data);
+            if ( !result.valid() ) {
+                sol::error err = result;
+                LE_DEBUG_ASSERT("Scripting", false, "[Lua onClicked Error] " << err.what());
+            }
+        }
+    }
+    void Sol2ScriptInstance::onDragStart(const UI::UIInteractionEventData& data) {
+        if ( dragStartFunc.valid() ) {
+            auto result = dragStartFunc(data);
+            if ( !result.valid() ) {
+                sol::error err = result;
+                LE_DEBUG_ASSERT("Scripting", false, "[Lua onDragStart Error] " << err.what());
+            }
+        }
+    }
+    void Sol2ScriptInstance::onDragging(const UI::UIInteractionEventData& data) {
+        if ( draggingFunc.valid() ) {
+            auto result = draggingFunc(data);
+            if ( !result.valid() ) {
+                sol::error err = result;
+                LE_DEBUG_ASSERT("Scripting", false, "[Lua onDragging Error] " << err.what());
+            }
+        }
+    }
+    void Sol2ScriptInstance::onDragEnd(const UI::UIInteractionEventData& data) {
+        if ( dragEndFunc.valid() ) {
+            auto result = dragEndFunc(data);
+            if ( !result.valid() ) {
+                sol::error err = result;
+                LE_DEBUG_ASSERT("Scripting", false, "[Lua onDragEnd Error] " << err.what());
+            }
+        }
+    }
+    void Sol2ScriptInstance::onFocusGained(const UI::UIInteractionEventData& data) {
+        if ( focusGainedFunc.valid() ) {
+            auto result = focusGainedFunc(data);
+            if ( !result.valid() ) {
+                sol::error err = result;
+                LE_DEBUG_ASSERT("Scripting", false, "[Lua onFocusGained Error] " << err.what());
+            }
+        }
+    }
+    void Sol2ScriptInstance::onFocusLost(const UI::UIInteractionEventData& data) {
+        if ( focusLostFunc.valid() ) {
+            auto result = focusLostFunc(data);
+            if ( !result.valid() ) {
+                sol::error err = result;
+                LE_DEBUG_ASSERT("Scripting", false, "[Lua onFocusLost Error] " << err.what());
             }
         }
     }
@@ -165,6 +280,19 @@ namespace LaurelEye::Scripting {
         triggerEnterFunc = sol::nil;
         triggerStayFunc = sol::nil;
         triggerExitFunc = sol::nil;
+
+        hoverEnterFunc = sol::nil;
+        HoverExitFunc = sol::nil;
+        pressedFunc = sol::nil;
+        heldFunc = sol::nil;
+        releasedFunc = sol::nil;
+        clickedFunc = sol::nil;
+        dragStartFunc = sol::nil;
+        draggingFunc = sol::nil;
+        dragEndFunc = sol::nil;
+        focusGainedFunc = sol::nil;
+        focusLostFunc = sol::nil;
+
         env = sol::nil;
         owner = nullptr;
     }

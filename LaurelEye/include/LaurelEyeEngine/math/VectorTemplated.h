@@ -14,6 +14,8 @@
 
 #include <array>
 #include <cstddef>
+#include <ostream>
+
 
 namespace LaurelEye {
 
@@ -86,6 +88,19 @@ namespace LaurelEye {
         static VectorTemplated elerp(const VectorTemplated& start, const VectorTemplated& end, T t)
             requires std::integral<T>;
     };
+
+    template <typename T, size_t N>
+        requires std::integral<T> || std::floating_point<T>
+    std::ostream& operator<<(std::ostream& os, const VectorTemplated<T, N>& vec) {
+        os << "(";
+        for ( size_t i = 0; i < N; ++i ) {
+            os << vec[i];
+            if ( i < N - 1 )
+                os << ", ";
+        }
+        os << ")";
+        return os;
+    }
 
     // Using extern to force only one instantiation.
     // Reduces header compile size and time a tiny bit.

@@ -64,6 +64,19 @@
                         "texture": "textures/PlayButton.jpg",
                         "layer": 10
                     }
+                },
+                "UIInteraction": {
+                    "isInteractable": true,
+                    "blockRaycast": true,
+                    "receiveHover": true,
+                    "receiveClick": true,
+                    "receiveDrag": false,
+                    "dragThreshold": 10.0,
+                    "focusable": false,
+                    "interactionPriority": 1
+                },
+                "Script": {
+                    "path": "scripts/button_menu_navigation.lua"
                 }
             }
         },

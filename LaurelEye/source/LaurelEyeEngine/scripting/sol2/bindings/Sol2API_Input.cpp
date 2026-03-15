@@ -19,6 +19,8 @@ namespace LaurelEye::Scripting {
                      "Escape", Key::Escape,
                      "LShift", Key::LShift,
                      "F11", Key::F11,
+                     "LAlt", Key::LAlt,
+                     "LCtrl", Key::LCtrl,
 
                      "ArrowDown", Key::arrowDown,
                      "ArrowUp", Key::arrowUp,
