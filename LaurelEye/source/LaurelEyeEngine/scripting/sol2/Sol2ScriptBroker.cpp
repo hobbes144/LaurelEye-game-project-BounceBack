@@ -26,6 +26,10 @@ namespace LaurelEye::Scripting {
     void Sol2ScriptBroker::queueMessage(const SolMessage& msg) {
         auto& messageQueue = currQueueA ? messageQueueA : messageQueueB;
         messageQueue.push(toQueueMessage(msg));
+
+        if ( messageQueue.size() > 5000 ) {
+            LE_WARN("Scripting", "Message queue size: " << messageQueue.size());
+        }
     }
 
     void Sol2ScriptBroker::queueBroadcast(const SolMessage& msg) {

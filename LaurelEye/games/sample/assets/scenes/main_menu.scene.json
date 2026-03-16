@@ -76,7 +76,84 @@
                     "interactionPriority": 1
                 },
                 "Script": {
-                    "path": "scripts/button_menu_navigation.lua"
+                    "path": "scripts/button_menu_navigation.lua",
+                    "data": [
+                        {
+                            "name": "targetScene",
+                            "type": "Int",
+                            "value": 1
+                        },
+                        {
+                            "name": "testBool",
+                            "type": "Bool",
+                            "value": true
+                        },
+                        {
+                            "name": "testFloat",
+                            "type": "Float",
+                            "value": 3.75
+                        },
+                        {
+                            "name": "testString",
+                            "type": "String",
+                            "value": "I got here on my First Try - Im that good"
+                        },
+                        {
+                            "name": "enemyConfig",
+                            "type": "Object",
+                            "value": {
+                                "speed": 10,
+                                "health": 100,
+                                "name": "Goblin",
+                                "spawnPoints": [
+                                    [ 0, 0 ],
+                                    [ 10, 5 ],
+                                    [ 20, 10 ]
+                                ],
+                                "stats": {
+                                    "attack": 12,
+                                    "defense": 8
+                                }
+                            }
+                        },
+                        {
+                            "name": "testVector2",
+                            "type": "Vector2",
+                            "value": {
+                                "x": 5.5,
+                                "y": 9.25
+                            }
+                        },
+                        {
+                            "name": "testVector3",
+                            "type": "Vector3",
+                            "value": {
+                                "x": 1,
+                                "y": 2,
+                                "z": 3
+                            }
+                        },
+                        {
+                            "name": "testVector4",
+                            "type": "Vector4",
+                            "value": {
+                                "x": 10,
+                                "y": 20,
+                                "z": 30,
+                                "w": 40
+                            }
+                        },
+                        {
+                            "name": "testColor",
+                            "type": "Vector4",
+                            "value": {
+                                "r": 0.25,
+                                "g": 0.5,
+                                "b": 0.75,
+                                "a": 1.0
+                            }
+                        }
+                    ]
                 }
             }
         },

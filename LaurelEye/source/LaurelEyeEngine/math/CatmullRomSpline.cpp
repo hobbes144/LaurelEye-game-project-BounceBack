@@ -10,7 +10,6 @@
 
 #include "LaurelEyeEngine/math/CatmullRomSpline.h"
 #include <fstream>
-#include <sstream>
 #include <rapidjson/document.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>

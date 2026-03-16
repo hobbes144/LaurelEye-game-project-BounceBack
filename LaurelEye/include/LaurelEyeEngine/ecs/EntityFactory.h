@@ -12,6 +12,7 @@
 #include "LaurelEyeEngine/core/EngineContext.h"
 #include "LaurelEyeEngine/ecs/Entity.h"
 #include "LaurelEyeEngine/math/VectorTemplated.h"
+#include "LaurelEyeEngine/scripting/ScriptComponent.h"
 
 #include <memory>
 #include <rapidjson/document.h>
@@ -68,6 +69,7 @@ namespace LaurelEye{
 
         //Helpers
         Vector2 ReadVector2(const rapidjson::Value& vectorData);
+        LaurelEye::Scripting::ScriptValue ReadScriptValue(const rapidjson::Value& valueData);
 
     };
 }

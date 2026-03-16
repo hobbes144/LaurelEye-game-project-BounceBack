@@ -16,12 +16,17 @@
 #include "LaurelEyeEngine/physics/interfaces/PhysicsTypes.h"
 #include "LaurelEyeEngine/physics/RigidBodyComponent.h"
 #include "LaurelEyeEngine/physics/GhostBodyComponent.h"
+#include "LaurelEyeEngine/scene/SceneManager.h"
 #include "LaurelEyeEngine/scene/Scene.h"
 #include "LaurelEyeEngine/scripting/ScriptComponent.h"
+#include "LaurelEyeEngine/scripting/ScriptTypeRegistry.h"
 #include "LaurelEyeEngine/transform/TransformComponent.h"
 #include "LaurelEyeEngine/UI/UIComponents/UITransformComponent.h"
 #include "LaurelEyeEngine/UI/UIComponents/UIRenderComponent.h"
 #include "LaurelEyeEngine/UI/UIComponents/UIInteractionComponent.h"
+
+#include "LaurelEyeEngine/logging/EngineLog.h"
+
 #include <iostream>
 #include <LaurelEyeEngine/animation/resources/Animation.h>
 #include <LaurelEyeEngine/animation/components/SkeletalAnimationComponent.h>
@@ -493,15 +498,45 @@ namespace LaurelEye {
     void EntityFactory::setupScriptComponent(Entity& entity, const rapidjson::Value& scriptData) {
         // Register script component
         if ( !scriptData.HasMember("path") || !scriptData["path"].IsString() ) {
-            std::cerr << "EntityFactory: Script component missing 'path' for entity: "
-                      << entity.getName() << std::endl;
+            LE_DEBUG_ASSERT("Entity Factory", false,"EntityFactory: Script component missing 'path' for entity: " << entity.getName());
             return;
         }
 
         std::string relPath = scriptData["path"].GetString();
         std::string resolvedPath = assetPath + relPath;
 
-        entity.addComponent<Scripting::ScriptComponent>(resolvedPath);
+        auto scriptComp = entity.addComponent<Scripting::ScriptComponent>(resolvedPath);
+
+        //Serialized Data Values
+        if ( scriptData.HasMember("data") && scriptData["data"].IsArray() ) {
+
+            const auto& dataArray = scriptData["data"];
+
+            for ( const auto& entry : dataArray.GetArray() ) {
+                if ( !entry.IsObject() ||
+                     !entry.HasMember("name") || !entry.HasMember("type") ||
+                     !entry["name"].IsString() || !entry["type"].IsString() ) {
+                    LE_DEBUG_ERROR("EntityFactory", "Invalid Serialized Data Value Structure");
+                    continue;
+                }
+
+                std::string name = entry["name"].GetString();
+                std::string type = entry["type"].GetString();
+
+                const rapidjson::Value& value = entry["value"];
+
+                auto parsed = Scripting::ScriptTypeRegistry::parse(type, value);
+
+                LE_DEBUG_ASSERT(
+                    "EntityFactory",
+                    parsed.has_value(),
+                    "Unknown script type: " << type);
+
+                scriptComp->setSerializedValue(name, *parsed);
+            }
+
+        }
+
     }
 
     void EntityFactory::setupParticleEmitterComponent(Entity& entity, const rapidjson::Value& emitterData) {
@@ -774,59 +809,59 @@ namespace LaurelEye {
                 animComponent->type = Animations::Animation::Type::Skeletal;
             else
                 animComponent->type = Animations::Animation::Type::Skeletal;
-            // Add more if needed
+                // Add more if needed
         }
         //default to be Skeletal/ for now
         else
             animComponent->type = Animations::Animation::Type::Skeletal;
 
-        // --- Load Animation Asset ---
-        // temp for now, mutiply Animation loading
-        if ( animationData.HasMember("file") ) {
-            auto& fileNode = animationData["file"];
+            // --- Load Animation Asset ---
+            // temp for now, mutiply Animation loading
+            if ( animationData.HasMember("file") ) {
+                auto& fileNode = animationData["file"];
 
-            std::vector<std::string> animPaths;
+                std::vector<std::string> animPaths;
 
-            // Case 1: Single string
-            if ( fileNode.IsString() ) {
-                animPaths.push_back(fileNode.GetString());
-            }
-            // Case 2: Array of strings
-            else if ( fileNode.IsArray() ) {
-                for ( auto& v : fileNode.GetArray() ) {
-                    if ( v.IsString() ) {
-                        animPaths.push_back(v.GetString());
+                // Case 1: Single string
+                if ( fileNode.IsString() ) {
+                    animPaths.push_back(fileNode.GetString());
+                }
+                // Case 2: Array of strings
+                else if ( fileNode.IsArray() ) {
+                    for ( auto& v : fileNode.GetArray() ) {
+                        if ( v.IsString() ) {
+                            animPaths.push_back(v.GetString());
+                        }
                     }
                 }
-            }
-            else {
-                throw std::runtime_error("EntityFactory::setupAnimationComponent - 'file' must be string or array of strings.");
-            }
-
-            // Process each animation file
-            for ( const auto& animPath : animPaths ) {
-                auto asset = context.getService<IO::AssetManager>()->load(assetPath + animPath);
-                auto skinnedMeshAsset = std::dynamic_pointer_cast<IO::SkinnedMeshAsset>(asset);
-                auto animAsset = std::dynamic_pointer_cast<IO::AnimationAsset>(skinnedMeshAsset->animation);
-
-                if ( !animAsset ) {
-                    throw std::runtime_error("EntityFactory::setupAnimationComponent - Asset '" + animPath + "' is not an AnimationAsset.");
+                else {
+                    throw std::runtime_error("EntityFactory::setupAnimationComponent - 'file' must be string or array of strings.");
                 }
 
-                assert((std::cout << "Loaded asset " + assetPath + animPath + "\n", true));
+                // Process each animation file
+                for ( const auto& animPath : animPaths ) {
+                    auto asset = context.getService<IO::AssetManager>()->load(assetPath + animPath);
+                    auto skinnedMeshAsset = std::dynamic_pointer_cast<IO::SkinnedMeshAsset>( asset );
+                    auto animAsset = std::dynamic_pointer_cast<IO::AnimationAsset>( skinnedMeshAsset->animation );
 
-                auto animManager = context.getService<Animations::AnimationManager>();
-                Animations::AnimationHandle handle = animManager->createAnimation(animAsset.get());
+                    if ( !animAsset ) {
+                        throw std::runtime_error("EntityFactory::setupAnimationComponent - Asset '" + animPath + "' is not an AnimationAsset.");
+                    }
 
-                // set last animation as default
-                animComponent->currentAnimation = handle;
-                animComponent->isPlaying = true;
+                    assert(( std::cout << "Loaded asset " + assetPath + animPath + "\n", true ));
+
+                    auto animManager = context.getService<Animations::AnimationManager>();
+                    Animations::AnimationHandle handle = animManager->createAnimation(animAsset.get());
+
+                    // set last animation as default
+                    animComponent->currentAnimation = handle;
+                    animComponent->isPlaying = true;
+                }
             }
-        }
 
 
-        // Add the component to the entity
-        entity.addComponent<Animations::SkeletalAnimationComponent>(std::move(animComponent));
+            // Add the component to the entity
+            entity.addComponent<Animations::SkeletalAnimationComponent>(std::move(animComponent));
     }
 
 
@@ -835,11 +870,152 @@ namespace LaurelEye {
 
 #pragma region Helpers
 
-
-
     Vector2 EntityFactory::ReadVector2(const rapidjson::Value& vectorData) {
-        return {vectorData[0].GetFloat(), vectorData[1].GetFloat()};
+        return { vectorData[0].GetFloat(), vectorData[1].GetFloat() };
     }
+
+    /*
+    LaurelEye::Scripting::ScriptValue EntityFactory::ReadScriptValue(const rapidjson::Value& valueData) {
+
+        if ( valueData.IsBool() ) {
+            return Scripting::ScriptValue(valueData.GetBool());
+        }
+
+        if ( valueData.IsInt() ) {
+            return Scripting::ScriptValue(valueData.GetInt());
+        }
+
+        if ( valueData.IsDouble() ) {
+            return Scripting::ScriptValue(valueData.GetDouble());
+        }
+
+        if ( valueData.IsString() ) {
+            return Scripting::ScriptValue(std::string(valueData.GetString()));
+        }
+
+        if ( valueData.IsArray() ) {
+            Scripting::ScriptArray scriptArray;
+
+            for ( auto& v : valueData.GetArray() ) {
+                scriptArray.push_back(ReadScriptValue(v));
+            }
+
+            return Scripting::ScriptValue(scriptArray);
+        }
+
+        if ( valueData.IsObject() ) {
+            Scripting::ScriptObject scriptObject;
+
+            //Vector 2
+            if ( valueData.HasMember("x") && valueData.HasMember("y") &&
+                 valueData["x"].IsNumber() && valueData["y"].IsNumber() &&
+                 valueData.MemberCount() == 2 ) {
+                Vector2 v;
+
+                v[0] = valueData["x"].GetFloat();
+                v[1] = valueData["y"].GetFloat();
+
+                return Scripting::ScriptValue(v);
+            }
+
+            //Vector 3
+            if ( valueData.HasMember("x") && valueData.HasMember("y") && valueData.HasMember("z") &&
+                 valueData["x"].IsNumber() && valueData["y"].IsNumber() && valueData["z"].IsNumber() &&
+                 valueData.MemberCount() == 3 ) {
+                Vector3 v;
+                v.x = valueData["x"].GetFloat();
+                v.y = valueData["y"].GetFloat();
+                v.z = valueData["z"].GetFloat();
+
+                return Scripting::ScriptValue(v);
+            }
+
+            //Vector 4
+            if ( valueData.HasMember("x") && valueData.HasMember("y") && valueData.HasMember("z") && valueData.HasMember("w") &&
+                 valueData["x"].IsNumber() && valueData["y"].IsNumber() && valueData["z"].IsNumber() && valueData["w"].IsNumber() &&
+                 valueData.MemberCount() == 4 ) {
+                Vector4 v;
+                v[0] = valueData["x"].GetFloat();
+                v[1] = valueData["y"].GetFloat();
+                v[2] = valueData["z"].GetFloat();
+                v[3] = valueData["w"].GetFloat();
+
+                return Scripting::ScriptValue(v);
+            }
+
+            //Color
+            //TODO: Could implement a System Wide Definition of Color, would require intensive refactor IMO
+            if ( valueData.HasMember("r") && valueData.HasMember("g") && valueData.HasMember("b") &&
+                 valueData["r"].IsNumber() && valueData["g"].IsNumber() && valueData["b"].IsNumber() &&
+                 3 <= valueData.MemberCount() && valueData.MemberCount() <= 4 ) {
+
+                Vector4 c;
+                c[0] = valueData["r"].GetFloat();
+                c[1] = valueData["g"].GetFloat();
+                c[2] = valueData["b"].GetFloat();
+                c[3] = valueData.HasMember("a") ? valueData["a"].GetFloat() : 1.0f;
+
+                return Scripting::ScriptValue(c);
+            }
+
+            //Entity Reference
+            if ( valueData.HasMember("entity") && valueData["entity"].IsString() ) {
+                std::string name = valueData["entity"].GetString();
+
+                if ( !name.empty() && name[0] == '@' ) {
+
+                    std::string entityName = name.substr(1);
+
+                    //Reference the Scene to Find the Public Function by Name
+                    Entity* ref = context.getService<SceneManager>()->getCurrentScene()->findEntityByName(entityName);
+                    LE_DEBUG_ASSERT("EntityFactory", ref, "Unable to Find Entity Refrence");
+
+                    return Scripting::ScriptValue(ref);
+
+                }
+                else {
+                    LE_DEBUG_ASSERT("EntityFactory", false, "Invalid Reference Format");
+                }
+
+            }
+
+            // Entity Reference
+            if ( valueData.HasMember("transform") && valueData["transform"].IsString() ) {
+                std::string name = valueData["transform"].GetString();
+
+                if ( !name.empty() && name[0] == '@' ) {
+
+                    std::string entityName = name.substr(1);
+
+                    // Reference the Scene to Find the Public Function by Name
+                    Entity* ref = context.getService<SceneManager>()->getCurrentScene()->findEntityByName(entityName);
+                    LE_DEBUG_ASSERT("EntityFactory", ref, "Unable to Find Entity Refrence");
+
+                    TransformComponent* transComp = ref->findComponent<TransformComponent>();
+                    LE_DEBUG_ASSERT("EntityFactory", transComp, "Unable to Find TransformComponentRefencence Refrence");
+
+                    return Scripting::ScriptValue(transComp);
+
+                }
+                else {
+                    LE_DEBUG_ASSERT("EntityFactory", false, "Invalid Reference Format");
+                }
+
+            }
+
+            //Generic Object
+            for ( auto itr = valueData.MemberBegin(); itr != valueData.MemberEnd(); ++itr ) {
+                scriptObject[itr->name.GetString()] = ReadScriptValue(itr->value);
+            }
+
+            return Scripting::ScriptValue(scriptObject);
+        }
+
+        LE_DEBUG_ASSERT("EntityFactory", false, "Unsupported script data type");
+        return Scripting::ScriptValue();
+
+    }
+    */
 
 #pragma endregion
 

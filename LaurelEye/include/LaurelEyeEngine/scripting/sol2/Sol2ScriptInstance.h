@@ -11,6 +11,7 @@
 
 #include "LaurelEyeEngine/scripting/IScriptInstance.h"
 #include "LaurelEyeEngine/scripting/sol2/Sol2Message.h"
+#include "LaurelEyeEngine/scripting/ScriptComponent.h"
 #include <sol/sol.hpp>
 
 namespace LaurelEye::Scripting {
@@ -75,13 +76,17 @@ namespace LaurelEye::Scripting {
                       collisionEnterFunc, collisionStayFunc, collisionExitFunc,
                       triggerEnterFunc, triggerStayFunc, triggerExitFunc;
 
-        sol::function hoverEnterFunc, HoverExitFunc,
+        sol::function hoverEnterFunc, hoverExitFunc,
                       pressedFunc, heldFunc, releasedFunc, clickedFunc,
                       dragStartFunc, draggingFunc, dragEndFunc,
                       focusGainedFunc, focusLostFunc;
         LaurelEye::Entity* owner;
 
         void invalidate();
+
+        sol::object ToLuaFromScriptValue(const ScriptValue& value);
+        ScriptValue ToScriptValueFromLua(sol::object obj);
+
     };
 
 } // namespace LaurelEye::Scripting

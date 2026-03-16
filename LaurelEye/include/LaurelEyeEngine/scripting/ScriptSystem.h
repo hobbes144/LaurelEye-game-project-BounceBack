@@ -31,6 +31,8 @@ namespace LaurelEye::Scripting {
         IScriptEngineState* getEngineState() const { return scriptEngineState.get(); }
         ScriptBroker* getBroker() const { return broker.get(); }
     private:
+        void registerScriptTypes();
+
         ScriptSystemType systemType;
 
         std::unique_ptr<ScriptBroker> broker;
