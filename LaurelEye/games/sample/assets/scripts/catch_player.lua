@@ -110,6 +110,9 @@ function onUpdate(dt)
     --Check if health = 0
     if currentHealth <= 0 then
         log("Player has died!")
+        currentHealth = maxHealth
+        GameManager:setPlayerHealth(maxHealth)
+        Window.setCursorMode(0, Window.CursorMode.Normal)
         SceneManager:changeScene("MainMenu")
     end
 
@@ -153,7 +156,7 @@ function onUpdate(dt)
         (Input:isKeyHeld(Key.S) and 1 or 0)
 
     if Input:isMouseButtonPressed(MouseButton.Left) then
-        if hasBall then 
+        if hasBall then
             shootProjectile()
             local scene = SceneManager:getCurrentScene()
             local ballInd = scene:findEntityByName("BallIndicator")
@@ -231,7 +234,7 @@ function onUpdate(dt)
         local dx = dashX - vel.x
         local dz = dashZ - vel.z
 
-        body:applyImpulse(Vector3.new(dx * mass, 0, dz * mass)) 
+        body:applyImpulse(Vector3.new(dx * mass, 0, dz * mass))
     end
 end
 

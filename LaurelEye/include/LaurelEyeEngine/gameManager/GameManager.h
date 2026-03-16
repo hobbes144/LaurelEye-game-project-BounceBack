@@ -5,12 +5,12 @@ namespace LaurelEye {
     class GameManager {
     public:
         // --- Generators Destroyed ---
-        void addGeneratorDestroyed(int value = 1) { gensDestroyed += value; }
-        int getGeneratorsDestroyed() const { return gensDestroyed; }
+        void addGeneratorDestroyed(float value = 1.0f) { gensDestroyed += static_cast<int>(value); }
+        float getGeneratorsDestroyed() const { return static_cast<float>(gensDestroyed); }
 
         // --- Player Health ---
-        void setPlayerHealth(int value) { playerHealth = value; }
-        int getPlayerHealth() const { return playerHealth; }
+        void setPlayerHealth(float value) { playerHealth = value; }
+        float getPlayerHealth() const { return playerHealth; }
 
         // --- Time Completed ---
         void addTime(float value) { timeCompleted += value; }
@@ -18,13 +18,13 @@ namespace LaurelEye {
         float getTimeCompleted() const { return timeCompleted; }
 
         // --- Enemies Killed ---
-        void addEnemyKilled(int value = 1) { enemiesKilled += value; }
-        int getEnemiesKilled() const { return enemiesKilled; }
+        void addEnemyKilled(float value = 1.0f) { enemiesKilled += static_cast<int>(value); }
+        float getEnemiesKilled() const { return static_cast<float>(enemiesKilled); }
 
         // --- Combos ---
-        void addCombo(int value = 1) { combos += value; }
+        void addCombo(float value = 1) { combos += static_cast<int>(value); }
         void resetCombo() { combos = 0; }
-        int getCombos() const { return combos; }
+        float getCombos() const { return static_cast<float>(combos); }
 
         // --- Reset All Stats ---
         void resetStats() {
@@ -37,7 +37,7 @@ namespace LaurelEye {
 
     private:
         int gensDestroyed = 0;
-        int playerHealth = 3;
+        float playerHealth = 3.0f;
         float timeCompleted = 0.0f;
         int enemiesKilled = 0;
         int combos = 0;
