@@ -6,23 +6,30 @@ aimShoulder = 8.5
 defaultHeight = 8.5
 aimHeight = 7.8
 zoomLerpSpeed = 12.0
+playerOffset = 0.0
+playerOffsetZoomMult = 0.3
+playerRunOffset = 4
+playerIdleOffset = 0.0
 
 currentDistance = defaultDistance
 currentShoulder = defaultShoulder
 currentHeight = defaultHeight
 
-transform = nil
-target = nil
+--@type TransformComponent
+local transform = nil
+--@type TransformComponent
+local target = nil
 
 -- Rotation
 yaw = 0.0
 pitch = -0.25 -- slight downward angle
 
 lerpSpeed = 10.0
+adsLerpSpeed = 40.0
 
 -- Pitch clamp
 pitchMin = -1.2
-pitchMax = 0.35
+pitchMax = 1.2
 
 -- Right-stick settings
 rStickDeadzone = 0.25
@@ -64,6 +71,7 @@ function onUpdate(dt)
 
 
     local playerPos = target:getWorldPosition()
+    local playerRot = target:getWorldRotation()
     local camTransform = transform:getWorldTransform()
 
     -- Check if aiming
@@ -112,6 +120,19 @@ function onUpdate(dt)
         playerPos
         + Vector3.new(0, currentHeight, 0)
 
+    if isAiming then
+        cameraPivot = cameraPivot + ((playerRot * Vector3.new(0.0, 0.0, playerOffset)) * playerOffsetZoomMult)
+    else
+        cameraPivot = cameraPivot + (playerRot * Vector3.new(0.0, 0.0, playerOffset))
+    end
+
+    if isAiming then
+        -- pivotPos = pivotPos + (cameraPivot - pivotPos) * adsLerpSpeed * dt
+        pivotPos = cameraPivot
+    else
+        pivotPos = pivotPos + (cameraPivot - pivotPos) * lerpSpeed * dt
+    end
+
     pivotPos = pivotPos + (cameraPivot - pivotPos) * lerpSpeed * dt
 
     -- Camera position derived from pivot
@@ -140,6 +161,18 @@ function onUpdate(dt)
     camTransform:setPosition(desiredPos)
     camTransform:setRotation(rotQuat)
     transform:setWorldTransform(camTransform)
+end
+
+function onMessage(message)
+    if message.topic == "PlayerAnimChange" then
+        if message.contents == "Running" then
+            playerOffset = playerRunOffset
+            debugLog("Camera offset set to playerRunOffset.")
+        else
+            playerOffset = playerIdleOffset
+            debugLog("Camera offset set to playerIdleOffset.")
+        end
+    end
 end
 
 function onShutdown()

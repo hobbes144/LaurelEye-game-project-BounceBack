@@ -10,6 +10,8 @@ dvDeadzone        = 0.05   -- ignore tiny dv values to avoid jitter
 transform = nil
 body = nil
 cameraTransform = nil
+---@type Entity
+cameraEntity = nil
 smokeEmitter = nil
 speaker = nil
 
@@ -95,10 +97,10 @@ function onMessage(msg)
 end
 
 function onUpdate(dt)
-    if cameraTransform == nil then
+    if cameraTransform == nil or cameraEntity == nil then
         local scene = SceneManager:getCurrentScene()
         if scene ~= nil then
-            local cameraEntity = scene:findEntityByName("Camera")
+            cameraEntity = scene:findEntityByName("Camera")
             if cameraEntity ~= nil then
                 print("Camera Entity: ", cameraEntity)
                 cameraTransform = cameraEntity:findTransform()
@@ -189,26 +191,62 @@ function onUpdate(dt)
     local dvz = desiredZ - vel.z
     local dvMag = math.sqrt(dvx * dvx + dvz * dvz)
 
+    local timeToReach = isGrounded and timeToReachGround or timeToReachAir
+    timeToReach = math.max(timeToReach, 0.0001)
+
+    local maxDelta = dvMag * (dt / timeToReach)
+
+    local deltaX, deltaZ = 0.0, 0.0
     if dvMag > dvDeadzone then
+        local scale = math.min(1.0, maxDelta / dvMag)
+        deltaX = dvx * scale
+        deltaZ = dvz * scale
+    end
 
-        local timeToReach = isGrounded and timeToReachGround or timeToReachAir
+    local newVel = Vector3.new(
+        vel.x + deltaX,
+        vel.y,
+        vel.z + deltaZ
+    )
 
-        local accelX = dvx / math.max(timeToReach, 0.0001)
-        local accelZ = dvz / math.max(timeToReach, 0.0001)
+    body:setLinearVelocity(newVel)
 
-        local accelMag = math.sqrt(accelX * accelX + accelZ * accelZ)
-
-        body:applyForce(Vector3.new(accelX * mass, 0, accelZ * mass))
+    if inputMag > 0.01 then
         local animName = animator.currentAnimationName
         if animName ~= "Running" then
             animator:changeAnimation("Running")
+            tellCameraMyAnimation("Running")
         end
     else
         local animName = animator.currentAnimationName
         if animName ~= "Idle" then
             animator:changeAnimation("Idle")
+            tellCameraMyAnimation("Idle")
         end
     end
+
+    -- if dvMag > dvDeadzone then
+    --
+    --     local timeToReach = isGrounded and timeToReachGround or timeToReachAir
+    --
+    --     local accelX = dvx / math.max(timeToReach, 0.0001)
+    --     local accelZ = dvz / math.max(timeToReach, 0.0001)
+    --
+    --     local accelMag = math.sqrt(accelX * accelX + accelZ * accelZ)
+    --
+    --     body:applyForce(Vector3.new(accelX * mass, 0, accelZ * mass))
+    --     local animName = animator.currentAnimationName
+    --     if animName ~= "Running" then
+    --         animator:changeAnimation("Running")
+    --         tellCameraMyAnimation("Running")
+    --     end
+    -- else
+    --     local animName = animator.currentAnimationName
+    --     if animName ~= "Idle" then
+    --         animator:changeAnimation("Idle")
+    --         tellCameraMyAnimation("Idle")
+    --     end
+    -- end
 
     -- Rotation
     if inputMag > 0 then
@@ -236,6 +274,14 @@ function onUpdate(dt)
 
         body:applyImpulse(Vector3.new(dx * mass, 0, dz * mass))
     end
+end
+
+function tellCameraMyAnimation(animName)
+    local message = Message.new()
+    message.to = cameraEntity
+    message.topic = "PlayerAnimChange"
+    message.contents = animName
+    Script.send(message)
 end
 
 function triggerLandingBurst()
