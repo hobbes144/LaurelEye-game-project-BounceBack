@@ -32,7 +32,7 @@ namespace LaurelEye::Scripting {
         lua.collect_garbage();
     }
 
-    std::unique_ptr<IScriptInstance> Sol2State::createInstance(const std::string& path, LaurelEye::Entity* owner) {
-        return std::make_unique<Sol2ScriptInstance>(lua, path, owner);
+    std::unique_ptr<IScriptInstance> Sol2State::createInstance(const std::string& path, LaurelEye::Entity* owner, LaurelEye::Scripting::ScriptComponent* scriptComp) {
+        return std::make_unique<Sol2ScriptInstance>(lua, path, owner, scriptComp);
     }
 } // namespace LaurelEye::Scripting

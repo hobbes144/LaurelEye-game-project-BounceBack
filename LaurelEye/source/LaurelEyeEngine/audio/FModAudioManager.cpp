@@ -362,9 +362,14 @@ namespace LaurelEye::Audio {
 #endif
     }
 
+    float FModAudioManager::getMasterVolume() {
+        return masterVolume;
+    }
+
     void FModAudioManager::setMasterVolume(float volume) {
+        masterVolume = volume;
         for ( const auto& pair : sounds_ ) {
-            sounds_[pair.first]->SetVolume(volume);
+            sounds_[pair.first]->SetVolume((masterVolume / 100) * sounds_[pair.first]->GetVolume());
         }
     }
 

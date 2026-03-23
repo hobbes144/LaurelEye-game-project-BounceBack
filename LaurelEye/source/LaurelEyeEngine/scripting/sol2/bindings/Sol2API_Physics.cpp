@@ -159,6 +159,7 @@ namespace LaurelEye::Scripting {
                                                       "contactNormal", &Physics::CollisionEventData::contactNormal);
 
         // Bind layer mask
+        // Leaving this here for legacy support
         sol::table Layers = lua["Layers"].get_or_create<sol::table>();
         Layers["Player"] = Physics::CollisionLayer::Player;
         Layers["Enemy"]  = Physics::CollisionLayer::Enemy;
@@ -168,6 +169,17 @@ namespace LaurelEye::Scripting {
         // Bind Raycast
         sol::table Physics = lua["Physics"].get_or_create<sol::table>();
         Physics::PhysicsSystem* physics = ctx->getService<Physics::PhysicsSystem>();
+
+        Physics.new_enum(
+            "Layers",
+            "None", Physics::CollisionLayer::None,
+            "Player", Physics::CollisionLayer::Player,
+            "Enemy", Physics::CollisionLayer::Enemy,
+            "World", Physics::CollisionLayer::World,
+            "Projectile", Physics::CollisionLayer::Projectile,
+            "Trigger", Physics::CollisionLayer::Trigger,
+            "All", Physics::CollisionLayer::All
+        );
 
         Physics.set_function("Raycast",
             [physics](sol::this_state ts,

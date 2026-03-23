@@ -18,6 +18,7 @@
 #include "LaurelEyeEngine/core/EngineContext.h"
 
 namespace LaurelEye::Scripting {
+    class ScriptComponent;
     class IScriptInstance;
     class IScriptEngineState {
     public:
@@ -31,7 +32,7 @@ namespace LaurelEye::Scripting {
 
         /// @brief Create a new script instance bound to this engine state
         /// @param path The path to the script file
-        virtual std::unique_ptr<IScriptInstance> createInstance(const std::string& path, LaurelEye::Entity* owner) = 0;
+        virtual std::unique_ptr<IScriptInstance> createInstance(const std::string& path, LaurelEye::Entity* owner, LaurelEye::Scripting::ScriptComponent* sc) = 0;
     };
 
 } // namespace LaurelEye::Scripting

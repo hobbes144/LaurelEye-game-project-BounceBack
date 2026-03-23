@@ -1,5 +1,5 @@
 ﻿{
-    "name": "Enemy1",
+    "name": "SecurityEnemy",
     "tags": [ "enemy" ],
     "components": {
         "Transform": {
@@ -9,10 +9,10 @@
         },
         "Render3D": {
             "mesh": {
-                "file": "models/BadgedEnemy/StickManBadge_Idle.fbx"
+                "file": "models/Security_Idle.fbx"
             },
             "material": {
-                "texture": "textures/EnermyBaseColor_red.png",
+                "texture": "textures/Security_tex.png",
                 "diffuse": [ 10.0, 1.0, 1.0 ],
                 "specular": [ 0.2, 0.2, 0.2 ],
                 "shininess": 32.0
@@ -64,10 +64,10 @@
         },
         "Animation": {
             "type": "Skeletal",
-            "file": [ "models/BadgedEnemy/StickManBadge_Idle.fbx", "models/StickManBadge_Throw.fbx" ]
+            "file": [ "animations/Running.fbx", "models/Security_Idle.fbx" ]
         },
         "Script": {
-            "path": "scripts/AISystem/simpleEnemy.lua"
+            "path": "scripts/AISystem/security_enemy.lua"
         }
     }
 }

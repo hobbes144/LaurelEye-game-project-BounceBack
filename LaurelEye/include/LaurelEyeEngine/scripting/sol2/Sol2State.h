@@ -21,7 +21,7 @@ namespace LaurelEye::Scripting {
     public:
         void initialize(EngineContext* ctx) override;
         void shutdown(EngineContext* ctx) override;
-        std::unique_ptr<IScriptInstance> createInstance(const std::string& path, LaurelEye::Entity* owner) override;
+        std::unique_ptr<IScriptInstance> createInstance(const std::string& path, LaurelEye::Entity* owner, LaurelEye::Scripting::ScriptComponent* sc) override;
 
         const sol::state& getState() const { return lua; }
     private:

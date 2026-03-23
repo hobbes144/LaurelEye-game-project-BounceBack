@@ -1,11 +1,29 @@
 ﻿#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Audio.h"
 #include "LaurelEyeEngine/audio/SpeakerComponent.h"
 #include "LaurelEyeEngine/audio/interfaces/IAudioManager.h"
-#include "LaurelEyeEngine/audio/FModAudioManager.h"
+#include "LaurelEyeEngine/audio/AudioSystem.h"
 
 namespace LaurelEye::Scripting {
     void Sol2API_Audio::setup(sol::state& lua, EngineContext* ctx) {
-        //FModAudioManager* audioManager = ctx->getService<FModAudioManager>();
+        Audio::IAudioManager* audioManager = ctx->getService<Audio::AudioSystem>()->getAudioManager();
+
+        // =========================
+        // AudioManager binding
+        // =========================
+        lua.new_usertype<Audio::IAudioManager>(
+            "AudioManager",
+
+            // Master Volume
+            "setMasterVolume", &Audio::IAudioManager::setMasterVolume,
+
+            // ADD THIS (you’ll want it)
+            "getMasterVolume", [](Audio::IAudioManager& self) {
+                // If you don’t already have this in interface, add it (see below)
+                return self.getMasterVolume();
+            });
+
+        // Global access point in Lua
+        lua["Audio"] = audioManager;
 
         lua.new_usertype<Audio::SpeakerComponent>(
             "SpeakerComponent",
@@ -51,7 +69,10 @@ namespace LaurelEye::Scripting {
             // --- Asset management ---
             "createAudioAsset", &Audio::SpeakerComponent::createAudioAsset,
             "loadAudioAsset", &Audio::SpeakerComponent::loadAudioAsset,
-            "loadAudioAssetImmidiate", &Audio::SpeakerComponent::loadAudioAssetImmidiate);
+            "loadAudioAssetImmidiate", &Audio::SpeakerComponent::loadAudioAssetImmidiate
+        );
+
+
 
         //lua["SpeakerComponentDefaultManager"] = audioManager;
     }

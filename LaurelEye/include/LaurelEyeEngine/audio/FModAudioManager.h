@@ -104,6 +104,7 @@ namespace LaurelEye::Audio {
         void setPlaybackSpeed(float speed) override;
         void togglePlaybackSpeed(float speed = 1) override;
         void setVolume(const std::string& name, float volume) override;
+        float getMasterVolume() override;
         void setMasterVolume(float volume) override;
         float getVolume(const std::string& name) const override;
         void setSoundPosition(const std::string& name, const Vector3& position) override;

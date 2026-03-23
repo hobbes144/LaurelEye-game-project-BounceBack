@@ -15,6 +15,8 @@ shootingSpeed = 3.0
 minShootingSpeed = 2.5
 maxShootingSpeed = 4.0
 
+hasKey = false
+
 -- State machine
 enemyAI = nil
 
@@ -42,6 +44,7 @@ function setupStateMachine()
 
     -- IDLE STATE
     idle:setOnEnter(function()
+        animator:changeAnimation("StickManBadge_Idle")
         log("Enemy idle")
     end)
 
@@ -63,7 +66,7 @@ function setupStateMachine()
     end)
 
     tracking:addTransition("toShooting", shooting, 1, function()
-        return isPlayerInRange(30.0)  -- Close enough to shoot
+        return isPlayerInRange(70.0)  -- Close enough to shoot
     end)
 
     tracking:addTransition("toIdle", idle, 2, function()
@@ -73,6 +76,7 @@ function setupStateMachine()
     -- SHOOTING STATE (rotate + shoot)
     shooting:setOnEnter(function()
         log("Enemy shooting!")
+        animator:changeAnimation("StickManBadge_Throw")
         shotTimer = 0.0
     end)
 
@@ -82,7 +86,7 @@ function setupStateMachine()
     end)
 
     shooting:addTransition("toTracking", tracking, 1, function()
-        return not isPlayerInRange(30.0)  -- Player too far
+        return not isPlayerInRange(70.0)  -- Player too far
     end)
 
 
@@ -97,6 +101,7 @@ function setupStateMachine()
     end)
 
     dead:setUpdate(function(dt)
+        -- maybe a dead Animation is good also
         -- Do nothing, already dead
     end)
 
@@ -110,6 +115,27 @@ function setupStateMachine()
     enemyAI:setInitialState("Idle")
 end
 
+function onMessage(msg)
+    if msg.topic == "I have the key!" then
+        print("Enemy has been given the key")
+        hasKey = true
+    end
+    if msg.topic == "Get Destroyed!" then
+        if enemyAI then
+            if hasKey then
+                local scene = SceneManager:getCurrentScene()
+                local player = scene:findEntityByName("PlayerPrefab")
+                local message = Message.new()
+                message.to = player
+                message.topic = "Here's the Key!"
+                Script.send(message)
+            end
+            enemyAI:forceTransition("Dead")
+        end
+    end
+
+end
+
 function onUpdate(dt)
     if enemyAI then
         enemyAI:update(dt)
@@ -117,26 +143,6 @@ function onUpdate(dt)
 end
 
 function onCollisionEnter(data)
-    local tagsA = data.entityA:getTags()
-    for _, tag in pairs(tagsA) do
-        if tag == "ball" then
-            log("Collided with Ball!")
-            -- Force transition to dead state
-            if enemyAI then
-                enemyAI:forceTransition("Dead")
-            end
-        end
-    end
-
-    local tagsB = data.entityB:getTags()
-    for _, tag in pairs(tagsB) do
-        if tag == "ball" then
-            log("Collided with Ball!")
-            if enemyAI then
-                enemyAI:forceTransition("Dead")
-            end
-        end
-    end
 end
 
 function onCollisionStay(data) end
@@ -242,9 +248,9 @@ function autoShootProjectile(dt)
         dir = forward
     end
 
-    local projBody = proj:findRigidBody()
+    local projBody = proj:findGhostBody()
     if projBody ~= nil then
-        local projectileSpeed = 100.0
+        local projectileSpeed = 80.0
         projBody:setLinearVelocity(dir * projectileSpeed)
     end
 end

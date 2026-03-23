@@ -15,6 +15,7 @@
 #include "LaurelEyeEngine/particles/ParticleEmitterComponent.h"
 #include "LaurelEyeEngine/UI/UIComponents/UITransformComponent.h"
 #include "LaurelEyeEngine/UI/UIComponents/UIRenderComponent.h"
+#include "LaurelEyeEngine/UI/UIComponents/UIInteractionComponent.h"
 #include "LaurelEyeEngine/audio/SpeakerComponent.h"
 #include "LaurelEyeEngine/ecs/IComponent.h"
 #include "LaurelEyeEngine/animation/components/SkeletalAnimationComponent.h"
@@ -68,6 +69,9 @@ namespace LaurelEye::Scripting {
         entityType.set_function("findScript", &safeFindComponent<ScriptComponent>);
         entityType.set_function("findSpeaker", &safeFindComponent<Audio::SpeakerComponent>);
         entityType.set_function("findParticleEmitter", &safeFindComponent<Particles::ParticleEmitterComponent>);
+        entityType.set_function("findUIRender", &safeFindComponent<UI::UIRenderComponent>);
+        entityType.set_function("findUITransform", &safeFindComponent<UI::UITransformComponent>);
+        entityType.set_function("findUIInteraction", &safeFindComponent<UI::UIInteractionComponent>);
         entityType.set_function("findAudioSpeaker", &safeFindComponent<Audio::SpeakerComponent>);
         entityType.set_function("findPointLight", &safeFindComponent<Graphics::PointLightComponent>);
         entityType.set_function("findAnimator", &safeFindComponent<Animations::SkeletalAnimationComponent>);

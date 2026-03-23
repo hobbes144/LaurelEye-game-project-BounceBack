@@ -15,10 +15,12 @@ namespace LaurelEye::Scripting {
 
     Sol2ScriptInstance::Sol2ScriptInstance(
         sol::state& luaState, const std::string& scriptPath,
-        LaurelEye::Entity* owner_)
+        LaurelEye::Entity* owner_, ScriptComponent* sc)
         : lua(luaState),
         env(luaState, sol::create, luaState.globals()),
         owner(owner_) {
+
+        scriptComp = sc;
 
         Sol2API::registerEnvironment(env, owner);
         // TODO: somehow let AssetManager do this?
@@ -35,8 +37,6 @@ namespace LaurelEye::Scripting {
         LE_ASSERT("Scripting", scriptLoadResult.valid(), "Failed to load file: " << scriptPath);
 
         //Serialized Data
-        ScriptComponent* scriptComp = owner->findComponent<ScriptComponent>();
-
         if ( scriptComp ) {
 
             //Proxy Table for Serialized Variables
@@ -44,7 +44,7 @@ namespace LaurelEye::Scripting {
 
             //Read Access (Called when a value is accessed)
             serializedProxy[sol::meta_function::index] =
-                [this, scriptComp](const std::string& key) -> sol::object {
+                [this](const std::string& key) -> sol::object {
                 ScriptValue* val = scriptComp->getSerializedValue(key);
 
                 if ( !val ) {
@@ -58,11 +58,11 @@ namespace LaurelEye::Scripting {
 
             //Write Access (Called when a value is assigned)
             serializedProxy[sol::meta_function::new_index] =
-                [this, scriptComp](const std::string& key, sol::object value) {
+                [this](const std::string& key, sol::object value) {
                     ScriptValue newValue = ToScriptValueFromLua(value);
 
                     scriptComp->setSerializedValue(key, newValue);
-                };
+            };
 
             for ( const auto& [key, value] : scriptComp->getAllSerializedData() ) {
                 serializedProxy[key] = ToLuaFromScriptValue(value);

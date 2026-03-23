@@ -28,13 +28,6 @@ function onMessage(msg)
     if msg.topic == "I am kicking you!" then
         print("Bouncing Away!")
         bounceCount = 0
-        gravityDisabled = false
-        homingTimer = nil
-
-        -- restore gravity if needed
-        local data = body:getBodyData()
-        data.gravityScale = 1.0
-        body:setBodyData(data)
     end
 end
 
@@ -63,30 +56,6 @@ function onTriggerEnter(data)
     if body == nil then return end
 
     if (isGround(data.entityA) or isGround(data.entityB)) then
-        
-        -- After 2 bounces, home to player
-        if bounceCount >= 2 then
-
-            local ballPos = transform:getWorldPosition()
-            local playerPos = playerTransform:getWorldPosition()
-            playerPos = Vector3.new(playerPos.x, 4.5, playerPos.z)
-            local newGrav = Vector3.new(0.0, 0.0, 0.0)
-            body:setGravityScale(newGrav)
-
-            local dir = playerPos - ballPos
-
-            if dir:Magnitude() > 0 then
-                dir = dir:Normalized()
-                body:setLinearVelocity(dir * returnSpeed)
-            end
-
-            -- Start the homing timer if not already running
-            if homingTimer == nil then
-                homingTimer = 0.0
-            end
-
-            return
-        end
 
         local vel = body:getLinearVelocity()
         local normal = data.normal or data.contactNormal
@@ -102,6 +71,13 @@ function onTriggerEnter(data)
         end
 
         body:setLinearVelocity(reflected)
+
+        if bounceCount == 1 then
+            local message = Message.new()
+            message.to = playerEntity
+            message.topic = "FirstBounce"
+            Script.send(message)
+        end
 
         bounceCount = bounceCount + 1
     end
@@ -119,6 +95,21 @@ function isGround(entity)
             GameManager:addGeneratorDestroyed(1)
             local gensDestroyed = GameManager:getGeneratorsDestroyed()
             print(gensDestroyed)
+            return true
+        end
+        if tag == "enemy" then
+            local message = Message.new()
+            message.to = entity
+            log("Get Script Hit")
+            message.topic = "Get Hit!"
+            Script.send(message)
+            return true
+        end
+        if tag == "shield" then
+            local message = Message.new()
+            message.to = entity
+            message.topic = "Bonk!"
+            Script.send(message)
             return true
         end
         if tag == "door" then

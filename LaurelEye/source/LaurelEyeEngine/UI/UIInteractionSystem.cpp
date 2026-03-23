@@ -208,11 +208,13 @@ namespace LaurelEye::UI {
                 const auto& data = event.GetData();
                 assert(data.entityRef);
 
-                if ( auto* scriptA = data.entityRef->findComponent<Scripting::ScriptComponent>() ) {
-                    if ( auto* instance = scriptA->getScriptInstance() ) {
+                auto scripts = data.entityRef->findAllComponents<Scripting::ScriptComponent>();
+
+                for ( auto* script : scripts ) {
+                    if ( auto* instance = script->getScriptInstance() ) {
                         instance->onHoverEnter(data);
                     }
-                }               
+                }              
 
             });
 
@@ -221,8 +223,10 @@ namespace LaurelEye::UI {
                 const auto& data = event.GetData();
                 assert(data.entityRef);
 
-                if ( auto* scriptA = data.entityRef->findComponent<Scripting::ScriptComponent>() ) {
-                    if ( auto* instance = scriptA->getScriptInstance() ) {
+                auto scripts = data.entityRef->findAllComponents<Scripting::ScriptComponent>();
+
+                for ( auto* script : scripts ) {
+                    if ( auto* instance = script->getScriptInstance() ) {
                         instance->onHoverExit(data);
                     }
                 }
@@ -233,8 +237,10 @@ namespace LaurelEye::UI {
                 const auto& data = event.GetData();
                 assert(data.entityRef);
 
-                if ( auto* scriptA = data.entityRef->findComponent<Scripting::ScriptComponent>() ) {
-                    if ( auto* instance = scriptA->getScriptInstance() ) {
+                auto scripts = data.entityRef->findAllComponents<Scripting::ScriptComponent>();
+
+                for ( auto* script : scripts ) {
+                    if ( auto* instance = script->getScriptInstance() ) {
                         instance->onPressed(data);
                     }
                 }
@@ -245,8 +251,10 @@ namespace LaurelEye::UI {
                 const auto& data = event.GetData();
                 assert(data.entityRef);
 
-                if ( auto* scriptA = data.entityRef->findComponent<Scripting::ScriptComponent>() ) {
-                    if ( auto* instance = scriptA->getScriptInstance() ) {
+                auto scripts = data.entityRef->findAllComponents<Scripting::ScriptComponent>();
+
+                for ( auto* script : scripts ) {
+                    if ( auto* instance = script->getScriptInstance() ) {
                         instance->onHeld(data);
                     }
                 }
@@ -257,8 +265,10 @@ namespace LaurelEye::UI {
                 const auto& data = event.GetData();
                 assert(data.entityRef);
 
-                if ( auto* scriptA = data.entityRef->findComponent<Scripting::ScriptComponent>() ) {
-                    if ( auto* instance = scriptA->getScriptInstance() ) {
+                auto scripts = data.entityRef->findAllComponents<Scripting::ScriptComponent>();
+
+                for ( auto* script : scripts ) {
+                    if ( auto* instance = script->getScriptInstance() ) {
                         instance->onReleased(data);
                     }
                 }
@@ -269,8 +279,10 @@ namespace LaurelEye::UI {
                 const auto& data = event.GetData();
                 assert(data.entityRef);
 
-                if ( auto* scriptA = data.entityRef->findComponent<Scripting::ScriptComponent>() ) {
-                    if ( auto* instance = scriptA->getScriptInstance() ) {
+                auto scripts = data.entityRef->findAllComponents<Scripting::ScriptComponent>();
+
+                for ( auto* script : scripts ) {
+                    if ( auto* instance = script->getScriptInstance() ) {
                         instance->onClicked(data);
                     }
                 }
@@ -281,8 +293,10 @@ namespace LaurelEye::UI {
                 const auto& data = event.GetData();
                 assert(data.entityRef);
 
-                if ( auto* scriptA = data.entityRef->findComponent<Scripting::ScriptComponent>() ) {
-                    if ( auto* instance = scriptA->getScriptInstance() ) {
+                auto scripts = data.entityRef->findAllComponents<Scripting::ScriptComponent>();
+
+                for ( auto* script : scripts ) {
+                    if ( auto* instance = script->getScriptInstance() ) {
                         instance->onDragStart(data);
                     }
                 }
@@ -293,8 +307,10 @@ namespace LaurelEye::UI {
                 const auto& data = event.GetData();
                 assert(data.entityRef);
 
-                if ( auto* scriptA = data.entityRef->findComponent<Scripting::ScriptComponent>() ) {
-                    if ( auto* instance = scriptA->getScriptInstance() ) {
+                auto scripts = data.entityRef->findAllComponents<Scripting::ScriptComponent>();
+
+                for ( auto* script : scripts ) {
+                    if ( auto* instance = script->getScriptInstance() ) {
                         instance->onDragging(data);
                     }
                 }
@@ -305,8 +321,10 @@ namespace LaurelEye::UI {
                 const auto& data = event.GetData();
                 assert(data.entityRef);
 
-                if ( auto* scriptA = data.entityRef->findComponent<Scripting::ScriptComponent>() ) {
-                    if ( auto* instance = scriptA->getScriptInstance() ) {
+                auto scripts = data.entityRef->findAllComponents<Scripting::ScriptComponent>();
+
+                for ( auto* script : scripts ) {
+                    if ( auto* instance = script->getScriptInstance() ) {
                         instance->onDragEnd(data);
                     }
                 }
@@ -317,8 +335,10 @@ namespace LaurelEye::UI {
                 const auto& data = event.GetData();
                 assert(data.entityRef);
 
-                if ( auto* scriptA = data.entityRef->findComponent<Scripting::ScriptComponent>() ) {
-                    if ( auto* instance = scriptA->getScriptInstance() ) {
+                auto scripts = data.entityRef->findAllComponents<Scripting::ScriptComponent>();
+
+                for ( auto* script : scripts ) {
+                    if ( auto* instance = script->getScriptInstance() ) {
                         instance->onFocusGained(data);
                     }
                 }
@@ -329,8 +349,10 @@ namespace LaurelEye::UI {
                 const auto& data = event.GetData();
                 assert(data.entityRef);
 
-                if ( auto* scriptA = data.entityRef->findComponent<Scripting::ScriptComponent>() ) {
-                    if ( auto* instance = scriptA->getScriptInstance() ) {
+                auto scripts = data.entityRef->findAllComponents<Scripting::ScriptComponent>();
+
+                for ( auto* script : scripts ) {
+                    if ( auto* instance = script->getScriptInstance() ) {
                         instance->onFocusLost(data);
                     }
                 }

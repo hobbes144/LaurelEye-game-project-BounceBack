@@ -8,7 +8,6 @@ end
 function onUpdate()
     if scene == nil then
         scene = SceneManager:getCurrentScene()
-        if scene == nil then return end
         local sceneName = scene:getName()
         if sceneName == "Level1" then
             setupLevel1()
@@ -23,8 +22,6 @@ function onUpdate()
         elseif sceneName == "Level6" then
             setupLevel6()
         end
-    else
-        checkTargets()
     end
 end
 
@@ -49,18 +46,10 @@ function setupLevel1()
     local enemyTransform = enemy:findTransform()
     enemyTransform:setWorldPosition(30.0, 0.0, -30.0)
 
-    --Target setup
- --   local t1 = SceneManager:instantiate("prefabs/generator.prefab.json")
- --   local t1Transform = t1:findTransform()
- --   t1Transform:setWorldPosition(-20.0, 25.0, -48.0)
-
- --   local t2 = SceneManager:instantiate("prefabs/generator.prefab.json")
- --   local t2Transform = t2:findTransform()
- --   t2Transform:setWorldPosition(20.0, 25.0, -48.0)
-
- --   local t3 = SceneManager:instantiate("prefabs/generator.prefab.json")
- --   local t3Transform = t3:findTransform()
- --   t3Transform:setWorldPosition(0.0, 10.0, -48.0)
+    local message = Message.new()
+    message.to = enemy
+    message.topic = "I have the key!"
+    Script.send(message)
 end
 
 function setupLevel2()
@@ -82,30 +71,11 @@ function setupLevel2()
     --Enemy setup
     local e1 = SceneManager:instantiate("prefabs/shooting_enemy.prefab.json")
     local e1Transform = e1:findTransform()
-    e1Transform:setWorldPosition(0.0, 0.0, -30.0)
+    e1Transform:setWorldPosition(56.35, 6.831, 28.497)
 
     local e2 = SceneManager:instantiate("prefabs/shooting_enemy.prefab.json")
     local e2Transform = e2:findTransform()
-    e2Transform:setWorldPosition(-30.0, 0.0, 10.0)
-
-    local e3 = SceneManager:instantiate("prefabs/shooting_enemy.prefab.json")
-    local e3Transform = e3:findTransform()
-    e3Transform:setWorldPosition(30.0, 0.0, 10.0)
-
-    --Target setup
-    local t1 = SceneManager:instantiate("prefabs/generator.prefab.json")
-    local t1Transform = t1:findTransform()
-    t1Transform:setWorldPosition(73.0, 15.0, -30.0)
-    t1Transform:setWorldScale(2.0, 10.0, 20.0)
-
-    local t2 = SceneManager:instantiate("prefabs/generator.prefab.json")
-    local t2Transform = t2:findTransform()
-    t2Transform:setWorldPosition(-73.0, 15.0, -30.0)
-    t2Transform:setWorldScale(2.0, 10.0, 20.0)
-
-    local t3 = SceneManager:instantiate("prefabs/generator.prefab.json")
-    local t3Transform = t3:findTransform()
-    t3Transform:setWorldPosition(0.0, 15.0, -48.0)
+    e2Transform:setWorldPosition(39.445, 6.831, 43.24)
 end
 
 function setupLevel3()
@@ -127,75 +97,61 @@ function setupLevel3()
     --Enemy setup
     local e1 = SceneManager:instantiate("prefabs/shooting_enemy.prefab.json")
     local e1Transform = e1:findTransform()
-    e1Transform:setWorldPosition(60.0, 0.0, -40.0)
+    e1Transform:setWorldPosition(-13.225, 6.831, -40.595)
 
     local e2 = SceneManager:instantiate("prefabs/shooting_enemy.prefab.json")
     local e2Transform = e2:findTransform()
-    e2Transform:setWorldPosition(-60.0, 0.0, -40.0)
-
-    local e3 = SceneManager:instantiate("prefabs/shooting_enemy.prefab.json")
-    local e3Transform = e3:findTransform()
-    e3Transform:setWorldPosition(10.0, 0.0, -10.0)
-
-    local e4 = SceneManager:instantiate("prefabs/shooting_enemy.prefab.json")
-    local e4Transform = e4:findTransform()
-    e4Transform:setWorldPosition(-10.0, 0.0, -10.0)
-
-    --Target setup
-    local t1 = SceneManager:instantiate("prefabs/generator.prefab.json")
-    local t1Transform = t1:findTransform()
-    t1Transform:setWorldPosition(60.0, 25.0, -83.0)
-
-    local t2 = SceneManager:instantiate("prefabs/generator.prefab.json")
-    local t2Transform = t2:findTransform()
-    t2Transform:setWorldPosition(-60.0, 25.0, -83.0)
-
-    local t3 = SceneManager:instantiate("prefabs/generator.prefab.json")
-    local t3Transform = t3:findTransform()
-    t3Transform:setWorldPosition(0.0, 25.0, -83.0)
+    e2Transform:setWorldPosition(55.775, 6.831, -5.06)
 end
 
 function setupLevel4()
-    --TODO: Edit when merging
+    print("STARTING SETUP FOR LEVEL 4")
+    local player = SceneManager:instantiate("prefabs/catch_player.prefab.json")
+    local playerTransform = player:findTransform()
+
+    local scene = SceneManager:getCurrentScene()
+    if scene == nil then return end
+    local spawnPoint = scene:findEntityByName("SpawnPoint")
+    local spawnTrans = spawnPoint:findTransform()
+    local spawnPos = spawnTrans:getWorldPosition()
+
+    playerTransform:setWorldPosition(spawnPos.x, spawnPos.y, spawnPos.z)
+
+    local camera = SceneManager:instantiate("prefabs/tpcamera.prefab.json")
+
+    local e1 = SceneManager:instantiate("prefabs/shooting_enemy.prefab.json")
+    local e1Transform = e1:findTransform()
+    e1Transform:setWorldPosition(43.01, 6.831, -14.145)
+
+    local e2 = SceneManager:instantiate("prefabs/shooting_enemy.prefab.json")
+    local e2Transform = e2:findTransform()
+    e2Transform:setWorldPosition(31.625, 6.831, 2.185)
+
+    local e3 = SceneManager:instantiate("prefabs/shooting_enemy.prefab.json")
+    local e3Transform = e3:findTransform()
+    e3Transform:setWorldPosition(-25.806, 6.831, 50.7955)
 end
 
 function setupLevel5()
-    --TODO: Edit when merging
+    print("STARTING SETUP FOR LEVEL 4")
+    local player = SceneManager:instantiate("prefabs/catch_player.prefab.json")
+    local playerTransform = player:findTransform()
+
+    local scene = SceneManager:getCurrentScene()
+    if scene == nil then return end
+    local spawnPoint = scene:findEntityByName("SpawnPoint")
+    local spawnTrans = spawnPoint:findTransform()
+    local spawnPos = spawnTrans:getWorldPosition()
+
+    playerTransform:setWorldPosition(spawnPos.x, spawnPos.y, spawnPos.z)
+
+    local camera = SceneManager:instantiate("prefabs/tpcamera.prefab.json")
+
+    local e1 = SceneManager:instantiate("prefabs/security_enemy.prefab.json")
+    local e1Transform = e1:findTransform()
+    e1Transform:setWorldPosition(35.42, 6.831, -113.045)
 end
 
 function setupLevel6()
     --TODO: Edit when merging
-end
-
-function checkTargets()
-    local anyTargets = targetCheck()
-    if not doorSpawned and not anyTargets then
-        local scene = SceneManager:getCurrentScene()
-        if scene == nil then return end
-        local sceneName = scene:getName()
-        if sceneName == "Level4" then
-            print("Level 4 Shenanigans")
-        else
-            local doorSpawn = scene:findEntityByName("DoorSpawn")
-            local spawnTrans = doorSpawn:findTransform()
-            local doorPos = spawnTrans:getWorldPosition()
-
-            local door = SceneManager:instantiate("prefabs/door.prefab.json")
-            local doorTrans = door:findTransform()
-            doorTrans:setWorldPosition(doorPos.x, doorPos.y, doorPos.z)
-            doorSpawned = true
-        end
-    end
-end
-
-function targetCheck()
-    local scene = SceneManager:getCurrentScene()
-    if scene == nil then return end
-
-    local targetList = scene:findEntitiesWithTag("target")
-    if #targetList == 0 then
-        return false
-    end
-
-    return true
 end

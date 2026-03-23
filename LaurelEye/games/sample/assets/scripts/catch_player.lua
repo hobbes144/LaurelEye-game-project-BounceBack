@@ -38,6 +38,8 @@ hasBall = true
 ballCreated = false
 baseProjSpeed = 75.0
 projectileSpeed = baseProjSpeed
+---@type Vector3
+local ballGravity = Vector3.new(0.0, 9.8, 0.0)
 
 --damage variables
 maxHealth = 3.0
@@ -50,13 +52,19 @@ dashDuration = 0.25
 dashTimer = 0.0
 isDashing = false
 
+local TrajectoryLine = require("TrajectoryLine")
+---@type TrajectoryLine|nil
+local trajectoryLine = nil
+
+hasKey = false
+
 function onStart()
     transform = self:findTransform()
     body = self:findRigidBody()
 
     animator = self:findAnimator()
     if animator == nil then return end
-    animator:changeAnimation("Idle")
+    animator:changeAnimation("MainChar2_Idle")
 
     smokeEmitter = self:findParticleEmitter()
 
@@ -71,6 +79,9 @@ function onStart()
     end
 
     speaker = self:findAudioSpeaker()
+
+    trajectoryLine = TrajectoryLine.new()
+    ballGravity = Vector3.new(0, -1.5*9.8, 0)
 
     currentHealth = GameManager:getPlayerHealth()
     moveHealthBar()
@@ -93,6 +104,19 @@ function onMessage(msg)
             invincible = true
             moveHealthBar()
         end
+    end
+
+    if msg.topic == "Here's the Key!" then
+        print("Player has the key!")
+        hasKey = true
+        local scene = SceneManager:getCurrentScene()
+        local ballInd = scene:findEntityByName("KeyIndicator")
+        local uiRender = ballInd:findComponent("UIRenderComponent")
+        uiRender:setTransparency(1.0)
+    end
+
+    if trajectoryLine ~= nil then
+        trajectoryLine:ballCallback(msg)
     end
 end
 
@@ -157,6 +181,34 @@ function onUpdate(dt)
         (Input:isKeyHeld(Key.W) and 1 or 0) -
         (Input:isKeyHeld(Key.S) and 1 or 0)
 
+    if hasBall and trajectoryLine ~= nil then
+
+        if not Input:isMouseButtonHeld(MouseButton.Right) then
+            trajectoryLine:resetLine()
+        else
+            local targetPoint = cameraAim(1000.0)
+
+            -- projectile spawn (player / weapon space)
+            local spawnHeight = 8.0
+            local spawnForward = 4.0
+
+            ---@type Vector3
+            local playerPos = transform:getWorldPosition()
+            ---@type Vector3
+            local aimDir = findForward()
+
+            ---@type Vector3
+            local spawnPos = playerPos + Vector3.new(0, spawnHeight, 0) + aimDir * spawnForward
+
+            local shootDir = (targetPoint - spawnPos)
+            if shootDir:Magnitude() <= 0.0001 then
+                return
+            end
+            shootDir = shootDir:Normalized()
+            trajectoryLine:updateTrajectory(spawnPos, shootDir, projectileSpeed, 1.0, ballGravity)
+        end
+    end
+
     if Input:isMouseButtonPressed(MouseButton.Left) then
         if hasBall then
             shootProjectile()
@@ -213,15 +265,13 @@ function onUpdate(dt)
 
     if inputMag > 0.01 then
         local animName = animator.currentAnimationName
-        if animName ~= "Running" then
-            animator:changeAnimation("Running")
-            tellCameraMyAnimation("Running")
+        if animName ~= "MainChar2_Running" then
+            animator:changeAnimation("MainChar2_Running")
         end
     else
         local animName = animator.currentAnimationName
-        if animName ~= "Idle" then
-            animator:changeAnimation("Idle")
-            tellCameraMyAnimation("Idle")
+        if animName ~= "MainChar2_Idle" then
+            animator:changeAnimation("MainChar2_Idle")
         end
     end
 
@@ -367,7 +417,7 @@ function shootProjectile()
     local projBody = proj:findGhostBody()
     if projBody ~= nil then
         print("Shooting Projectile")
-        projBody:setLinearVelocity(shootDir * projectileSpeed)
+        projBody:setLinearVelocity(shootDir * baseProjSpeed)
     end
 end
 
@@ -382,8 +432,9 @@ function onCollisionEnter(data)
             isGrounded = true
             jumping = false
         elseif tag == "door" then
-            SceneManager:destroy(data.entityB)
-            changeLevels()
+            --if hasKey then
+                changeLevels()
+            --end
         end
     end
 
@@ -396,8 +447,9 @@ function onCollisionEnter(data)
             isGrounded = true
             jumping = false
         elseif tag == "door" then
-            SceneManager:destroy(data.entityB)
-            changeLevels()
+            --if hasKey then
+                changeLevels()
+            --end
         end
     end
 
@@ -447,7 +499,11 @@ function changeLevels()
     elseif sceneName == "Level2" then
         SceneManager:changeScene("Level3")
     elseif sceneName == "Level3" then
-        log("Alpha Completed!")
+        SceneManager:changeScene("Level4")
+    elseif sceneName == "Level4" then
+        SceneManager:changeScene("Level5")
+    elseif sceneName == "Level5" then
+        log("Beta Completed!")
     end
 end
 
@@ -477,37 +533,63 @@ function kickBack()
     local scene = SceneManager:getCurrentScene()
     if scene == nil then return end
 
-    local ball = scene:findEntityByName("Ball")
-    if ball == nil then return end
-
     local initialPos = transform:getWorldPosition()
     local playerPos = Vector3.new(initialPos.x, 4.5, initialPos.z)
-    local ballTransform = ball:findTransform()
-    local ballPos = ballTransform:getWorldPosition()
 
-    local distVec = ballPos - playerPos
-    local dist = distVec:Magnitude()
-    print(dist)
-    if dist < 20.0 then
-        print("Kicked Back!")
-        -- Get the camera's aim direction (reusing your existing cameraAim logic)
-        local targetPoint = cameraAim(1000.0)
-        if targetPoint == nil then return end
+    -- Get the camera aim direction early, so we can reuse it
+    local targetPoint = cameraAim(1000.0)
+    if targetPoint == nil then return end
 
-        local ballBody = ball:findGhostBody()
-        if ballBody == nil then return end
+    -- Find the player's ball and kick it if in range
+    local ball = scene:findEntityByName("Ball")
+    if ball ~= nil then
+        local ballTransform = ball:findTransform()
+        local ballPos = ballTransform:getWorldPosition()
+        local dist = (ballPos - playerPos):Magnitude()
 
-        local kickDir = (targetPoint - ballPos)
-        if kickDir:Magnitude() <= 0.0001 then return end
-        kickDir = kickDir:Normalized()
+        if dist < 20.0 then
+            print("Kicked Back!")
+            local ballBody = ball:findGhostBody()
+            if ballBody ~= nil then
+                local kickDir = (targetPoint - ballPos)
+                if kickDir:Magnitude() > 0.0001 then
+                    kickDir = kickDir:Normalized()
+                    ballBody:setLinearVelocity(kickDir * baseProjSpeed)
+                    local message = Message.new()
+                    message.to = ball
+                    message.topic = "I am kicking you!"
+                    Script.send(message)
+                end
+            end
+        end
+    end
 
-        projectileSpeed = projectileSpeed + 30.0 -- faster than a normal shot
-        ballBody:setLinearVelocity(kickDir * projectileSpeed)
+    -- Find all enemy projectiles by tag and kick any within range
+    local projectiles = scene:findEntitiesWithTag("bullet")
+    print(projectiles)
+    if projectiles == nil then return end
 
-        -- Reset the ball's bounce count so it behaves as a fresh kick
-    local message = Message.new()
-        message.to = ball
-        message.topic = "I am kicking you!"
-        Script.send(message)
+    for _, projectile in ipairs(projectiles) do
+        local projTransform = projectile:findTransform()
+        if projTransform ~= nil then
+            local projPos = projTransform:getWorldPosition()
+            local dist = (projPos - playerPos):Magnitude()
+
+            if dist < 20.0 then
+                print("Kicked enemy projectile back!")
+                local projBody = projectile:findGhostBody()
+                if projBody ~= nil then
+                    local kickDir = (targetPoint - projPos)
+                    if kickDir:Magnitude() > 0.0001 then
+                        kickDir = kickDir:Normalized()
+                        projBody:setLinearVelocity(kickDir * baseProjSpeed)
+                        local message = Message.new()
+                        message.to = projectile
+                        message.topic = "I am kicking you!"
+                        Script.send(message)
+                    end
+                end
+            end
+        end
     end
 end

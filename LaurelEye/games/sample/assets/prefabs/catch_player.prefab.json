@@ -9,7 +9,7 @@
         },
         "Render3D": {
             "mesh": {
-                "file": "models/MainChar_Idle.fbx"
+                "file": "models/player/MainChar2_Idle.fbx"
             },
             "material": {
                 "texture": "textures/MainChar_tex.png",
@@ -90,7 +90,7 @@
             },
             "Animation": {
                 "type": "Skeletal",
-                "file": [ "animations/Running.fbx", "models/Idle.fbx" ]
+                "file": [ "models/player/MainChar2_Running.fbx", "models/player/MainChar2_Idle.fbx" ]
             },
             "Script": {
                 "path": "scripts/catch_player.lua"

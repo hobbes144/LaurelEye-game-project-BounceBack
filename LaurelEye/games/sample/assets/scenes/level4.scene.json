@@ -98,25 +98,6 @@
             }
         },
         {
-            "name": "KeyIndicator",
-            "components": {
-                "UITransform": {
-                    "anchorMin": [ 0.0, 1.0 ],
-                    "anchorMax": [ 0.0, 1.0 ],
-                    "pivot": [ 0.5, 0.5 ],
-                    "offset": [ 45, -150 ],
-                    "size": [ 30, 30 ]
-                },
-                "UIRender": {
-                    "material": {
-                        "texture": "textures/texture_01_purple.png",
-                        "layer": 10
-                    },
-                    "transparency": 0.0
-                }
-            }
-        },
-        {
             "name": "HCrosshair",
             "components": {
                 "UITransform": {
@@ -132,6 +113,16 @@
                         "layer": 10
                     },
                     "transparency": 0.5
+                }
+            }
+        },
+        {
+            "name": "DoorSpawn",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 10.0, -49.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 0.08, 0.08, 0.08 ]
                 }
             }
         },
@@ -178,7 +169,7 @@
             "name": "SpawnPoint",
             "components": {
                 "Transform": {
-                    "position": [ -40.0, 0.0, -15.0 ],
+                    "position": [ 68.5745, -0.6900001, -62.345 ],
                     "rotation": [ 0.0, 0.0, 0.0, 0.0 ],
                     "scale": [ 0.08, 0.08, 0.08 ]
                 }
@@ -229,17 +220,14 @@
                 }
             }
         },
-
-
-
         {
             "name": "westWall",
             "tags": [ "ground" ],
             "components": {
                 "Transform": {
-                    "position": [ 1.265002, -15.295, -54.50999 ],
+                    "position": [ -25.0585, -15.295, -3.4385 ],
                     "rotation": [ -0.7071068, 0, 0.7071069, 0 ],
-                    "scale": [ -0.115, 1.805395, -1.547815 ]
+                    "scale": [ -0.115, 1.805395, -0.9168395 ]
                 },
                 "Render3D": {
                     "mesh": {
@@ -260,49 +248,7 @@
                         "size": {
                             "x": 20,
                             "y": 784.9542,
-                            "z": 1345.927
-                        }
-                    },
-                    "mass": 0.0,
-                    "linearDamping": 0.0,
-                    "angularDamping": 0.0,
-                    "friction": 0.0,
-                    "restitution": 0.0,
-                    "collisionGroup": 4,
-                    "collisionMask": 11,
-                    "gravityScale": 0.0
-                }
-            }
-        },
-        {
-            "name": "northWall",
-            "tags": [ "ground" ],
-            "components": {
-                "Transform": {
-                    "position": [ 48.3, -15.295, -9.89 ],
-                    "rotation": [ -1, 0, 0, 0 ],
-                    "scale": [ -0.115, 1.805395, -1.547815 ]
-                },
-                "Render3D": {
-                    "mesh": {
-                        "name": "wall-low",
-                        "file": "models/wall-low.fbx"
-                    },
-                    "material": {
-                        "texture": "textures/arcadeColormap.png",
-                        "diffuse": [ 1.0, 10.0, 1.0 ],
-                        "specular": [ 0.2, 0.2, 0.2 ],
-                        "shininess": 32.0
-                    }
-                },
-                "Physics": {
-                    "type": "Static",
-                    "shapeDefinition": {
-                        "type": "Box",
-                        "size": {
-                            "x": 20,
-                            "y": 784.9542,
-                            "z": 1345.926
+                            "z": 100
                         }
                     },
                     "mass": 0.0,
@@ -321,7 +267,7 @@
             "tags": [ "ground" ],
             "components": {
                 "Transform": {
-                    "position": [ -54.717, -15.295, -10.6605 ],
+                    "position": [ -54.717, -15.295, 5.06 ],
                     "rotation": [ -1, 0, 0, 0 ],
                     "scale": [ -0.115, 1.805395, -1.547815 ]
                 },
@@ -344,7 +290,91 @@
                         "size": {
                             "x": 20,
                             "y": 784.9542,
-                            "z": 1345.926
+                            "z": 100
+                        }
+                    },
+                    "mass": 0.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.0,
+                    "restitution": 0.0,
+                    "collisionGroup": 4,
+                    "collisionMask": 11,
+                    "gravityScale": 0.0
+                }
+            }
+        },
+        {
+            "name": "southWall (1)",
+            "tags": [ "ground" ],
+            "components": {
+                "Transform": {
+                    "position": [ 20.585, -15.295, -79.6785 ],
+                    "rotation": [ -1, 0, 0, 0 ],
+                    "scale": [ -0.115, 1.805395, -1.547815 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "wall-low",
+                        "file": "models/wall-low.fbx"
+                    },
+                    "material": {
+                        "texture": "textures/arcadeColormap.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 20,
+                            "y": 784.9542,
+                            "z": 100
+                        }
+                    },
+                    "mass": 0.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.0,
+                    "restitution": 0.0,
+                    "collisionGroup": 4,
+                    "collisionMask": 11,
+                    "gravityScale": 0.0
+                }
+            }
+        },
+        {
+            "name": "southWall (2)",
+            "tags": [ "ground" ],
+            "components": {
+                "Transform": {
+                    "position": [ 100.51, -15.295, 0.69 ],
+                    "rotation": [ -1, 0, 0, 0 ],
+                    "scale": [ -0.115, 1.805395, -3.203976 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "wall-low",
+                        "file": "models/wall-low.fbx"
+                    },
+                    "material": {
+                        "texture": "textures/arcadeColormap.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 20,
+                            "y": 784.9542,
+                            "z": 2786.066
                         }
                     },
                     "mass": 0.0,
@@ -363,9 +393,9 @@
             "tags": [ "ground" ],
             "components": {
                 "Transform": {
-                    "position": [ -10.58, -15.295, 61.1455 ],
+                    "position": [ -10.58, -15.295, 69.69 ],
                     "rotation": [ -0.7071068, 0, 0.7071068, 0 ],
-                    "scale": [ -0.115, 1.805395, -1.547815 ]
+                    "scale": [ -0.115, 1.805395, -2.445393 ]
                 },
                 "Render3D": {
                     "mesh": {
@@ -386,7 +416,7 @@
                         "size": {
                             "x": 20,
                             "y": 784.9542,
-                            "z": 1345.927
+                            "z": 2126.429
                         }
                     },
                     "mass": 0.0,
@@ -401,13 +431,13 @@
             }
         },
         {
-            "name": "ceiling",
+            "name": "eastWall (1)",
             "tags": [ "ground" ],
             "components": {
                 "Transform": {
-                    "position": [ -62.905, 47.78251, 3.68 ],
-                    "rotation": [ -0.7071068, 0, 0, 0.7071068 ],
-                    "scale": [ -0.115, 2.196286, -1.954007 ]
+                    "position": [ -10.58, -15.295, -95.56501 ],
+                    "rotation": [ -0.7071068, 0, 0.7071068, 0 ],
+                    "scale": [ -0.115, 1.805395, -2.445393 ]
                 },
                 "Render3D": {
                     "mesh": {
@@ -427,8 +457,8 @@
                         "type": "Box",
                         "size": {
                             "x": 20,
-                            "y": 954.907,
-                            "z": 1699.136
+                            "y": 784.9542,
+                            "z": 2126.429
                         }
                     },
                     "mass": 0.0,
@@ -443,18 +473,18 @@
             }
         },
         {
-            "name": "column",
+            "name": "ceiling",
             "tags": [ "ground" ],
             "components": {
                 "Transform": {
-                    "position": [ -39.169, -0.4599996, 43.9645 ],
-                    "rotation": [ -1, 0, 0, 0 ],
-                    "scale": [ 0.15413, 0.443, 0.16142 ]
+                    "position": [ -62.905, 44.505, 3.68 ],
+                    "rotation": [ -0.7071068, 0, 0, 0.7071068 ],
+                    "scale": [ -0.161759, 3.490595, -2.748506 ]
                 },
                 "Render3D": {
                     "mesh": {
-                        "name": "column",
-                        "file": "models/column.fbx"
+                        "name": "wall-low",
+                        "file": "models/wall-low.fbx"
                     },
                     "material": {
                         "texture": "textures/arcadeColormap.png",
@@ -466,18 +496,21 @@
                 "Physics": {
                     "type": "Static",
                     "shapeDefinition": {
-                        "type": "Capsule",
-                        "radius": 40.93788,
-                        "height": 520.811
+                        "type": "Box",
+                        "size": {
+                            "x": 28.132,
+                            "y": 1517.65,
+                            "z": 2390.005
+                        }
                     },
-                    "mass": 1.0,
+                    "mass": 0.0,
                     "linearDamping": 0.0,
                     "angularDamping": 0.0,
                     "friction": 0.0,
                     "restitution": 0.0,
                     "collisionGroup": 4,
                     "collisionMask": 11,
-                    "gravityScale": 1.0
+                    "gravityScale": 0.0
                 }
             }
         },
@@ -485,8 +518,8 @@
             "name": "entrance",
             "components": {
                 "Transform": {
-                    "position": [ -52.854, -0.6900001, -14.5015 ],
-                    "rotation": [ -0.7071068, 0, 0.7071068, 0 ],
+                    "position": [ 68.5745, -0.6900001, -92.345 ],
+                    "rotation": [ 0, 0, -1, 0 ],
                     "scale": [ -0.1855137, 0.1855136, -0.1855137 ]
                 },
                 "Render3D": {
@@ -506,9 +539,52 @@
                     "shapeDefinition": {
                         "type": "Box",
                         "size": {
-                            "x": 161.3163,
+                            "x": 161.3162,
                             "y": 161.3162,
-                            "z": 96.78977
+                            "z": 96.78974
+                        }
+                    },
+                    "mass": 0.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.0,
+                    "restitution": 0.0,
+                    "collisionGroup": 4,
+                    "collisionMask": 11,
+                    "gravityScale": 0.0
+                }
+            }
+        },
+
+        {
+            "name": "Machine2",
+            "tags": [ "ground" ],
+            "components": {
+                "Transform": {
+                    "position": [ 90.275, -2.208, 48.2195 ],
+                    "rotation": [ -0.7071068, 0, -0.7071068, 0 ],
+                    "scale": [ -0.191736, 0.1700399, -0.3314113 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "Machine2.fbx",
+                        "file": "models/Machine2.fbx"
+                    },
+                    "material": {
+                        "texture": "textures/arcadeColormap.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 85.3659,
+                            "y": 94.38511,
+                            "z": 230.3842
                         }
                     },
                     "mass": 0.0,
@@ -527,8 +603,8 @@
             "tags": [ "door" ],
             "components": {
                 "Transform": {
-                    "position": [ 44.528, -0.6900001, 30.544 ],
-                    "rotation": [ -0.7071068, 0, -0.7071068, 0 ],
+                    "position": [ -53.13, -0.6900001, 31.97 ],
+                    "rotation": [ -0.7071068, 0, 0.7071068, 0 ],
                     "scale": [ -0.1855137, 0.1855136, -0.1855137 ]
                 },
                 "Render3D": {
@@ -591,8 +667,8 @@
             "tags": [ "target" ],
             "components": {
                 "Transform": {
-                    "position": [ 44.091, 24.8055, -49.6455 ],
-                    "rotation": [ -0.2705981, 0.2705981, -0.6532815, -0.6532815 ],
+                    "position": [ 96.715, 29.5665, 65.32 ],
+                    "rotation": [ 0.6495336, -0.6495336, 0.2794746, 0.2794746 ],
                     "scale": [ -0.2609911, 0.260991, -0.260991 ]
                 },
                 "Render3D": {
@@ -609,6 +685,44 @@
                 },
                 "Script": {
                     "path": "scripts/generator.lua"
+                }
+            }
+        },
+        {
+            "name": "column",
+            "components": {
+                "Transform": {
+                    "position": [ 20.93, -0.4599996, -3.91 ],
+                    "rotation": [ -1, 0, 0, 0 ],
+                    "scale": [ -0.1541399, 0.443479, -0.1614212 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "column",
+                        "file": "models/column.fbx"
+                    },
+                    "material": {
+                        "texture": "textures/arcadeColormap.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Capsule",
+                        "radius": 50.93788,
+                        "height": 520.811
+                    },
+                    "mass": 1.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.0,
+                    "restitution": 0.0,
+                    "collisionGroup": 1,
+                    "collisionMask": 30,
+                    "gravityScale": 1.0
                 }
             }
         }

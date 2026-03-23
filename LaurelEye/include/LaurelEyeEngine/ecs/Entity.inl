@@ -146,3 +146,16 @@ ComponentType* LaurelEye::Entity::findComponent() {
     }
     return nullptr;
 }
+
+template <typename ComponentType>
+std::vector<ComponentType*> LaurelEye::Entity::findAllComponents() {
+    std::vector<ComponentType*> result;
+
+    for ( auto& c : components ) {
+        if ( auto* casted = dynamic_cast<ComponentType*>(c.get()) ) {
+            result.push_back(casted);
+        }
+    }
+
+    return result;
+}

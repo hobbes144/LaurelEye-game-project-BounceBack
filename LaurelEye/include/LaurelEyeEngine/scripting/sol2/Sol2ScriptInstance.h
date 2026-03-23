@@ -20,7 +20,7 @@ namespace LaurelEye::Scripting {
     public:
         Sol2ScriptInstance(
             sol::state& luaState, const std::string& scriptPath,
-            LaurelEye::Entity* owner_);
+            LaurelEye::Entity* owner_, ScriptComponent* scriptComp);
         ~Sol2ScriptInstance();
         void onStart() override;
         void onUpdate(float dt) override;

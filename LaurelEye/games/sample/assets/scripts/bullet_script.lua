@@ -8,6 +8,7 @@ body = nil
 speaker = nil
 
 bounceCount = 0
+attackEnemy = false
 
 function onStart()
     transform = self:findTransform()
@@ -17,6 +18,13 @@ function onStart()
     if speaker ~= nil then
         speaker:stop()
         speaker:play()
+    end
+end
+
+function onMessage(msg)
+    if msg.topic == "I am kicking you!" then
+        bounceCount = 3
+        attackEnemy = true
     end
 end
 
@@ -33,6 +41,9 @@ end
 
 function onTriggerEnter(data)
     local tagsA = data.entityA:getTags()
+    local tagsB = data.entityB:getTags()
+    local scene = SceneManager:getCurrentScene()
+
     for _, tag in pairs(tagsA) do
         if tag == "ground" then
             if bounceCount > 2 then
@@ -59,7 +70,6 @@ function onTriggerEnter(data)
                 bounceCount = bounceCount + 1
             end
         elseif tag == "player" then
-            local scene = SceneManager:getCurrentScene()
             local player = scene:findEntityByName("PlayerPrefab")
             if player == nil then return end
             local message = Message.new()
@@ -67,10 +77,14 @@ function onTriggerEnter(data)
             message.topic = "Get Hit!"
             Script.send(message)
             SceneManager:destroy(self)
+        elseif tag == "enemy" then
+            if attackEnemy then
+                SceneManager:destroy(data.entityA)
+                destroySelf()
+            end
         end
     end
-
-    local tagsB = data.entityB:getTags()
+    
     for _, tag in pairs(tagsB) do
         if tag == "ground" then
             if bounceCount > 2 then
@@ -105,6 +119,11 @@ function onTriggerEnter(data)
             message.topic = "Get Hit!"
             Script.send(message)
             SceneManager:destroy(self)
+        elseif tag == "enemy" then
+            if attackEnemy then
+                SceneManager:destroy(data.entityB)
+                destroySelf()
+            end
         end
     end
 

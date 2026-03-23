@@ -61,7 +61,7 @@ namespace LaurelEye::Scripting {
 
     void ScriptSystem::registerComponent(const ComponentPtr comp) {
         if ( !comp->getScriptPath().empty() ) {
-            comp->setScriptInstance(scriptEngineState->createInstance(comp->getScriptPath(), comp->getOwner()));
+            comp->setScriptInstance(scriptEngineState->createInstance(comp->getScriptPath(), comp->getOwner(), comp));
             if ( comp->getScriptInstance() ) {
                 broker->registerScript(comp->getOwner(), comp->getScriptInstance());
                 comp->getScriptInstance()->onStart();

@@ -20,6 +20,7 @@ namespace LaurelEye::Physics {
 }
 
 namespace LaurelEye::Scripting {
+    class ScriptComponent;
 
     class IScriptInstance {
     public:
@@ -76,6 +77,16 @@ namespace LaurelEye::Scripting {
 
         virtual void onFocusLost(const UI::UIInteractionEventData& data) = 0;
 
+        ScriptComponent* GetScriptComp() {
+            return scriptComp;
+        }
+
+        void SetScriptComp(ScriptComponent* sc) {
+            scriptComp = sc;
+        }
+
+    protected:
+        ScriptComponent* scriptComp = nullptr;
     };
 
 } // namespace LaurelEye

@@ -16,6 +16,18 @@
         {
             "name": "Level3",
             "path": "scenes/level3.scene.json"
+        },
+        {
+            "name": "Level4",
+            "path": "scenes/level4.scene.json"
+        },
+        {
+            "name": "Level5",
+            "path": "scenes/level5.scene.json"
+        },
+        {
+            "name": "SettingsMenu",
+            "path": "scenes/settings_menu.scene.json"
         }
     ]
 }

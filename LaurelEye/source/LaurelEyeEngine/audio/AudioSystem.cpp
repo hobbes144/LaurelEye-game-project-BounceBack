@@ -11,6 +11,13 @@
 namespace LaurelEye::Audio {
     AudioSystem::AudioSystem(AudioSystemType type) {
         systemType = type;
+
+        switch ( systemType ) {
+        case AudioSystemType::FMod:
+            audioManager = new FModAudioManager();
+            break;
+            // Add more backends here
+        }
     }
 
     AudioSystem::~AudioSystem() {
@@ -34,12 +41,7 @@ namespace LaurelEye::Audio {
     }
 
     void AudioSystem::initialize() {
-        switch ( systemType ) {
-        case AudioSystemType::FMod:
-            audioManager = new FModAudioManager();
-            break;
-            // Add more backends here
-        }
+        
     }
 
     void AudioSystem::update(float dt) {

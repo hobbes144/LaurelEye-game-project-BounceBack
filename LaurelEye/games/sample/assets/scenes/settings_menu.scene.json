@@ -60,19 +60,19 @@
                     "size": [ 1, 1]
                 },
                 "UIRender": {
-                    "color": [ 0.37, 0.22, 0.9, 1.0 ]
+                    "color": [ 0.37, 0.32, 0.9, 1.0 ]
                 }
             }
         },
             {
-                "name": "Play Button",
+                "name": "Back Button",
                 "components": {
                     "UITransform": {
-                        "anchorMin": [ 1.0, 1.0 ],
-                        "anchorMax": [ 1.0, 1.0 ],
-                        "pivot": [ 1.0, 1.0 ],
-                        "offset": [ -100, -50 ],
-                        "size": [ 300, 100 ]
+                        "anchorMin": [ 0.0, 1.0 ],
+                        "anchorMax": [ 0.0, 1.0 ],
+                        "pivot": [ 0.0, 1.0 ],
+                        "offset": [ 50, -50 ],
+                        "size": [ 150, 50 ]
                     },
                     "UIRender": {
                         "material": {
@@ -94,7 +94,7 @@
                             {
                                 "name": "targetScene",
                                 "type": "String",
-                                "value": "Level1"
+                                "value": "MainMenu"
                             }
 
                         ]
@@ -130,11 +130,11 @@
                 "name": "Prototype 1 Button",
                 "components": {
                     "UITransform": {
-                        "anchorMin": [ 0.0, 0.0 ],
-                        "anchorMax": [ 0.0, 0.0 ],
-                        "pivot": [ 0.0, 0.0 ],
-                        "offset": [ 100, 300 ],
-                        "size": [ 225, 75 ]
+                        "anchorMin": [ 0.5, 0.5 ],
+                        "anchorMax": [ 0.5, 0.5 ],
+                        "pivot": [ 0.5, 0.5 ],
+                        "offset": [ -100, 0 ],
+                        "size": [ 75, 75 ]
                     },
                     "UIRender": {
                         "material": {
@@ -151,12 +151,12 @@
                         "interactionPriority": 1
                     },
                     "Script": {
-                        "path": "scripts/ButtonScripts/button_menu_navigation.lua",
+                        "path": "scripts/ButtonScripts/button_volume_effect.lua",
                         "data": [
                             {
-                                "name": "targetScene",
-                                "type": "String",
-                                "value": "SettingsMenu"
+                                "name": "volumeDelta",
+                                "type": "Float",
+                                "value": -10
                             }
 
                         ]
@@ -178,13 +178,21 @@
                                 "name": "pressedColor",
                                 "type": "Vector4",
                                 "value": {
-                                    "r": 1.0,
-                                    "g": 0.26,
-                                    "b": 0.0,
+                                    "r": 0.0,
+                                    "g": 0.25,
+                                    "b": 1.0,
                                     "a": 1.0
                                 }
                             }
                         ]
+                    },
+                    "Speaker": {
+                        "audioName": "blaster",
+                        "audioPath": "audio/blaster.mp3",
+                        "volume": 0.5,
+                        "loop": false,
+                        "3D": false,
+                        "playOnLoad": false
                     }
                 }
             },
@@ -192,11 +200,11 @@
                 "name": "Prototype 2 Button",
                 "components": {
                     "UITransform": {
-                        "anchorMin": [ 0.0, 0.0 ],
-                        "anchorMax": [ 0.0, 0.0 ],
-                        "pivot": [ 0.0, 0.0 ],
-                        "offset": [ 100, 175 ],
-                        "size": [ 225, 75 ]
+                        "anchorMin": [ 0.5, 0.5 ],
+                        "anchorMax": [ 0.5, 0.5 ],
+                        "pivot": [ 0.5, 0.5 ],
+                        "offset": [ 100, 0 ],
+                        "size": [ 75, 75 ]
                     },
                     "UIRender": {
                         "material": {
@@ -213,12 +221,12 @@
                         "interactionPriority": 1
                     },
                     "Script": {
-                        "path": "scripts/ButtonScripts/button_menu_navigation.lua",
+                        "path": "scripts/ButtonScripts/button_volume_effect.lua",
                         "data": [
                             {
-                                "name": "targetScene",
-                                "type": "String",
-                                "value": "Reload"
+                                "name": "volumeDelta",
+                                "type": "Float",
+                                "value": 10
                             }
 
                         ]
@@ -241,74 +249,20 @@
                                 "type": "Vector4",
                                 "value": {
                                     "r": 1.0,
-                                    "g": 0.26,
+                                    "g": 0.75,
                                     "b": 0.0,
                                     "a": 1.0
                                 }
                             }
                         ]
-                    }
-                }
-            },
-            {
-                "name": "Quit Button",
-                "components": {
-                    "UITransform": {
-                        "anchorMin": [ 0.0, 0.0 ],
-                        "anchorMax": [ 0.0, 0.0 ],
-                        "pivot": [ 0.0, 0.0 ],
-                        "offset": [ 100, 50 ],
-                        "size": [ 225, 75 ]
                     },
-                    "UIRender": {
-                        "material": {
-                            "texture": "textures/Quit.jpg",
-                            "layer": 10
-                        },
-                        "color": [ 0.23, 0.59, 0.42, 1.0 ]
-                    },
-                    "UIInteraction": {
-                        "isInteractable": true,
-                        "blockRaycast": true,
-                        "receiveHover": true,
-                        "receiveClick": true,
-                        "interactionPriority": 1
-                    },
-                    "Script": {
-                        "path": "scripts/ButtonScripts/button_menu_navigation.lua",
-                        "data": [
-                            {
-                                "name": "targetScene",
-                                "type": "String",
-                                "value": "Quit"
-                            }
-
-                        ]
-                    },
-                    "Script": {
-                        "path": "scripts/ButtonScripts/button_visual_effect.lua",
-                        "data": [
-                            {
-                                "name": "hoverColor",
-                                "type": "Vector4",
-                                "value": {
-                                    "r": 0.47,
-                                    "g": 0.86,
-                                    "b": 0.21,
-                                    "a": 1.0
-                                }
-                            },
-                            {
-                                "name": "pressedColor",
-                                "type": "Vector4",
-                                "value": {
-                                    "r": 1.0,
-                                    "g": 0.26,
-                                    "b": 0.0,
-                                    "a": 1.0
-                                }
-                            }
-                        ]
+                    "Speaker": {
+                        "audioName": "blaster",
+                        "audioPath": "audio/blaster.mp3",
+                        "volume": 0.5,
+                        "loop": false,
+                        "3D": false,
+                        "playOnLoad": false
                     }
                 }
             },
@@ -326,7 +280,7 @@
                             {
                                 "name": "hideMouse",
                                 "type": "Bool",
-                                "value": false
+                                "value":  false
                             }
                         ]
                     }

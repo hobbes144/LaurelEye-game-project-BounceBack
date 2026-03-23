@@ -11,7 +11,7 @@ namespace LaurelEye {
         explicit TriggerEvent(const LaurelEye::Physics::CollisionEventData& cd)
             : collisionData(cd) {
             //std::cout << "[TriggerEvent] Contructed: " << cd << std::endl;
-            //LE_DEBUG_INFO("Physics", "Trigger Event Contructed");
+            LE_DEBUG_INFO("Physics", "Trigger Event Contructed");
         }
 
         virtual ~TriggerEvent() = default;

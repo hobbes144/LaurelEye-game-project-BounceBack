@@ -60,6 +60,9 @@ namespace LaurelEye {
         template <typename ComponentType>
         ComponentType* findComponent();
 
+        template <typename ComponentType>
+        std::vector<ComponentType*> findAllComponents();
+
         void setName(std::string newName) { name = newName; }
         const std::string& getName() const { return name; }
         unsigned int getId() const { return id; }
