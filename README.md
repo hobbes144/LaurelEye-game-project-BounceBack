@@ -22,6 +22,11 @@ Scripting System  - https://github.com/hobbes144/LaurelEye-game-project-BounceBa
 - Serialization
 - Bindings for Physics Particle UI
 
+Debug Drawing System - https://github.com/hobbes144/LaurelEye-game-project-BounceBack/tree/main/LaurelEye/include/LaurelEyeEngine/debugDraw
+- Physics Body Rendering
+- Velocity Rendering
+- Extendable System Architecture
+
  
 # Team Laurel Game Project
 
