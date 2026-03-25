@@ -1,4 +1,29 @@
-﻿# Team Laurel Game Project
+# Bounce Back
+
+An Action RPG depicting a bouncy ball factory employee rebeling against the meniacle CEO. By using simple movement mechanics and a reactive bouncy ball to destroy generator, defeat enemies, and score points. Through clever use of that balls phycis and the environment the play advances through the factory
+
+### Nicholas Shaw Contributions
+Physics System - https://github.com/hobbes144/LaurelEye-game-project-BounceBack/tree/main/LaurelEye/include/LaurelEyeEngine/physics
+- Physics Agnostic Layer Implemented
+- Bullet Integration
+- Rigid & Ghost Body Functionality
+- Collision Event Generation
+
+Particle System - https://github.com/hobbes144/LaurelEye-game-project-BounceBack/tree/main/LaurelEye/include/LaurelEyeEngine/particles
+- Particle Emmision & Simulation
+- Particle Rendering
+
+UI System - https://github.com/hobbes144/LaurelEye-game-project-BounceBack/tree/main/LaurelEye/include/LaurelEyeEngine/UI
+- UI Rendering
+- UI Layout & Anchoring
+- UI Interaction
+
+Scripting System  - https://github.com/hobbes144/LaurelEye-game-project-BounceBack/tree/main/LaurelEye/include/LaurelEyeEngine/scripting
+- Serialization
+- Bindings for Physics Particle UI
+
+ 
+# Team Laurel Game Project
 
 ## Steps to Clone and Run
 1. From git bash call 'git clone --recursive'. Do not use GitHub Desktop, and recommended not to use other GUI based implementations due to the use of submodules.
