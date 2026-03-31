@@ -35,16 +35,40 @@ local dead_state = nil
 ---------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------
 
+hasKey = false
 
 function onStart()
     transform = self:findTransform()
     body = self:findRigidBody()
     --shooting_speed = math.random(minshooting_speed * 100, maxshooting_speed * 100) / 100
-
+    local scene = SceneManager:getCurrentScene()
+    player = scene:findEntityByName("PlayerPrefab")
     animator = self:findAnimator()
     if animator == nil then return end
     animator:changeAnimation("StickManBadge_Idle")
     setupStateMachine()
+
+end
+
+function onMessage(msg)
+    if msg.topic == "I have the key!" then
+        print("Enemy has been given the key")
+        hasKey = true
+    end
+    if msg.topic == "Get Hit!" then
+        if enemyAI then
+            if hasKey then
+                local scene = SceneManager:getCurrentScene()
+                local player = scene:findEntityByName("PlayerPrefab")
+                local message = Message.new()
+                message.to = player
+                message.topic = "Here's the Key!"
+                Script.send(message)
+            end
+            destroySelf()
+            enemyAI:forceTransition("Dead")
+        end
+    end
 
 end
 
@@ -207,6 +231,12 @@ function onTriggerEnter(data)
     for _, tag in pairs(tagsA) do
         if tag == "ball" then
             log("Collided with Ball!")
+            if hasKey then
+                local message = Message.new()
+                message.to = player
+                message.topic = "Here's the Key!"
+                Script.send(message)
+            end
             destroySelf()
         end
     end
@@ -215,6 +245,12 @@ function onTriggerEnter(data)
     for _, tag in pairs(tagsB) do
         if tag == "ball" then
             log("Collided with Ball!")
+            if hasKey then
+                local message = Message.new()
+                message.to = player
+                message.topic = "Here's the Key!"
+                Script.send(message)
+            end
             destroySelf()
         end
     end
@@ -315,7 +351,7 @@ function autoShootProjectile(dt)
 
     local projBody = proj:findGhostBody()
     if projBody ~= nil then
-        local projectileSpeed = 100.0 -- tune as needed
+        local projectileSpeed = 75.0 -- tune as needed
         projBody:setLinearVelocity(dir * projectileSpeed)
     end
 end

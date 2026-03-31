@@ -432,9 +432,9 @@ function onCollisionEnter(data)
             isGrounded = true
             jumping = false
         elseif tag == "door" then
-            --if hasKey then
+            if hasKey then
                 changeLevels()
-            --end
+            end
         end
     end
 
@@ -447,9 +447,9 @@ function onCollisionEnter(data)
             isGrounded = true
             jumping = false
         elseif tag == "door" then
-            --if hasKey then
+            if hasKey then
                 changeLevels()
-            --end
+            end
         end
     end
 

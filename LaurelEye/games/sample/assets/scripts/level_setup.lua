@@ -76,6 +76,10 @@ function setupLevel2()
     local e2 = SceneManager:instantiate("prefabs/shooting_enemy.prefab.json")
     local e2Transform = e2:findTransform()
     e2Transform:setWorldPosition(39.445, 6.831, 43.24)
+    local message = Message.new()
+    message.to = e2
+    message.topic = "I have the key!"
+    Script.send(message)
 end
 
 function setupLevel3()
@@ -102,6 +106,10 @@ function setupLevel3()
     local e2 = SceneManager:instantiate("prefabs/shooting_enemy.prefab.json")
     local e2Transform = e2:findTransform()
     e2Transform:setWorldPosition(55.775, 6.831, -5.06)
+    local message = Message.new()
+    message.to = e2
+    message.topic = "I have the key!"
+    Script.send(message)
 end
 
 function setupLevel4()
@@ -130,10 +138,14 @@ function setupLevel4()
     local e3 = SceneManager:instantiate("prefabs/shooting_enemy.prefab.json")
     local e3Transform = e3:findTransform()
     e3Transform:setWorldPosition(-25.806, 6.831, 50.7955)
+    local message = Message.new()
+    message.to = e3
+    message.topic = "I have the key!"
+    Script.send(message)
 end
 
 function setupLevel5()
-    print("STARTING SETUP FOR LEVEL 4")
+    print("STARTING SETUP FOR LEVEL 5")
     local player = SceneManager:instantiate("prefabs/catch_player.prefab.json")
     local playerTransform = player:findTransform()
 
