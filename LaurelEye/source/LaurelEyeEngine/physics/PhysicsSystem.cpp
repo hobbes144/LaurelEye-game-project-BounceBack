@@ -1,4 +1,5 @@
 ﻿#include "LaurelEyeEngine/physics/PhysicsSystem.h"
+#include "LaurelEyeEngine/logging/EngineLog.h"
 #include "LaurelEyeEngine/physics/GhostBodyComponent.h"
 #include "LaurelEyeEngine/physics/interfaces/PhysicsTypes.h"
 #include "LaurelEyeEngine/physics/interfaces/Bullet/BulletWorld.h"
@@ -30,7 +31,7 @@ namespace LaurelEye::Physics {
         }
 
         isSteppingPhysics = true;
-        if ( world ) world->StepSimulation(dt, 4, 1.0f/60.0f);
+        if ( world ) world->StepSimulation(dt, 4, 1.0f/60.0f * context->time().timeScale);
         isSteppingPhysics = false;
 
         //Sync Physics to Transforms
@@ -363,7 +364,7 @@ namespace LaurelEye::Physics {
             */
 
         }
-    
+
     }
 
     void PhysicsSystem::dispatchCollisionEvents() const {
@@ -442,6 +443,4 @@ namespace LaurelEye::Physics {
             //std::cout << evt << std::endl;
         }
     }
-
-
 }

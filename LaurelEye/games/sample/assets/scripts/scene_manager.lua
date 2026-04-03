@@ -14,7 +14,7 @@ function onStart()
 
     if hideMouse then
         Window.setCursorMode(0, Window.CursorMode.Disabled)
-    else 
+    else
         Window.setCursorMode(0, Window.CursorMode.Normal)
     end
 

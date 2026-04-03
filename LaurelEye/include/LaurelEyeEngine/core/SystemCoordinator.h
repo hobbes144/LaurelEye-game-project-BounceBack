@@ -28,11 +28,15 @@ namespace LaurelEye {
     public:
         SystemCoordinator(EngineContext& ctx, const EngineConfig& engineConfig);
         void initialize();
-        void update(float deltaTime);
+        void update();
+#ifdef ENABLE_FC_PHYSICS_ACCUMULATOR
         void updateFixed(float deltaTimeFixed);
+#endif
         void shutdown();
 
     private:
+        EngineContext* ctx;
+
         // TODO - determine if this should be generic list
         // for now, add systems that are needed here.
         std::unique_ptr<TransformSystem> transformSystem;

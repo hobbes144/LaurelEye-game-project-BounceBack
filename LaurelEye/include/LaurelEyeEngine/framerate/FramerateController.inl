@@ -20,9 +20,12 @@ FramerateController<T>::FramerateController()
       lastFrameTime(0),
       frameCount(0),
       framesSinceLastFPSQuery(0),
-      timeOfLastFPSQuery(getTime()),
+      timeOfLastFPSQuery(getTime())
+#ifdef ENABLE_FC_PHYSICS_ACCUMULATOR
+      ,
       physicsAccumulatorTimestep(static_cast<T>(1.0 / 120.0)),
       physicsAccumulator(0)
+#endif
 #ifdef ENABLE_RATE_CONTROLLERS
       ,
       rateControllersRegistered(0),
@@ -59,7 +62,10 @@ void FramerateController<T>::endFrame() {
 
     timeAtFrameEnd = getTime();
     lastFrameTime = timeAtFrameEnd - timeAtFrameStart;
+
+#ifdef ENABLE_FC_PHYSICS_ACCUMULATOR
     physicsAccumulator += lastFrameTime;
+#endif
 
 #ifdef ENABLE_ADDITIONAL_ACCUMULATORS
     for ( unsigned int i = 0; i < accumulatorsRegistered; ++i )
@@ -95,11 +101,11 @@ T FramerateController<T>::getTime() {
     return std::chrono::duration_cast<seconds>(now - startTime).count();
 }
 
+#ifdef ENABLE_FC_PHYSICS_ACCUMULATOR
 template <typename T>
 T FramerateController<T>::getPhysicsTimestep() {
     return physicsAccumulatorTimestep;
 }
-
 template <typename T>
 void FramerateController<T>::setPhysicsTimestep(T timestep) {
     physicsAccumulatorTimestep = timestep;
@@ -124,6 +130,7 @@ template <typename T>
 T FramerateController<T>::getAccumulatorAlpha() const {
     return physicsAccumulator / physicsAccumulatorTimestep;
 }
+#endif
 
 #ifdef ENABLE_RATE_CONTROLLERS
 template <typename T>

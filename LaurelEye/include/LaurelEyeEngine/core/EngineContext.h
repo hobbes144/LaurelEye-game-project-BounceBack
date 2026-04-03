@@ -19,6 +19,16 @@
 #include <typeindex>
 #include <unordered_map>
 
+struct TimeData {
+    float timeScale = 1.0f;
+
+    float unscaledDt = 0.0f;
+    float scaledDt = 0.0f;
+
+    float unscaledTime = 0.0f;
+    float scaledTime = 0.0f;
+};
+
 namespace LaurelEye {
     class EngineContext {
     public:
@@ -49,7 +59,14 @@ namespace LaurelEye {
             return services.find(typeid(T)) != services.end();
         }
 
+        const TimeData& time() const { return timeData; }
+
     private:
         std::unordered_map<std::type_index, void*> services;
+        TimeData timeData;
+
+        TimeData& mutableTime() { return timeData; }
+
+        friend class Engine;
     };
 } // namespace LaurelEye

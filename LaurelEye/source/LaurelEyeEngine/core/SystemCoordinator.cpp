@@ -1,10 +1,12 @@
 ﻿#include "LaurelEyeEngine/core/SystemCoordinator.h"
 #include "LaurelEyeEngine/window/WindowManager.h"
+#include "LaurelEyeEngine/logging/EngineLog.h"
 
 namespace LaurelEye {
     SystemCoordinator::SystemCoordinator(EngineContext& ctx, const EngineConfig& engineConfig) {
-        std::cout << "Systems Constructing" << std::endl;
-        // TODO - anything that needs ctx or engine config sets them here
+        LE_DEBUG_INFO("SystemCoordinator", "Systems Constructing");
+
+        this->ctx = &ctx;
 
         transformSystem = std::make_unique<TransformSystem>();
         transformSystem->setEngineContext(ctx);
@@ -20,18 +22,15 @@ namespace LaurelEye {
         // Render system setup
         LaurelEye::Graphics::RenderSystemConfig renderConfig;
         WindowManager* windowManager = ctx.getService<WindowManager>();
+        LE_DEBUG_WARN_IF("SystemCoordinator", !windowManager, "Could not find WindowManager in SystemCoordinator - Renderer will likely not work!");
         if ( windowManager ) {
             IWindow* currentWindow = ctx.getService<WindowManager>()->getWindow(0);
+            LE_DEBUG_WARN_IF("SystemCoordinator", !currentWindow, "Could not find Main Window in SystemCoordinator - Renderer will likely not work!");
             if ( currentWindow ) {
                 renderConfig.windows.push_back(currentWindow);
             }
-            else {
-                std::cerr << "Could not find Main Window in SystemCoordinator - Renderer will likely not work!" << std::endl;
-            }
         }
-        else {
-            std::cerr << "Could not find WindowManager in SystemCoordinator - Renderer will likely not work!" << std::endl;
-        }
+
         renderSystem->setConfig(renderConfig);
         renderSystem->setRunDebugDraw(engineConfig.enableDebugMode);
 
@@ -83,29 +82,33 @@ namespace LaurelEye {
         animationSystem->initialize();
     }
 
-    void SystemCoordinator::update(float deltaTime) {
-        scriptSystem->update(deltaTime);
-        transformSystem->update(deltaTime);
+    void SystemCoordinator::update() {
+        scriptSystem->update(ctx->time().scaledDt);
+        transformSystem->update(ctx->time().unscaledDt);
         // Moved physics here since Bullet takes care of variable timestep
         // itself. We just call it with the real deltaTime and that's enough.
-        physicsSystem->update(deltaTime);
-        transformSystem->update(deltaTime);
-        uiLayoutSystem->update(deltaTime);
-        uiInteractionSystem->update(deltaTime);
-        particleSystem->update(deltaTime);
-        audioSystem->update(deltaTime);
+#ifndef ENABLE_FC_PHYSICS_ACCUMULATOR
+        physicsSystem->update(ctx->time().scaledDt);
+#endif
+        transformSystem->update(ctx->time().unscaledDt);
+        uiLayoutSystem->update(ctx->time().unscaledDt);
+        uiInteractionSystem->update(ctx->time().unscaledDt);
+        particleSystem->update(ctx->time().scaledDt);
+        audioSystem->update(ctx->time().scaledDt);
         if ( debugDrawSystem ) {
-            debugDrawSystem->update(deltaTime);
+            debugDrawSystem->update(ctx->time().scaledDt);
         }
-        physicsSystem->update(deltaTime);
-        animationSystem->update(deltaTime);
-        renderSystem->update(deltaTime);
+        physicsSystem->update(ctx->time().scaledDt);
+        animationSystem->update(ctx->time().scaledDt);
+        renderSystem->update(ctx->time().unscaledDt);
     }
 
+#ifdef ENABLE_FC_PHYSICS_ACCUMULATOR
     void SystemCoordinator::updateFixed(float deltaTimeFixed) {
-        // transformSystem->update(deltaTimeFixed);
-        // physicsSystem->update(deltaTimeFixed);
+        transformSystem->update(deltaTimeFixed);
+        physicsSystem->update(deltaTimeFixed);
     }
+#endif
 
     void SystemCoordinator::shutdown() {
         std::cout << "Systems Shutting Down" << std::endl;

@@ -43,6 +43,7 @@ public:
     T getFrameTime();
     static T getTime();
 
+#ifdef ENABLE_FC_PHYSICS_ACCUMULATOR
     // Physics accumulator system
     T getPhysicsTimestep();
     void setPhysicsTimestep(T timestep);
@@ -50,6 +51,7 @@ public:
     void consumePhysicsTime();
     void clearPhysicsTime();
     T getAccumulatorAlpha() const;
+#endif
 
 #ifdef ENABLE_RATE_CONTROLLERS
     // Rate controller system (optional)
@@ -78,9 +80,11 @@ private:
     long long framesSinceLastFPSQuery;
     T timeOfLastFPSQuery;
 
+#ifdef ENABLE_FC_PHYSICS_ACCUMULATOR
     // Physics accumulator
     T physicsAccumulatorTimestep;
     T physicsAccumulator;
+#endif
 
 #ifdef ENABLE_RATE_CONTROLLERS
     unsigned int rateControllersRegistered;
@@ -94,9 +98,6 @@ private:
     std::vector<T> accumulatorTimes;
 #endif
 };
-
-template class FramerateController<float>;
-template class FramerateController<double>;
 
 /// \typedef FFramerateController
 /// \brief Alias for float-based framerate controller.

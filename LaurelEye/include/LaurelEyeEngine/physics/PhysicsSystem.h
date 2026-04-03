@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <memory>
 
 #include "LaurelEyeEngine/physics/interfaces/IPhysicsWorld.h"

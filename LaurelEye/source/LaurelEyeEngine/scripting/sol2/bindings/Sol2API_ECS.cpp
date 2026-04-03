@@ -1,5 +1,6 @@
 ﻿#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_ECS.h"
 #include "LaurelEyeEngine/core/Engine.h"
+#include "LaurelEyeEngine/core/EngineContext.h"
 #include "LaurelEyeEngine/transform/TransformComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/Renderable3DComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/Renderable2DComponent.h"
@@ -19,6 +20,7 @@
 #include "LaurelEyeEngine/audio/SpeakerComponent.h"
 #include "LaurelEyeEngine/ecs/IComponent.h"
 #include "LaurelEyeEngine/animation/components/SkeletalAnimationComponent.h"
+#include "LaurelEyeEngine/logging/EngineLog.h"
 #include "LaurelEyeEngine/audio/AudioComponent.h"
 
 namespace LaurelEye::Scripting {
@@ -27,12 +29,31 @@ namespace LaurelEye::Scripting {
 
         // Engine setup - TODO move to engine binding file later
         auto* engine = ctx->getService<Engine>();
-        assert(engine && "Engine service not found in context!");
+        LE_ASSERT("scripting", engine, "Engine service not found in context!");
 
-        // Expose as an object in Lua
-        lua.new_usertype<Engine>("Engine",
-                                 "stop", &Engine::stop);
-        lua["Engine"] = engine;
+        auto timeDataType = lua.new_usertype<TimeData>("TimeData");
+        timeDataType["scaledTime"] = &TimeData::scaledTime;
+        timeDataType["unscaledTime"] = &TimeData::unscaledTime;
+        timeDataType["scaledDt"] = &TimeData::scaledDt;
+        timeDataType["unscaledDt"] = &TimeData::unscaledDt;
+
+        sol::table Engine = lua["Engine"].get_or_create<sol::table>();
+        Engine.set_function("stop",
+                             [engine]() -> void {
+                                 engine->stop();
+                             });
+        Engine.set_function("setTimeScale",
+                             [engine](float timeScale) -> void {
+                                 engine->setTimeScale(timeScale);
+                             });
+        Engine.set_function("getTimeScale",
+                             [engine]() -> float {
+                                 return engine->getTimeScale();
+                             });
+        Engine.set_function("time",
+                             [ctx]() -> TimeData {
+                                 return ctx->time();
+                             });
     }
 
     void Sol2API_ECS::setupEntityType(sol::state& lua) {

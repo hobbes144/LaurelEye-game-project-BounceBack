@@ -24,24 +24,34 @@ namespace LaurelEye {
 
         auto* frameController = FFramerateController::getController();
         frameController->setTargetFramerate(engineConfig.render.targetFramerate);
+#ifdef ENABLE_FC_PHYSICS_ACCUMULATOR
         frameController->setPhysicsTimestep(engineConfig.physics.fixedDeltaTime);
+#endif
 
         while ( isRunning && !currentWindow->shouldClose() ) {
             frameController->startFrame();
             LaurelEye::Log::set_frame(frameController->getFrameCount());
 
+            // Time update
+            float deltaTime = frameController->getFrameTime();
+            auto& time = ctx->mutableTime();
+            time.unscaledDt = deltaTime;
+            time.scaledDt = time.timeScale * time.unscaledDt;
+            time.unscaledTime += time.unscaledDt;
+            time.scaledTime += time.scaledDt;
+
+#ifdef ENABLE_FC_PHYSICS_ACCUMULATOR
             // --- Fixed timestep physics loop ---
             while ( frameController->shouldUpdatePhysics() ) {
                 float physicsDelta = frameController->getPhysicsTimestep();
-                // std::cout << "|Fixed\n";
-                systemCoordinator->updateFixed(physicsDelta);
+                systemCoordinator->updateFixed(physicsDelta * timeScale);
                 frameController->consumePhysicsTime();
             }
+#endif
 
             // --- Variable timestep updates (optional) ---
-            float deltaTime = frameController->getFrameTime();
-            // std::cout << "-Update\n";
-            systemCoordinator->update(deltaTime);
+
+            systemCoordinator->update();
             resourceCoordinator->update(deltaTime);
 
             // --- End frame and regulate FPS ---
@@ -75,6 +85,14 @@ namespace LaurelEye {
         currentWindow = nullptr;
         systemCoordinator->shutdown();
         resourceCoordinator->shutdown();
+    }
+
+    void Engine::setTimeScale(float timeScale) {
+        ctx->mutableTime().timeScale = timeScale;
+    }
+
+    float Engine::getTimeScale() const {
+        return ctx->time().timeScale;
     }
 
 } // namespace LaurelEye

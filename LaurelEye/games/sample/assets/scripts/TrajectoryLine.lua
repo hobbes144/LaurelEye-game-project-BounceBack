@@ -89,7 +89,7 @@ end
 ---@param mass number
 ---@param maxTime number
 ---@param dt number
----@return Vector3|nil, Vector3|nil, number, Vector3|nil
+---@return Vector3|nil position, Vector3|nil direction, number distance, Vector3|nil velocity
 local function getGravityBounce(playerPos, playerAimDir, speed, gravityForce, mass, maxTime, dt)
 
     ---@type RaycastOpt

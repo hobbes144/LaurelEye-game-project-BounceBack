@@ -37,6 +37,9 @@ namespace LaurelEye {
         // Return the engine context stored here
         EngineContext& getContext() { return *ctx; }
 
+        void setTimeScale(float timeScale);
+        float getTimeScale() const;
+
     private:
         /// @brief Initialize the engine
         void initialize();
