@@ -80,13 +80,18 @@
                 "usePhysics": false,
                 "maxParticles": 200
             },
-            "Speaker": {
-                "audioName": "footsteps",
-                "audioPath": "audio/footstep.mp3",
-                "volume": 0.5,
-                "loop": false,
-                "3D": false,
-                "playOnLoad": false
+            "Audio": {
+                "sounds": [
+                    {
+                        "id": "footstep",
+                        "path": "audio/footstep.mp3",
+                        "volume": 0.2,
+                        "fadeSpeed": 1.0,
+                        "loop": true,
+                        "playOnLoad": false,
+                        "type": "SFX3D"
+                    }
+                ]
             },
             "Animation": {
                 "type": "Skeletal",

@@ -10,457 +10,369 @@
  *
  *****************************************************************************/
 
+/// @file   FModAudioManager.cpp
 #include "LaurelEyeEngine/audio/FModAudioManager.h"
 #include "LaurelEyeEngine/io/FileSystem.h"
-
-//#define NDEBUG
+#include <cassert>
 
 namespace LaurelEye::Audio {
-    /*!****************************************************************************
-     * \brief To read audio file path configuration.
-     *****************************************************************************/
-    std::string FModAudioManager::readAudioConfig(const std::string& configFile) {
-        std::ifstream file(configFile);
-        std::string line;
-        std::string key, value;
 
-        if ( !file.is_open() ) {
-            std::cerr << "Could not open config file: " << configFile << std::endl;
-            return "./"; // fallback path
-        }
+    FModAudioManager::FModAudioManager(int maxChannels)
+        : maxChannels(maxChannels) {}
 
-        while ( std::getline(file, line) ) {
-            std::istringstream iss(line);
-            if ( std::getline(iss, key, '=') && std::getline(iss, value) ) {
-                if ( key == "asset_path" ) {
-                    return value;
-                }
-            }
-        }
-        return "./"; // default fallback
-    }
-
-    /*!****************************************************************************
-     * \brief Destructor for AudioManager.
-     *
-     * ## Usage:
-     *
-     * This method is automatically triggers when the AudioManager is destroyed.
-     *
-     * ## Explanation:
-     *
-     * The destructor make sure the FMOD system is properly shut down by
-     * calling shutdown(), releasing all audio resources if the user forgot to do so.
-     *****************************************************************************/
     FModAudioManager::~FModAudioManager() {
         shutdown();
     }
 
-    /*!****************************************************************************
-     * \brief Initialize the AudioManager.
-     *
-     * ## Usage:
-     *
-     * Call this method once at the start of the application to initialize the FMOD
-     * audio system before any audio operations are performed.
-     *
-     * ## Explanation:
-     *
-     * This method creates and initializes the FMOD system with the specified maximum
-     * number of channels.
-     *
-     * \param maxChannels The maximum number of channels to allocate for audio playback.
-     * \return void
-     *****************************************************************************/
-    void FModAudioManager::initialize(int maxChannels) {
-        // Create the main FMOD system object
-        FMOD_RESULT result = FMOD::System_Create(&fmodSystem_);
-        assert(result == FMOD_OK && fmodSystem_ && "FMOD system creation failed");
+    void FModAudioManager::initialize() {
+        FMOD_RESULT result = FMOD::System_Create(&system);
+        // change to LE assert later
+        assert(result == FMOD_OK && "FMOD: System_Create failed");
 
-        // Initialize the system with a given number of channels
-        result = fmodSystem_->init(maxChannels, FMOD_INIT_NORMAL, nullptr);
-        assert(result == FMOD_OK && "FMOD system init failed");
-        fmodSystem_->setStreamBufferSize(1024 * 1024, FMOD_TIMEUNIT_RAWBYTES);
+        // glm style right-handed 3D coordinates, which is what we're using in our math library(I think)
+        result = system->init(maxChannels, FMOD_INIT_3D_RIGHTHANDED, nullptr);
+        assert(result == FMOD_OK && "FMOD: system->init failed");
 
-        // Example: Set 3D settings if you want realistic attenuation over distance
-        fmodSystem_->set3DSettings(
-            1.0f, // Doppler scale
-            1.0f, // Distance factor (1.0 = 1 meter)
-            1.0f  // Rolloff scale
-        );
-#if !defined(NDEBUG)
-        std::cerr << "[AudioManager] FMOD initialized with " << maxChannels << " channels.\n";
-#endif
+        // default is good enough for our needs, but we could tweak these if we want to optimize for latency or memory usage
+        //system_->setStreamBufferSize(1024 * 1024, FMOD_TIMEUNIT_RAWBYTES);
+
+        createDefaultGroups();
     }
 
-    /*!****************************************************************************
-     * \brief Update the FMOD audio system.
-     *
-     * ## Usage:
-     *
-     * Call this method once per frame (within the main loop) to allow FMOD to
-     * process audio tasks.
-     *
-     * ## Explanation:
-     *
-     * This method updates the FMOD system so that the audio can be played
-     * every frame.
-     *
-     * \return void
-     *****************************************************************************/
+    void FModAudioManager::createDefaultGroups() {
+        system->getMasterChannelGroup(&masterGroup);
+
+        system->createChannelGroup("Music", &musicGroup);
+        system->createChannelGroup("SFX", &sfxGroup);
+        system->createChannelGroup("UI", &uiGroup);
+
+        // Register handles
+        masterGroupHandle = registerGroup(masterGroup);
+        musicGroupHandle = registerGroup(musicGroup);
+        sfxGroupHandle = registerGroup(sfxGroup);
+        uiGroupHandle = registerGroup(uiGroup);
+
+        // Attach groups to master
+        masterGroup->addGroup(musicGroup);
+        masterGroup->addGroup(sfxGroup);
+        masterGroup->addGroup(uiGroup);
+    }
+
+    ChannelGroupHandle FModAudioManager::registerGroup(FMOD::ChannelGroup* group) {
+        assert(group != nullptr && "FMOD: Tried to register a null channel group");
+        ChannelGroupHandle handle = nextGroupHandle++;
+        groups[handle] = group;
+        return handle;
+    }
+
+    FMOD::ChannelGroup* FModAudioManager::getGroup(ChannelGroupHandle handle) {
+        auto it = groups.find(handle);
+        return (it != groups.end()) ? it->second : nullptr;
+    }
+
+
+
     void FModAudioManager::update() {
-        if ( fmodSystem_ ) {
-            fmodSystem_->update();
-            for ( const auto& pair : sounds_ ) {
-                sounds_[pair.first]->Update();
-            }
-            if ( awatingSounds.empty() == false ) {
-                for ( int i = 0; i < awatingSounds.size(); ++i ) {
-                    AudioAsset* sound = awatingSounds[i];
-                    if ( sound->IsReady() ) {
-                        sound->Play(fmodSystem_);
-                        awatingSounds.erase(awatingSounds.begin() + i);
-                        --i;
-                    }
-                    else {
-#if !defined(NDEBUG)
-                        std::cout << "[AudioManager] Sound in the awating queue is not ready to play yet.\n";
-#endif
-                    }
-                }
-            }
+        if ( system ) {
+            pruneFinishedChannels();
+            system->update();
         }
     }
 
-    /*!****************************************************************************
-     * \brief Load a sound asset for later playback.
-     *
-     * ## Usage:
-     *
-     * Use this method to load a sound file into the AudioManager. This must be done
-     * before attempting to play the sound.
-     *
-     * ## Explanation:
-     *
-     * This function creates a sound from the specified file path and stores it in a
-     * map. The sound can be loaded as either a 3D or 2D sound, and optionally set to loop.
-     *
-     * \param name A unique identifier for the sound.
-     * \param path The file path to the sound asset.
-     * \param is3D If true, the sound is loaded as a 3D sound; otherwise as a 2D sound.
-     * \param loop If true, the sound will loop over and over again.
-     * \return void
-     *****************************************************************************/
-    void FModAudioManager::createSound(const std::string& name, const std::string& path, float volume, bool is3D, bool loop) {
-        assert(fmodSystem_ && "FMOD system not initialized");
-        if ( sounds_.find(name) != sounds_.end() ) {
-            return;
-        }
-        auto fullPath = IO::resolve(path);
-
-        AudioAsset* newAsset = new AudioAsset(fullPath.string(), volume, is3D, loop);
-
-        // Store the sound in the map
-        sounds_[name] = newAsset;
-#if !defined(NDEBUG)
-        std::cout << "[AudioManager] Created sound \"" << name << "\" from " << path << "\n";
-#endif
-    }
-
-    void FModAudioManager::loadSound(const std::string& name) {
-        auto it = sounds_.find(name);
-        assert(it != sounds_.end() && "Sound not found");
-        AudioAsset* sound = it->second;
-        assert(fmodSystem_ && sound && "Cannot play sound: system or sound invalid");
-
-        sound->LoadAsnyc(fmodSystem_);
-#if !defined(NDEBUG)
-        std::cout << "[AudioManager] Loaded sound \"" << name << "\n";
-#endif
-    }
-
-    void FModAudioManager::loadSoundImmidiate(const std::string& name) {
-        auto it = sounds_.find(name);
-        assert(it != sounds_.end() && "Sound not found");
-        AudioAsset* sound = it->second;
-        assert(fmodSystem_ && sound && "Cannot play sound: system or sound invalid");
-
-        sound->Load(fmodSystem_);
-#if !defined(NDEBUG)
-        std::cout << "[AudioManager] Loaded sound \"" << name << "\n";
-#endif
-    }
-
-    /*!****************************************************************************
-     * \brief Play a previously loaded sound.
-     *
-     * ## Usage:
-     *
-     * Call this method to play a sound that has already been loaded using loadSound().
-     *
-     * ## Explanation:
-     *
-     * This function retrieves the sound by the map location stored from loadSound()
-     * and plays it using the FMOD system. If the sound is 3D, its spatial attributes
-     * are set according to the provided position.
-     *
-     * \param name The unique identifier of the sound to play.
-     * \param x The x-coordinate of the sound's position in 3D space.
-     * \param y The y-coordinate of the sound's position in 3D space.
-     * \param z The z-coordinate of the sound's position in 3D space.
-     * \return void
-     *****************************************************************************/
-    void FModAudioManager::playSound(const std::string& name) {
-        // Retrieve the sound pointer from our stored sounds.
-        auto it = sounds_.find(name);
-        assert(it != sounds_.end() && "Sound not found");
-        AudioAsset* sound = it->second;
-        assert(fmodSystem_ && sound && "Cannot play sound: system or sound invalid");
-
-        if ( sound->IsPlaying() ) {
-            return;
-        }
-        else {
-            if ( sound->IsReady() ) {
-                sound->Play(fmodSystem_);
-            }
-            else {
-                awatingSounds.push_back(sound);
-#if !defined(NDEBUG)
-                std::cout << "[AudioManager] Sound \"" << name << "\" is not ready to play yet.\n";
-#endif
-            }
-        }
-    }
-
-    /*!****************************************************************************
-     * \brief Stop playing a specific sound.
-     *
-     * ## Usage:
-     *
-     * Call this method with the it's name (as loaded with loadSound())
-     * to stop playing the sound.
-     *
-     * ## Explanation:
-     *
-     * This function retrieves the stored sound pointer for the given name and fine
-     * the channel. If channel name matches the target sound the channel is stopped.
-     *
-     * \param name The name of the sound to stop.
-     * \return void
-     *****************************************************************************/
-    void FModAudioManager::stopSound(const std::string& name) {
-        auto it = sounds_.find(name);
-        assert(it != sounds_.end() && "Sound not found");
-        AudioAsset* targetSound = it->second;
-        targetSound->Stop();
-
-#if !defined(NDEBUG)
-        std::cout << "[AudioManager] Stopped all instances of sound \"" << name << "\".\n";
-#endif
-    }
-
-    /*!****************************************************************************
-     * \brief Set the audio listener's position in 3D space.
-     *
-     * ## Usage:
-     *
-     * Call this method every frame (or when the listener's position changes) to update
-     * the where you hear the audio. This typically reflects the camera's position.
-     *
-     * ## Explanation:
-     *
-     * This function sets the position of the primary audio listener in the FMOD system.
-     *
-     * \param x The x-coordinate of the listener's position.
-     * \param y The y-coordinate of the listener's position.
-     * \param z The z-coordinate of the listener's position.
-     * \return void
-     *****************************************************************************/
-    void FModAudioManager::setListenerPosition(const Vector3& position) {
-        assert(fmodSystem_ && "FMOD system not initialized");
-
-        listenerPosition = position;
-        // The orientation vectors can be adjusted based on camera property
-        FMOD_VECTOR pos = {listenerPosition.x, listenerPosition.y, listenerPosition.z};
-        FMOD_VECTOR vel = {listenerVelocity.x, listenerVelocity.y, listenerVelocity.z};
-        FMOD_VECTOR forward = {0.0f, 0.0f, 1.0f};
-        FMOD_VECTOR up = {0.0f, 1.0f, 0.0f};
-
-        // Set the listener at index 0
-        fmodSystem_->set3DListenerAttributes(0, &pos, &vel, &forward, &up);
-    }
-
-    void FModAudioManager::setListenerVelocity(const Vector3& velocity) {
-        assert(fmodSystem_ && "FMOD system not initialized");
-        listenerVelocity = velocity;
-        // The orientation vectors can be adjusted based on camera property
-        FMOD_VECTOR pos = {listenerPosition.x, listenerPosition.y, listenerPosition.z};
-        FMOD_VECTOR vel = {listenerVelocity.x, listenerVelocity.y, listenerVelocity.z};
-        FMOD_VECTOR forward = {0.0f, 0.0f, 1.0f};
-        FMOD_VECTOR up = {0.0f, 1.0f, 0.0f};
-        // Set the listener at index 0
-        fmodSystem_->set3DListenerAttributes(0, &pos, &vel, &forward, &up);
-    }
-
-    /*!****************************************************************************
-     * \brief Set the playback speed for all current playing audio.
-     *
-     * ## Usage:
-     *
-     * Call this method to adjust the playback speed of all currently playing audio.
-     *
-     * \param speed A positive float value representing the desired playback speed.
-     *              For example, 0.5 for half speed, 2.0 for double speed.
-     * \return void
-     *****************************************************************************/
-    void FModAudioManager::setPlaybackSpeed(float speed) {
-        assert(speed > 0.0f && "Playback speed must be a positive value");
-        currentPlaybackSpeed_ = speed;
-
-        for ( const auto& pair : sounds_ ) {
-            sounds_[pair.first]->SetVolume(currentPlaybackSpeed_);
-        }
-
-#if !defined(NDEBUG)
-        std::cout << "[AudioManager] Playback speed set to " << speed << "x.\n";
-#endif
-    }
-
-    /*!****************************************************************************
-     * \brief Toggle playback speed between normal and a given speed.
-     *
-     * ## Usage:
-     *
-     * Call this method to toggle the playback speed between the provided speed and
-     * normal speed (1.0). For example, if you want half-speed playback, calling
-     * togglePlaybackSpeed(0.5f) will set the speed to 0.5 if it is currently 1.0,
-     * or revert to 1.0 if it is already 0.5.
-     *
-     * \param speed A positive float value representing the alternate playback speed.
-     * \return void
-     *****************************************************************************/
-    void FModAudioManager::togglePlaybackSpeed(float speed) {
-        // Use a small epsilon to compare floating-point values.
-        const float epsilon = 0.001f;
-        if ( std::fabs(currentPlaybackSpeed_ - speed) < epsilon ) {
-            setPlaybackSpeed(1.0f);
-        }
-        else {
-            setPlaybackSpeed(speed);
-        }
-    }
-
-    void FModAudioManager::setVolume(const std::string& name, float volume) {
-        auto it = sounds_.find(name);
-        assert(it != sounds_.end() && "Sound not found");
-        AudioAsset* targetSound = it->second;
-        targetSound->SetVolume(volume);
-
-#if !defined(NDEBUG)
-        std::cout << "[AudioManager] Volume for sound \"" << name << "\" set to " << volume << ".\n";
-#endif
-    }
-
-    float FModAudioManager::getMasterVolume() {
-        return masterVolume;
-    }
-
-    void FModAudioManager::setMasterVolume(float volume) {
-        masterVolume = volume;
-        for ( const auto& pair : sounds_ ) {
-            sounds_[pair.first]->SetVolume((masterVolume / 100) * sounds_[pair.first]->GetVolume());
-        }
-    }
-
-    void FModAudioManager::setSoundPosition(const std::string& name, const Vector3& position) {
-        auto it = sounds_.find(name);
-        assert(it != sounds_.end() && "Sound not found");
-        AudioAsset* targetSound = it->second;
-        targetSound->SetPosition(position);
-    }
-
-    void FModAudioManager::setSoundVelocity(const std::string& name, const Vector3& velocity) {
-        auto it = sounds_.find(name);
-        assert(it != sounds_.end() && "Sound not found");
-        AudioAsset* targetSound = it->second;
-        targetSound->SetVelocity(velocity);
-    }
-
-    float FModAudioManager::getVolume(const std::string& name) const {
-        auto it = sounds_.find(name);
-        assert(it != sounds_.end() && "Sound not found");
-        AudioAsset* targetSound = it->second;
-        return targetSound->GetVolume();
-    }
-
-    void FModAudioManager::pauseSound(const std::string& name) {
-        auto it = sounds_.find(name);
-        assert(it != sounds_.end() && "Sound not found");
-        AudioAsset* targetSound = it->second;
-        targetSound->Pause();
-#if !defined(NDEBUG)
-        std::cout << "[AudioManager] Paused sound \"" << name << "\" .\n";
-#endif
-        return;
-    }
-
-    void FModAudioManager::resumeSound(const std::string& name) {
-        auto it = sounds_.find(name);
-        assert(it != sounds_.end() && "Sound not found");
-        AudioAsset* targetSound = it->second;
-        targetSound->Resume();
-#if !defined(NDEBUG)
-        std::cout << "[AudioManager] Resumed sound \"" << name << "\" .\n";
-#endif
-        return;
-    }
-
-    void FModAudioManager::pauseAllSound() {
-        for ( const auto& pair : sounds_ ) {
-            sounds_[pair.first]->Pause();
-        }
-#if !defined(NDEBUG)
-        std::cout << "[AudioManager] All sound paused.\n";
-#endif
-    }
-
-    void FModAudioManager::resumeAllSound() {
-        for ( const auto& pair : sounds_ ) {
-            sounds_[pair.first]->Resume();
-        }
-#if !defined(NDEBUG)
-        std::cout << "[AudioManager] All sound resumed.\n";
-#endif
-    }
-
-    /*!****************************************************************************
-     * \brief Shut down the AudioManager and release all resources.
-     *
-     * ## Usage:
-     *
-     * Call this method when the application is closing to clean up all audio
-     * resources and properly shut down the FMOD system.
-     *
-     * ## Explanation:
-     *
-     * This method releases all loaded sound assets and closes the FMOD system to prevent
-     * memory leaks. It should be called once before the application exits.
-     *
-     * \return void
-     *****************************************************************************/
     void FModAudioManager::shutdown() {
-        // Release all loaded sounds
-        sounds_.clear();
+        if ( !system ) return;
 
-        // Close and release the FMOD system
-        if ( fmodSystem_ ) {
-            fmodSystem_->close();
-            fmodSystem_->release();
-            fmodSystem_ = nullptr;
-        }
-#if !defined(NDEBUG)
-        std::cout << "[AudioManager] FMOD system shut down.\n";
-#endif
+        // Stop all audio first
+        if ( masterGroup )
+            masterGroup->stop();
+
+        // Release channel groups we created
+        if ( musicGroup ) musicGroup->release();
+        if ( sfxGroup ) sfxGroup->release();
+        if ( uiGroup ) uiGroup->release();
+
+        // Release all loaded sounds
+        for ( auto& [handle, sound] : sounds )
+            sound->release();
+        sounds.clear();
+
+        // FMOD owns channels; we just drop our references
+        channels.clear();
+        groups.clear();
+
+        system->close();
+        system->release();
+        system = nullptr;
     }
+
+    // --- Sound creation ---
+    SoundHandle FModAudioManager::createSound(const std::string& path,
+                                              bool is3D,
+                                              bool loop) {
+        FMOD_MODE mode = FMOD_DEFAULT;
+        mode |= is3D ? FMOD_3D : FMOD_2D;
+        mode |= loop ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF;
+
+        FMOD::Sound* sound = nullptr;
+        auto string = "games/sample/assets/" + path;
+        auto fullPath = IO::resolve(string).make_preferred().string();
+        std::cout << "Loading sound: " << fullPath << std::endl;
+
+        FMOD_RESULT result = system->createSound(fullPath.c_str(), mode, nullptr, &sound);
+        if ( result != FMOD_OK )
+        {
+            // Log the error (in a real implementation, you'd want a proper logging system)
+            fprintf(stderr, "FMOD: Failed to create sound '%s' (error %d )\n",
+                    path.c_str(), result);
+            return NULL_SOUND;
+        }
+            
+
+        SoundHandle handle = nextSoundHandle++;
+        sounds[handle] = sound;
+        return handle;
+    }
+
+    SoundHandle FModAudioManager::createSoundAsync(const std::string& path,
+                                                   bool is3D,
+                                                   bool loop) {
+        FMOD_MODE mode = FMOD_DEFAULT | FMOD_NONBLOCKING;
+        mode |= is3D ? FMOD_3D : FMOD_2D;
+        mode |= loop ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF;
+
+        // recomment for large file
+        mode |= FMOD_CREATESTREAM;
+
+        FMOD::Sound* sound = nullptr;
+        FMOD_RESULT result = system->createSound(path.c_str(), mode, nullptr, &sound);
+        if ( result != FMOD_OK )
+            return NULL_SOUND;
+
+        SoundHandle handle = nextSoundHandle++;
+        sounds[handle] = sound;
+        return handle;
+    }
+
+    SoundLoadState FModAudioManager::getSoundLoadState(SoundHandle handle) {
+        auto it = sounds.find(handle);
+        if ( it == sounds.end() ) return SoundLoadState::Failed;
+
+        FMOD_OPENSTATE openState;
+        unsigned int percentBuffered;
+        bool starving, diskBusy;
+
+        //instead of doing it with hard code change we can get the state though FMOD API
+        // less work to do and more accurate
+        FMOD_RESULT result = it->second->getOpenState(&openState,
+                                                      &percentBuffered,
+                                                      &starving,
+                                                      &diskBusy);
+        if ( result != FMOD_OK ) return SoundLoadState::Failed;
+
+        switch ( openState ) {
+        case FMOD_OPENSTATE_READY:
+            return SoundLoadState::Ready;
+        case FMOD_OPENSTATE_ERROR:
+            return SoundLoadState::Failed;
+        default:
+            return SoundLoadState::Loading;
+        }
+    }
+
+    void FModAudioManager::destroySound(SoundHandle handle) {
+        auto it = sounds.find(handle);
+        if ( it == sounds.end() ) return;
+
+        it->second->release();
+        sounds.erase(it);
+    }
+
+    // --- Playback ---
+    ChannelHandle FModAudioManager::playSound(SoundHandle soundHandle,
+                                              float volume,
+                                              SoundCategory category) {
+        auto it = sounds.find(soundHandle);
+        if ( it == sounds.end() )
+            return NULL_CHANNEL;
+
+        FMOD::Sound* sound = it->second;
+
+        // Check async load state
+        FMOD_OPENSTATE state;
+        sound->getOpenState(&state, nullptr, nullptr, nullptr);
+
+        if ( state == FMOD_OPENSTATE_ERROR )
+            return NULL_CHANNEL;
+
+        FMOD::Channel* channel = nullptr;
+
+        // Play the sound
+        FMOD_RESULT result = system->playSound(sound, nullptr, false, &channel);
+        if ( result != FMOD_OK || !channel )
+            return NULL_CHANNEL;
+
+        // Route to correct category group
+        FMOD::ChannelGroup* targetGroup = nullptr;
+        switch ( category ) {
+        case SoundCategory::Music:
+            targetGroup = musicGroup;
+            break;
+        case SoundCategory::UI:
+            targetGroup = uiGroup;
+            break;
+        default:
+            targetGroup = sfxGroup;
+            break;
+        }
+
+        if ( targetGroup )
+            channel->setChannelGroup(targetGroup);
+
+        // Set initial volume
+        channel->setVolume(volume);
+
+        channel->setPaused(false);
+
+        // Register channel handle
+        ChannelHandle handle = nextChannelHandle++;
+        channels[handle] = channel;
+
+        return handle;
+    }
+
+    void FModAudioManager::playOneShot3D(SoundHandle sound,
+                                         const Vector3& pos,
+                                         const Vector3& vel,
+                                         float volume,
+                                         SoundCategory category) {
+        // Validate sound
+        auto it = sounds.find(sound);
+        if ( it == sounds.end() )
+            return;
+
+        FMOD::Sound* fmodSound = it->second;
+
+        // Play the sound
+        FMOD::Channel* channel = nullptr;
+        FMOD_RESULT result = system->playSound(fmodSound, nullptr, false, &channel);
+        if ( result != FMOD_OK || !channel )
+            return;
+
+        // Route to correct group
+        FMOD::ChannelGroup* targetGroup = nullptr;
+        switch ( category ) {
+        case SoundCategory::Music:
+            targetGroup = musicGroup;
+            break;
+        case SoundCategory::UI:
+            targetGroup = uiGroup;
+            break;
+        default:
+            targetGroup = sfxGroup;
+            break;
+        }
+
+        if ( targetGroup )
+            channel->setChannelGroup(targetGroup);
+
+        // Set volume
+        channel->setVolume(volume);
+
+        // Apply 3D attributes
+        FMOD_VECTOR fpos{pos.x, pos.y, pos.z};
+        FMOD_VECTOR fvel{vel.x, vel.y, vel.z};
+        channel->set3DAttributes(&fpos, &fvel);
+
+        // Fire-and-forget: do NOT store the channel handle
+        // FMOD will clean it up automatically when finished
+    }
+
+
+    void FModAudioManager::stopChannel(ChannelHandle handle) {
+        auto it = channels.find(handle);
+        if ( it == channels.end() ) return;
+
+        it->second->stop();
+        channels.erase(it);
+    }
+
+    void FModAudioManager::pauseChannel(ChannelHandle handle, bool paused) {
+        auto it = channels.find(handle);
+        if ( it == channels.end() ) return;
+
+        it->second->setPaused(paused);
+    }
+
+    void FModAudioManager::setChannelVolume(ChannelHandle handle, float volume) {
+        auto it = channels.find(handle);
+        if ( it == channels.end() ) return;
+
+        it->second->setVolume(volume);
+    }
+
+    bool FModAudioManager::isChannelPlaying(ChannelHandle handle) {
+        auto it = channels.find(handle);
+        if ( it == channels.end() ) return false;
+
+        bool playing = false;
+        it->second->isPlaying(&playing);
+        return playing;
+    }
+
+    void FModAudioManager::setGroupVolume(ChannelGroupHandle group, float volume) {
+        if ( auto* g = getGroup(group) )
+            g->setVolume(volume);
+    }
+
+    void FModAudioManager::pauseGroup(ChannelGroupHandle group, bool paused) {
+        if ( auto* g = getGroup(group) )
+            g->setPaused(paused);
+    }
+
+
+    // --- 3D attributes ---
+
+    void FModAudioManager::setChannel3DAttributes(ChannelHandle handle,
+                                                  const Vector3& position,
+                                                  const Vector3& velocity) {
+        auto it = channels.find(handle);
+        if ( it == channels.end() ) return;
+
+        FMOD_VECTOR fpos{position.x, position.y, position.z};
+        FMOD_VECTOR fvel{velocity.x, velocity.y, velocity.z};
+
+        it->second->set3DAttributes(&fpos, &fvel);
+    }
+
+    void FModAudioManager::setListenerAttributes(const Vector3& position,
+                                                 const Vector3& velocity,
+                                                 const Vector3& forward) {
+        FMOD_VECTOR fpos{position.x, position.y, position.z};
+        FMOD_VECTOR fvel{velocity.x, velocity.y, velocity.z};
+        FMOD_VECTOR fwd{forward.x, forward.y, forward.z};
+        FMOD_VECTOR fup{0.0f, 1.0f, 0.0f};
+
+        system->set3DListenerAttributes(0, &fpos, &fvel, &fwd, &fup);
+    }
+
+    // --- Private helpers ---
+
+    void FModAudioManager::pruneFinishedChannels() {
+        for ( auto it = channels.begin(); it != channels.end(); ) {
+
+            if ( !it->second ) {
+                it = channels.erase(it);
+                continue;
+            }
+
+            bool playing = false;
+            FMOD_RESULT result = it->second->isPlaying(&playing);
+
+            if ( result != FMOD_OK || !playing )
+                it = channels.erase(it);
+            else
+                ++it;
+        }
+    }
+
 } // namespace LaurelEye::Audio

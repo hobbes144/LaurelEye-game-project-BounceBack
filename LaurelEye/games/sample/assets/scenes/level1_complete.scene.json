@@ -219,14 +219,29 @@
                     "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
                     "scale": [ 1.0, 1.0, 1.0 ]
                 },
-                "Speaker": {
-                    "audioName": "background",
-                    "audioPath": "audio/background_music_loop.mp3",
-                    "volume": 0.05,
-                    "loop": true,
-                    "3D": false,
-                    "playOnLoad": true
+                "Audio": {
+                    "sounds": [
+                        {
+                            "id": "background",
+                            "path": "audio/background_music_loop.mp3",
+                            "volume": 0.2,
+                            "fadeSpeed": 1.0,
+                            "loop": true,
+                            "playOnLoad": true,
+                            "type": "BGM"
+                        },
+                        {
+                            "id": "background2",
+                            "path": "audio/testAudio.mp3",
+                            "volume": 0.2,
+                            "fadeSpeed": 1.0,
+                            "loop": true,
+                            "playOnLoad": true,
+                            "type": "BGM"
+                        }
+                    ]
                 }
+
             }
         },
 

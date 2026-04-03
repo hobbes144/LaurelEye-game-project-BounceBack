@@ -37,6 +37,19 @@
             "collisionGroup": 4,
             "collisionMask": 11,
             "gravityScale": 0.0
+        },
+        "Audio": {
+            "sounds": [
+                {
+                    "id": "footstep",
+                    "path": "audio/footstep.mp3",
+                    "volume": 0.2,
+                    "fadeSpeed": 1.0,
+                    "loop": true,
+                    "playOnLoad": false,
+                    "type": "SFX3D"
+                }
+            ]
         }
     }
 }

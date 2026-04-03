@@ -113,8 +113,11 @@ namespace LaurelEye {
             else if ( compName == "ParticleEmitter" ) {
                 setupParticleEmitterComponent(entity, compData);
             }
-            else if ( compName == "Speaker" ) {
-                setupSpeakerComponent(entity, compData);
+            //else if ( compName == "Speaker" ) {
+            //    setupSpeakerComponent(entity, compData);
+            //}
+            else if ( compName == "Audio" ) {
+                setupAudioComponent(entity, compData);
             }
             else if ( compName == "DebugDraw" ) {
                 setupDebugDrawComponent(entity, compData);
@@ -583,48 +586,96 @@ namespace LaurelEye {
         }
     }
 
-    void EntityFactory::setupSpeakerComponent(Entity& entity, const rapidjson::Value& speakerData) {
-        auto audioSystem = context.getService<Audio::AudioSystem>();
-        std::string audioName = "";
-        std::string audioPath = "";
-        float volume = 0.0f;
-        bool is3D = false;
-        bool isLooping = false;
-        bool playOnLoad = false;
+    //void EntityFactory::setupSpeakerComponent(Entity& entity, const rapidjson::Value& speakerData) {
+    //    auto audioSystem = context.getService<Audio::AudioSystem>();
+    //    std::string audioName = "";
+    //    std::string audioPath = "";
+    //    float volume = 0.0f;
+    //    bool is3D = false;
+    //    bool isLooping = false;
+    //    bool playOnLoad = false;
 
-        if ( speakerData.HasMember("audioName") && speakerData["audioName"].IsString() ) {
-            audioName = speakerData["audioName"].GetString();
-        }
-        if ( speakerData.HasMember("audioPath") && speakerData["audioPath"].IsString() ) {
-            audioPath = speakerData["audioPath"].GetString();
-        }
-        else {
-            std::cerr << "Audio path invalid for entity: " << entity.getName() << std::endl;
+    //    if ( speakerData.HasMember("audioName") && speakerData["audioName"].IsString() ) {
+    //        audioName = speakerData["audioName"].GetString();
+    //    }
+    //    if ( speakerData.HasMember("audioPath") && speakerData["audioPath"].IsString() ) {
+    //        audioPath = speakerData["audioPath"].GetString();
+    //    }
+    //    else {
+    //        std::cerr << "Audio path invalid for entity: " << entity.getName() << std::endl;
+    //        return;
+    //    }
+    //    if ( speakerData.HasMember("volume") && speakerData["volume"].IsFloat() ) {
+    //        volume = speakerData["volume"].GetFloat();
+    //    }
+    //    if ( speakerData.HasMember("3D") && speakerData["3D"].IsBool() ) {
+    //        is3D = speakerData["3D"].GetBool();
+    //    }
+    //    if ( speakerData.HasMember("loop") && speakerData["loop"].IsBool() ) {
+    //        isLooping = speakerData["loop"].GetBool();
+    //    }
+    //    if ( speakerData.HasMember("playOnLoad") && speakerData["playOnLoad"].IsBool() ) {
+    //        playOnLoad = speakerData["playOnLoad"].GetBool();
+    //    }
+    //    auto am = audioSystem->getAudioManager();
+    //    Audio::SpeakerComponent* sp = entity.addComponent<Audio::SpeakerComponent>();
+    //    sp->setAudioManager(am);
+    //    sp->setAudioName(audioName);
+    //    sp->setPlayOnLoad(playOnLoad);
+    //    sp->setIsLooping(isLooping);
+
+    //    sp->createAudioAsset(assetPath + audioPath, volume, is3D, isLooping);
+    //    sp->loadAudioAsset();
+
+    //    assert(sp != nullptr);
+    //}
+
+    void EntityFactory::setupAudioComponent(Entity& entity, const rapidjson::Value& audioData) {
+        if ( !audioData.HasMember("sounds") || !audioData["sounds"].IsArray() ) {
+            std::cerr << "Audio data missing 'sounds' array for entity: "
+                      << entity.getName() << std::endl;
             return;
         }
-        if ( speakerData.HasMember("volume") && speakerData["volume"].IsFloat() ) {
-            volume = speakerData["volume"].GetFloat();
-        }
-        if ( speakerData.HasMember("3D") && speakerData["3D"].IsBool() ) {
-            is3D = speakerData["3D"].GetBool();
-        }
-        if ( speakerData.HasMember("loop") && speakerData["loop"].IsBool() ) {
-            isLooping = speakerData["loop"].GetBool();
-        }
-        if ( speakerData.HasMember("playOnLoad") && speakerData["playOnLoad"].IsBool() ) {
-            playOnLoad = speakerData["playOnLoad"].GetBool();
-        }
-        auto am = audioSystem->getAudioManager();
-        Audio::SpeakerComponent* sp = entity.addComponent<Audio::SpeakerComponent>();
-        sp->setAudioManager(am);
-        sp->setAudioName(audioName);
-        sp->setPlayOnLoad(playOnLoad);
-        sp->setIsLooping(isLooping);
 
-        sp->createAudioAsset(assetPath + audioPath, volume, is3D, isLooping);
-        sp->loadAudioAsset();
+        auto audioSystem = context.getService<Audio::AudioSystem>();
+        auto audioManager = audioSystem->getAudioManager();
 
-        assert(sp != nullptr);
+        // Create component
+        Audio::AudioComponent* audioComp = entity.addComponent<Audio::AudioComponent>(audioManager);
+
+        const auto& soundsArray = audioData["sounds"].GetArray();
+
+        for ( const auto& s : soundsArray ) {
+            if ( !s.HasMember("id") || !s.HasMember("path") || !s["id"].IsString() || !s["path"].IsString() ) {
+                std::cerr << "Invalid sound entry in entity: " << entity.getName() << std::endl;
+                continue;
+            }
+
+            std::string id = s["id"].GetString();
+            std::string path = s["path"].GetString();
+            float volume = s.HasMember("volume") ? s["volume"].GetFloat() : 1.0f;
+            float fadeSpeed = s.HasMember("fadeSpeed") ? s["fadeSpeed"].GetFloat() : 1.0f;
+            bool looping = s.HasMember("loop") ? s["loop"].GetBool() : false;
+            bool playOnLoad = s.HasMember("playOnLoad") ? s["playOnLoad"].GetBool() : false;
+
+            // Determine sound type
+            Audio::SoundType type = Audio::SoundType::SFX2D;
+            if ( s.HasMember("type") && s["type"].IsString() ) {
+                std::string t = s["type"].GetString();
+                if ( t == "BGM" ) type = Audio::SoundType::BGM;
+                else if ( t == "SFX3D" ) type = Audio::SoundType::SFX3D;
+                else if ( t == "UI" ) type = Audio::SoundType::UI;
+            }
+
+            // Register sound in component
+            audioComp->addSound(id, path, type, volume, fadeSpeed, looping);
+
+            // Play immediately if requested
+            if ( playOnLoad ) {
+                Audio::SoundHandle handle = audioManager->createSound(path, type == Audio::SoundType::SFX3D, looping);
+                audioComp->play(id);
+            }
+        }
     }
 
     void EntityFactory::setupUITransformComponent(Entity& entity, const rapidjson::Value& uitransformData) {

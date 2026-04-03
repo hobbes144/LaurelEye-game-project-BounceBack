@@ -20,6 +20,8 @@ namespace LaurelEye {
         sceneManager = std::make_unique<SceneManager>(ctx, engineConfig);
         eventManager = std::make_unique<EventManager>();
         animationManager = std::make_unique<Animations::AnimationManager>();
+        FModAudioManager = std::make_unique<Audio::FModAudioManager>();
+        FModAudioManager->initialize();
         gameManager = std::make_unique<GameManager>();
 
         ctx.registerService<InputManager>(inputManager.get());
@@ -29,6 +31,7 @@ namespace LaurelEye {
         ctx.registerService<EventManager>(eventManager.get());
         ctx.registerService<SceneManager>(sceneManager.get());
         ctx.registerService<Animations::AnimationManager>(animationManager.get());
+        ctx.registerService<Audio::IAudioManager>(FModAudioManager.get());
         ctx.registerService<GameManager>(gameManager.get());
     }
 

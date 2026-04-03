@@ -14,11 +14,11 @@ function onStart()
     transform = self:findTransform()
     body = self:findGhostBody()
 
-    speaker = self:findAudioSpeaker()
-    if speaker ~= nil then
-        speaker:stop()
-        speaker:play()
-    end
+    --speaker = self:findAudioSpeaker()
+    --if speaker ~= nil then
+        --speaker:stop()
+        --speaker:play()
+    --end
 end
 
 function onMessage(msg)

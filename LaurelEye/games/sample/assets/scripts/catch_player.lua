@@ -14,6 +14,7 @@ cameraTransform = nil
 cameraEntity = nil
 smokeEmitter = nil
 speaker = nil
+audio = nil
 
 isGrounded = true
 jumping = false
@@ -78,7 +79,7 @@ function onStart()
         defaultSpreadAngle  = data.spreadAngle
     end
 
-    speaker = self:findAudioSpeaker()
+
 
     trajectoryLine = TrajectoryLine.new()
     ballGravity = Vector3.new(0, -1.5*9.8, 0)
@@ -132,6 +133,26 @@ function onUpdate(dt)
             end
         end
     end
+
+    -- Audio Part
+    playerPos = transform:getWorldPosition()
+    Audio.setListenerPosition(playerPos.x,playerPos.y,playerPos.z)
+    local camRot = cameraTransform:getWorldRotation()
+    local forward = camRot:forward()
+    Audio.setListenerForward(forward.x, forward.y, forward.z)
+    playerAudio = self:findAudio()
+    Audio.setMusicVolume(0.0)
+    -- test 3D sound set it inf far and see if audio disappear/ in the correct position
+    --log(string.format("Player Position: %.3f, %.3f, %.3f",
+    --playerPos.x, playerPos.y, playerPos.z))
+
+    local emitterPos = Vector3.new(
+            playerPos.x,playerPos.y,playerPos.z
+            ) -- keep it close for testing
+            playerAudio = self:findAudio()
+            playerAudio:setPosition(emitterPos)
+    --playerPos = transform:getWorldPosition()
+
 
     --Check if health = 0
     if currentHealth <= 0 then
@@ -267,11 +288,13 @@ function onUpdate(dt)
         local animName = animator.currentAnimationName
         if animName ~= "MainChar2_Running" then
             animator:changeAnimation("MainChar2_Running")
+            playerAudio:play("footstep")
         end
     else
         local animName = animator.currentAnimationName
         if animName ~= "MainChar2_Idle" then
             animator:changeAnimation("MainChar2_Idle")
+            playerAudio:stop("footstep")
         end
     end
 

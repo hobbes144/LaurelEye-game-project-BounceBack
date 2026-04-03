@@ -356,13 +356,18 @@ namespace LaurelEye {
                     particleSystem->registerComponent(emitterComp);
                 }
             }
-            else if ( auto* speakerComp = dynamic_cast<Audio::SpeakerComponent*>(comp.get()) ) {
+            //else if ( auto* speakerComp = dynamic_cast<Audio::SpeakerComponent*>(comp.get()) ) {
+            //    if ( audioSystem ) {
+            //        audioSystem->registerComponent(speakerComp);
+            //        // speakerComp->loadAudioAsset();
+            //        if ( speakerComp->getPlayOnLoad() ) {
+            //            speakerComp->playSound();
+            //        }
+            //    }
+            //}
+            else if ( auto* speakerComp = dynamic_cast<Audio::AudioComponent*>(comp.get()) ) {
                 if ( audioSystem ) {
                     audioSystem->registerComponent(speakerComp);
-                    // speakerComp->loadAudioAsset();
-                    if ( speakerComp->getPlayOnLoad() ) {
-                        speakerComp->playSound();
-                    }
                 }
             }
             else if ( auto* uirenderComp = dynamic_cast<UI::UIRenderComponent*>(comp.get()) ) {
@@ -447,13 +452,19 @@ namespace LaurelEye {
                     particleSystem->deregisterComponent(emitterComp);
                 }
             }
-            else if ( auto* speakerComp = dynamic_cast<Audio::SpeakerComponent*>(comp.get()) ) {
+            //else if ( auto* speakerComp = dynamic_cast<Audio::SpeakerComponent*>(comp.get()) ) {
+            //    if ( audioSystem ) {
+            //        audioSystem->deregisterComponent(speakerComp);
+            //    }
+            //    // BG music n jazz
+            //    if ( speakerComp->getIsLooping() ) {
+            //        speakerComp->stopSound(speakerComp->getAudioName());
+            //    }
+            //}
+            else if ( auto* audioComp = dynamic_cast<Audio::AudioComponent*>(comp.get()) ) {
                 if ( audioSystem ) {
-                    audioSystem->deregisterComponent(speakerComp);
-                }
-                // BG music n jazz
-                if ( speakerComp->getIsLooping() ) {
-                    speakerComp->stopSound(speakerComp->getAudioName());
+                    audioComp->stopAll();
+                    audioSystem->deregisterComponent(audioComp);
                 }
             }
             else if ( auto* uirenderComp = dynamic_cast<UI::UIRenderComponent*>(comp.get()) ) {

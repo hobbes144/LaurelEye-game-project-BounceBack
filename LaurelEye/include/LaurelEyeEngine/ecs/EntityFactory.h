@@ -60,7 +60,8 @@ namespace LaurelEye{
         void setupPhysicsComponent(Entity& entity, const rapidjson::Value& physicsData);
         void setupScriptComponent(Entity& entity, const rapidjson::Value& scriptData);
         void setupParticleEmitterComponent(Entity& entity, const rapidjson::Value& emitterData);
-        void setupSpeakerComponent(Entity& entity, const rapidjson::Value& speakerData);
+        //void setupSpeakerComponent(Entity& entity, const rapidjson::Value& speakerData);
+        void setupAudioComponent(Entity& entity, const rapidjson::Value& speakerData);
         void setupDebugDrawComponent(Entity& entity, const rapidjson::Value& emitterData);
         void setupAnimationComponent(Entity& entity, const rapidjson::Value& animationData);
         void setupUIRenderComponent(Entity& entity, const rapidjson::Value& uirenderData);

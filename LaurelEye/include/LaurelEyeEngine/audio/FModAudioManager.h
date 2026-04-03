@@ -21,112 +21,105 @@
 #include <vector>
 
 namespace LaurelEye::Audio {
-    /*!****************************************************************************
-     * \brief Audio Manager
-     *
-     * ## Usage:
-     *
-     * The AudioManager manages all audio functionality using FMOD. It is responsible
-     * for initializing the audio system, loading sounds, playing sounds, updating
-     * audio each frame, and properly shutting down the audio system.
-     *
-     * ## Pre-initialization calls:
-     *
-     * N/A
-     *
-     * (AudioManager is created on first use; be sure to call init() before any
-     * other audio operations.)
-     *
-     * ## General lifecycle of an AudioManager:
-     *
-     * - Start the AudioManager instance using AudioManager::instance().
-     * - Call init() once at startup to initialize the audio system:
-     *   - Example: AudioManager::instance().init();
-     * - Load all necessary sound assets using loadSound():
-     *   - Example: AudioManager::instance().loadSound("pew", "/media/pew.mp3", true, false);
-     *     - The third parameter indicates whether the sound is 3D (true) or 2D (false).
-     *     - Optionally, a loop flag can be provided on the 4th parameter.
-     * - Play sounds using playSound():
-     *   - Example: AudioManager::instance().playSound("pew", 0.0f, 0.0f, 0.0f);
-     * - Stop a sound using stopSound():
-     *   - Example: AudioManager::instance().stopSound("radio");
-     * - In the main loop, call update() every frame to process audio updates:
-     *   - Example: AudioManager::instance().update();
-     *   - You need to call update every frame to play the sounds properly.
-     * - Adjust the listener position using setListenerPosition() to control 3D audio:
-     *   - Example: AudioManager::instance().setListenerPosition(x, y, z);
-     * - To change playback speed, call setPlaybackSpeed():
-     *   - Example: AudioManager::instance().setPlaybackSpeed(0.5f);
-     * - To toggle playback speed, call togglePlaybackSpeed(), when called again reset the speed.
-     *   - Example: AudioManager::instance().togglePlaybackSpeed(0.7f);
-     * - Before terminating the application, call shutdown() to clean up the audio system:
-     *   - Example: AudioManager::instance().shutdown();
-     *
-     * ## Defaults:
-     *
-     * - Maximum channels: 512 (can be adjusted via the init() parameter)
-     * - Sounds are non-looping unless the loop flag is set during loadSound()
-     *
-     * ## Notes:
-     *
-     * - You need to call update() every frame to ensure proper audio processing.
-     * - It is recommended to load all required sounds during initialization to avoid
-     *   runtime performance issues.
-     *
-     *****************************************************************************/
+
     class FModAudioManager : public IAudioManager {
     public:
-        FModAudioManager() {
-            initialize();
-        }
-
-        FModAudioManager(int maxChanels) {
-            initialize(maxChanels);
-        }
-
+        explicit FModAudioManager(int maxChannels = 512);
         ~FModAudioManager() override;
 
-        void initialize(int maxChannels = 512);
+        // --- Lifecycle ---
+        void initialize() override;
         void update() override;
         void shutdown() override;
 
-        void createSound(const std::string& name, const std::string& path, float volume = 1.0f, bool is3D = false, bool loop = false) override;
-        void loadSound(const std::string& name) override;
-        void loadSoundImmidiate(const std::string& name) override;
-        void playSound(const std::string& name) override;
-        void stopSound(const std::string& name) override;
+        // --- Sound creation ---
+        SoundHandle createSound(const std::string& path,
+                                bool is3D,
+                                bool loop) override;
 
-        void setListenerPosition(const Vector3& position) override;
-        Vector3 getListenerPosition() const override { return listenerPosition; }
-        void setListenerVelocity(const Vector3& velocity) override;
-        Vector3 getListenerVelocity() const override { return listenerVelocity; }
+        SoundHandle createSoundAsync(const std::string& path,
+                                     bool is3D,
+                                     bool loop) override;
 
-        void setPlaybackSpeed(float speed) override;
-        void togglePlaybackSpeed(float speed = 1) override;
-        void setVolume(const std::string& name, float volume) override;
-        float getMasterVolume() override;
-        void setMasterVolume(float volume) override;
-        float getVolume(const std::string& name) const override;
-        void setSoundPosition(const std::string& name, const Vector3& position) override;
-        void setSoundVelocity(const std::string& name, const Vector3& velocity) override;
-        void pauseSound(const std::string& name) override;
-        void resumeSound(const std::string& name) override;
-        void pauseAllSound() override;
-        void resumeAllSound() override;
+        SoundLoadState getSoundLoadState(SoundHandle sound) override;
 
-        std::string readAudioConfig(const std::string& configFilePath) override;
+        void destroySound(SoundHandle sound) override;
+
+        // --- Playback ---
+        ChannelHandle playSound(SoundHandle sound,
+                                float volume = 1.0f,
+                                SoundCategory category = SoundCategory::SFX) override;
+
+        // fire and forget 3D sound at the given position and velocity, without needing to manage the channel
+        // we not using it for the current Fmod design, but if we use for another sound lib may need it
+        void playOneShot3D(SoundHandle sound,
+                           const Vector3& pos,
+                           const Vector3& vel,
+                           float volume = 1.0f,
+                           SoundCategory category = SoundCategory::SFX) override;
+
+        void stopChannel(ChannelHandle channel) override;
+        void pauseChannel(ChannelHandle channel,
+                          bool paused) override;
+        void setChannelVolume(ChannelHandle channel,
+                              float volume) override;
+        bool isChannelPlaying(ChannelHandle channel) override;
+
+        // --- 3D attributes ---
+        void setChannel3DAttributes(ChannelHandle channel,
+                                    const Vector3& position,
+                                    const Vector3& velocity) override;
+
+        // --- Listener ---
+        void setListenerAttributes(const Vector3& position,
+                                   const Vector3& velocity,
+                                   const Vector3& forward) override;
+
+        void setGroupVolume(ChannelGroupHandle group,
+                            float volume) override;
+        void pauseGroup(ChannelGroupHandle group,
+                        bool paused) override;
+
+        // Channel groups
+        ChannelGroupHandle getMusicGroup() override { return musicGroupHandle; }
+        ChannelGroupHandle getSFXGroup() override { return sfxGroupHandle; }
+        ChannelGroupHandle getUIGroup() override { return uiGroupHandle; }
+
+        // Raw FMOD access (for systems)
+        FMOD::Channel* getRawChannel(ChannelHandle handle);
 
     private:
-        FMOD::System* fmodSystem_ = nullptr;
-        std::unordered_map<std::string, AudioAsset*> sounds_;
+        FMOD::System* system = nullptr;
 
-        float currentPlaybackSpeed_ = 1.0f;
-        Vector3 listenerPosition = Vector3();
-        Vector3 listenerVelocity = Vector3();
+        FMOD::ChannelGroup* masterGroup = nullptr;
+        FMOD::ChannelGroup* musicGroup = nullptr;
+        FMOD::ChannelGroup* sfxGroup = nullptr;
+        FMOD::ChannelGroup* uiGroup = nullptr;
 
-        std::vector<AudioAsset*> awatingSounds;
+        ChannelGroupHandle masterGroupHandle = NULL_GROUP;
+        ChannelGroupHandle musicGroupHandle = NULL_GROUP;
+        ChannelGroupHandle sfxGroupHandle = NULL_GROUP;
+        ChannelGroupHandle uiGroupHandle = NULL_GROUP;
+
+        int maxChannels = 512;
+        uint32_t nextSoundHandle = 1;   // 0 is reserved for NULL_SOUND
+        uint32_t nextChannelHandle = 1; // 0 is reserved for NULL_CHANNEL
+        uint32_t nextGroupHandle = 1;   // 0 reserved for NULL_GROUP
+
+        std::unordered_map<SoundHandle, FMOD::Sound*> sounds;
+        std::unordered_map<ChannelHandle, FMOD::Channel*> channels;
+        std::unordered_map<ChannelGroupHandle, FMOD::ChannelGroup*> groups;
+
+        // Helpers
+        void createDefaultGroups();
+        ChannelGroupHandle registerGroup(FMOD::ChannelGroup* group);
+        FMOD::ChannelGroup* getGroup(ChannelGroupHandle handle);
+
+        // Helper: silently remove stale channels FMOD has already freed
+        void pruneFinishedChannels();
     };
 
-#endif // AUDIO_H
 
 } // namespace LaurelEye::Audio
+#endif // AUDIO_H
+

@@ -19,6 +19,7 @@
 #include "LaurelEyeEngine/audio/SpeakerComponent.h"
 #include "LaurelEyeEngine/ecs/IComponent.h"
 #include "LaurelEyeEngine/animation/components/SkeletalAnimationComponent.h"
+#include "LaurelEyeEngine/audio/AudioComponent.h"
 
 namespace LaurelEye::Scripting {
     void Sol2API_ECS::setup(sol::state& lua, EngineContext* ctx) {
@@ -67,12 +68,11 @@ namespace LaurelEye::Scripting {
         entityType.set_function("findGhostBody", &safeFindComponent<Physics::GhostBodyComponent>);
         //entityType.set_function("findPhysics", &safeFindComponent<Physics::PhysicsBodyBaseComponent>);
         entityType.set_function("findScript", &safeFindComponent<ScriptComponent>);
-        entityType.set_function("findSpeaker", &safeFindComponent<Audio::SpeakerComponent>);
         entityType.set_function("findParticleEmitter", &safeFindComponent<Particles::ParticleEmitterComponent>);
+        entityType.set_function("findAudio", &safeFindComponent<Audio::AudioComponent>);
         entityType.set_function("findUIRender", &safeFindComponent<UI::UIRenderComponent>);
         entityType.set_function("findUITransform", &safeFindComponent<UI::UITransformComponent>);
         entityType.set_function("findUIInteraction", &safeFindComponent<UI::UIInteractionComponent>);
-        entityType.set_function("findAudioSpeaker", &safeFindComponent<Audio::SpeakerComponent>);
         entityType.set_function("findPointLight", &safeFindComponent<Graphics::PointLightComponent>);
         entityType.set_function("findAnimator", &safeFindComponent<Animations::SkeletalAnimationComponent>);
     }
@@ -116,12 +116,12 @@ namespace LaurelEye::Scripting {
             if ( auto* c = e.findComponent<ScriptComponent>() )
                 return sol::make_object(lua, c);
         }
-        else if ( type == "SpeakerComponent" ) {
-            if ( auto* c = e.findComponent<Audio::SpeakerComponent>() )
-                return sol::make_object(lua, c);
-        }
-        else if ( type == "AudioSpeakerComponent" ) {
-            if ( auto* c = e.findComponent<Audio::SpeakerComponent>() )
+        //else if ( type == "SpeakerComponent" ) {
+        //    if ( auto* c = e.findComponent<Audio::SpeakerComponent>() )
+        //        return sol::make_object(lua, c);
+        //}
+        else if ( type == "AudioComponent" ) {
+            if ( auto* c = e.findComponent<Audio::AudioComponent>() )
                 return sol::make_object(lua, c);
         }
         else if ( type == "PointLightComponent" ) {
@@ -147,6 +147,6 @@ namespace LaurelEye::Scripting {
 
         return sol::make_object(lua, sol::nil);
     }
-    
+
 
 } // namespace LaurelEye::Scripting
