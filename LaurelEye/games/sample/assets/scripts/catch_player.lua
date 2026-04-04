@@ -1,11 +1,10 @@
 ﻿baseSpeed      = 50.0
 sprintSpeed    = 75.0
 moveSpeed      = baseSpeed
-dashSpeed      = 150.0
 turnSpeed      = 10.0
-timeToReachGround = 0.12   -- seconds to reach desired speed on ground (tweak)
-timeToReachAir    = 0.25   -- seconds to reach desired speed in air
-dvDeadzone        = 0.05   -- ignore tiny dv values to avoid jitter
+timeToReachGround = 0.08
+timeToReachAir    = 0.25
+dvDeadzone        = 0.05
 
 ---@type Scene|nil
 local scene = nil
@@ -27,6 +26,11 @@ audio = nil
 isGrounded = true
 jumping = false
 
+-- ── Jump settings ─────────────────────────────────────────────────
+jumpImpulse       = 50.0
+jumpCutMultiplier = 0.45
+-- ─────────────────────────────────────────────────────────────────
+
 landingBurstTime = 0.1
 landingBurstTimer = 0.0
 inLandingBurst = false
@@ -40,8 +44,8 @@ walkSoundMinSpeed = 5.0
 isWalkSoundPlaying = false
 
 footstepTimer = 0.0
-stepInterval = 0.35   -- seconds between steps
-speedThreshold = 2.0  -- when footsteps should begin
+stepInterval = 0.35
+speedThreshold = 2.0
 
 ---@type boolean
 local hasBall = true
@@ -51,16 +55,11 @@ projectileSpeed = baseProjSpeed
 ---@type Vector3
 local ballGravity = Vector3.new(0.0, 9.8, 0.0)
 
---damage variables
 maxHealth = 3.0
 currentHealth = nil
 invincible = false
 invincibleTimer = 0.0
 invincibleDuration = 1.5
-
-dashDuration = 0.25
-dashTimer = 0.0
-isDashing = false
 
 local TrajectoryLine = require("TrajectoryLine")
 ---@type TrajectoryLine|nil
@@ -176,15 +175,12 @@ function onStart()
 
     if smokeEmitter ~= nil then
         smokeEmitter:pause()
-
         local data = smokeEmitter:getEmitterData()
         defaultEmissionRate = data.emissionRate
         defaultStartSize    = data.startSize
         defaultEndSize      = data.endSize
         defaultSpreadAngle  = data.spreadAngle
     end
-
-
 
     trajectoryLine = TrajectoryLine.new()
     ballGravity = Vector3.new(0, -1.5*9.8, 0)
@@ -246,7 +242,7 @@ function onUpdate(dt)
             and (hasBall or #projectilesInRange > 0) then
 
             targetTimeScale = slowedTimeScale
-            slowStartTime = timeData.unscaledTime;
+            slowStartTime = timeData.unscaledTime
         end
     else
         if (not hasBall and #projectilesInRange == 0) or
@@ -260,18 +256,14 @@ function onUpdate(dt)
 
     if timeScale ~= targetTimeScale then
         timeScale = timeScale + (targetTimeScale - timeScale) * timeSlowLerpSpeed * (timeData.unscaledDt)
-        Engine.setTimeScale(timeScale);
-        -- timeScale = targetTimeScale
-        -- Engine.setTimeScale(targetTimeScale);
+        Engine.setTimeScale(timeScale)
         dt = timeData.unscaledDt * timeScale
     end
 
     if cameraTransform == nil or cameraEntity == nil then
         cameraEntity = scene:findEntityByName("Camera")
         if cameraEntity ~= nil then
-            debugLog("Camera Entity: ", cameraEntity)
             cameraTransform = cameraEntity:findTransform()
-            debugLog("Camera Transform: ", cameraTransform)
         end
     end
 
@@ -283,19 +275,14 @@ function onUpdate(dt)
     Audio.setListenerForward(forward.x, forward.y, forward.z)
     playerAudio = self:findAudio()
     Audio.setMusicVolume(0.0)
-    -- test 3D sound set it inf far and see if audio disappear/ in the correct position
-    --log(string.format("Player Position: %.3f, %.3f, %.3f",
-    --playerPos.x, playerPos.y, playerPos.z))
 
     local emitterPos = Vector3.new(
             playerPos.x,playerPos.y,playerPos.z
             ) -- keep it close for testing
             playerAudio = self:findAudio()
             playerAudio:setPosition(emitterPos)
-    --playerPos = transform:getWorldPosition()
 
 
-    --Check if health = 0
     if currentHealth <= 0 then
         log("Player has died!")
         currentHealth = maxHealth
@@ -311,25 +298,29 @@ function onUpdate(dt)
         end
     end
 
-    if isDashing then
-        dashTimer = dashTimer + dt
-        if dashTimer >= dashDuration then
-            isDashing = false
+    -- Sprint
+    moveSpeed = Input:isKeyHeld(Key.LShift) and sprintSpeed or baseSpeed
 
-            -- Only disable if not in damage invincibility
-            if invincibleTimer >= dashDuration then
-                invincible = false
-            end
-        end
+    -- ── Jump ──────────────────────────────────────────────────────
+    if Input:isKeyPressed(Key.Space) and isGrounded then
+        local vel  = body:getLinearVelocity()
+        local mass = body:getBodyData().mass
+        body:setLinearVelocity(Vector3.new(vel.x, 0.0, vel.z))
+        body:applyImpulse(Vector3.new(0.0, jumpImpulse * mass, 0.0))
+        isGrounded = false
     end
 
-    moveSpeed = Input:isKeyHeld(Key.LShift) and sprintSpeed or baseSpeed
+    -- ── Jump-cut: release early → shorter hop ─────────────────────
+    if Input:isKeyReleased(Key.Space) then
+        local vel = body:getLinearVelocity()
+        if vel.y > 0.0 then
+            body:setLinearVelocity(Vector3.new(vel.x, vel.y * jumpCutMultiplier, vel.z))
+        end
+    end
 
     -- Input
     local lStickX = Input:getGamepadAxis(GamepadAxes.LStickX)
     local lStickY = Input:getGamepadAxis(GamepadAxes.LStickY)
-
-    -- Deadzone
     if math.abs(lStickX) < 0.5 then lStickX = 0 end
     if math.abs(lStickY) < 0.5 then lStickY = 0 end
 
@@ -349,10 +340,8 @@ function onUpdate(dt)
         inputZ = inputZ / inputMag
     end
 
-    -- Camera Movement
     local moveDir = getCameraRelativeMovement(inputX, inputZ)
 
-    -- Physics Movement
     local vel = body:getLinearVelocity()
     local mass = body:getBodyData().mass
 
@@ -375,48 +364,27 @@ function onUpdate(dt)
         deltaZ = dvz * scale
     end
 
-    local newVel = Vector3.new(
+    body:setLinearVelocity(Vector3.new(
         vel.x + deltaX,
         vel.y,
         vel.z + deltaZ
-    )
-
-    body:setLinearVelocity(newVel)
+    ))
 
     if inputMag > 0.01 then
-        local animName = animator.currentAnimationName
-        if animName ~= "MainChar2_Running" then
+        if animator.currentAnimationName ~= "MainChar2_Running" then
             animator:changeAnimation("MainChar2_Running")
             playerAudio:play("footstep")
         end
     else
-        local animName = animator.currentAnimationName
-        if animName ~= "MainChar2_Idle" then
+        if animator.currentAnimationName ~= "MainChar2_Idle" then
             animator:changeAnimation("MainChar2_Idle")
             playerAudio:stop("footstep")
         end
     end
 
-    -- Rotation
     if inputMag > 0 then
         local angle = math.atan(moveDir.x, moveDir.z)
         rotateTo(angle, dt)
-    end
-
-    if Input:isKeyPressed(Key.Space) then
-        isDashing = true
-        dashTimer = 0.0
-
-        invincible = true
-        invincibleTimer = 0.0
-
-        local dashX = moveDir.x * dashSpeed
-        local dashZ = moveDir.z * dashSpeed
-
-        local dx = dashX - vel.x
-        local dz = dashZ - vel.z
-
-        body:applyImpulse(Vector3.new(dx * mass, 0, dz * mass))
     end
 
     playerPos = transform:getWorldPosition()
@@ -466,15 +434,12 @@ end
 
 function triggerLandingBurst()
     if smokeEmitter == nil then return end
-
     local data = smokeEmitter:getEmitterData()
     data.emissionRate = defaultEmissionRate * 2.0
     data.startSize = defaultStartSize * 2.5
     data.endSize = defaultEndSize * 2.0
     data.spreadAngle = 90.0
-
     smokeEmitter:playFor(0.2)
-
     landingBurstTimer = landingBurstTime
     inLandingBurst = true
 end
@@ -483,24 +448,15 @@ function getCameraRelativeMovement(inputX, inputZ)
     if cameraTransform == nil then
         return Vector3.new(inputX, 0, inputZ)
     end
-
     local camRot = cameraTransform:getWorldRotation()
     local forward = camRot:forward()
     forward.y = 0
-    if forward:Magnitude() > 0 then
-        forward = forward:Normalized()
-    end
-
+    if forward:Magnitude() > 0 then forward = forward:Normalized() end
     local right = camRot:right()
     right.y = 0
-    if right:Magnitude() > 0 then
-        right = right:Normalized()
-    end
-
+    if right:Magnitude() > 0 then right = right:Normalized() end
     local moveDir = forward * inputZ + right * inputX
-    if moveDir:Magnitude() > 0 then
-        moveDir = moveDir:Normalized()
-    end
+    if moveDir:Magnitude() > 0 then moveDir = moveDir:Normalized() end
     return moveDir
 end
 
@@ -511,6 +467,7 @@ function rotateTo(angle, dt)
     transform:setWorldRotation(rot)
 end
 
+
 function shootProjectile()    local
     proj = SceneManager:instantiate("prefabs/catch_ball.prefab.json")
     if proj == nil then return end
@@ -520,50 +477,49 @@ function shootProjectile()    local
         SceneManager:destroy(proj)
         return
     end
-
-    debugLog("Shooting Projectile")
     projTransform:setWorldPosition(spawnPos)
     projBody:setLinearVelocity(shootDir * baseProjSpeed)
 end
 
 function onCollisionEnter(data)
-    --Check for enemy collision
     local tagsA = data.entityA:getTags()
     for _, tag in pairs(tagsA) do
         if tag == "ground" then
-            if not isGrounded then
-                triggerLandingBurst()
-            end
+            if not isGrounded then triggerLandingBurst() end
             isGrounded = true
             jumping = false
         elseif tag == "door" then
-            if hasKey then
-                changeLevels()
-            end
+            if hasKey then changeLevels() end
         end
     end
-
     local tagsB = data.entityB:getTags()
     for _, tag in pairs(tagsB) do
         if tag == "ground" then
-            if not isGrounded then
-                triggerLandingBurst()
-            end
+            if not isGrounded then triggerLandingBurst() end
             isGrounded = true
             jumping = false
         elseif tag == "door" then
-            if hasKey then
-                changeLevels()
-            end
+            if hasKey then changeLevels() end
         end
     end
-
 end
 
 function catchBall(ball)
     local ballBody = ball:findGhostBody()
     ballBody:setLinearVelocity(0.0, 0.0, 0.0)
     hasBall = true
+end
+
+function findForward()
+    local scene = SceneManager:getCurrentScene()
+    if scene == nil then return end
+    local cameraEntity = scene:findEntityByName("Camera")
+    if cameraEntity == nil then return end
+    local cameraTransform = cameraEntity:findTransform()
+    if cameraTransform == nil then return end
+    local camRot = cameraTransform:getWorldRotation()
+    local aimDir = camRot:forward()
+    return aimDir:Normalized()
 end
 
 function moveHealthBar()
@@ -574,25 +530,18 @@ function moveHealthBar()
     local hSize = barTransform:getSize()
     local maxSize = 160
     local percent = currentHealth / maxHealth
-    local newSize = Vector2.new(maxSize * percent, hSize.y)
-    barTransform:setSize(newSize)
+    barTransform:setSize(Vector2.new(maxSize * percent, hSize.y))
 end
 
 function changeLevels()
     local scene = SceneManager:getCurrentScene()
     if scene == nil then return end
     local sceneName = scene:getName()
-    if sceneName == "Level1" then
-        SceneManager:changeScene("Level2")
-    elseif sceneName == "Level2" then
-        SceneManager:changeScene("Level3")
-    elseif sceneName == "Level3" then
-        SceneManager:changeScene("Level4")
-    elseif sceneName == "Level4" then
-        SceneManager:changeScene("Level5")
-    elseif sceneName == "Level5" then
-        log("Beta Completed!")
-    end
+    if sceneName == "Level1" then SceneManager:changeScene("Level2")
+    elseif sceneName == "Level2" then SceneManager:changeScene("Level3")
+    elseif sceneName == "Level3" then SceneManager:changeScene("Level4")
+    elseif sceneName == "Level4" then SceneManager:changeScene("Level5")
+    elseif sceneName == "Level5" then log("Beta Completed!") end
 end
 
 function cameraAim(maxDistance)
@@ -600,11 +549,7 @@ function cameraAim(maxDistance)
     local forward = cameraTransform:getWorldRotation():forward():Normalized()
 
     local hit = Physics.Raycast(camPos, forward, maxDistance, { layerMask = Layers.World | Layers.Enemy })
-
-    if hit ~= nil then
-        return hit.position
-    end
-
+    if hit ~= nil then return hit.position end
     return camPos + forward * maxDistance
 end
 

@@ -12,9 +12,7 @@ scene = nil
 playerEntity = nil
 playerTransform = nil
 
-gravityDisabled = false
-homingTimer = nil        -- tracks time since homing started
-HOMING_TIMEOUT = 2.0     -- seconds before giving up and sending "Catch Me!"
+chaseRange = 10.0
 
 function onStart()
     transform = self:findTransform()
@@ -38,17 +36,32 @@ function onUpdate(dt)
         returnSpeed = initialSpeed + 25.0
     end
 
-    -- Count down the homing timeout
-    if homingTimer ~= nil then
-        homingTimer = homingTimer + dt
-        if homingTimer >= HOMING_TIMEOUT then
-            print("Homing timeout! Sending Catch Me!")
-            local message = Message.new()
-            message.to = playerEntity
-            message.topic = "Catch Me!"
-            Script.send(message)
-            destroySelf()
+    local target = findPlayer()
+    if not target then return end
+
+    local pos = transform:getWorldPosition()
+    local dir = target - pos
+    dir.y = 0.0
+
+    local dist = dir:Magnitude()
+    if dist <= chaseRange then
+        local n = dir:Normalized()
+
+        local newVel = body:getLinearVelocity()
+        local desiredVel = n * initialSpeed
+        local ax = (desiredVel.x - newVel.x) * dt
+        local az = (desiredVel.z - newVel.z) * dt
+
+        newVel.x = newVel.x + ax
+        newVel.z = newVel.z + az
+        local horizSq = newVel.x*newVel.x + newVel.z*newVel.z
+        if horizSq > initialSpeed * initialSpeed then
+            local m = math.sqrt(horizSq)
+            newVel.x = (newVel.x / m) * initialSpeed
+            newVel.z = (newVel.z / m) * initialSpeed
         end
+
+        body:setLinearVelocity(newVel)
     end
 end
 
@@ -137,6 +150,19 @@ function destroySelf()
     if destroyed then return end
     destroyed = true
     SceneManager:destroy(self)
+end
+
+function findPlayer()
+    local scene = SceneManager:getCurrentScene()
+    if not scene then return nil end
+
+    local playerEntity = scene:findEntityByName("PlayerPrefab")
+    if not playerEntity then return nil end
+
+    local playerTransform = playerEntity:findTransform()
+    if not playerTransform then return nil end
+
+    return playerTransform:getWorldPosition()
 end
 
 function findEnemyDirection(origin, baseDir)
