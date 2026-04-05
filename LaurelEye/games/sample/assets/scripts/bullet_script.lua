@@ -79,7 +79,10 @@ function onTriggerEnter(data)
             SceneManager:destroy(self)
         elseif tag == "enemy" then
             if attackEnemy then
-                SceneManager:destroy(data.entityA)
+                local message = Message.new()
+                message.to = data.entityA
+                message.topic = "Get Hit!"
+                Script.send(message)
                 destroySelf()
             end
         end
@@ -121,7 +124,10 @@ function onTriggerEnter(data)
             SceneManager:destroy(self)
         elseif tag == "enemy" then
             if attackEnemy then
-                SceneManager:destroy(data.entityB)
+                local message = Message.new()
+                message.to = data.entityB
+                message.topic = "Get Hit!"
+                Script.send(message)
                 destroySelf()
             end
         end

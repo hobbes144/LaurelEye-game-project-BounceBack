@@ -56,18 +56,16 @@ function onMessage(msg)
         hasKey = true
     end
     if msg.topic == "Get Hit!" then
-        if enemyAI then
-            if hasKey then
-                local scene = SceneManager:getCurrentScene()
-                local player = scene:findEntityByName("PlayerPrefab")
-                local message = Message.new()
-                message.to = player
-                message.topic = "Here's the Key!"
-                Script.send(message)
-            end
-            destroySelf()
-            enemyAI:forceTransition("Dead")
+        if hasKey then
+            local scene = SceneManager:getCurrentScene()
+            local player = scene:findEntityByName("PlayerPrefab")
+            local message = Message.new()
+            message.to = player
+            message.topic = "Here's the Key!"
+            Script.send(message)
         end
+        destroySelf()
+        if enemyAI then enemyAI:forceTransition("Dead") end
     end
 
 end
