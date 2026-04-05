@@ -43,7 +43,7 @@ namespace LaurelEye::Physics {
         virtual std::shared_ptr<IRigidBody> CreateRigidBody(const PhysicsBodyData& data) = 0;
 
         /// @brief Create a new physics ghost body
-        /// @param The Physics Body Data of the 
+        /// @param The Physics Body Data of the
         /// @return A shared pointer to the created Ghost body.
         virtual std::shared_ptr<IGhostBody> CreateGhostBody(const PhysicsBodyData& data) = 0;
 
@@ -61,6 +61,10 @@ namespace LaurelEye::Physics {
                                    const Vector3& direction,
                                    float maxDistance,
                                    const RaycastParams& params) const = 0;
+
+        virtual RaycastHit Raycast(const Vector3& from,
+                           const Vector3& to,
+                           const RaycastParams& params) const = 0;
 
     protected:
         //TODO: Track Physics Bodies in a more efficient manner

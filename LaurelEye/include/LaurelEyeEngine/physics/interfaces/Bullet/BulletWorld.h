@@ -44,6 +44,10 @@ namespace LaurelEye::Physics {
                            float maxDistance,
                            const RaycastParams& params) const override;
 
+        RaycastHit Raycast(const Vector3& from,
+                           const Vector3& to,
+                           const RaycastParams& params) const override;
+
     private:
         btCollisionShape* ApplyShapeOffset(
             btCollisionShape* shape,

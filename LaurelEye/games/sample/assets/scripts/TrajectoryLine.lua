@@ -1,4 +1,5 @@
 ﻿local EPS = 1e-6
+local RAY_EPS = 0.01
 
 --- Reflect a Vector3
 ---@param dir Vector3
@@ -44,6 +45,7 @@ end
 ---@param startPos Vector3
 ---@param initialVel Vector3
 ---@param accel Vector3
+---@param linearDamping number
 ---@param maxTime number
 ---@param dt number
 ---@param opt RaycastOpt
@@ -51,7 +53,7 @@ end
 ---@return Vector3|nil hitNormal
 ---@return Vector3|nil hitVelocity
 ---@return number chordDistance
-local function simulateArcHit(startPos, initialVel, accel, maxTime, dt, opt)
+local function simulateArcHit(startPos, initialVel, accel, linearDamping, maxTime, dt, opt)
     local pos = startPos
     local vel = initialVel
     local elapsed = 0.0
@@ -59,22 +61,34 @@ local function simulateArcHit(startPos, initialVel, accel, maxTime, dt, opt)
     while elapsed < maxTime do
         local step = math.min(dt, maxTime - elapsed)
 
-        local nextPos = pos + (vel * step) + (accel * (0.5 * step * step))
+        -- Apply acceleration first
+        local nextVel = vel + accel * step
+
+        -- Apply linear damping
+        if linearDamping ~= nil and linearDamping > 0.0 then
+            local dampFactor = math.max(0.0, 1.0 - linearDamping * step)
+            nextVel = nextVel * dampFactor
+        end
+
+        -- Integrate position using average velocity over the step
+        local avgVel = (vel + nextVel) * 0.5
+        local nextPos = pos + avgVel * step
         local move = nextPos - pos
         local segLen = move:Magnitude()
 
         if segLen > EPS then
-            local dir = move / segLen
-            local hit = Physics.Raycast(pos, dir, segLen, opt)
+            local dir = move:Normalized()
+            local rayStart = pos - dir * RAY_EPS
+            local rayEnd = nextPos + dir * RAY_EPS
+            local hit = Physics.Raycast(rayStart, rayEnd, opt)
 
             if hit ~= nil and hit.position ~= nil then
-                local impactVel = vel + accel * step
-                return hit.position, hit.normal, impactVel, (hit.position - startPos):Magnitude()
+                return hit.position, hit.normal, nextVel, (hit.position - startPos):Magnitude()
             end
         end
 
         pos = nextPos
-        vel = vel + accel * step
+        vel = nextVel
         elapsed = elapsed + step
     end
 
@@ -90,7 +104,7 @@ end
 ---@param maxTime number
 ---@param dt number
 ---@return Vector3|nil position, Vector3|nil direction, number distance, Vector3|nil velocity
-local function getGravityBounce(playerPos, playerAimDir, speed, gravityForce, mass, maxTime, dt)
+local function getGravityBounce(playerPos, playerAimDir, speed, gravityForce, linearDamping, mass, maxTime, dt)
 
     ---@type RaycastOpt
     local opt = { layerMask = (~(Physics.Layers.Player | Physics.Layers.Projectile)) & Physics.Layers.All }
@@ -109,7 +123,7 @@ local function getGravityBounce(playerPos, playerAimDir, speed, gravityForce, ma
     local initialVel = playerAimDir:Normalized() * speed
 
     bouncePos, hitNormal, hitVelocity, bounceDist =
-        simulateArcHit(playerPos, initialVel, accel, maxTime, dt, opt)
+        simulateArcHit(playerPos, initialVel, accel, linearDamping, maxTime, dt, opt)
 
     if bouncePos ~= nil and hitNormal ~= nil and hitVelocity ~= nil then
         hitNormal = hitNormal:Normalized()
@@ -163,7 +177,7 @@ end
 ---@param baseDir Vector3|nil
 ---@return Vector3|nil, RaycastResult|nil
 function findEnemyDirection(origin, baseDir)
-    local maxDistance = 75.0
+    local maxDistance = 1000.0
     local coneAngle = math.rad(15)
     local rings = 3
     local raysPerRing = 6
@@ -217,6 +231,7 @@ end
 ---@field simDt number
 ---@field simMaxTime number
 ---@field bounceRestitution number
+---@field linearDamping number
 local TrajectoryLine = {}
 TrajectoryLine.__index = TrajectoryLine
 
@@ -235,9 +250,10 @@ function TrajectoryLine.new()
     self.offScreenPos = Vector3.new(0.0, -100.0, 0.0)
 
     -- Gravity simulation settings
-    self.simDt = 0.1
-    self.simMaxTime = 3.0
+    self.simDt = 0.016
+    self.simMaxTime = 10.0
     self.bounceRestitution = 1.0 -- lower this if your real projectile loses speed on bounce
+    self.linearDamping = 0.1
 
     return self
 end
@@ -330,6 +346,7 @@ function TrajectoryLine:updateTrajectory(playerPos, playerAimDir, projectileSpee
             playerAimDir,
             projectileSpeed,
             gravityForce,
+            self.linearDamping,
             projectileMass,
             self.simMaxTime,
             self.simDt
@@ -352,37 +369,6 @@ function TrajectoryLine:updateTrajectory(playerPos, playerAimDir, projectileSpee
         self.bounceLineTransform:setWorldPosition(self.offScreenPos)
         return
     end
-
-    -- -- Use reflected speed after impact
-    -- local bouncedSpeed = hitVelocity:Magnitude() * self.bounceRestitution
-    -- local bouncedVel = bounceDir * bouncedSpeed
-    --
-    -- -- Small offset to avoid immediate self-hit on the same wall
-    -- local secondStart = bouncePos + bounceDir * 0.05
-    --
-    -- local opt = { layerMask = (~(Physics.Layers.Player | Physics.Layers.Projectile)) & Physics.Layers.All }
-    -- local secondPos = nil
-    --
-    -- -- Optional enemy assist: keep your existing straight cone search
-    -- local enemyDir, enemyHit = findEnemyDirection(secondStart, bounceDir)
-    -- if enemyHit ~= nil and enemyHit.position ~= nil then
-    --     secondPos = enemyHit.position
-    -- else
-    --     local wallPos = nil
-    --     wallPos = select(1, simulateArcHit(secondStart, bouncedVel, accel, self.simMaxTime, self.simDt, opt))
-    --     secondPos = wallPos
-    -- end
-    --
-    -- if secondPos ~= nil then
-    --     self:_updateLineFromPoints(
-    --         self.bounceLineTransform,
-    --         bouncePos,
-    --         secondPos,
-    --         self.bounceLineWallOffset
-    --     )
-    -- else
-    --     self.bounceLineTransform:setWorldPosition(self.offScreenPos)
-    -- end
 
     ---@type Vector3|nil
     local enemyDir

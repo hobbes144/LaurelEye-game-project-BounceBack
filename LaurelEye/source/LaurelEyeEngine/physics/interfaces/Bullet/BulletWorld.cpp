@@ -1,4 +1,5 @@
 ﻿#include "LaurelEyeEngine/physics/interfaces/Bullet/BulletWorld.h"
+#include "LaurelEyeEngine/logging/EngineLog.h"
 #include "LaurelEyeEngine/physics/interfaces/Bullet/BulletRigidBody.h"
 #include "LaurelEyeEngine/physics/PhysicsBodyBaseComponent.h"
 #include "LaurelEyeEngine/physics/GhostBodyComponent.h"
@@ -51,12 +52,12 @@ namespace LaurelEye::Physics {
         auto bulletShape = std::dynamic_pointer_cast<BulletShape>(CreateShape(data.shapeDefinition));
         if ( !bulletShape ) throw std::runtime_error("Failed to create BulletShape");
 
+        LE_DEBUG_ASSERT("physics", data.transformRef != nullptr, "transformRef not valid!");
+
         // Apply local scaling from transform
-        if ( data.transformRef ) {
-            Vector3 scale = data.transformRef->getWorldScale();
-            btVector3 dim = bulletShape->GetInternal()->getLocalScaling();
-            bulletShape->GetInternal()->setLocalScaling(btVector3(scale.x * dim.x(), scale.y * dim.y(), scale.z*dim.z()));
-        }
+        Vector3 scale = data.transformRef->getWorldScale();
+        btVector3 dim = bulletShape->GetInternal()->getLocalScaling();
+        bulletShape->GetInternal()->setLocalScaling(btVector3(scale.x * dim.x(), scale.y * dim.y(), scale.z*dim.z()));
 
         //Start Transform
         btTransform btStart;
@@ -151,12 +152,12 @@ namespace LaurelEye::Physics {
                 CreateShape(data.shapeDefinition));
         if ( !bulletShape ) throw std::runtime_error("Failed to create BulletShape");
 
+        LE_DEBUG_ASSERT("physics", data.transformRef != nullptr, "transformRef not valid!");
+
         // Apply local scaling from transform
-        if ( data.transformRef ) {
-            Vector3 scale = data.transformRef->getWorldScale();
-            btVector3 dim = bulletShape->GetInternal()->getLocalScaling();
-            bulletShape->GetInternal()->setLocalScaling(btVector3(scale.x * dim.x(), scale.y * dim.y(), scale.z * dim.z()));
-        }
+        Vector3 scale = data.transformRef->getWorldScale();
+        btVector3 dim = bulletShape->GetInternal()->getLocalScaling();
+        bulletShape->GetInternal()->setLocalScaling(btVector3(scale.x * dim.x(), scale.y * dim.y(), scale.z * dim.z()));
 
         // Start Transform
         btTransform btStart;
@@ -254,7 +255,7 @@ namespace LaurelEye::Physics {
         return newGhost;
 
     }
-    
+
     void BulletWorld::RemoveObject(std::shared_ptr<ICollider> body) {
         if ( !body ) return;
 
@@ -417,6 +418,37 @@ namespace LaurelEye::Physics {
         out.position = Vector3(cb.m_hitPointWorld.x(), cb.m_hitPointWorld.y(), cb.m_hitPointWorld.z());
         out.normal = Vector3(cb.m_hitNormalWorld.x(), cb.m_hitNormalWorld.y(), cb.m_hitNormalWorld.z());
         out.distance = maxDistance * cb.m_closestHitFraction;
+
+        const btCollisionObject* obj = cb.m_collisionObject;
+        auto body = static_cast<PhysicsBodyBaseComponent*>(obj->getUserPointer());
+        out.entityRef = body->getOwner();
+
+        return out;
+    }
+
+    RaycastHit BulletWorld::Raycast(const Vector3& from,
+                                    const Vector3& to,
+                                    const RaycastParams& params) const {
+        RaycastHit out{};
+
+        btVector3 btFrom(from.x, from.y, from.z);
+        btVector3 btTo(to.x, to.y, to.z);
+
+        btCollisionWorld::ClosestRayResultCallback cb(btFrom, btTo);
+
+        // Bullet filtering: mask/group.
+        cb.m_collisionFilterMask = params.layerMask;
+        // cb.m_collisionFilterGroup = ??? (rarely needed for raycasts)
+
+        world->rayTest(btFrom, btTo, cb);
+
+        if ( !cb.hasHit() )
+            return out;
+
+        out.hit = true;
+        out.position = Vector3(cb.m_hitPointWorld.x(), cb.m_hitPointWorld.y(), cb.m_hitPointWorld.z());
+        out.normal = Vector3(cb.m_hitNormalWorld.x(), cb.m_hitNormalWorld.y(), cb.m_hitNormalWorld.z());
+        out.distance = (out.position-from).magnitude();
 
         const btCollisionObject* obj = cb.m_collisionObject;
         auto body = static_cast<PhysicsBodyBaseComponent*>(obj->getUserPointer());

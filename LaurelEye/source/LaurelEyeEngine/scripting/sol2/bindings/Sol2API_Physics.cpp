@@ -185,54 +185,104 @@ namespace LaurelEye::Scripting {
         );
 
         Physics.set_function("Raycast",
-            [physics](sol::this_state ts,
+            sol::overload(
+                [physics](sol::this_state ts,
                             const Vector3& origin,
                             const Vector3& dir,
                             float maxDist,
                             sol::optional<sol::table> opt) -> sol::object {
-                assert(!physics->IsSteppingPhysics() && "ERROR::SCRIPTING::RAYCAST::PHYSICS_IS_STEPPING");
-                sol::state_view L(ts);
-                Physics::RaycastParams params{};
-                if ( opt ) {
-                    sol::table t = *opt;
-                    if ( auto v = t["layerMask"]; v.valid() ) params.layerMask = v.get<uint32_t>();
+                    assert(!physics->IsSteppingPhysics() && "ERROR::SCRIPTING::RAYCAST::PHYSICS_IS_STEPPING");
+                    sol::state_view L(ts);
+                    Physics::RaycastParams params{};
+                    if ( opt ) {
+                        sol::table t = *opt;
+                        if ( auto v = t["layerMask"]; v.valid() ) params.layerMask = v.get<uint32_t>();
+                    }
+
+                    Physics::RaycastHit hit = physics->Raycast(
+                        origin,
+                        dir,
+                        maxDist,
+                        params);
+
+                    if ( !hit.hit ) {
+                        return sol::nil; // idiomatic Lua
+                    }
+
+                    sol::table out = L.create_table();
+                    Entity* e = hit.entityRef; // your pointer result (nullable)
+                    if ( !e ) {
+                        out["entity"] = sol::nil;
+                    }
+                    else {
+                        out["entity"] = e;
+                    }
+                    out["distance"] = hit.distance;
+
+                    // sol::table p = L.create_table();
+                    // p["x"] = hit.position.x;
+                    // p["y"] = hit.position.y;
+                    // p["z"] = hit.position.z;
+                    // out["position"] = p;
+                    out["position"] = hit.position;
+
+                    // sol::table n = L.create_table();
+                    // n["x"] = hit.normal.x;
+                    // n["y"] = hit.normal.y;
+                    // n["z"] = hit.normal.z;
+                    // out["normal"] = n;
+                    out["normal"] = hit.normal;
+
+                    return sol::make_object(L, out);
+                },
+                [physics](sol::this_state ts,
+                            const Vector3& from,
+                            const Vector3& to,
+                            sol::optional<sol::table> opt) -> sol::object {
+                    assert(!physics->IsSteppingPhysics() && "ERROR::SCRIPTING::RAYCAST::PHYSICS_IS_STEPPING");
+                    sol::state_view L(ts);
+                    Physics::RaycastParams params{};
+                    if ( opt ) {
+                        sol::table t = *opt;
+                        if ( auto v = t["layerMask"]; v.valid() ) params.layerMask = v.get<uint32_t>();
+                    }
+
+                    Physics::RaycastHit hit = physics->Raycast(
+                        from,
+                        to,
+                        params);
+
+                    if ( !hit.hit ) {
+                        return sol::nil; // idiomatic Lua
+                    }
+
+                    sol::table out = L.create_table();
+                    Entity* e = hit.entityRef; // your pointer result (nullable)
+                    if ( !e ) {
+                        out["entity"] = sol::nil;
+                    }
+                    else {
+                        out["entity"] = e;
+                    }
+                    out["distance"] = hit.distance;
+
+                    // sol::table p = L.create_table();
+                    // p["x"] = hit.position.x;
+                    // p["y"] = hit.position.y;
+                    // p["z"] = hit.position.z;
+                    // out["position"] = p;
+                    out["position"] = hit.position;
+
+                    // sol::table n = L.create_table();
+                    // n["x"] = hit.normal.x;
+                    // n["y"] = hit.normal.y;
+                    // n["z"] = hit.normal.z;
+                    // out["normal"] = n;
+                    out["normal"] = hit.normal;
+
+                    return sol::make_object(L, out);
                 }
-
-                Physics::RaycastHit hit = physics->Raycast(
-                    Vector3(origin.x, origin.y, origin.z),
-                    Vector3(dir.x, dir.y, dir.z),
-                    maxDist,
-                    params);
-
-                if ( !hit.hit ) {
-                    return sol::nil; // idiomatic Lua
-                }
-
-                sol::table out = L.create_table();
-                Entity* e = hit.entityRef; // your pointer result (nullable)
-                if ( !e ) {
-                    out["entity"] = sol::nil;
-                }
-                else {
-                    out["entity"] = e;
-                }
-                out["distance"] = hit.distance;
-
-                // sol::table p = L.create_table();
-                // p["x"] = hit.position.x;
-                // p["y"] = hit.position.y;
-                // p["z"] = hit.position.z;
-                // out["position"] = p;
-                out["position"] = hit.position;
-
-                // sol::table n = L.create_table();
-                // n["x"] = hit.normal.x;
-                // n["y"] = hit.normal.y;
-                // n["z"] = hit.normal.z;
-                // out["normal"] = n;
-                out["normal"] = hit.normal;
-
-                return sol::make_object(L, out);
-            });
+            )
+        );
     }
 } // namespace LaurelEye::Scripting

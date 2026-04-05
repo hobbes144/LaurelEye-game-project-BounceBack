@@ -53,7 +53,7 @@ ballCreated = false
 baseProjSpeed = 75.0
 projectileSpeed = baseProjSpeed
 ---@type Vector3
-local ballGravity = Vector3.new(0.0, 9.8, 0.0)
+local ballGravity = Vector3.new(0.0, -9.8, 0.0)
 
 maxHealth = 3.0
 currentHealth = nil
@@ -183,7 +183,6 @@ function onStart()
     end
 
     trajectoryLine = TrajectoryLine.new()
-    ballGravity = Vector3.new(0, -1.5*9.8, 0)
 
     currentHealth = GameManager:getPlayerHealth()
     moveHealthBar()

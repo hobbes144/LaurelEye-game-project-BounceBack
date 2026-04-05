@@ -713,7 +713,7 @@ namespace LaurelEye {
         uirenderComponent->SetMaterial(pMat);
 
         //---Material---
-        // Default 
+        // Default
         pMat->setProperty<int>("useTexture", 0);
         pMat->setProperty<Vector2>("mainTextureScale", Vector2(1.0f));
         pMat->setProperty<Vector3>("diffuse", Vector3(1, 1, 1));
@@ -840,7 +840,7 @@ namespace LaurelEye {
 
     void EntityFactory::setupDebugDrawComponent(Entity& entity, const rapidjson::Value& emitterData) {
     }
-    
+
     void EntityFactory::setupAnimationComponent(Entity& entity, const rapidjson::Value& animationData) {
         if ( !animationData.IsObject() )
             return;

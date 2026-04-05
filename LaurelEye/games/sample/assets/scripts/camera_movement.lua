@@ -141,15 +141,10 @@ function onUpdate(dt)
         - forward * currentDistance
         + right * (currentShoulder - 3.0)
 
-    local camDir = desiredPos - pivotPos
-    local camDist = camDir:Magnitude()
-    camDir = camDir:Normalized()
-
     -- Raycasting to prevent clipping
     local hit = Physics.Raycast(
         pivotPos,
-        camDir,
-        camDist,
+        desiredPos,
         { layerMask = Layers.World }
     )
 

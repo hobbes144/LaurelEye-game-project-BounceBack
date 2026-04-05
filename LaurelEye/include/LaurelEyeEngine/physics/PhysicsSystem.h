@@ -90,6 +90,16 @@ namespace LaurelEye::Physics {
                            float maxDistance,
                            const RaycastParams& params) const;
 
+        /// @brief Raycast query.
+        ///
+        /// @param from Ray start.
+        /// @param to Ray to.
+        /// @param params Raycast parameters.
+        /// @return Raycast hit.
+        RaycastHit Raycast(const Vector3& from,
+                           const Vector3& to,
+                           const RaycastParams& params) const;
+
         // /// @brief Helper function to return if any RayHit occurred.
         // ///
         // /// @return True if hit.
