@@ -728,6 +728,45 @@
                     "gravityScale": 1.0
                 }
             }
+        },
+        {
+            "name": "column (1)",
+            "tags": [ "ground" ],
+            "components": {
+                "Transform": {
+                    "position": [ 20.93, -0.4599982, -4.485 ],
+                    "rotation": [ -1, 0, 0, 0 ],
+                    "scale": [ -0.1541399, 0.443479, -0.1614212 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "column",
+                        "file": "models/column.fbx"
+                    },
+                    "material": {
+                        "texture": "textures/arcadeColormap.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Capsule",
+                        "radius": 40.93788,
+                        "height": 520.811
+                    },
+                    "mass": 1.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.0,
+                    "restitution": 0.0,
+                    "collisionGroup": 4,
+                    "collisionMask": 11,
+                    "gravityScale": 1.0
+                }
+            }
         }
     ]
 }

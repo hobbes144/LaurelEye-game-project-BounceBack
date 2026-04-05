@@ -85,9 +85,11 @@ namespace LaurelEye {
         }
         auto committed = spawnPendingEntities();
         // Also register any existing entities (for activation we want whole scene)
-        for ( auto& e : entities ) {
+        for ( size_t i = 0; i < entities.size(); i++ ) {
+            auto& e = entities[i];
             if ( !e->getRegistered() ) {
                 registerEntityComponents(e);
+                e = entities[i];
                 e->setRegistered(true);
             }
         }
