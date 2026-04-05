@@ -258,13 +258,13 @@ function onUpdate(dt)
         if (timeData.unscaledTime - slowEndTime > slowCooldown)
             and Input:isMouseButtonHeld(MouseButton.Right)
             and (timeData.unscaledTime - rightMousePressTime < slowTimeLeniency)
-            and (hasBall or #projectilesInRange > 0) then
+            and #projectilesInRange > 0 then
 
             targetTimeScale = slowedTimeScale
             slowStartTime = timeData.unscaledTime
         end
     else
-        if (not hasBall and #projectilesInRange == 0) or
+        if #projectilesInRange == 0 or
             Input:isMouseButtonReleased(MouseButton.Right) or
             (timeData.unscaledTime - slowStartTime > slowTimeLimit) then
 
