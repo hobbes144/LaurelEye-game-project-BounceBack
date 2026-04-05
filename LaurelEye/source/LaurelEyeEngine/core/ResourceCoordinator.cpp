@@ -1,6 +1,7 @@
 ﻿#include "LaurelEyeEngine/audio/FModAudioManager.h"
 #include "LaurelEyeEngine/core/ResourceCoordinator.h"
 #include "LaurelEyeEngine/platforms/glfw/GlfwPlatform.h"
+#include "LaurelEyeEngine/window/IWindow.h"
 
 namespace LaurelEye {
     ResourceCoordinator::ResourceCoordinator(EngineContext& ctx, const EngineConfig& engineConfig) {
@@ -11,7 +12,15 @@ namespace LaurelEye {
         platformManager->initialize();
 
         windowManager = std::make_unique<WindowManager>();
-        auto window = windowManager->createWindow(LaurelEye::WindowDescription());
+        LaurelEye::WindowDescription windowDesc{};
+        windowDesc.width = engineConfig.window.width;
+        windowDesc.height = engineConfig.window.height;
+        windowDesc.windowedX = engineConfig.window.windowedX;
+        windowDesc.windowedY = engineConfig.window.windowedY;
+        windowDesc.mode = engineConfig.window.fullscreen ? WindowMode::Borderless : WindowMode::Windowed;
+        windowDesc.title = engineConfig.window.title;
+        windowDesc.vsync = engineConfig.window.vsync;
+        auto window = windowManager->createWindow(windowDesc);
 
         // TODO - anything that needs ctx or engine config sets them here
         inputManager = std::make_unique<InputManager>(*window);

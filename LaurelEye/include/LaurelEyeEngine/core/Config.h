@@ -10,17 +10,21 @@
 /// Copyright © 2025 DIGIPEN Institute of Technology. All rights reserved.
 
 #pragma once
-#include <iostream>
+#include <string>
 
 namespace LaurelEye {
     struct WindowConfig {
+        std::string title = "LaurelEye Project";
         int width = 1280;
         int height = 720;
+        int windowedX = 100;
+        int windowedY = 100;
         bool fullscreen = false;
+        bool vsync = true;
+        // Unsupported
+        int monitorIndex = 0; // which monitor to use
         bool resizable = true;
         bool highDPISupport = true;
-        int monitorIndex = 0; // which monitor to use
-        std::string title = "LaurelEye Project";
     };
 
     struct RenderConfig {
