@@ -23,7 +23,7 @@ end
 
 function onMessage(msg)
     if msg.topic == "I am kicking you!" then
-        bounceCount = 3
+        bounceCount = 2
         attackEnemy = true
     end
 end

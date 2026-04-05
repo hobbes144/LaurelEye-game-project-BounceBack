@@ -83,6 +83,8 @@ local shootDir
 ---@type number
 local kickBackRange = 20.0
 
+---@type boolean
+local isNormalTime = true
 ---@type number
 local slowedTimeScale = 0.06
 ---@type number
@@ -103,6 +105,8 @@ local slowStartTime
 local slowEndTime = 0.0
 ---@type number
 local rightMousePressTime = 0.0
+---@type number
+local timeEps = 0.001
 
 ---@class Projectile
 ---@field entity Entity
@@ -161,6 +165,22 @@ local function getProjectilesInRange()
     end
 
     return projList
+end
+
+--- Get the closest projectile from list
+---@param projectileList Projectile[]
+---@return Projectile|nil
+local function getClosestProjectile(projectileList)
+    local closestDist = math.huge
+    local closest = nil
+    for _, projectile in ipairs(projectileList) do
+        local projDist = projectile.position:Magnitude()
+        if projDist < closestDist then
+            closestDist = projDist
+            closest = projectile
+        end
+    end
+    return closest
 end
 
 function onStart()
@@ -253,7 +273,8 @@ function onUpdate(dt)
         end
     end
 
-    if timeScale ~= targetTimeScale then
+    isNormalTime = math.abs(timeScale - 1.0) < timeEps
+    if math.abs(timeScale - targetTimeScale) > timeEps then
         timeScale = timeScale + (targetTimeScale - timeScale) * timeSlowLerpSpeed * (timeData.unscaledDt)
         Engine.setTimeScale(timeScale)
         dt = timeData.unscaledDt * timeScale
@@ -396,11 +417,24 @@ function onUpdate(dt)
     shootDir = shootVector:Normalized()
     spawnPos = playerArmPos + (shootDir * spawnForward)
 
-    if hasBall and trajectoryLine ~= nil then
+    if trajectoryLine ~= nil then
         if not Input:isMouseButtonHeld(MouseButton.Right) then
-            trajectoryLine:resetLine()
+                trajectoryLine:resetLine()
         else
-            trajectoryLine:updateTrajectory(spawnPos, shootDir, projectileSpeed, 1.0, ballGravity)
+            if hasBall then
+                trajectoryLine:updateTrajectory(spawnPos, shootDir, projectileSpeed, 1.0, ballGravity)
+            else
+                if not isNormalTime then
+                    local closestProjectile = getClosestProjectile(projectilesInRange)
+                    if closestProjectile ~= nil then
+                        trajectoryLine:updateTrajectory(closestProjectile.position, shootDir, projectileSpeed, 1.0, ballGravity)
+                    else
+                        trajectoryLine:resetLine()
+                    end
+                else
+                    trajectoryLine:resetLine()
+                end
+            end
         end
     end
 
