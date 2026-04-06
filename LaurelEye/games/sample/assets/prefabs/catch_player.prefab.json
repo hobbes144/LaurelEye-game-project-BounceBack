@@ -12,7 +12,7 @@
                 "file": "models/player/MainChar2_Idle.fbx"
             },
             "material": {
-                "texture": "textures/MainChar_tex.png",
+                "texture": "textures/MainChar_tex_fix.png",
                 "diffuse": [ 10.0, 1.0, 1.0 ],
                 "specular": [ 0.2, 0.2, 0.2 ],
                 "shininess": 32.0
@@ -95,7 +95,11 @@
             },
             "Animation": {
                 "type": "Skeletal",
-                "file": [ "models/player/MainChar2_Running.fbx", "models/player/MainChar2_Idle.fbx" ]
+                "file": [ "models/player/MainChar2_Running.fbx",
+                          "models/player/MainChar2_Idle.fbx",
+                          "models/player/Kicking.fbx",
+                          "models/player/Death.fbx"
+                        ]
             },
             "Script": {
                 "path": "scripts/catch_player.lua"

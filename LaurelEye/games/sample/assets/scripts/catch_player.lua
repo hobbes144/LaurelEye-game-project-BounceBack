@@ -6,6 +6,28 @@ timeToReachGround = 0.08
 timeToReachAir    = 0.25
 dvDeadzone        = 0.05
 
+--Kickback anim cooldown
+kickbackCountdown = 0.0
+
+--death anim cooldown
+deathCooldown = 0.0
+dead = false
+
+--getting hit feedback
+CreateObj = nil
+CreateDamageObj = nil
+
+playerOrgobj = nil
+damageObj = nil
+
+damageTex = nil
+normalTex = nil
+
+flickerTimer = 0.1
+flickerCooldown = 0.0
+
+-----------------------------
+
 ---@type Scene|nil
 local scene = nil
 ---@type Transform|nil
@@ -50,6 +72,7 @@ speedThreshold = 2.0
 ---@type boolean
 local hasBall = true
 ballCreated = false
+ballCreated = false
 baseProjSpeed = 75.0
 projectileSpeed = baseProjSpeed
 ---@type Vector3
@@ -61,11 +84,22 @@ invincible = false
 invincibleTimer = 0.0
 invincibleDuration = 1.5
 
+dashDuration = 0.25
+dashTimer = 0.0
+isDashing = false
+
+kickbackCountdown = 0.0
+
 local TrajectoryLine = require("TrajectoryLine")
 ---@type TrajectoryLine|nil
 local trajectoryLine = nil
 
 hasKey = false
+
+
+
+
+
 
 -- projectile spawn (player / weapon space)
 ---@type Vector3
@@ -184,6 +218,17 @@ local function getClosestProjectile(projectileList)
 end
 
 function onStart()
+    CreateObj = SceneManager:instantiate("prefabs/player_org.prefab.json")
+    CreateDamageObj = SceneManager:instantiate("prefabs/player_damage.prefab.json")
+
+    local scene = SceneManager:getCurrentScene()
+
+    playerOrgobj = scene:findEntityByName("OrgPrefab")
+    damageObj = scene:findEntityByName("damagePrefab")
+    damageTex = damageObj:findComponent("Renderable3DComponent"):getMaterial()
+    local component = playerOrgobj:findComponent("Renderable3DComponent")
+    normalTex = component:getMaterial()
+
     transform = self:findTransform()
     body = self:findRigidBody()
 
@@ -220,6 +265,7 @@ function onMessage(msg)
 
     if msg.topic == "Get Hit!" then
         if not invincible then
+            flickerCooldown = 2.0
             currentHealth = currentHealth - 1
             GameManager:setPlayerHealth(currentHealth)
             invincible = true
@@ -242,6 +288,21 @@ function onMessage(msg)
 end
 
 function onUpdate(dt)
+
+    if kickbackCountdown > 0.0 and not dead then
+        kickbackCountdown = kickbackCountdown - dt
+        if kickbackCountdown < 0.0 then
+            kickbackCountdown = 0.0
+        end
+    end
+
+    if deathCooldown > 0.0 and dead then
+        deathCooldown = deathCooldown - dt
+        if deathCooldown <= 0.0 then
+            reset()
+        end
+    end
+
     scene = SceneManager:getCurrentScene()
     if scene == nil then return end
 
@@ -305,16 +366,22 @@ function onUpdate(dt)
 
     if currentHealth <= 0 then
         log("Player has died!")
-        currentHealth = maxHealth
-        GameManager:setPlayerHealth(maxHealth)
-        Window.setCursorMode(0, Window.CursorMode.Normal)
-        SceneManager:changeScene("MainMenu")
+        if not dead then
+            die()
+            dead = true
+        end
     end
 
-    if invincible then
+    if invincible and not dead then
         invincibleTimer = invincibleTimer + dt
+        flickerTimer = flickerTimer - dt
+        flicker()
         if invincibleTimer >= invincibleDuration then
             invincible = false
+            invincibleTimer = 0.0
+            flickerTimer = 0.1
+            local renderComp = self:findComponent("Renderable3DComponent")
+            renderComp:setMaterial(normalTex)
         end
     end
 
@@ -391,12 +458,14 @@ function onUpdate(dt)
     ))
 
     if inputMag > 0.01 then
-        if animator.currentAnimationName ~= "MainChar2_Running" then
+        local animName = animator.currentAnimationName
+        if animName ~= "MainChar2_Running"  and kickbackCountdown <= 0.0 and not dead then
             animator:changeAnimation("MainChar2_Running")
             playerAudio:play("footstep")
         end
     else
-        if animator.currentAnimationName ~= "MainChar2_Idle" then
+        local animName = animator.currentAnimationName
+        if animName ~= "MainChar2_Idle" and kickbackCountdown <= 0.0 and not dead then
             animator:changeAnimation("MainChar2_Idle")
             playerAudio:stop("footstep")
         end
@@ -595,6 +664,10 @@ function kickBack(projectile)
     if projBody ~= nil then
         local kickDir = (targetPoint - projectile.position)
         if kickDir:Magnitude() > 0.0001 then
+            if animName ~= "Kicking" then
+                animator:changeAnimation("Kicking")
+                kickbackCountdown = 0.7
+            end
             kickDir = kickDir:Normalized()
             projBody:setLinearVelocity(kickDir * baseProjSpeed)
             local message = Message.new()
@@ -602,5 +675,34 @@ function kickBack(projectile)
             message.topic = "I am kicking you!"
             Script.send(message)
         end
+    end
+end
+
+
+function die()
+    if animName ~= "Death" then
+        animator:changeAnimation("Death")
+    end
+    deathCooldown = 2.5
+end
+
+
+function reset()
+    currentHealth = maxHealth
+    GameManager:setPlayerHealth(maxHealth)
+    Window.setCursorMode(0, Window.CursorMode.Normal)
+    SceneManager:changeScene("MainMenu")
+end
+
+function flicker()
+    local renderComp = self:findComponent("Renderable3DComponent")
+    if flickerTimer < 0.0 then
+        if renderComp:getMaterial() == normalTex
+        then
+                renderComp:setMaterial(damageTex)
+            else
+                renderComp:setMaterial(normalTex)
+        end
+        flickerTimer = 0.1
     end
 end
