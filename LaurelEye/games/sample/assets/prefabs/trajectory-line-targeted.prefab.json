@@ -1,0 +1,22 @@
+﻿{
+    "name": "TrajectoryLine",
+    "tags": [ "trajectoryLine" ],
+    "components": {
+        "Transform": {
+            "position": [ 0.0, 2.0, 0.0 ],
+            "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+            "scale": [ 0.3, 0.3, 1.0 ]
+        },
+        "Render3D": {
+            "mesh": {
+                "name": "cubeMesh",
+                "primitiveType": "Cube"
+            },
+            "material": {
+                "diffuse": [ 10.0, 1.0, 1.0 ],
+                "specular": [ 0.2, 0.2, 0.2 ],
+                "shininess": 32.0
+            }
+        }
+    }
+}

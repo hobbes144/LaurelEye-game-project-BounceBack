@@ -220,10 +220,16 @@ end
 ---@class TrajectoryLine
 ---@field aimLine Entity
 ---@field aimLineTransform TransformComponent
+---@field aimLineRender Renderable3DComponent
+---@field aimLineMaterial Material
+---@field aimLineTargeted Entity
+---@field aimLineTargetedRender Renderable3DComponent
+---@field aimLineTargetedMaterial Material
 ---@field aimLineWallOffset number
 ---@field aimLineLengthMult number
 ---@field bounceLine Entity
 ---@field bounceLineTransform TransformComponent
+---@field bounceLineRender Renderable3DComponent
 ---@field bounceLineWallOffset number
 ---@field bounceLineLengthMult number
 ---@field lineWidth number
@@ -231,6 +237,7 @@ end
 ---@field simDt number
 ---@field simMaxTime number
 ---@field bounceRestitution number
+---@field isTargeted boolean
 ---@field linearDamping number
 local TrajectoryLine = {}
 TrajectoryLine.__index = TrajectoryLine
@@ -240,10 +247,20 @@ function TrajectoryLine.new()
 
     self.aimLine = SceneManager:instantiate("prefabs/trajectory-line.prefab.json")
     self.aimLineTransform = self.aimLine:findTransform()
+    self.aimLineTargeted = SceneManager:instantiate("prefabs/trajectory-line-targeted.prefab.json")
+    self.aimLineRender = self.aimLine:findComponent("Renderable3DComponent")
+    self.aimLineMaterial = self.aimLineRender:getMaterial()
+
+    self.aimLineTargetedRender = self.aimLineTargeted:findComponent("Renderable3DComponent")
+    self.aimLineTargetedMaterial = self.aimLineTargetedRender:getMaterial()
+
     self.aimLineWallOffset = 5.0
     self.aimLineLengthMult = 0.3
+
     self.bounceLine = SceneManager:instantiate("prefabs/trajectory-line.prefab.json")
     self.bounceLineTransform = self.bounceLine:findTransform()
+    self.bounceLineRender = self.bounceLine:findComponent("Renderable3DComponent")
+
     self.bounceLineWallOffset = 0.0
     self.bounceLineLengthMult = 0.2
     self.lineWidth = 0.3
@@ -254,6 +271,10 @@ function TrajectoryLine.new()
     self.simMaxTime = 10.0
     self.bounceRestitution = 1.0 -- lower this if your real projectile loses speed on bounce
     self.linearDamping = 0.1
+
+    self.isTargeted = false
+
+    self.aimLineTargeted:findTransform():setWorldPosition(self.offScreenPos)
 
     return self
 end
@@ -377,11 +398,23 @@ function TrajectoryLine:updateTrajectory(playerPos, playerAimDir, projectileSpee
     enemyDir, enemyHit = findEnemyDirection(bouncePos, bounceDir)
 
     if enemyHit ~= nil and enemyHit.distance > EPS and enemyHit.position ~= nil and enemyDir ~= nil then
+        if not self.isTargeted then
+            log("Target found, setting to red")
+            self.isTargeted = true
+            self.aimLineRender:setMaterial(self.aimLineTargetedMaterial)
+            self.bounceLineRender:setMaterial(self.aimLineTargetedMaterial)
+        end
         self:_updateLine(
             self.bounceLineTransform,
             bouncePos, -enemyDir, enemyHit.distance,
             self.bounceLineLengthMult, self.bounceLineWallOffset)
     else
+        if self.isTargeted then
+            log("Unable to find target, resetting to green")
+            self.isTargeted = false
+            self.aimLineRender:setMaterial(self.aimLineMaterial)
+            self.bounceLineRender:setMaterial(self.aimLineMaterial)
+        end
 
         ---@type Vector3|nil
         local wallPos
