@@ -68,32 +68,70 @@ end
 function onTriggerEnter(data)
     if body == nil then return end
 
-    if (isGround(data.entityA) or isGround(data.entityB)) then
-
-        local vel = body:getLinearVelocity()
-        local normal = data.normal or data.contactNormal
-        if normal == nil then return end
-
-        normal = normal:Normalized()
-        local reflected = vel - normal * (2.0 * vel:Dot(normal))
-
-        local pos = transform:getWorldPosition()
-        local homingDir = findEnemyDirection(pos, reflected)
-        if homingDir ~= nil then
-            reflected = homingDir * reflected:Magnitude()
+    local function processTags(entity)
+        if entity == nil then return false end
+        local tags = entity:getTags()
+        for _, tag in pairs(tags) do
+            if tag == "enemy" then
+                local message = Message.new()
+                message.to = entity
+                message.topic = "Get Hit!"
+                Script.send(message)
+                return true
+            end
+            if tag == "shield" then
+                local message = Message.new()
+                message.to = entity
+                message.topic = "Bonk!"
+                Script.send(message)
+                return true
+            end
+            if tag == "player" then
+                local message = Message.new()
+                message.to = playerEntity
+                message.topic = "Catch Me!"
+                Script.send(message)
+                SceneManager:destroy(self)
+                return true
+            end
+            if tag == "target" then
+                SceneManager:destroy(entity)
+                GameManager:addGeneratorDestroyed(1)
+                return true
+            end
+            if tag == "generator" then
+                local message = Message.new()
+                message.to = entity
+                message.topic = "Get Destroyed!"
+                Script.send(message)
+                return true
+            end
         end
-
-        body:setLinearVelocity(reflected)
-
-        if bounceCount == 1 then
-            local message = Message.new()
-            message.to = playerEntity
-            message.topic = "FirstBounce"
-            Script.send(message)
-        end
-
-        bounceCount = bounceCount + 1
+        return false
     end
+
+    -- Handle non-ground entity first
+    if not processTags(data.entityA) then
+        processTags(data.entityB)
+    end
+
+    -- Ground bounce is separate
+    --if (isGround(data.entityA) or isGround(data.entityB)) then
+    local vel = body:getLinearVelocity()
+    local normal = data.normal or data.contactNormal
+    if normal == nil then return end
+
+    normal = normal:Normalized()
+    local reflected = vel - normal * (2.0 * vel:Dot(normal))
+
+    local pos = transform:getWorldPosition()
+    local homingDir = findEnemyDirection(pos, reflected)
+    if homingDir ~= nil then
+        reflected = homingDir * reflected:Magnitude()
+    end
+
+    body:setLinearVelocity(reflected)
+    --end
 end
 
 function onTriggerStay(data)
@@ -112,55 +150,17 @@ function onTriggerStay(data)
     end
 end
 
-function isGround(entity)
+-- isGround now only checks actual ground
+--[[function isGround(entity)
     if entity == nil then return false end
     local tags = entity:getTags()
     for _, tag in pairs(tags) do
-        if tag == "ground" then
-            return true
-        end
-        if tag == "target" then
-            SceneManager:destroy(entity)
-            GameManager:addGeneratorDestroyed(1)
-            local gensDestroyed = GameManager:getGeneratorsDestroyed()
-            print(gensDestroyed)
-            return true
-        end
-        if tag == "enemy" then
-            local message = Message.new()
-            message.to = entity
-            log("Get Script Hit")
-            message.topic = "Get Hit!"
-            Script.send(message)
-            return true
-        end
-        if tag == "shield" then
-            local message = Message.new()
-            message.to = entity
-            message.topic = "Bonk!"
-            Script.send(message)
-            return true
-        end
-        if tag == "door" then
-            return true
-        end
-        if tag == "player" then
-            local message = Message.new()
-            message.to = playerEntity
-            message.topic = "Catch Me!"
-            Script.send(message)
-            SceneManager:destroy(self)
-        end
-        if tag == "generator" then
-            local message = Message.new()
-            message.to = entity
-            message.topic = "Get Destroyed!"
-            Script.send(message)
+        if tag == "ground" or tag == "door" then
             return true
         end
     end
     return false
-end
+end]]
 
 function destroySelf()
     if destroyed then return end

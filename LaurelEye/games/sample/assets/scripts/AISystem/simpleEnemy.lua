@@ -10,12 +10,17 @@ local State = require("State")
 local turn_speed = 8.0
 local transform = nil
 local body = nil
-local destroyed = false
+--local destroyed = false
 local shot_timer = 10.0
 local shooting_speed = 3.0 -- Default value
 local min_shooting_speed = 2.5
 local max_shooting_speed = 4.0
 local player = nil
+local player_transform = nil
+--local death_triggered = false
+local hasKey = false
+local animator = nil
+local shot = false
 local player_transform = nil
 
 local active = false
@@ -35,7 +40,7 @@ local dead_state = nil
 ---------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------
 
-hasKey = false
+
 
 function onStart()
     transform = self:findTransform()
@@ -43,9 +48,14 @@ function onStart()
     --shooting_speed = math.random(minshooting_speed * 100, maxshooting_speed * 100) / 100
     local scene = SceneManager:getCurrentScene()
     player = scene:findEntityByName("PlayerPrefab")
+
     animator = self:findAnimator()
+
+    print(tostring(self) .. " active=" .. tostring(active))
+    active = false  -- does this reset it for all enemies?
+
     if animator == nil then return end
-    animator:changeAnimation("StickManBadge_Idle")
+    animator:changeAnimation("Idle")
     setupStateMachine()
 
 end
@@ -56,6 +66,7 @@ function onMessage(msg)
         hasKey = true
     end
     if msg.topic == "Get Hit!" then
+        if msg.to ~= self then return end 
         if hasKey then
             local scene = SceneManager:getCurrentScene()
             local player = scene:findEntityByName("PlayerPrefab")
@@ -64,8 +75,8 @@ function onMessage(msg)
             message.topic = "Here's the Key!"
             Script.send(message)
         end
-        destroySelf()
-        if enemyAI then enemyAI:forceTransition("Dead") end
+        if state_machine.current_state.name == "Dead" then return end
+        if state_machine then state_machine:forceTransition("Dead") end
     end
 
 end
@@ -111,7 +122,7 @@ end
 
 function setupIdleState()
     idle_state:setOnEnter(function()
-        animator:changeAnimation("StickManBadge_Idle")
+        animator:changeAnimation("Idle")
         log("Enemy idle")
     end)
     
@@ -135,16 +146,16 @@ function setupStartleState()
     local state_duration
 
     startle_state:setOnEnter(function()
-        log("Enemy startled by player")
-        animator:changeAnimation("StickManBadge_startle")
+        animator:changeAnimation("Surprised")
         player = getPlayer()
         if player == nil then return end
-        state_duration = 0.5
+        state_duration = 1.0
     end)
     
     startle_state:setUpdate(function(dt)
         -- You can add logic for the startle state here (e.g., a brief pause or animation)
         state_duration = state_duration - dt
+        rotateTowardsPlayer(dt)
     end)
     
     startle_state:addTransition("toAlert", alert_state, 1, function()
@@ -166,7 +177,7 @@ function setupAlertState()
         log("Enemy alert and tracking player")
         alert_duration = math.random(300, 500) / 100.0  -- random between 1.5s and 3.5s
         alert_timer = 0.0
-        --animator:changeAnimation("StickManBadge_alert")
+        animator:changeAnimation("Alert")
     end)
     
     alert_state:setUpdate(function(dt)
@@ -187,17 +198,29 @@ end
 -----------------------------------
 
 function setupShootState()
+
+    local state_duration
+
     shoot_state:setOnEnter(function()
         log("Enemy shooting at player")
-        --animator:changeAnimation("StickManBadge_shoot")
+        animator:changeAnimation("Throw")
+        state_duration = 1.0
+        shot = false
     end)
     
     shoot_state:setUpdate(function(dt)
-        autoShootProjectile(dt)
+        state_duration = state_duration - dt
+        if state_duration < 0.5 then
+            if not shot then
+                rotateTowardsPlayer(dt)
+                autoShootProjectile(dt)
+                shot = true
+            end
+        end
     end)
     
     shoot_state:addTransition("toAlert", alert_state, 1, function()
-        return true
+        return state_duration <= 0.0 
     end)
 end
 
@@ -206,14 +229,23 @@ end
 -----------------------------------
 
 function setupDeadState()
+
+    local state_duration
+    local death_triggered = false  -- now local to this closure
+    local destroyed = false        -- now local to this closure
+
     dead_state:setOnEnter(function()
         log("Enemy destroyed")
-        animator:changeAnimation("StickManBadge_Death")
-        --once animation is over, 
+        death_triggered  = true
+        animator:changeAnimation("Death")
+        state_duration = 2.0
     end)
-    
+
     dead_state:setUpdate(function(dt)
-        -- You can add logic for the dead state here (e.g., play death animation)
+        state_duration = state_duration - dt
+        if state_duration <= 0 then
+            destroySelf()
+        end
     end)
 end
 
@@ -225,32 +257,27 @@ function onCollisionStay(data) end
 function onCollisionExit(data) end
 
 function onTriggerEnter(data)
+    if state_machine.current_state.name == "Dead" then return end  -- already dying
+
+    local function handleBallHit()
+        log("Collided with Ball!")
+        if hasKey then
+            local message = Message.new()
+            message.to = player
+            message.topic = "Here's the Key!"
+            Script.send(message)
+        end
+        if state_machine then state_machine:forceTransition("Dead") end
+    end
+
     local tagsA = data.entityA:getTags()
     for _, tag in pairs(tagsA) do
-        if tag == "ball" then
-            log("Collided with Ball!")
-            if hasKey then
-                local message = Message.new()
-                message.to = player
-                message.topic = "Here's the Key!"
-                Script.send(message)
-            end
-            destroySelf()
-        end
+        if tag == "ball" then handleBallHit() return end
     end
 
     local tagsB = data.entityB:getTags()
     for _, tag in pairs(tagsB) do
-        if tag == "ball" then
-            log("Collided with Ball!")
-            if hasKey then
-                local message = Message.new()
-                message.to = player
-                message.topic = "Here's the Key!"
-                Script.send(message)
-            end
-            destroySelf()
-        end
+        if tag == "ball" then handleBallHit() return end
     end
 end
 
@@ -261,7 +288,7 @@ function getPlayer()
 end
 
 function rotateTowardsPlayer(dt)
-    playerTransform = player:findTransform()
+    local playerTransform = player:findTransform()
     if playerTransform == nil then return end
     if transform == nil then return end
 

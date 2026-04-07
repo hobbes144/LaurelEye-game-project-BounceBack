@@ -95,9 +95,11 @@ namespace LaurelEye::Animations {
                                       : globalBindPose[parent] * local;
             }
 
+            std::string addressString = std::to_string(reinterpret_cast<uintptr_t>(component->getOwner()));
+
             // Allocate GPU buffer for animation matrices
             skeletal->AnimationDataBuffer = renderResources->createDataBuffer(
-                    component->getOwner()->getName() + ":AnimData",
+                    addressString + ":AnimData",
                     LaurelEye::Graphics::DataBufferDesc{
                         LaurelEye::Graphics::DataBufferType::SSBO,
                         LaurelEye::Graphics::DataBufferUpdateMode::Dynamic,

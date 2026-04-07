@@ -1,5 +1,5 @@
 ﻿{
-    "name": "Enemy1",
+    "name": "Enemy",
     "tags": [ "enemy" ],
     "components": {
         "Transform": {
@@ -9,7 +9,7 @@
         },
         "Render3D": {
             "mesh": {
-                "file": "models/BadgedEnemy/StickManBadge_Idle.fbx"
+                "file": "models/BadgedEnemy/Idle.fbx"
             },
             "material": {
                 "texture": "textures/EnermyBaseColor_red.png",
@@ -64,7 +64,13 @@
         },
         "Animation": {
             "type": "Skeletal",
-            "file": [ "models/BadgedEnemy/StickManBadge_Idle.fbx", "models/StickManBadge_Throw.fbx" ]
+            "file": [
+                "models/BadgedEnemy/Idle.fbx",
+                "models/BadgedEnemy/Throw.fbx",
+                "models/BadgedEnemy/Surprised.fbx",
+                "models/BadgedEnemy/Death.fbx",
+                "models/BadgedEnemy/Alert.fbx"
+            ]
         },
         "Script": {
             "path": "scripts/AISystem/simpleEnemy.lua"

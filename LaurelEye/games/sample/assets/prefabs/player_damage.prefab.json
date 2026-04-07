@@ -2,9 +2,9 @@
     "name": "damagePrefab",
     "components": {
         "Transform": {
-            "position": [ 0.0, 0.0, 10.0 ],
+            "position": [ -1000.0, -1000.0, -1000.0 ],
             "rotation": [ -1.0, 0.0, -1.0, 0.0 ],
-            "scale": [ 0.012, 0.012, 0.012 ]
+            "scale": [ 0.0000002, 0.0000002, 0.0000002 ]
         },
         "Render3D": {
             "mesh": {

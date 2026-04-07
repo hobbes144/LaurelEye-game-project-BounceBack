@@ -9,7 +9,7 @@
         },
         "Render3D": {
             "mesh": {
-                "file": "models/Security_Idle.fbx"
+                "file": "models/SecurityEnemy/Security_Idle.fbx"
             },
             "material": {
                 "texture": "textures/Security_tex.png",
@@ -64,7 +64,12 @@
         },
         "Animation": {
             "type": "Skeletal",
-            "file": [ "animations/Running.fbx", "models/Security_Idle.fbx" ]
+            "file": [
+                "models/SecurityEnemy/Running.fbx",
+                "models/SecurityEnemy/Security_Idle.fbx",
+                "models/SecurityEnemy/Death.fbx",
+                "models/SecurityEnemy/Hit.fbx"
+            ]
         },
         "Script": {
             "path": "scripts/AISystem/security_enemy.lua"

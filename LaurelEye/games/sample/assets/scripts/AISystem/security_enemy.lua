@@ -4,190 +4,283 @@
 local StateMachine = require("StateMachine")
 local State = require("State")
 
--- Enemy data
-turnSpeed = 5.0
-moveSpeed = 8.0
-attackDistance = 8.0   -- Distance at which to switch to shield attack
-transform = nil
-body = nil
-destroyed = false
-hitCount = 0
-maxHits = 3
+-----------------------------------
+-- Enemy variables
+-----------------------------------
 
--- State machine
-enemyAI = nil
+local turn_speed    = 5.0
+local move_speed    = 8.0
+local attack_distance = 8.0
+local transform     = nil
+local body          = nil
+local destroyed     = false
+local hit_count     = 0
+local max_hits      = 3
+local animator      = nil
+local shield        = nil
 
-shield = nil
+-----------------------------------
+-- State machine & states
+-----------------------------------
+
+local enemy_ai      = nil
+
+local idle_state      = nil
+local alert_state     = nil
+local moving_state    = nil
+local attacking_state = nil
+local get_hit_state   = nil
+local dead_state      = nil
+local take_damage_state = nil
+
+---------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
 
 function onStart()
     transform = self:findTransform()
-    body = self:findRigidBody()
+    body      = self:findRigidBody()
 
     animator = self:findAnimator()
     if animator == nil then return end
     animator:changeAnimation("Security_Idle")
 
     shield = SceneManager:instantiate("prefabs/shield.prefab.json")
-    local message = Message.new()
-    message.to = shield
-    message.from = self
-    message.topic = "Here I Am!"
+    local message  = Message.new()
+    message.to     = shield
+    message.from   = self
+    message.topic  = "Here I Am!"
     Script.send(message)
 
     setupStateMachine()
 end
 
-function setupStateMachine()
-    enemyAI = StateMachine.new()
-
-    -- Create states
-    local idle      = State.new("Idle")
-    local alert     = State.new("Alert")
-    local moving    = State.new("Moving")
-    local attacking = State.new("Attacking")
-    local getHit    = State.new("GetHit")
-    local dead      = State.new("Dead")
-
-    -- IDLE STATE
-    idle:setOnEnter(function()
-        log("Security: idle")
-        if animator then animator:changeAnimation("Security_Idle") end
-    end)
-
-    idle:setUpdate(function(dt)
-        -- Just wait
-    end)
-
-    idle:addTransition("toAlert", alert, 1, function()
-        return getPlayer() ~= nil
-    end)
-
-    -- ALERT STATE
-    -- Player has been spotted; pause briefly before pursuing
-    alert:setOnEnter(function()
-        log("Security: alert! Player spotted")
-        alertTimer = 0.0
-        if animator then animator:changeAnimation("Security_Idle") end
-    end)
-
-    alert:setUpdate(function(dt)
-        alertTimer = alertTimer + dt
-        -- Face the player while alerting
-        rotateTowardsPlayer(dt)
-    end)
-
-    alert:addTransition("toMoving", moving, 1, function()
-        return alertTimer ~= nil and alertTimer >= 1.5
-    end)
-
-    -- MOVING STATE
-    -- Walk slowly toward the player
-    moving:setOnEnter(function()
-        log("Security: moving towards player")
-        if animator then animator:changeAnimation("Running") end
-    end)
-
-    moving:setUpdate(function(dt)
-        rotateTowardsPlayer(dt)
-        moveTowardsPlayer(dt)
-    end)
-
-    moving:addTransition("toAttacking", attacking, 1, function()
-        return isPlayerInRange(attackDistance)
-    end)
-
-    -- ATTACKING STATE
-    -- Close enough: attack with shield
-    attacking:setOnEnter(function()
-        log("Security: attacking with shield!")
-        if animator then animator:changeAnimation("Security_Idle") end
-        local message = Message.new()
-        message.to = shield
-        message.topic = "Attack!"
-        Script.send(message)
-    end)
-
-    attacking:setUpdate(function(dt)
-        rotateTowardsPlayer(dt)
-        -- Could add melee/shield damage logic here
-    end)
-
-    attacking:addTransition("toMoving", moving, 1, function()
-        return not isPlayerInRange(attackDistance)
-    end)
-
-    -- GET HIT STATE
-    -- Briefly stagger when hit; then resume moving
-    getHit:setOnEnter(function()
-        log("Security: got hit! Hits taken: " .. hitCount)
-        hitTimer = 0.0
-        if animator then animator:changeAnimation("Security_Idle") end
-    end)
-
-    getHit:setUpdate(function(dt)
-        hitTimer = hitTimer + dt
-    end)
-
-    -- After stagger, resume chasing
-    getHit:addTransition("toMoving", moving, 1, function()
-        return hitTimer ~= nil and hitTimer >= 0.5
-    end)
-
-    -- DEAD STATE
-    dead:setOnEnter(function()
-        log("Security: destroyed after " .. maxHits .. " hits")
-        if animator then animator:changeAnimation("StickManBadge_Death") end
-        destroySelf()
-    end)
-
-    dead:setUpdate(function(dt) end)
-
-    -- Register all states
-    enemyAI:addState(idle)
-    enemyAI:addState(alert)
-    enemyAI:addState(moving)
-    enemyAI:addState(attacking)
-    enemyAI:addState(getHit)
-    enemyAI:addState(dead)
-
-    enemyAI:setInitialState("Idle")
-end
-
 function onMessage(msg)
     if msg.topic == "Get Hit!" then
         log("Security hit by ball!")
-        hitCount = hitCount + 1
-        if hitCount >= maxHits then
-            if enemyAI then enemyAI:forceTransition("Dead") end
+        hit_count = hit_count + 1
+        if hit_count >= max_hits then
+            if enemy_ai then enemy_ai:forceTransition("Dead") end
         else
-            if enemyAI then enemyAI:forceTransition("GetHit") end
+            if enemy_ai then enemy_ai:forceTransition("TakeDamage") end
         end
         return true
     end
     if msg.topic == "We Bonked!" then
-        if enemyAI then enemyAI:forceTransition("GetHit") end
+        if enemy_ai then enemy_ai:forceTransition("GetHit") end
+        return true
+    end
+    if msg.topic == "Shield Hit!" then      -- ball hit the shield
+        if enemy_ai then enemy_ai:forceTransition("GetHit") end
         return true
     end
 end
 
 function onUpdate(dt)
-    if enemyAI then
-        enemyAI:update(dt)
+    if enemy_ai then
+        enemy_ai:update(dt)
     end
 end
 
+---------------------------------------------------------------------------------------
+-- State machine setup
+
+function setupStateMachine()
+    enemy_ai = StateMachine.new()
+
+    idle_state      = State.new("Idle")
+    alert_state     = State.new("Alert")
+    moving_state    = State.new("Moving")
+    attacking_state = State.new("Attacking")
+    get_hit_state   = State.new("GetHit")
+    take_damage_state = State.new("TakeDamage")
+    dead_state      = State.new("Dead")
+
+    setupIdleState()
+    setupAlertState()
+    setupMovingState()
+    setupAttackingState()
+    setupGetHitState()
+    setupTakeDamageState()
+    setupDeadState()
+
+    enemy_ai:addState(idle_state)
+    enemy_ai:addState(alert_state)
+    enemy_ai:addState(moving_state)
+    enemy_ai:addState(attacking_state)
+    enemy_ai:addState(get_hit_state)
+    enemy_ai:addState(take_damage_state)
+    enemy_ai:addState(dead_state)
+
+    enemy_ai:setInitialState("Idle")
+end
+
+-----------------------------------
+-- Idle state
+-----------------------------------
+
+function setupIdleState()
+    idle_state:setOnEnter(function()
+        log("Security: idle")
+        if animator then animator:changeAnimation("Security_Idle") end
+    end)
+
+    idle_state:setUpdate(function(dt)
+        -- Just wait
+    end)
+
+    idle_state:addTransition("toAlert", alert_state, 1, function()
+        return getPlayer() ~= nil
+    end)
+end
+
+-----------------------------------
+-- Alert state
+-----------------------------------
+
+function setupAlertState()
+    local alert_timer = 0.0
+
+    alert_state:setOnEnter(function()
+        log("Security: alert! Player spotted")
+        alert_timer = 0.0
+        if animator then animator:changeAnimation("Security_Idle") end
+    end)
+
+    alert_state:setUpdate(function(dt)
+        alert_timer = alert_timer + dt
+        rotateTowardsPlayer(dt)
+    end)
+
+    alert_state:addTransition("toMoving", moving_state, 1, function()
+        return alert_timer >= 1.5
+    end)
+end
+
+-----------------------------------
+-- Moving state
+-----------------------------------
+
+function setupMovingState()
+    moving_state:setOnEnter(function()
+        log("Security: moving towards player")
+        if animator then animator:changeAnimation("Running") end
+    end)
+
+    moving_state:setUpdate(function(dt)
+        rotateTowardsPlayer(dt)
+        moveTowardsPlayer(dt)
+    end)
+
+    moving_state:addTransition("toAttacking", attacking_state, 1, function()
+        return isPlayerInRange(attack_distance)
+    end)
+end
+
+-----------------------------------
+-- Attacking state
+-----------------------------------
+
+function setupAttackingState()
+    attacking_state:setOnEnter(function()
+        log("Security: attacking with shield!")
+        if animator then animator:changeAnimation("Security_Idle") end
+        local message  = Message.new()
+        message.to     = shield
+        message.topic  = "Attack!"
+        Script.send(message)
+    end)
+
+    attacking_state:setUpdate(function(dt)
+        rotateTowardsPlayer(dt)
+    end)
+
+    attacking_state:addTransition("toMoving", moving_state, 1, function()
+        return not isPlayerInRange(attack_distance)
+    end)
+end
+
+-----------------------------------
+-- GetHit state
+-----------------------------------
+
+function setupGetHitState()
+    local hit_timer = 0.0
+
+    get_hit_state:setOnEnter(function()
+        log("Security: got hit! Hits taken: " .. hit_count)
+        hit_timer = 0.0
+        if animator then animator:changeAnimation("Security_Idle") end
+    end)
+
+    get_hit_state:setUpdate(function(dt)
+        hit_timer = hit_timer + dt
+    end)
+
+    get_hit_state:addTransition("toMoving", moving_state, 1, function()
+        return hit_timer >= 0.5
+    end)
+end
+
+-----------------------------------
+-- TakeDamage state
+-----------------------------------
+function setupTakeDamageState()
+    local hit_timer = 0.0
+
+    take_damage_state:setOnEnter(function()
+        log("Security: got hit! Hits taken: " .. hit_count)
+        hit_timer = 0.0
+        if animator then animator:changeAnimation("Hit") end
+    end)
+
+    take_damage_state:setUpdate(function(dt)
+        hit_timer = hit_timer + dt
+    end)
+
+    take_damage_state:addTransition("toMoving", moving_state, 1, function()
+        return hit_timer >= 1.0
+    end)
+end
+
+
+-----------------------------------
+-- Dead state
+-----------------------------------
+
+function setupDeadState()
+
+    local state_duration
+
+    dead_state:setOnEnter(function()
+        state_duration = 2.0
+        log("Security: destroyed after " .. max_hits .. " hits")
+        if animator then animator:changeAnimation("Death") end
+    end)
+
+    dead_state:setUpdate(function(dt)
+        state_duration = state_duration - dt
+        if state_duration <= 0 then
+            destroySelf()
+        end
+    end)
+end
+
+---------------------------------------------------------------------------------------
+-- Helper functions
+---------------------------------------------------------------------------------------
+
 function onCollisionEnter(data)
-    -- Check both entities in the collision for the "ball" tag
     local function checkTags(entity)
         local tags = entity:getTags()
         for _, tag in pairs(tags) do
             if tag == "ball" then
                 log("Security hit by ball!")
-                hitCount = hitCount + 1
-                if hitCount >= maxHits then
-                    if enemyAI then enemyAI:forceTransition("Dead") end
+                hit_count = hit_count + 1
+                if hit_count >= max_hits then
+                    if state_machine.current_state.name == "Dead" then return end
+                    if enemy_ai then enemy_ai:forceTransition("Dead") end
                 else
-                    if enemyAI then enemyAI:forceTransition("GetHit") end
+                    if enemy_ai then enemy_ai:forceTransition("TakeDamage") end
                 end
                 return true
             end
@@ -195,14 +288,13 @@ function onCollisionEnter(data)
         return false
     end
 
-    checkTags(data.entityA)
-    checkTags(data.entityB)
+    if not checkTags(data.entityA) then
+        checkTags(data.entityB)
+    end
 end
 
 function onCollisionStay(data) end
 function onCollisionExit(data) end
-
--- ── Helper functions ──────────────────────────────────────────────────────────
 
 function getPlayer()
     local scene = SceneManager:getCurrentScene()
@@ -214,13 +306,13 @@ function isPlayerInRange(range)
     local player = getPlayer()
     if player == nil then return false end
 
-    local playerTransform = player:findTransform()
-    if playerTransform == nil then return false end
+    local player_transform = player:findTransform()
+    if player_transform == nil then return false end
     if transform == nil then return false end
 
-    local selfPos   = transform:getWorldPosition()
-    local playerPos = playerTransform:getWorldPosition()
-    local distance  = (playerPos - selfPos):Magnitude()
+    local self_pos   = transform:getWorldPosition()
+    local player_pos = player_transform:getWorldPosition()
+    local distance   = (player_pos - self_pos):Magnitude()
 
     return distance < range
 end
@@ -229,23 +321,23 @@ function rotateTowardsPlayer(dt)
     local player = getPlayer()
     if player == nil then return end
 
-    local playerTransform = player:findTransform()
-    if playerTransform == nil then return end
+    local player_transform = player:findTransform()
+    if player_transform == nil then return end
     if transform == nil then return end
 
-    local selfPos   = transform:getWorldPosition()
-    local playerPos = playerTransform:getWorldPosition()
-    local dir = playerPos - selfPos
+    local self_pos   = transform:getWorldPosition()
+    local player_pos = player_transform:getWorldPosition()
+    local dir        = player_pos - self_pos
     dir.y = 0
 
     if dir:Magnitude() == 0 then return end
     dir = dir:Normalized()
 
-    local frontOffset  = math.pi
-    local angle        = math.atan(-dir.x, -dir.z) + frontOffset
-    local targetQuat   = Quaternion.fromEuler(0, angle, 0)
-    local currentRot   = transform:getWorldRotation()
-    local rot          = Quaternion.slerp(currentRot, targetQuat, dt * turnSpeed)
+    local front_offset = math.pi
+    local angle        = math.atan(-dir.x, -dir.z) + front_offset
+    local target_quat  = Quaternion.fromEuler(0, angle, 0)
+    local current_rot  = transform:getWorldRotation()
+    local rot          = Quaternion.slerp(current_rot, target_quat, dt * turn_speed)
 
     transform:setWorldRotation(rot)
 end
@@ -254,36 +346,34 @@ function moveTowardsPlayer(dt)
     local player = getPlayer()
     if player == nil then return end
 
-    local playerTransform = player:findTransform()
-    if playerTransform == nil then return end
+    local player_transform = player:findTransform()
+    if player_transform == nil then return end
     if transform == nil then return end
 
-    local selfPos   = transform:getWorldPosition()
-    local playerPos = playerTransform:getWorldPosition()
-    local dir = playerPos - selfPos
+    local self_pos   = transform:getWorldPosition()
+    local player_pos = player_transform:getWorldPosition()
+    local dir        = player_pos - self_pos
     dir.y = 0
 
     if dir:Magnitude() == 0 then return end
     dir = dir:Normalized()
 
-    -- Use RigidBody velocity for physics-friendly movement
     if body ~= nil then
-        local vel = dir * moveSpeed
-        vel.y = body:getLinearVelocity().y  -- preserve gravity
+        local vel = dir * move_speed
+        vel.y = body:getLinearVelocity().y
         body:setLinearVelocity(vel)
     else
-        -- Fallback: directly translate the transform
-        local newPos = selfPos + dir * moveSpeed * dt
-        transform:setWorldPosition(newPos.x, newPos.y, newPos.z)
+        local new_pos = self_pos + dir * move_speed * dt
+        transform:setWorldPosition(new_pos.x, new_pos.y, new_pos.z)
     end
 end
 
 function destroySelf()
     if destroyed then return end
     destroyed = true
-    local message = Message.new()
-    message.to = shield
-    message.topic = "We Die Together!"
+    local message  = Message.new()
+    message.to     = shield
+    message.topic  = "We Die Together!"
     Script.send(message)
     SceneManager:destroy(self)
 end

@@ -385,97 +385,105 @@ function onUpdate(dt)
         end
     end
 
-    -- Sprint
-    moveSpeed = Input:isKeyHeld(Key.LShift) and sprintSpeed or baseSpeed
+    ----
 
-    -- ── Jump ──────────────────────────────────────────────────────
-    if Input:isKeyPressed(Key.Space) and isGrounded then
-        local vel  = body:getLinearVelocity()
-        local mass = body:getBodyData().mass
-        body:setLinearVelocity(Vector3.new(vel.x, 0.0, vel.z))
-        body:applyImpulse(Vector3.new(0.0, jumpImpulse * mass, 0.0))
-        isGrounded = false
-    end
+    if not dead then
 
-    -- ── Jump-cut: release early → shorter hop ─────────────────────
-    if Input:isKeyReleased(Key.Space) then
+
+
+        -- Sprint
+        moveSpeed = Input:isKeyHeld(Key.LShift) and sprintSpeed or baseSpeed
+
+        -- ── Jump ──────────────────────────────────────────────────────
+        if Input:isKeyPressed(Key.Space) and isGrounded then
+            local vel  = body:getLinearVelocity()
+            local mass = body:getBodyData().mass
+            body:setLinearVelocity(Vector3.new(vel.x, 0.0, vel.z))
+            body:applyImpulse(Vector3.new(0.0, jumpImpulse * mass, 0.0))
+            isGrounded = false
+        end
+
+        -- ── Jump-cut: release early → shorter hop ─────────────────────
+        if Input:isKeyReleased(Key.Space) then
+            local vel = body:getLinearVelocity()
+            if vel.y > 0.0 then
+                body:setLinearVelocity(Vector3.new(vel.x, vel.y * jumpCutMultiplier, vel.z))
+            end
+        end
+
+        -- Input
+        local lStickX = Input:getGamepadAxis(GamepadAxes.LStickX)
+        local lStickY = Input:getGamepadAxis(GamepadAxes.LStickY)
+        if math.abs(lStickX) < 0.5 then lStickX = 0 end
+        if math.abs(lStickY) < 0.5 then lStickY = 0 end
+
+        local inputX =
+            lStickX +
+            (Input:isKeyHeld(Key.D) and 1 or 0) -
+            (Input:isKeyHeld(Key.A) and 1 or 0)
+
+        local inputZ =
+            -lStickY +
+            (Input:isKeyHeld(Key.W) and 1 or 0) -
+            (Input:isKeyHeld(Key.S) and 1 or 0)
+
+        local inputMag = math.sqrt(inputX*inputX + inputZ*inputZ)
+        if inputMag > 1 then
+            inputX = inputX / inputMag
+            inputZ = inputZ / inputMag
+        end
+
+        local moveDir = getCameraRelativeMovement(inputX, inputZ)
+
         local vel = body:getLinearVelocity()
-        if vel.y > 0.0 then
-            body:setLinearVelocity(Vector3.new(vel.x, vel.y * jumpCutMultiplier, vel.z))
+        local mass = body:getBodyData().mass
+
+        local desiredX = moveDir.x * moveSpeed
+        local desiredZ = moveDir.z * moveSpeed
+
+        local dvx = desiredX - vel.x
+        local dvz = desiredZ - vel.z
+        local dvMag = math.sqrt(dvx * dvx + dvz * dvz)
+
+        local timeToReach = isGrounded and timeToReachGround or timeToReachAir
+        timeToReach = math.max(timeToReach, 0.0001)
+
+        local maxDelta = dvMag * (dt / timeToReach)
+
+        local deltaX, deltaZ = 0.0, 0.0
+        if dvMag > dvDeadzone then
+            local scale = math.min(1.0, maxDelta / dvMag)
+            deltaX = dvx * scale
+            deltaZ = dvz * scale
         end
-    end
 
-    -- Input
-    local lStickX = Input:getGamepadAxis(GamepadAxes.LStickX)
-    local lStickY = Input:getGamepadAxis(GamepadAxes.LStickY)
-    if math.abs(lStickX) < 0.5 then lStickX = 0 end
-    if math.abs(lStickY) < 0.5 then lStickY = 0 end
+        body:setLinearVelocity(Vector3.new(
+            vel.x + deltaX,
+            vel.y,
+            vel.z + deltaZ
+        ))
 
-    local inputX =
-        lStickX +
-        (Input:isKeyHeld(Key.D) and 1 or 0) -
-        (Input:isKeyHeld(Key.A) and 1 or 0)
 
-    local inputZ =
-        -lStickY +
-        (Input:isKeyHeld(Key.W) and 1 or 0) -
-        (Input:isKeyHeld(Key.S) and 1 or 0)
-
-    local inputMag = math.sqrt(inputX*inputX + inputZ*inputZ)
-    if inputMag > 1 then
-        inputX = inputX / inputMag
-        inputZ = inputZ / inputMag
-    end
-
-    local moveDir = getCameraRelativeMovement(inputX, inputZ)
-
-    local vel = body:getLinearVelocity()
-    local mass = body:getBodyData().mass
-
-    local desiredX = moveDir.x * moveSpeed
-    local desiredZ = moveDir.z * moveSpeed
-
-    local dvx = desiredX - vel.x
-    local dvz = desiredZ - vel.z
-    local dvMag = math.sqrt(dvx * dvx + dvz * dvz)
-
-    local timeToReach = isGrounded and timeToReachGround or timeToReachAir
-    timeToReach = math.max(timeToReach, 0.0001)
-
-    local maxDelta = dvMag * (dt / timeToReach)
-
-    local deltaX, deltaZ = 0.0, 0.0
-    if dvMag > dvDeadzone then
-        local scale = math.min(1.0, maxDelta / dvMag)
-        deltaX = dvx * scale
-        deltaZ = dvz * scale
-    end
-
-    body:setLinearVelocity(Vector3.new(
-        vel.x + deltaX,
-        vel.y,
-        vel.z + deltaZ
-    ))
-
-    if inputMag > 0.01 then
-        local animName = animator.currentAnimationName
-        if animName ~= "MainChar2_Running"  and kickbackCountdown <= 0.0 and not dead then
-            animator:changeAnimation("MainChar2_Running")
-            playerAudio:play("footstep")
+        if inputMag > 0.01 then
+            local animName = animator.currentAnimationName
+            if animName ~= "MainChar2_Running"  and kickbackCountdown <= 0.0 and not dead then
+                animator:changeAnimation("MainChar2_Running")
+                playerAudio:play("footstep")
+            end
+        else
+            local animName = animator.currentAnimationName
+            if animName ~= "MainChar2_Idle" and kickbackCountdown <= 0.0 and not dead then
+                animator:changeAnimation("MainChar2_Idle")
+                playerAudio:stop("footstep")
+            end
         end
-    else
-        local animName = animator.currentAnimationName
-        if animName ~= "MainChar2_Idle" and kickbackCountdown <= 0.0 and not dead then
-            animator:changeAnimation("MainChar2_Idle")
-            playerAudio:stop("footstep")
+
+        if inputMag > 0 then
+            local angle = math.atan(moveDir.x, moveDir.z)
+            rotateTo(angle, dt)
         end
-    end
 
-    if inputMag > 0 then
-        local angle = math.atan(moveDir.x, moveDir.z)
-        rotateTo(angle, dt)
     end
-
     playerPos = transform:getWorldPosition()
     playerArmPos = playerPos + spawnHeightVec
     targetPoint = cameraAim(1000.0)
