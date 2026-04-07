@@ -96,6 +96,22 @@ function onTriggerEnter(data)
     end
 end
 
+function onTriggerStay(data)
+    local tagsA = data.entityA:getTags()
+    local pos = transform:getWorldPosition()
+    for _, tag in pairs(tagsA) do
+        if tag == "ground" then
+            transform:setWorldPosition(pos.x, 1.0, pos.z)
+        end
+    end
+    local tagsB = data.entityB:getTags()
+    for _, tag in pairs(tagsB) do
+        if tag == "ground" then
+            transform:setWorldPosition(pos.x, 1.0, pos.z)
+        end
+    end
+end
+
 function isGround(entity)
     if entity == nil then return false end
     local tags = entity:getTags()

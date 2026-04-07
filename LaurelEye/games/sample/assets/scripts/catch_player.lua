@@ -570,8 +570,8 @@ function rotateTo(angle, dt)
 end
 
 
-function shootProjectile()    local
-    proj = SceneManager:instantiate("prefabs/catch_ball.prefab.json")
+function shootProjectile()
+    local proj = SceneManager:instantiate("prefabs/catch_ball.prefab.json")
     if proj == nil then return end
     local projTransform = proj:findTransform()
     local projBody = proj:findGhostBody()
