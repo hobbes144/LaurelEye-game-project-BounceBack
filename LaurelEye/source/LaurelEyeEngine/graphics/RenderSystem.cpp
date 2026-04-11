@@ -30,6 +30,7 @@
 #include "LaurelEyeEngine/graphics/ShaderManager.h"
 #include "LaurelEyeEngine/graphics/ShadowManager.h"
 #include "LaurelEyeEngine/graphics/SkeletonManager.h"
+#include "LaurelEyeEngine/graphics/FontManager.h"
 
 // Resource headers
 #include "LaurelEyeEngine/graphics/resources/DataBuffer.h"
@@ -48,6 +49,7 @@
 #include "LaurelEyeEngine/graphics/graphics_components/LightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/Renderable3DComponent.h"
 #include "LaurelEyeEngine/UI/UIComponents/UIRenderComponent.h"
+#include "LaurelEyeEngine/UI/UIComponents/UITextComponent.h"
 
 // Render pass Headers
 #include "LaurelEyeEngine/graphics/renderpass/DebugDrawRenderPass.h"
@@ -60,6 +62,7 @@
 #include "LaurelEyeEngine/graphics/renderpass/UIPass.h"
 // #include "LaurelEyeEngine/graphics/renderpass/SingleBufferedDataPass.h"
 #include "LaurelEyeEngine/graphics/renderpass/LocalLightsToonPass.h"
+
 
 #include <memory>
 #include <algorithm>
@@ -161,6 +164,7 @@ namespace LaurelEye::Graphics {
         initLocalLightsBuffer();
 
         tempShadowManager = std::make_unique<ShadowManager>(tempRenderResources.get());
+        FontManager::getInstance().initialize(tempRenderResources.get());
 
         skeletonManager = std::make_unique<SkeletonManager>();
         meshManager = std::make_unique<MeshManager>(*tempRenderResources.get(), *skeletonManager.get());
@@ -447,6 +451,49 @@ namespace LaurelEye::Graphics {
             uiComponents.push_back(uiRenderComp);
             break;
         }
+        case RenderComponentType::UITextRenderable: {
+            auto* uiTextComp = static_cast<UI::UITextComponent*>(component);
+            assert(uiTextComp && "ERROR::GRAPHICS::RENDERSYSTEM::INVALID_UI_TEXT_COMPONENT");
+
+            // --- Ensure Quad Mesh (same as UI) ---
+            if ( !uiTextComp->HasMesh() ) {
+                auto meshHandle = meshManager->createPrimitiveMesh(
+                    PrimitiveMeshType::Square);
+                auto meshResource = meshManager->getMesh(meshHandle);
+
+                uiTextComp->SetMesh(meshHandle);
+                uiTextComp->SetMeshTempAttr(
+                    meshResource->gpu.vao,
+                    meshResource->gpu.indexCount);
+            }
+
+            // --- Ensure Font Atlas Exists ---
+            auto& FM = FontManager::getInstance();
+            auto font = FM.getFont(uiTextComp->GetFontName());
+            if ( !font ) {
+                // Only load if missing — safe, one-time operation
+                std::string filePath = uiTextComp->GetFontName();
+                font = FM.loadFont(uiTextComp->GetFontName(), filePath);
+            }
+            if ( font ) {
+                TextureHandle atlas = font->getAtlasTexture();
+
+                if ( atlas == InvalidTexture ) {
+                    std::cerr << "[UITextRenderable] Font atlas not initialized!\n";
+                }
+
+                // OPTIONAL: if your material system expects a texture slot
+                // you can bind it here (even if shader uses u_FontAtlas directly)
+                uiTextComp->GetMaterial()->setTexture("u_FontAtlas", atlas);
+            }
+            else {
+                std::cerr << "[UITextRenderable] Missing font on UITextComponent!\n";
+            }
+
+            // --- Add to UI list ---
+            uiComponents.push_back(uiTextComp);
+            break;
+        }
         case RenderComponentType::PropertyCamera: {
             assert(dynamic_cast<CameraComponent*>(component) && "ERROR::GRAPHICS::RENDERSYSTEM::INVALID_LIGHT");
             // TODO: This is currently updating camera to the new component
@@ -505,6 +552,10 @@ namespace LaurelEye::Graphics {
             break;
         case RenderComponentType::UIRenderable:
             //Remove an Element from a vector
+            uiComponents.erase(std::remove(uiComponents.begin(), uiComponents.end(), component), uiComponents.end());
+            break;
+        case RenderComponentType::UITextRenderable:
+            // Remove an Element from a vector
             uiComponents.erase(std::remove(uiComponents.begin(), uiComponents.end(), component), uiComponents.end());
             break;
         case RenderComponentType::PropertyCamera: {

@@ -7,17 +7,24 @@
 
 #include "LaurelEyeEngine/graphics/renderpass/UIPass.h"
 #include "LaurelEyeEngine/UI/UIComponents/UIRenderComponent.h"
+#include "LaurelEyeEngine/UI/UIComponents/UITextComponent.h"
 #include "LaurelEyeEngine/graphics/resources/Shader.h"
 #include "LaurelEyeEngine/graphics/ShaderManager.h"
 #include "LaurelEyeEngine/math/Matrix4.h"
 #include "LaurelEyeEngine/math/Vector3.h"
 #include "LaurelEyeEngine/math/Transform.h"
+#include "LaurelEyeEngine/graphics/FontManager.h"
+#include "LaurelEyeEngine/logging/EngineLog.h"
 
 namespace LaurelEye::Graphics {
 
     void UIPass::setup(RenderResources& rs) {
         shader = ShaderManager::getInstance().loadFile("UIPass", "../../../assets/shaders/UIPass.frag\n../../../assets/shaders/UIPass.vert");
         //textShader = ShaderManager::getInstance().loadFile("../../../assets/shaders/UIPass.frag\n../../../assets/shaders/UIPass.vert");
+        textShader = ShaderManager::getInstance().loadFile(
+            "UIText",
+            "../../../assets/shaders/UIText.frag\n../../../assets/shaders/UIText.vert");
+
         Square = Mesh::createSquareMesh("Square", 1.0f);
     }
 
@@ -39,35 +46,99 @@ namespace LaurelEye::Graphics {
         Transform trans = Transform();
         //Loop Over UI Elements Drawing them in the shader as minimally as possible
         for ( IRenderComponent* rc : ctx.objects ) {
-            auto temp = rc->getOwner()->getName();
+            if ( auto* uiQuad = dynamic_cast<UI::UIRenderComponent*>(rc) ) {
+                // draw quad
+                auto temp = rc->getOwner()->getName();
 
-            auto* uiComponent = dynamic_cast<UI::UIRenderComponent*>(rc);
-            assert(uiComponent && "[ERROR - UIPass] UIPass received non-UIRenderComponent!");
+                auto* uiComponent = dynamic_cast<UI::UIRenderComponent*>(rc);
+                assert(uiComponent && "[ERROR - UIPass] UIPass received non-UIRenderComponent!");
 
-            const UI::UITransformComponent* t = uiComponent->GetBoundTransform();
-            assert(t && "[ERROR - UIPass] UIRenderComponent has no bound UITransformComponent!");
+                const UI::UITransformComponent* t = uiComponent->GetBoundTransform();
+                assert(t && "[ERROR - UIPass] UIRenderComponent has no bound UITransformComponent!");
 
-            const Rect& rec = t->GetResolvedRect();
+                const Rect& rec = t->GetResolvedRect();
 
-            auto* uiMat = uiComponent->GetMaterial().get();
-            //Set Model Matrix
-            Matrix4 m = Matrix4::translation(Vector3(rec.center[0], rec.center[1], 0.0f)) *
-                Matrix4::scale(Vector3(rec.size[0], rec.size[1], 1.0f));
-            uiMat->setProperty("m_Model", m);
+                auto* uiMat = uiComponent->GetMaterial().get();
+                // Set Model Matrix
+                Matrix4 m = Matrix4::translation(Vector3(rec.center[0], rec.center[1], 0.0f)) *
+                            Matrix4::scale(Vector3(rec.size[0], rec.size[1], 1.0f));
+                uiMat->setProperty("m_Model", m);
 
-            //Set Screen Size Property
-            uiMat->setProperty("u_ScreenSize", Vector2(size.width, size.height));
+                // Set Screen Size Property
+                uiMat->setProperty("u_ScreenSize", Vector2(size.width, size.height));
 
-            //Set Color
-            uiMat->setProperty("u_Color", uiComponent->GetColor());
+                // Set Color
+                uiMat->setProperty("u_Color", uiComponent->GetColor());
 
-            //Set Transparency
-            uiMat->setProperty("transparency", uiComponent->GetTransparency());
+                // Set Transparency
+                uiMat->setProperty("transparency", uiComponent->GetTransparency());
 
-            //Apply Texture
-            uiMat->apply(shader);
+                // Apply Texture
+                uiMat->apply(shader);
 
-            Square->draw(GL_TRIANGLES);
+                Square->draw(GL_TRIANGLES);
+
+                continue;
+            }
+            if ( auto* uiText = dynamic_cast<UI::UITextComponent*>(rc) ) {
+                // draw text
+                const UI::UITransformComponent* t = uiText->GetBoundTransform();
+                const Rect& rec = t->GetResolvedRect();
+                auto font = FontManager::getInstance().getFont(uiText->GetFontName());
+                if ( !font ) {
+                    LE_DEBUG_WARN("[UIPass]", " Font not found: " << uiText->GetFontName() << "\n");
+                    continue;
+                }
+                auto shaped = font->shapeText(uiText->GetText(), uiText->GetFontSize());
+
+                auto* uiMat = uiText->GetMaterial().get();
+                // Set Model Matrix
+                Matrix4 m = Matrix4::translation(Vector3(rec.center[0], rec.center[1], 0.0f)) *
+                            Matrix4::scale(Vector3(rec.size[0], rec.size[1], 1.0f));
+                uiMat->setProperty("m_Model", m);
+                uiMat->setTexture("u_FontAtlas", font->getAtlasTexture());
+                // Set Screen Size Property
+                uiMat->setProperty("u_ScreenSize", Vector2(size.width, size.height));
+
+                // Set Color
+                uiMat->setProperty("u_Color", uiText->GetColor());
+
+                // Set Transparency
+                uiMat->setProperty("transparency", uiText->GetTransparency());
+
+                float originX = rec.center[0] - rec.size[0] * 0.5f;
+                float originY = rec.center[1] - rec.size[1] * 0.5f; // top of rect
+
+                
+
+                for ( const ShapedGlyph& g : shaped ) {
+                    const GlyphInfo* info = g.info;
+                    if ( !info ) continue;
+                    
+                    float scale = uiText->GetFontSize() / 64.0f;
+
+                    float w = (float)info->width * scale;
+                    float h = (float)info->height * scale;
+                    float xpos = originX + g.x + info->bearingX * scale + w * 0.5f; // g.x already scaled by HB
+                    float ypos = originY + (info->height - info->bearingY) * scale + h * 0.5f;
+
+                    Matrix4 model =
+                        Matrix4::translation(Vector3(xpos, ypos, 0.0f)) *
+                        Matrix4::scale(Vector3(w, h, 1.0f));
+
+                    uiMat->setProperty("u_Color", uiText->GetColor());
+                    uiMat->setProperty("transparency", uiText->GetTransparency());
+                    uiMat->setProperty("u_UV0", Vector2(info->u0, info->v0));
+                    uiMat->setProperty("u_UV1", Vector2(info->u1, info->v1));
+                    uiMat->setProperty("m_Model", model);
+                    uiMat->apply(textShader);
+
+                    Square->draw(GL_TRIANGLES);
+                }
+
+                continue;
+            }
+            assert("[ERROR - UIPass] UIPass received non-UIRenderComponent or non-UITextComponent!");
         }
 
         glBlendFunc(GL_ONE, GL_ONE);

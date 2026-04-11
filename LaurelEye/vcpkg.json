@@ -8,7 +8,11 @@
         { "name": "assimp" },
         { "name": "stb" },
         { "name": "rapidjson" },
-        { "name": "lua"},
-        { "name": "sol2"}
+        { "name": "lua" },
+        { "name": "sol2" },
+        {
+            "name": "harfbuzz",
+            "features": ["freetype"]
+        }
     ]
 }

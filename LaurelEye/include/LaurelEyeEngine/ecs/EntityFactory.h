@@ -73,6 +73,7 @@ namespace LaurelEye{
         void setupUIRenderComponent(Entity& entity, const rapidjson::Value& uirenderData);
         void setupUITransformComponent(Entity& entity, const rapidjson::Value& uitransformData);
         void setupUIInteractionComponent(Entity& entity, const rapidjson::Value& uiinteractionData);
+        void setupUITextComponent(Entity& entity, const rapidjson::Value& uirenderData);
 
         //Helpers
         Vector2 ReadVector2(const rapidjson::Value& vectorData);

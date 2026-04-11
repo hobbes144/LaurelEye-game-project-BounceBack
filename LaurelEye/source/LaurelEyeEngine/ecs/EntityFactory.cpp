@@ -23,6 +23,7 @@
 #include "LaurelEyeEngine/transform/TransformComponent.h"
 #include "LaurelEyeEngine/UI/UIComponents/UITransformComponent.h"
 #include "LaurelEyeEngine/UI/UIComponents/UIRenderComponent.h"
+#include "LaurelEyeEngine/UI/UIComponents/UITextComponent.h"
 #include "LaurelEyeEngine/UI/UIComponents/UIInteractionComponent.h"
 
 #include "LaurelEyeEngine/logging/EngineLog.h"
@@ -159,6 +160,9 @@ namespace LaurelEye {
             }
             else if ( compName == "UITransform" ) {
                 setupUITransformComponent(entity, compData);
+            }
+            else if ( compName == "UIText" ) {
+                setupUITextComponent(entity, compData);
             }
             else if ( compName == "UIInteraction" ) {
                 setupUIInteractionComponent(entity, compData);
@@ -823,6 +827,8 @@ namespace LaurelEye {
         entity.addComponent(std::move(uirenderComponent));
     }
 
+    
+
     void EntityFactory::setupUIInteractionComponent(Entity& entity, const rapidjson::Value& uiinteractionData) {
         std::unique_ptr<UI::UIInteractionComponent> uiinteractionComponent = std::make_unique<UI::UIInteractionComponent>();
 
@@ -873,6 +879,88 @@ namespace LaurelEye {
     }
 
     void EntityFactory::setupDebugDrawComponent(Entity& entity, const rapidjson::Value& emitterData) {
+    }
+
+    void EntityFactory::setupUITextComponent(Entity& entity, const rapidjson::Value& uitextData) {
+        std::unique_ptr<UI::UITextComponent> textComponent = std::make_unique<UI::UITextComponent>();
+
+        // ALWAYS create material (same pattern as UI quad)
+        auto pMat = std::make_shared<Graphics::Material>();
+        textComponent->SetMaterial(pMat);
+
+        // --- Material Defaults ---
+        pMat->setProperty<Vector2>("mainTextureScale", Vector2(1.0f));
+        pMat->setProperty<Vector3>("diffuse", Vector3(1, 1, 1));
+        pMat->setProperty<Vector3>("specular", Vector3(0, 0, 0));
+        pMat->setProperty<float>("shininess", 1.0f);
+        pMat->setProperty<int>("layer", 0);
+
+        // Text shader typically doesn't use this toggle, but keep consistent
+        pMat->setProperty<int>("useTexture", 1);
+
+        // --- Font ---
+        if ( uitextData.HasMember("font") && uitextData["font"].IsString() ) {
+            std::string fontPath = uitextData["font"].GetString();
+
+            textComponent->SetFontName(fontPath);
+            
+        }
+
+        // --- Text Content ---
+        if ( uitextData.HasMember("text") && uitextData["text"].IsString() ) {
+            textComponent->SetText(uitextData["text"].GetString());
+        }
+
+        // --- Font Size ---
+        if ( uitextData.HasMember("fontSize") && uitextData["fontSize"].IsInt()) {
+            textComponent->SetFontSize(uitextData["fontSize"].GetInt());
+        }
+
+        // --- Color ---
+        if ( uitextData.HasMember("color") && uitextData["color"].IsArray() ) {
+            const auto& color = uitextData["color"].GetArray();
+            if ( color.Size() >= 4 ) {
+                float r = color[0].GetFloat() <= 1 ? color[0].GetFloat() : 1.0f;
+                float g = color[1].GetFloat() <= 1 ? color[1].GetFloat() : 1.0f;
+                float b = color[2].GetFloat() <= 1 ? color[2].GetFloat() : 1.0f;
+                float a = color[3].GetFloat() <= 1 ? color[3].GetFloat() : 1.0f;
+                textComponent->SetColor(Vector4(r, g, b, a));
+            }
+            else {
+                std::cerr << "[UITextComponent] Color is not a Vector4\n";
+            }
+        }
+
+        // --- Transparency ---
+        if ( uitextData.HasMember("transparency") && uitextData["transparency"].IsFloat() ) {
+            textComponent->SetTransparency(uitextData["transparency"].GetFloat());
+        }
+
+        // --- Alignment ---
+        if ( uitextData.HasMember("alignment") && uitextData["alignment"].IsString() ) {
+            std::string align = uitextData["alignment"].GetString();
+
+            if ( align == "left" ) {
+                textComponent->SetAlignment(UI::TextAlignment::Left);
+            }
+            else if ( align == "center" ) {
+                textComponent->SetAlignment(UI::TextAlignment::Center);
+            }
+            else if ( align == "right" ) {
+                textComponent->SetAlignment(UI::TextAlignment::Right);
+            }
+        }
+
+        // --- Wrapping ---
+        if ( uitextData.HasMember("wrap") && uitextData["wrap"].IsBool() ) {
+            textComponent->SetWrap(uitextData["wrap"].GetBool());
+        }
+
+        if ( uitextData.HasMember("maxWidth") && uitextData["maxWidth"].IsFloat() ) {
+            textComponent->SetMaxWidth(uitextData["maxWidth"].GetFloat());
+        }
+
+        entity.addComponent(std::move(textComponent));
     }
 
     void EntityFactory::setupAnimationComponent(Entity& entity, const rapidjson::Value& animationData) {

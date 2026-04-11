@@ -32,6 +32,7 @@ namespace LaurelEye::Graphics {
         Renderable3D,
         Renderable2D,
         UIRenderable,
+        UITextRenderable,
         PropertyCamera,
         PropertyLight
     };

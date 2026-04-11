@@ -13,6 +13,7 @@
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Scene.h"
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Spline.h"
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Time.h"
+#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_UIText.h"
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Transform.h"
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_UI.h"
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Window.h"
@@ -82,6 +83,9 @@ namespace LaurelEye::Scripting {
 
         /* Game Manager */
         Sol2API_GameManager::setup(lua, ctx);
+
+        /*UI Text */
+        Sol2API_UIText::setup(lua, ctx);
     }
 
     void Sol2API::registerEnvironment(sol::environment& env, LaurelEye::Entity* owner) {

@@ -22,6 +22,7 @@
 #include "LaurelEyeEngine/animation/components/SkeletalAnimationComponent.h"
 #include "LaurelEyeEngine/logging/EngineLog.h"
 #include "LaurelEyeEngine/audio/AudioComponent.h"
+#include "LaurelEyeEngine/UI/UIComponents/UITextComponent.h"
 
 namespace LaurelEye::Scripting {
     void Sol2API_ECS::setup(sol::state& lua, EngineContext* ctx) {
@@ -92,6 +93,7 @@ namespace LaurelEye::Scripting {
         entityType.set_function("findParticleEmitter", &safeFindComponent<Particles::ParticleEmitterComponent>);
         entityType.set_function("findAudio", &safeFindComponent<Audio::AudioComponent>);
         entityType.set_function("findUIRender", &safeFindComponent<UI::UIRenderComponent>);
+        entityType.set_function("findUIText", &safeFindComponent<UI::UITextComponent>);
         entityType.set_function("findUITransform", &safeFindComponent<UI::UITransformComponent>);
         entityType.set_function("findUIInteraction", &safeFindComponent<UI::UIInteractionComponent>);
         entityType.set_function("findPointLight", &safeFindComponent<Graphics::PointLightComponent>);
@@ -163,6 +165,10 @@ namespace LaurelEye::Scripting {
         }
         else if ( type == "UIRenderComponent" ) {
             if ( auto* c = e.findComponent<UI::UIRenderComponent>() )
+                return sol::make_object(lua, c);
+        }
+        else if ( type == "UITextComponent" ) {
+            if ( auto* c = e.findComponent<UI::UITextComponent>() )
                 return sol::make_object(lua, c);
         }
 

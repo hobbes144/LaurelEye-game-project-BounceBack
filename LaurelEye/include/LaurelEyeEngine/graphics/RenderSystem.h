@@ -38,6 +38,7 @@ namespace LaurelEye::Graphics {
     class IRenderDevice;
     class MeshManager;
     class SkeletonManager;
+    class FontManager;
 
     // temp
     class LightComponent;

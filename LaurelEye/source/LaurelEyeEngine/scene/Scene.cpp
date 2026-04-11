@@ -419,6 +419,11 @@ namespace LaurelEye {
                     renderSystem->registerComponent(uirenderComp);
                 }
             }
+            else if ( auto* uirenderComp = dynamic_cast<UI::UITextComponent*>(comp.get()) ) {
+                if ( renderSystem ) {
+                    renderSystem->registerComponent(uirenderComp);
+                }
+            }
             else if ( auto* uitransformComp = dynamic_cast<UI::UITransformComponent*>(comp.get()) ) {
                 if ( uiLayoutSystem ) {
                     uiLayoutSystem->registerComponent(uitransformComp);
@@ -532,6 +537,11 @@ namespace LaurelEye {
             else if ( auto* uirenderComp = dynamic_cast<UI::UIRenderComponent*>(comp.get()) ) {
                 if ( renderSystem ) {
                     renderSystem->deregisterComponent(uirenderComp);
+                }
+            }
+            else if ( auto* uitextComp = dynamic_cast<UI::UITextComponent*>(comp.get()) ) {
+                if ( renderSystem ) {
+                    renderSystem->deregisterComponent(uitextComp);
                 }
             }
             else if ( auto* uitransformComp = dynamic_cast<UI::UITransformComponent*>(comp.get()) ) {

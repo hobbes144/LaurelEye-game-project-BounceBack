@@ -89,6 +89,8 @@ find_package(RapidJSON CONFIG REQUIRED)
 find_package(Stb REQUIRED)
 find_package(sol2 CONFIG REQUIRED)
 find_package(lua CONFIG REQUIRED)
+find_package(freetype CONFIG REQUIRED)
+find_package(HarfBuzz CONFIG REQUIRED)
 # find_package(unofficial-lua CONFIG REQUIRED)
 find_package(Bullet CONFIG REQUIRED)
 
@@ -234,8 +236,12 @@ target_sources(LaurelEyeEngine
     "source/LaurelEyeEngine/UI/UILayoutSystem.cpp"
     "source/LaurelEyeEngine/window/glfw/LGlfwWindow.cpp"
     "source/LaurelEyeEngine/window/WindowManager.cpp"
+    "source/LaurelEyeEngine/graphics/FontManager.cpp"
+    "source/LaurelEyeEngine/graphics/resources/Font.cpp"
+    "source/LaurelEyeEngine/UI/UIComponents/UITextComponent.cpp"
+    "source/LaurelEyeEngine/scripting/sol2/bindings/Sol2API_UIText.cpp"
     ${ENGINE_SOURCES}
-)
+    )
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     # Actions specific to the Debug build type
@@ -275,7 +281,11 @@ target_link_libraries(LaurelEyeEngine
         sol2::sol2
         ${LAURELEYE_BULLET_LIBS}
         FMOD::FMOD
+        freetype
+        harfbuzz::harfbuzz
 )
+
+add_compile_definitions(HB_HAVE_FREETYPE ON)
 
 target_compile_features(LaurelEyeEngine PUBLIC cxx_std_23)
 
