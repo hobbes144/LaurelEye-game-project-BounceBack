@@ -63,6 +63,7 @@ function onUpdate(dt)
 
         body:setLinearVelocity(newVel)
     end
+
 end
 
 function onTriggerEnter(data)
@@ -137,15 +138,20 @@ end
 function onTriggerStay(data)
     local tagsA = data.entityA:getTags()
     local pos = transform:getWorldPosition()
+    local vel = body:getLinearVelocity()
     for _, tag in pairs(tagsA) do
         if tag == "ground" then
-            transform:setWorldPosition(pos.x, 1.0, pos.z)
+            if vel.y < 1.0 then
+                transform:setWorldPosition(pos.x, 1.0, pos.z)
+            end
         end
     end
     local tagsB = data.entityB:getTags()
     for _, tag in pairs(tagsB) do
         if tag == "ground" then
-            transform:setWorldPosition(pos.x, 1.0, pos.z)
+            if vel.y < 1.0 then
+                transform:setWorldPosition(pos.x, 1.0, pos.z)
+            end
         end
     end
 end
