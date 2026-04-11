@@ -28,6 +28,12 @@ namespace LaurelEye{
         ///@brief Deserialize all entities in a scene JSON file, adding them to the given scene
         void populateSceneFromJson(Scene& scene, const rapidjson::Document& jsonDoc);
 
+        Entity* createEntityRecursive(
+            Scene& scene,
+            const rapidjson::Value& entityJson,
+            Entity* parent,
+            std::unordered_map<std::string, Entity*>& entityMap);
+
         ///@brief Deserialize one entity definition into a live entity
         Entity* createEntityFromJson(const rapidjson::Value& entityData);
 

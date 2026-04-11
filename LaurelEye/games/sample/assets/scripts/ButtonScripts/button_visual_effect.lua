@@ -1,12 +1,16 @@
 ﻿--Button Menu Visuals
 
 local renderUI
+local material
 local transformUI
 local interactionUI
 
-local normalColor
-local hoverColor
-local pressedColor
+local normalTex
+local hoverTex
+local pressedTex
+
+local hoverEnt
+local pressedEnt
 
 --Compression
 
@@ -19,6 +23,7 @@ local holdAmplitude = 1.5
 local holdSpeed = 20.0
 
 function onStart()
+    local scene = SceneManager:getCurrentScene()
 
     -- Get components using YOUR bindings
     render = self:findUIRender()
@@ -26,15 +31,58 @@ function onStart()
     interaction = self:findUIInteraction()
 
     -- Pull serialized values
-    hoverColor = Serialized.hoverColor
-    pressedColor = Serialized.pressedColor
+    local hoverEntNameStr = Serialized.hoverEntName
+    local pressedEntNameStr = Serialized.pressedEntName
+
+    if hoverEntNameStr ~= nil then
+        hoverEnt = scene:findEntityByName(hoverEntNameStr)
+    end
+
+    if pressedEntNameStr ~= nil then 
+        pressedEnt = scene:findEntityByName(pressedEntNameStr)
+    end
+
+    if hoverEnt == nil then
+        log("ERROR: No Hover Entity found")
+    end
+
+    if pressedEnt == nil then
+        log("ERROR: No Pressed Entity found")
+    end
+
+    if hoverEnt ~= nil then
+        local hoverUIRender = hoverEnt:findUIRender()
+        if hoverUIRender ~= nil then
+            local hoverMat = hoverUIRender:getMaterial()
+            if hoverMat ~= nil then
+                hoverTex = hoverMat:getTexture("mainTexture")
+                log("Hover Tex: " .. hoverTex)
+            end
+        end
+    end
+
+    if pressedEnt ~= nil then
+        local pressedUIRender = pressedEnt:findUIRender()
+        if pressedUIRender ~= nil then
+            local pressedMat = pressedUIRender:getMaterial()
+            if pressedMat ~= nil then
+                pressedTex = pressedMat:getTexture("mainTexture")
+                log("Pressed Tex: " .. pressedTex)
+            end
+        end
+    end
+
+
 
     if render == nil then
         log("ERROR: No UIRenderComponent found")
     end
 
     if render ~= nil then
-        normalColor = render:getColor()
+        material = render:getMaterial()
+        if material ~= nil then
+            normalTex = material:getTexture("mainTexture")
+        end
     end
 
     if transform ~= nil then
@@ -46,22 +94,22 @@ end
 function onHoverEnter()
     log("Hover Visual Enter")
 
-    if render ~= nil and hoverColor ~= nil then
-        log("Changing Color")
-        render:setColor(hoverColor)
+    if render ~= nil and hoverTex ~= nil then
+        log("Changing Texture")
+        material:setTexture("mainTexture", hoverTex)
     end
 end
 
 function onHoverExit()
-    if render ~= nil and normalColor ~= nil then
-        render:setColor(normalColor)
+    if render ~= nil and normalTex ~= nil then
+         material:setTexture("mainTexture", normalTex)
     end
 end
 
 function onPressed()
 
-    if render ~= nil and pressedColor ~= nil then
-        render:setColor(pressedColor)
+    if render ~= nil and pressedTex ~= nil then
+        material:setTexture("mainTexture", pressedTex)
     end
 
     if transform ~= nil and baseSize ~= nil then
@@ -77,9 +125,9 @@ end
 function onReleased()
 
     if interaction ~= nil and interaction:getIsHovered() then
-        render:setColor(hoverColor)
+        material:setTexture("mainTexture", hoverTex)
     else
-        render:setColor(normalColor)
+        material:setTexture("mainTexture", normalTex)
     end
 
     if transform ~= nil and baseSize ~= nil then

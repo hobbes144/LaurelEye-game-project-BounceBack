@@ -1,9 +1,25 @@
 ﻿{
-    "initialScene": "Level1",
+    "initialScene": "DigiPenLogo",
     "scenes": [
+        {
+            "name": "DigiPenLogo",
+            "path": "scenes/digipenlogo.scene.json"
+        },
+        {
+            "name": "Cutscene",
+            "path": "scenes/cutscene.scene.json"
+        },
         {
             "name": "MainMenu",
             "path": "scenes/main_menu.scene.json"
+        },
+        {
+            "name": "SettingsMenu",
+            "path": "scenes/settings_menu.scene.json"
+        },
+        {
+            "name": "Credits",
+            "path": "scenes/credits.scene.json"
         },
         {
             "name": "Level1",
@@ -24,10 +40,6 @@
         {
             "name": "Level5",
             "path": "scenes/level5.scene.json"
-        },
-        {
-            "name": "SettingsMenu",
-            "path": "scenes/settings_menu.scene.json"
         }
     ]
 }

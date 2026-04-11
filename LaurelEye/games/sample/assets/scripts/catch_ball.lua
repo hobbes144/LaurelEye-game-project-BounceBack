@@ -12,6 +12,14 @@ scene = nil
 playerEntity = nil
 playerTransform = nil
 
+impactPE = nil
+attackPE = nil
+kickbackPE = nil
+
+gravityDisabled = false
+homingTimer = nil        -- tracks time since homing started
+HOMING_TIMEOUT = 2.0     -- seconds before giving up and sending "Catch Me!"
+
 chaseRange = 10.0
 
 function onStart()
@@ -20,6 +28,19 @@ function onStart()
     scene = SceneManager:getCurrentScene()
     playerEntity = scene:findEntityByName("PlayerPrefab")
     playerTransform = playerEntity and playerEntity:findTransform()
+
+    local impactEntity = scene:findEntityByName("ImpactEmitter")
+    impactPE = impactEntity and impactEntity:findParticleEmitter()
+    impactPE:pause()
+
+    local attackEntity = scene:findEntityByName("AttackEmitter")
+    attackPE = attackEntity and attackEntity:findParticleEmitter()
+    attackPE:pause()
+
+    local kickbackEntity = scene:findEntityByName("KickbackEmitter")
+    kickbackPE = kickbackEntity and kickbackEntity:findParticleEmitter()
+    kickbackPE:pause()
+
 end
 
 function onMessage(msg)
@@ -77,7 +98,17 @@ function onTriggerEnter(data)
                 local message = Message.new()
                 message.to = entity
                 message.topic = "Get Hit!"
+                impactPE:playFor(0.1)
+                attackPE:playFor(0.2)
                 Script.send(message)
+                return true
+            end
+            if tag == "ground" then
+                impactPE:playFor(0.1)
+                return true
+            end
+            if tag == "door" then
+                impactPE:playFor(0.1)
                 return true
             end
             if tag == "shield" then
@@ -98,6 +129,8 @@ function onTriggerEnter(data)
             if tag == "target" then
                 SceneManager:destroy(entity)
                 GameManager:addGeneratorDestroyed(1)
+                attackPE:playFor(0.1)
+                impactPE:playFor(0.1)
                 return true
             end
             if tag == "generator" then
@@ -105,6 +138,9 @@ function onTriggerEnter(data)
                 message.to = entity
                 message.topic = "Get Destroyed!"
                 Script.send(message)
+                
+                impactPE:playFor(0.1)
+                attackPE:playFor(0.2)
                 return true
             end
         end

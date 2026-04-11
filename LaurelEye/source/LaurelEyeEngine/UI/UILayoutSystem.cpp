@@ -88,8 +88,8 @@ namespace LaurelEye::UI {
         //Be Consious of GPU / Engine Space Represention of Rects
         finalSize = 0.5 * finalSize;
 
-        Vector2 anchorPoint = minAnchorPX + anchorSize * transformData.pivot;
-        Vector2 center = anchorPoint + transformData.localOffset + ((Vector2(0.5f, 0.5f) - transformData.pivot)*2 * finalSize);
+        Vector2 anchorPoint = minAnchorPX + (anchorSize * transformData.pivot);
+        Vector2 center = anchorPoint + transformData.localOffset + ((Vector2(0.5f, 0.5f) - transformData.pivot) * finalSize);
 
         Rect rect;
         rect.center = center;

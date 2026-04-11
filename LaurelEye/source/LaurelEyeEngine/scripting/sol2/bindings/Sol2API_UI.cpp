@@ -190,7 +190,9 @@ namespace LaurelEye::Scripting {
             "setVisible", &LaurelEye::UI::UIRenderComponent::SetVisible,
             "setInvisible", &LaurelEye::UI::UIRenderComponent::SetInvisible,
             "toggleVisibility", &LaurelEye::UI::UIRenderComponent::ToggleVisibility,
-            "isVisible", &LaurelEye::UI::UIRenderComponent::IsVisible
+            "isVisible", &LaurelEye::UI::UIRenderComponent::IsVisible,
+
+            sol::base_classes, sol::bases<Graphics::IRenderableComponent>()
         );
 
     }

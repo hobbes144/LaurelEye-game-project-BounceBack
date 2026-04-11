@@ -41,6 +41,8 @@
 
 #include "LaurelEyeEngine/math/VectorTemplated.h"
 
+#include "LaurelEyeEngine/logging/EngineLog.h"
+
 namespace LaurelEye {
 
     Scene::Scene(const std::string& name, EngineContext& context, std::shared_ptr<IO::JsonAsset> json, const std::string& assetPath)
@@ -83,13 +85,23 @@ namespace LaurelEye {
             ctx.getService<Graphics::RenderSystem>()->retrieveSkydomePass()->addTexture(handle);
             ctx.getService<Graphics::RenderSystem>()->retrieveGBufferPass()->addSkydome(handle);
         }
-        auto committed = spawnPendingEntities();
+        auto committed = spawnPendingEntities();    
         // Also register any existing entities (for activation we want whole scene)
-        for ( size_t i = 0; i < entities.size(); i++ ) {
-            auto& e = entities[i];
+        auto entitiesCopy = entities;
+        for ( auto& e : entitiesCopy ) {
             if ( !e->getRegistered() ) {
+                LE_DEBUG_INFO("Scene", "Address before : " << e << std::endl);
                 registerEntityComponents(e);
-                e = entities[i];
+                LE_DEBUG_INFO("Scene", "Address after: " << e << std::endl);
+
+                // DEBUG CHECK
+                if ( !e ) {
+                    LE_DEBUG_WARN("Scene", "ENTITY POINTER NULL AFTER REGISTER\n");
+                }
+                else {
+                    LE_DEBUG_INFO("Scene", "Entity after register: " << e->getName() << "\n");
+                }
+
                 e->setRegistered(true);
             }
         }
@@ -189,6 +201,15 @@ namespace LaurelEye {
     Entity* Scene::addEntity(Entity* entityToAdd) {
         if ( entityToAdd ) {
             pendingAdditions.push_back(entityToAdd);
+
+            //Recursivly Add Children to pendingAdditions
+            auto transformComponent = entityToAdd->findComponent<TransformComponent>();
+            if ( transformComponent ) {
+                for ( LaurelEye::TransformComponent* transComponent : transformComponent->getChildren() ) {
+                    addEntity(transComponent->getOwner());
+                }
+            }
+
             return entityToAdd;
         }
         return nullptr;
@@ -213,6 +234,15 @@ namespace LaurelEye {
     void Scene::removeEntity(Entity* entityToRemove) {
         if ( entityToRemove ) {
             pendingRemovals.push_back(entityToRemove);
+
+            //Recursivly Add Children to pendingRemovals List
+            auto transformComponent = entityToRemove->findComponent<TransformComponent>();
+            if ( transformComponent ) {
+                for ( LaurelEye::TransformComponent* transComponent : transformComponent->getChildren() ) {
+                    removeEntity(transComponent->getOwner());
+                }
+            }
+
         }
     }
 
@@ -222,12 +252,24 @@ namespace LaurelEye {
             [&entityName](const Entity* e) {
                 return e->getName() == entityName;
             });
-        if ( it != entities.end() ) pendingRemovals.push_back(*it);
+        if ( it != entities.end() ) {
+            pendingRemovals.push_back(*it);
+
+            // Recursivly Add Children to pendingRemovals List
+            auto transformComponent = (*it)->findComponent<TransformComponent>();
+            if ( transformComponent ) {
+                for ( LaurelEye::TransformComponent* transComponent : transformComponent->getChildren() ) {
+                    removeEntity(transComponent->getOwner());
+                }
+            }
+        }
     }
 
     Entity* Scene::findEntityByName(const std::string& name) const {
         for ( auto& e : entities ) {
-            if ( e->getName() == name ) return e;
+            if ( e->getName() == name ) {
+                return e;
+            }
         }
         return nullptr;
     }
@@ -394,10 +436,28 @@ namespace LaurelEye {
             
             // add more as needed...
         }
+
+        //Recursivvly Register Components
+        auto transComp = entity->findComponent<TransformComponent>();
+        if ( transComp ) {
+            for ( TransformComponent* child : transComp->getChildren() ) {
+                registerEntityComponents(child->getOwner());
+            }
+        }
+
     }
 
     void Scene::deregisterEntityComponents(Entity* entity) {
         if ( !entity ) return;
+
+        // Recursivvly Register Components
+        auto transComp = entity->findComponent<TransformComponent>();
+        if ( transComp ) {
+            for ( TransformComponent* child : transComp->getChildren() ) {
+                deregisterEntityComponents(child->getOwner());
+            }
+        }
+
         auto* transformSystem = ctx.getService<TransformSystem>();
         auto* physicsSystem = ctx.getService<Physics::PhysicsSystem>();
         auto* renderSystem = ctx.getService<Graphics::RenderSystem>();

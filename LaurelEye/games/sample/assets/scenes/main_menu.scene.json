@@ -49,6 +49,7 @@
                 }
             }
         },
+
         {
             "name": "Background",
             "components": {
@@ -57,280 +58,511 @@
                     "anchorMax": [ 1.0, 1.0 ],
                     "pivot": [ 0.5, 0.5 ],
                     "offset": [ 0, 0 ],
-                    "size": [ 1, 1]
+                    "size": [ 1, 1 ]
                 },
                 "UIRender": {
-                    "color": [ 0.37, 0.22, 0.9, 1.0 ]
+                    "color": [ 0.79, 0.83, 0.83, 1.0 ]
                 }
             }
         },
-            {
-                "name": "Play Button",
-                "components": {
-                    "UITransform": {
-                        "anchorMin": [ 1.0, 1.0 ],
-                        "anchorMax": [ 1.0, 1.0 ],
-                        "pivot": [ 1.0, 1.0 ],
-                        "offset": [ -100, -50 ],
-                        "size": [ 300, 100 ]
+        {
+            "name": "Art",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0.0, 0.0 ],
+                    "anchorMax": [ 1.0, 1.0 ],
+                    "pivot": [ 0.5, 0.5 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 1.0, 1.0 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "UIElements/MainMenu/MainMenu.png",
+                        "layer": 10
                     },
-                    "UIRender": {
-                        "material": {
-                            "texture": "textures/PlayButton.jpg",
-                            "layer": 10
-                        },
-                        "color": [0.33, 0.79, 0.52, 1.0]
-                    },
-                    "UIInteraction": {
-                        "isInteractable": true,
-                        "blockRaycast": true,
-                        "receiveHover": true,
-                        "receiveClick": true,
-                        "interactionPriority": 1
-                    },
-                    "Script": {
-                        "path": "scripts/ButtonScripts/button_menu_navigation.lua",
-                        "data": [
-                            {
-                                "name": "targetScene",
-                                "type": "String",
-                                "value": "Level1"
-                            }
-
-                        ]
-                    },
-                    "Script": {
-                        "path": "scripts/ButtonScripts/button_visual_effect.lua",
-                        "data": [
-                            {
-                                "name": "hoverColor",
-                                "type": "Vector4",
-                                "value": {
-                                    "r": 0.47,
-                                    "g": 0.86,
-                                    "b": 0.21,
-                                    "a": 1.0
-                                }
-                            },
-                            {
-                                "name": "pressedColor",
-                                "type": "Vector4",
-                                "value": {
-                                    "r": 1.0,
-                                    "g": 0.26,
-                                    "b": 0.0,
-                                    "a": 1.0
-                                }
-                            }
-                        ]
-                    }
-                }
-            },
-            {
-                "name": "Prototype 1 Button",
-                "components": {
-                    "UITransform": {
-                        "anchorMin": [ 0.0, 0.0 ],
-                        "anchorMax": [ 0.0, 0.0 ],
-                        "pivot": [ 0.0, 0.0 ],
-                        "offset": [ 100, 300 ],
-                        "size": [ 225, 75 ]
-                    },
-                    "UIRender": {
-                        "material": {
-                            "texture": "textures/Prototype1.jpg",
-                            "layer": 10
-                        },
-                        "color": [ 0.23, 0.59, 0.42, 1.0 ]
-                    },
-                    "UIInteraction": {
-                        "isInteractable": true,
-                        "blockRaycast": true,
-                        "receiveHover": true,
-                        "receiveClick": true,
-                        "interactionPriority": 1
-                    },
-                    "Script": {
-                        "path": "scripts/ButtonScripts/button_menu_navigation.lua",
-                        "data": [
-                            {
-                                "name": "targetScene",
-                                "type": "String",
-                                "value": "SettingsMenu"
-                            }
-
-                        ]
-                    },
-                    "Script": {
-                        "path": "scripts/ButtonScripts/button_visual_effect.lua",
-                        "data": [
-                            {
-                                "name": "hoverColor",
-                                "type": "Vector4",
-                                "value": {
-                                    "r": 0.47,
-                                    "g": 0.86,
-                                    "b": 0.21,
-                                    "a": 1.0
-                                }
-                            },
-                            {
-                                "name": "pressedColor",
-                                "type": "Vector4",
-                                "value": {
-                                    "r": 1.0,
-                                    "g": 0.26,
-                                    "b": 0.0,
-                                    "a": 1.0
-                                }
-                            }
-                        ]
-                    }
-                }
-            },
-            {
-                "name": "Prototype 2 Button",
-                "components": {
-                    "UITransform": {
-                        "anchorMin": [ 0.0, 0.0 ],
-                        "anchorMax": [ 0.0, 0.0 ],
-                        "pivot": [ 0.0, 0.0 ],
-                        "offset": [ 100, 175 ],
-                        "size": [ 225, 75 ]
-                    },
-                    "UIRender": {
-                        "material": {
-                            "texture": "textures/Prototype2.jpg",
-                            "layer": 10
-                        },
-                        "color": [ 0.23, 0.59, 0.42, 1.0 ]
-                    },
-                    "UIInteraction": {
-                        "isInteractable": true,
-                        "blockRaycast": true,
-                        "receiveHover": true,
-                        "receiveClick": true,
-                        "interactionPriority": 1
-                    },
-                    "Script": {
-                        "path": "scripts/ButtonScripts/button_menu_navigation.lua",
-                        "data": [
-                            {
-                                "name": "targetScene",
-                                "type": "String",
-                                "value": "Reload"
-                            }
-
-                        ]
-                    },
-                    "Script": {
-                        "path": "scripts/ButtonScripts/button_visual_effect.lua",
-                        "data": [
-                            {
-                                "name": "hoverColor",
-                                "type": "Vector4",
-                                "value": {
-                                    "r": 0.47,
-                                    "g": 0.86,
-                                    "b": 0.21,
-                                    "a": 1.0
-                                }
-                            },
-                            {
-                                "name": "pressedColor",
-                                "type": "Vector4",
-                                "value": {
-                                    "r": 1.0,
-                                    "g": 0.26,
-                                    "b": 0.0,
-                                    "a": 1.0
-                                }
-                            }
-                        ]
-                    }
-                }
-            },
-            {
-                "name": "Quit Button",
-                "components": {
-                    "UITransform": {
-                        "anchorMin": [ 0.0, 0.0 ],
-                        "anchorMax": [ 0.0, 0.0 ],
-                        "pivot": [ 0.0, 0.0 ],
-                        "offset": [ 100, 50 ],
-                        "size": [ 225, 75 ]
-                    },
-                    "UIRender": {
-                        "material": {
-                            "texture": "textures/Quit.jpg",
-                            "layer": 10
-                        },
-                        "color": [ 0.23, 0.59, 0.42, 1.0 ]
-                    },
-                    "UIInteraction": {
-                        "isInteractable": true,
-                        "blockRaycast": true,
-                        "receiveHover": true,
-                        "receiveClick": true,
-                        "interactionPriority": 1
-                    },
-                    "Script": {
-                        "path": "scripts/ButtonScripts/button_menu_navigation.lua",
-                        "data": [
-                            {
-                                "name": "targetScene",
-                                "type": "String",
-                                "value": "Quit"
-                            }
-
-                        ]
-                    },
-                    "Script": {
-                        "path": "scripts/ButtonScripts/button_visual_effect.lua",
-                        "data": [
-                            {
-                                "name": "hoverColor",
-                                "type": "Vector4",
-                                "value": {
-                                    "r": 0.47,
-                                    "g": 0.86,
-                                    "b": 0.21,
-                                    "a": 1.0
-                                }
-                            },
-                            {
-                                "name": "pressedColor",
-                                "type": "Vector4",
-                                "value": {
-                                    "r": 1.0,
-                                    "g": 0.26,
-                                    "b": 0.0,
-                                    "a": 1.0
-                                }
-                            }
-                        ]
-                    }
-                }
-            },
-            {
-                "name": "SceneManager",
-                "components": {
-                    "Transform": {
-                        "position": [ 0.0, 10.0, 0.0 ],
-                        "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                        "scale": [ 0.08, 0.08, 0.08 ]
-                    },
-                    "Script": {
-                        "path": "scripts/scene_manager.lua",
-                        "data": [
-                            {
-                                "name": "hideMouse",
-                                "type": "Bool",
-                                "value": false
-                            }
-                        ]
-                    }
+                    "color": [ 1.0, 1.0, 1.0, 1.0 ]
                 }
             }
+        },
+
+
+
+
+
+        {
+            "name": "StartButtonHovered",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0, 0 ],
+                    "anchorMax": [ 0, 0 ],
+                    "pivot": [ 0, 0 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 0, 0 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "UIElements/StartButton/startHovered.png",
+                        "layer": 10
+                    },
+                    "color": [ 1.0, 1.0, 1.0, 0.0 ]
+                }
+            }
+        },
+        {
+            "name": "StartButtonPressed",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0, 0 ],
+                    "anchorMax": [ 0, 0 ],
+                    "pivot": [ 0, 0 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 0, 0 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "UIElements/StartButton/startPressed.png",
+                        "layer": 10
+                    },
+                    "color": [ 1.0, 1.0, 1.0, 0.0 ]
+                }
+            }
+        },
+        {
+            "name": "ControlsButtonPressed",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0, 0 ],
+                    "anchorMax": [ 0, 0 ],
+                    "pivot": [ 0, 0 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 0, 0 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "UIElements/ControlsButton/controllsPressed.png",
+                        "layer": 10
+                    },
+                    "color": [ 1.0, 1.0, 1.0, 0.0 ]
+                }
+            }
+        },
+        {
+            "name": "ControlsButtonHovered",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0, 0 ],
+                    "anchorMax": [ 0, 0 ],
+                    "pivot": [ 0, 0 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 0, 0 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "UIElements/ControlsButton/controllsHovered.png",
+                        "layer": 10
+                    },
+                    "color": [ 1.0, 1.0, 1.0, 0.0 ]
+                }
+            }
+        },
+        {
+            "name": "SettingsButtonPressed",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0, 0 ],
+                    "anchorMax": [ 0, 0 ],
+                    "pivot": [ 0, 0 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 0, 0 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "UIElements/SettingsButton/SettingsPressed.png",
+                        "layer": 10
+                    },
+                    "color": [ 1.0, 1.0, 1.0, 0.0 ]
+                }
+            }
+        },
+        {
+            "name": "SettingsButtonHovered",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0, 0 ],
+                    "anchorMax": [ 0, 0 ],
+                    "pivot": [ 0, 0 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 0, 0 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "UIElements/SettingsButton/SettingsHovered.png",
+                        "layer": 10
+                    },
+                    "color": [ 1.0, 1.0, 1.0, 0.0 ]
+                }
+            }
+        },
+        {
+            "name": "CreditsButtonPressed",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0, 0 ],
+                    "anchorMax": [ 0, 0 ],
+                    "pivot": [ 0, 0 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 0, 0 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "UIElements/InfoButton/infoPressed.png",
+                        "layer": 10
+                    },
+                    "color": [ 1.0, 1.0, 1.0, 0.0 ]
+                }
+            }
+        },
+        {
+            "name": "CreditsButtonHovered",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0, 0 ],
+                    "anchorMax": [ 0, 0 ],
+                    "pivot": [ 0, 0 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 0, 0 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "UIElements/InfoButton/infoHovered.png",
+                        "layer": 10
+                    },
+                    "color": [ 1.0, 1.0, 1.0, 0.0 ]
+                }
+            }
+        },
+        {
+            "name": "QuitButtonPressed",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0, 0 ],
+                    "anchorMax": [ 0, 0 ],
+                    "pivot": [ 0, 0 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 0, 0 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "UIElements/ExitButton/exitPressed.png",
+                        "layer": 10
+                    },
+                    "color": [ 1.0, 1.0, 1.0, 0.0 ]
+                }
+            }
+        },
+        {
+            "name": "QuitButtonHovered",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0, 0 ],
+                    "anchorMax": [ 0, 0 ],
+                    "pivot": [ 0, 0 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 0, 0 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "UIElements/ExitButton/exitHovered.png",
+                        "layer": 10
+                    },
+                    "color": [ 1.0, 1.0, 1.0, 0.0 ]
+                }
+            }
+        },
+
+
+
+
+
+        {
+            "name": "Start Button",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0.05, 0.2 ],
+                    "anchorMax": [ 0.34, 0.35 ],
+                    "pivot": [ 0.5, 0.5 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 0, 0 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "UIElements/StartButton/start.png",
+                        "layer": 10
+                    },
+                    "color": [ 1.0, 1.0, 1.0, 1.0 ]
+                },
+                "UIInteraction": {
+                    "isInteractable": true,
+                    "blockRaycast": true,
+                    "receiveHover": true,
+                    "receiveClick": true,
+                    "interactionPriority": 1
+                },
+                "Script": {
+                    "path": "scripts/ButtonScripts/button_menu_navigation.lua",
+                    "data": [
+                        {
+                            "name": "targetScene",
+                            "type": "String",
+                            "value": "Level1"
+                        }
+
+                    ]
+                },
+                "Script": {
+                    "path": "scripts/ButtonScripts/button_visual_effect.lua",
+                    "data": [
+                        {
+                            "name": "hoverEntName",
+                            "type": "String",
+                            "value": "StartButtonHovered"
+                        },
+                        {
+                            "name": "pressedEntName",
+                            "type": "String",
+                            "value": "StartButtonPressed"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Controls Button",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0.06, 0.1 ],
+                    "anchorMax": [ 0.12, 0.2 ],
+                    "pivot": [ 0.5, 0.5 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 0, 0 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "UIElements/ControlsButton/controlls.png",
+                        "layer": 10
+                    },
+                    "color": [ 1.0, 1.0, 1.0, 1.0 ]
+                },
+                "UIInteraction": {
+                    "isInteractable": true,
+                    "blockRaycast": true,
+                    "receiveHover": true,
+                    "receiveClick": true,
+                    "interactionPriority": 1
+                },
+                "Script": {
+                    "path": "scripts/ButtonScripts/button_menu_navigation.lua",
+                    "data": [
+                        {
+                            "name": "targetScene",
+                            "type": "String",
+                            "value": "SettingsMenu"
+                        }
+
+                    ]
+                },
+                "Script": {
+                    "path": "scripts/ButtonScripts/button_visual_effect.lua",
+                    "data": [
+                        {
+                            "name": "hoverEntName",
+                            "type": "String",
+                            "value": "ControlsButtonHovered"
+                        },
+                        {
+                            "name": "pressedEntName",
+                            "type": "String",
+                            "value": "ControlsButtonPressed"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Settings Button",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0.13, 0.1 ],
+                    "anchorMax": [ 0.19, 0.2 ],
+                    "pivot": [ 0.5, 0.5 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 0, 0 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "UIElements/SettingsButton/Settings.png",
+                        "layer": 10
+                    },
+                    "color": [ 1.0, 1.0, 1.0, 1.0 ]
+                },
+                "UIInteraction": {
+                    "isInteractable": true,
+                    "blockRaycast": true,
+                    "receiveHover": true,
+                    "receiveClick": true,
+                    "interactionPriority": 1
+                },
+                "Script": {
+                    "path": "scripts/ButtonScripts/button_menu_navigation.lua",
+                    "data": [
+                        {
+                            "name": "targetScene",
+                            "type": "String",
+                            "value": "SettingsMenu"
+                        }
+
+                    ]
+                },
+                "Script": {
+                    "path": "scripts/ButtonScripts/button_visual_effect.lua",
+                    "data": [
+                        {
+                            "name": "hoverEntName",
+                            "type": "String",
+                            "value": "SettingsButtonHovered"
+                        },
+                        {
+                            "name": "pressedEntName",
+                            "type": "String",
+                            "value": "SettingsButtonPressed"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Credits Button",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0.20, 0.1 ],
+                    "anchorMax": [ 0.26, 0.2 ],
+                    "pivot": [ 0.5, 0.5 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 0, 0 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "UIElements/InfoButton/info.png",
+                        "layer": 10
+                    },
+                    "color": [ 1.0, 1.0, 1.0, 1.0 ]
+                },
+                "UIInteraction": {
+                    "isInteractable": true,
+                    "blockRaycast": true,
+                    "receiveHover": true,
+                    "receiveClick": true,
+                    "interactionPriority": 1
+                },
+                "Script": {
+                    "path": "scripts/ButtonScripts/button_menu_navigation.lua",
+                    "data": [
+                        {
+                            "name": "targetScene",
+                            "type": "String",
+                            "value": "Credits"
+                        }
+                    ]
+                },
+                "Script": {
+                    "path": "scripts/ButtonScripts/button_visual_effect.lua",
+                    "data": [
+                        {
+                            "name": "hoverEntName",
+                            "type": "String",
+                            "value": "CreditsButtonHovered"
+                        },
+                        {
+                            "name": "pressedEntName",
+                            "type": "String",
+                            "value": "CreditsButtonPressed"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Quit Button",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0.27, 0.1 ],
+                    "anchorMax": [ 0.33, 0.2 ],
+                    "pivot": [ 0.5, 0.5 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 0, 0 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "UIElements/ExitButton/exit.png",
+                        "layer": 10
+                    },
+                    "color": [ 1.0, 1.0, 1.0, 1.0 ]
+                },
+                "UIInteraction": {
+                    "isInteractable": true,
+                    "blockRaycast": true,
+                    "receiveHover": true,
+                    "receiveClick": true,
+                    "interactionPriority": 1
+                },
+                "Script": {
+                    "path": "scripts/ButtonScripts/button_menu_navigation.lua",
+                    "data": [
+                        {
+                            "name": "targetScene",
+                            "type": "String",
+                            "value": "Quit"
+                        }
+
+                    ]
+                },
+                "Script": {
+                    "path": "scripts/ButtonScripts/button_visual_effect.lua",
+                    "data": [
+                        {
+                            "name": "hoverEntName",
+                            "type": "String",
+                            "value": "QuitButtonHovered"
+                        },
+                        {
+                            "name": "pressedEntName",
+                            "type": "String",
+                            "value": "QuitButtonPressed"
+                        }
+                    ]
+                }
+            }
+        },
+
+        {
+            "name": "SceneManager",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 10.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 0.08, 0.08, 0.08 ]
+                },
+                "Script": {
+                    "path": "scripts/scene_manager.lua",
+                    "data": [
+                        {
+                            "name": "hideMouse",
+                            "type": "Bool",
+                            "value": false
+                        }
+                    ]
+                }
+            }
+        }
     ]
 }

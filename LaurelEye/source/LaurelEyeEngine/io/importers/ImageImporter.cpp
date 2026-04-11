@@ -5,6 +5,8 @@
 #include "LaurelEyeEngine/graphics/resources/RenderResources.h"
 #include "LaurelEyeEngine/graphics/resources/Texture.h"
 #include "LaurelEyeEngine/io/Assets.h"
+#include "LaurelEyeEngine/logging/EngineLog.h"
+
 #include <filesystem>
 
 namespace LaurelEye::IO {
@@ -23,7 +25,7 @@ namespace LaurelEye::IO {
         int w = 0, h = 0;
         // Request 4 components (RGBA float)
         float* data = stbi_loadf(path.c_str(), &w, &h, &channels, 4);
-        assert(("ERROR::TEXTURE::LOADHDR::LOADFAILED::" + path).c_str() && data);
+        LE_ASSERT("io", data, "ERROR::TEXTURE::LOADHDR::LOADFAILED::" << path);
 
         Graphics::TextureDesc desc = Graphics::TextureDesc();
         desc.width = static_cast<uint32_t>(w);
@@ -46,7 +48,7 @@ namespace LaurelEye::IO {
         int channels = 0;
         int w = 0, h = 0;
         unsigned char* data = stbi_load(path.c_str(), &w, &h, &channels, 0);
-        assert(("ERROR::TEXTURE::LOADSDR::LOADFAILED::" + path).c_str() && data);
+        LE_ASSERT("io", data, "ERROR::TEXTURE::LOADHDR::LOADFAILED::" << path);
 
         Graphics::TextureDesc desc = Graphics::TextureDesc();
         desc.width = static_cast<uint32_t>(w);

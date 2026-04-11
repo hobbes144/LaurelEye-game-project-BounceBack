@@ -27,6 +27,8 @@
 
 #include "LaurelEyeEngine/logging/EngineLog.h"
 
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/writer.h>
 #include <iostream>
 #include <LaurelEyeEngine/animation/resources/Animation.h>
 #include <LaurelEyeEngine/animation/components/SkeletalAnimationComponent.h>
@@ -47,6 +49,36 @@ namespace LaurelEye {
 
         // --- Pass 2: resolve parent-child transforms ---
         resolveParentChildTransforms(scene, entities, entityMap);
+    }
+
+    Entity* EntityFactory::createEntityRecursive(
+        Scene& scene,
+        const rapidjson::Value& entityJson,
+        Entity* parent,
+        std::unordered_map<std::string, Entity*>& entityMap) {
+
+        Entity* entity = createEntityFromJson(entityJson);
+
+        entityMap[entity->getName()] = entity;
+        scene.addEntity(entity);
+
+        if ( parent ) {
+            auto* childTransform = entity->findComponent<TransformComponent>();
+            auto* parentTransform = parent->findComponent<TransformComponent>();
+
+            if ( childTransform && parentTransform ) {
+                childTransform->setParent(parentTransform);
+            }
+        }
+
+        if ( entityJson.HasMember("Children") && entityJson["Children"].IsArray() ) {
+            for ( const auto& childJson : entityJson["Children"].GetArray() ) {
+                createEntityRecursive(scene, childJson, entity, entityMap);
+            }
+        }
+
+        return entity;
+
     }
 
     Entity* EntityFactory::createEntityFromJson(const rapidjson::Value& entityJson) {
@@ -148,7 +180,8 @@ namespace LaurelEye {
         if ( !jsonAsset ) {
             std::cerr << "EntityFactory: Could not parse prefab for entity";
         }
-        auto entity = createEntityFromJson(jsonAsset->jsonDocument);
+        std::unordered_map<std::string, Entity*> entityMap;
+        auto entity = createEntityRecursive(scene, jsonAsset->jsonDocument, nullptr, entityMap);
         scene.addEntity(entity);
         return entity;
     }
@@ -157,9 +190,10 @@ namespace LaurelEye {
                                                     const rapidjson::GenericArray<true, rapidjson::Value>& entities,
                                                     std::unordered_map<std::string, Entity*>& entityMap) {
         for ( const auto& entityData : entities ) {
-            auto entity = createEntityFromJson(entityData);
-            entityMap[entity->getName()] = entity;
-            scene.addEntity(entity);
+            createEntityRecursive(scene, entityData, nullptr, entityMap);
+            //auto entity = createEntityFromJson(entityData);
+            //entityMap[entity->getName()] = entity;
+            //scene.addEntity(entity);
         }
     }
 
@@ -924,149 +958,6 @@ namespace LaurelEye {
     Vector2 EntityFactory::ReadVector2(const rapidjson::Value& vectorData) {
         return { vectorData[0].GetFloat(), vectorData[1].GetFloat() };
     }
-
-    /*
-    LaurelEye::Scripting::ScriptValue EntityFactory::ReadScriptValue(const rapidjson::Value& valueData) {
-
-        if ( valueData.IsBool() ) {
-            return Scripting::ScriptValue(valueData.GetBool());
-        }
-
-        if ( valueData.IsInt() ) {
-            return Scripting::ScriptValue(valueData.GetInt());
-        }
-
-        if ( valueData.IsDouble() ) {
-            return Scripting::ScriptValue(valueData.GetDouble());
-        }
-
-        if ( valueData.IsString() ) {
-            return Scripting::ScriptValue(std::string(valueData.GetString()));
-        }
-
-        if ( valueData.IsArray() ) {
-            Scripting::ScriptArray scriptArray;
-
-            for ( auto& v : valueData.GetArray() ) {
-                scriptArray.push_back(ReadScriptValue(v));
-            }
-
-            return Scripting::ScriptValue(scriptArray);
-        }
-
-        if ( valueData.IsObject() ) {
-            Scripting::ScriptObject scriptObject;
-
-            //Vector 2
-            if ( valueData.HasMember("x") && valueData.HasMember("y") &&
-                 valueData["x"].IsNumber() && valueData["y"].IsNumber() &&
-                 valueData.MemberCount() == 2 ) {
-                Vector2 v;
-
-                v[0] = valueData["x"].GetFloat();
-                v[1] = valueData["y"].GetFloat();
-
-                return Scripting::ScriptValue(v);
-            }
-
-            //Vector 3
-            if ( valueData.HasMember("x") && valueData.HasMember("y") && valueData.HasMember("z") &&
-                 valueData["x"].IsNumber() && valueData["y"].IsNumber() && valueData["z"].IsNumber() &&
-                 valueData.MemberCount() == 3 ) {
-                Vector3 v;
-                v.x = valueData["x"].GetFloat();
-                v.y = valueData["y"].GetFloat();
-                v.z = valueData["z"].GetFloat();
-
-                return Scripting::ScriptValue(v);
-            }
-
-            //Vector 4
-            if ( valueData.HasMember("x") && valueData.HasMember("y") && valueData.HasMember("z") && valueData.HasMember("w") &&
-                 valueData["x"].IsNumber() && valueData["y"].IsNumber() && valueData["z"].IsNumber() && valueData["w"].IsNumber() &&
-                 valueData.MemberCount() == 4 ) {
-                Vector4 v;
-                v[0] = valueData["x"].GetFloat();
-                v[1] = valueData["y"].GetFloat();
-                v[2] = valueData["z"].GetFloat();
-                v[3] = valueData["w"].GetFloat();
-
-                return Scripting::ScriptValue(v);
-            }
-
-            //Color
-            //TODO: Could implement a System Wide Definition of Color, would require intensive refactor IMO
-            if ( valueData.HasMember("r") && valueData.HasMember("g") && valueData.HasMember("b") &&
-                 valueData["r"].IsNumber() && valueData["g"].IsNumber() && valueData["b"].IsNumber() &&
-                 3 <= valueData.MemberCount() && valueData.MemberCount() <= 4 ) {
-
-                Vector4 c;
-                c[0] = valueData["r"].GetFloat();
-                c[1] = valueData["g"].GetFloat();
-                c[2] = valueData["b"].GetFloat();
-                c[3] = valueData.HasMember("a") ? valueData["a"].GetFloat() : 1.0f;
-
-                return Scripting::ScriptValue(c);
-            }
-
-            //Entity Reference
-            if ( valueData.HasMember("entity") && valueData["entity"].IsString() ) {
-                std::string name = valueData["entity"].GetString();
-
-                if ( !name.empty() && name[0] == '@' ) {
-
-                    std::string entityName = name.substr(1);
-
-                    //Reference the Scene to Find the Public Function by Name
-                    Entity* ref = context.getService<SceneManager>()->getCurrentScene()->findEntityByName(entityName);
-                    LE_DEBUG_ASSERT("EntityFactory", ref, "Unable to Find Entity Refrence");
-
-                    return Scripting::ScriptValue(ref);
-
-                }
-                else {
-                    LE_DEBUG_ASSERT("EntityFactory", false, "Invalid Reference Format");
-                }
-
-            }
-
-            // Entity Reference
-            if ( valueData.HasMember("transform") && valueData["transform"].IsString() ) {
-                std::string name = valueData["transform"].GetString();
-
-                if ( !name.empty() && name[0] == '@' ) {
-
-                    std::string entityName = name.substr(1);
-
-                    // Reference the Scene to Find the Public Function by Name
-                    Entity* ref = context.getService<SceneManager>()->getCurrentScene()->findEntityByName(entityName);
-                    LE_DEBUG_ASSERT("EntityFactory", ref, "Unable to Find Entity Refrence");
-
-                    TransformComponent* transComp = ref->findComponent<TransformComponent>();
-                    LE_DEBUG_ASSERT("EntityFactory", transComp, "Unable to Find TransformComponentRefencence Refrence");
-
-                    return Scripting::ScriptValue(transComp);
-
-                }
-                else {
-                    LE_DEBUG_ASSERT("EntityFactory", false, "Invalid Reference Format");
-                }
-
-            }
-
-            //Generic Object
-            for ( auto itr = valueData.MemberBegin(); itr != valueData.MemberEnd(); ++itr ) {
-                scriptObject[itr->name.GetString()] = ReadScriptValue(itr->value);
-            }
-
-            return Scripting::ScriptValue(scriptObject);
-        }
-
-        LE_DEBUG_ASSERT("EntityFactory", false, "Unsupported script data type");
-        return Scripting::ScriptValue();
-
-    }
-    */
 
 #pragma endregion
 

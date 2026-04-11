@@ -682,6 +682,12 @@ function kickBack(projectile)
             message.to = entity
             message.topic = "I am kicking you!"
             Script.send(message)
+
+            local kickbackEmitter = scene:findEntityByName("KickbackEmitter")
+            if kickbackEmitter ~= nil then
+                local kickbackPE = kickbackEmitter:findParticleEmitter()
+                kickbackPE:playFor(0.1)
+            end 
         end
     end
 end

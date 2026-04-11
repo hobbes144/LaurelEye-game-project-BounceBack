@@ -11,6 +11,8 @@
 #include "LaurelEyeEngine/particles/ParticleSystem.h"
 #include "LaurelEyeEngine/graphics/renderpass/ParticleRenderPass.h"
 
+#include "LaurelEyeEngine/logging/EngineLog.h"
+
 // #include <cmath>
 
 namespace LaurelEye::Particles {
@@ -55,6 +57,7 @@ namespace LaurelEye::Particles {
 
             //---Spawn New Particles---
             if (emitter->GetIsPlaying()) {
+                LE_DEBUG_INFO("Particle System", "Particle Emitter Updated: " << emitter->getOwner()->getName());
                 emitter->IncrementEmittedParticles(dt);
                 // While the Emitter is still poised to emit
                 while ( emitter->GetEmissionAccumulator() >= 1.0f ) {
@@ -62,6 +65,9 @@ namespace LaurelEye::Particles {
                     // Spawn a new Particle
                     spawnParticle(*emitter);
                 }
+            }
+            else {
+                LE_DEBUG_INFO("Particle System", "Paused Particle Updated: " << emitter->getOwner()->getName());
             }
 
             //---Update Particles---
