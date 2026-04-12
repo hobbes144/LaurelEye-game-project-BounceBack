@@ -391,6 +391,8 @@ function TrajectoryLine:updateTrajectory(playerPos, playerAimDir, projectileSpee
         return
     end
 
+    local hit = Physics.Raycast(playerPos, bouncePos-playerPos, bounceDist+RAY_EPS, { layerMask = Layers.Enemy })
+
     ---@type Vector3|nil
     local enemyDir
     ---@type RaycastResult|nil
@@ -398,24 +400,11 @@ function TrajectoryLine:updateTrajectory(playerPos, playerAimDir, projectileSpee
     enemyDir, enemyHit = findEnemyDirection(bouncePos, bounceDir)
 
     if enemyHit ~= nil and enemyHit.distance > EPS and enemyHit.position ~= nil and enemyDir ~= nil then
-        if not self.isTargeted then
-            log("Target found, setting to red")
-            self.isTargeted = true
-            self.aimLineRender:setMaterial(self.aimLineTargetedMaterial)
-            self.bounceLineRender:setMaterial(self.aimLineTargetedMaterial)
-        end
         self:_updateLine(
             self.bounceLineTransform,
             bouncePos, -enemyDir, enemyHit.distance,
             self.bounceLineLengthMult, self.bounceLineWallOffset)
     else
-        if self.isTargeted then
-            log("Unable to find target, resetting to green")
-            self.isTargeted = false
-            self.aimLineRender:setMaterial(self.aimLineMaterial)
-            self.bounceLineRender:setMaterial(self.aimLineMaterial)
-        end
-
         ---@type Vector3|nil
         local wallPos
         ---@type Vector3|nil
@@ -430,6 +419,20 @@ function TrajectoryLine:updateTrajectory(playerPos, playerAimDir, projectileSpee
                 self.bounceLineLengthMult, self.bounceLineWallOffset)
         else
             self.bounceLineTransform:setWorldPosition(self.offScreenPos)
+        end
+    end
+
+    if hit ~= nil or enemyHit ~= nil then
+        if not self.isTargeted then
+            self.isTargeted = true
+            self.aimLineRender:setMaterial(self.aimLineTargetedMaterial)
+            self.bounceLineRender:setMaterial(self.aimLineTargetedMaterial)
+        end
+    else
+        if self.isTargeted then
+            self.isTargeted = false
+            self.aimLineRender:setMaterial(self.aimLineMaterial)
+            self.bounceLineRender:setMaterial(self.aimLineMaterial)
         end
     end
 end

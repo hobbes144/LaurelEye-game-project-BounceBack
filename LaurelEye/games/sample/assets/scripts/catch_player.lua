@@ -96,10 +96,11 @@ local trajectoryLine = nil
 
 hasKey = false
 
-
-
-
-
+-- Kickback range ring
+---@type Entity|nil
+local kickbackRing = nil
+---@type TransformComponent|nil
+local kickbackRingTrans = nil
 
 -- projectile spawn (player / weapon space)
 ---@type Vector3
@@ -228,6 +229,12 @@ function onStart()
     damageTex = damageObj:findComponent("Renderable3DComponent"):getMaterial()
     local component = playerOrgobj:findComponent("Renderable3DComponent")
     normalTex = component:getMaterial()
+
+    kickbackRing = scene:findEntityByName("KickbackRing")
+    if kickbackRing ~= nil then
+        kickbackRingTrans = kickbackRing:findTransform()
+        kickbackRingTrans:setWorldScale(Vector3.new(kickBackRange*0.6, 1.0, kickBackRange*0.6))
+    end
 
     transform = self:findTransform()
     body = self:findRigidBody()
@@ -484,6 +491,7 @@ function onUpdate(dt)
         end
 
     end
+
     playerPos = transform:getWorldPosition()
     playerArmPos = playerPos + spawnHeightVec
     targetPoint = cameraAim(1000.0)
@@ -494,17 +502,33 @@ function onUpdate(dt)
     shootDir = shootVector:Normalized()
     spawnPos = playerArmPos + (shootDir * spawnForward)
 
+    if kickbackRingTrans ~= nil then
+        if #projectilesInRange > 0 then
+            kickbackRingTrans:setLocalPosition(0, 0, 0)
+            kickbackRingTrans:setLocalRotation(Quaternion.new(1, 0, 0, 0))
+        else
+            kickbackRingTrans:setWorldPosition(0, -100, 0)
+        end
+    end
+
     if trajectoryLine ~= nil then
         if not Input:isMouseButtonHeld(MouseButton.Right) then
-                trajectoryLine:resetLine()
+            trajectoryLine:resetLine()
         else
             if hasBall then
                 trajectoryLine:updateTrajectory(spawnPos, shootDir, projectileSpeed, 1.0, ballGravity)
             else
                 if not isNormalTime then
+
                     local closestProjectile = getClosestProjectile(projectilesInRange)
                     if closestProjectile ~= nil then
-                        trajectoryLine:updateTrajectory(closestProjectile.position, shootDir, projectileSpeed, 1.0, ballGravity)
+                        trajectoryLine:updateTrajectory(
+                            closestProjectile.position,
+                            shootDir,
+                            projectileSpeed,
+                            1.0,
+                            ballGravity
+                        )
                     else
                         trajectoryLine:resetLine()
                     end
@@ -687,7 +711,7 @@ function kickBack(projectile)
             if kickbackEmitter ~= nil then
                 local kickbackPE = kickbackEmitter:findParticleEmitter()
                 kickbackPE:playFor(0.1)
-            end 
+            end
         end
     end
 end

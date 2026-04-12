@@ -3,7 +3,7 @@
     "tags": [ "player" ],
     "components": {
         "Transform": {
-            "position": [ 0.0, 0.0, 10.0 ],
+            "position": [ 0.0, 0.0, 0.0 ],
             "rotation": [ -1.0, 0.0, -1.0, 0.0 ],
             "scale": [ 0.012, 0.012, 0.012 ]
         },
@@ -26,83 +26,89 @@
                     "x": 1.0,
                     "y": 1.0,
                     "z": 1.0
-                    },
-                    "radius": 110.0,
-                    "height": 560.0
                 },
-                "mass": 1.0,
-                "linearVelocity": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
-                "angularVelocity": {
-                    "x": 0.0,
-                    "y": 5.0,
-                    "z": 0.0
-                },
-                "inertia": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "centerOfMass": {
-                    "x": 0.0,
-                    "y": 4.5,
-                    "z": 0.0
-                },
-                "linearDamping": 0.5,
-                "angularDamping": 2.0,
-                "friction": 2.5,
-                "restitution": 0.1,
-                "collisionGroup": 1,
-                "collisionMask": 30,
-                "useCCD": false,
-                "ccdMotionThreshold": 0.01,
-                "ccdSweptSphereRadius": 1.0,
-                "gravityScale": 8.0
+                "radius": 110.0,
+                "height": 560.0
             },
-            "ParticleEmitter": {
-                "emissionRate": 60.0,
-                "spreadAngle": 65.0,
-                "particleLifetime": 0.6,
-                "lifetimeVariation": 0.2,
-                "initialSpeed": 2.0,
-                "speedVariation": 1.0,
+            "mass": 1.0,
+            "linearVelocity": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "angularVelocity": {
+                "x": 0.0,
+                "y": 5.0,
+                "z": 0.0
+            },
+            "inertia": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "centerOfMass": {
+                "x": 0.0,
+                "y": 4.5,
+                "z": 0.0
+            },
+            "linearDamping": 0.5,
+            "angularDamping": 2.0,
+            "friction": 2.5,
+            "restitution": 0.1,
+            "collisionGroup": 1,
+            "collisionMask": 30,
+            "useCCD": false,
+            "ccdMotionThreshold": 0.01,
+            "ccdSweptSphereRadius": 1.0,
+            "gravityScale": 8.0
+        },
+        "ParticleEmitter": {
+            "emissionRate": 60.0,
+            "spreadAngle": 65.0,
+            "particleLifetime": 0.6,
+            "lifetimeVariation": 0.2,
+            "initialSpeed": 2.0,
+            "speedVariation": 1.0,
 
-                "startSize": 15.0,
-                "endSize": 5.0,
-                "sizeVariation": 0.4,
+            "startSize": 15.0,
+            "endSize": 5.0,
+            "sizeVariation": 0.4,
 
-                "startColor": [ 0.3, 0.25, 0.2, 0.6 ],
-                "endColor": [ 0.3, 0.25, 0.2, 0.0 ],
+            "startColor": [ 0.3, 0.25, 0.2, 0.6 ],
+            "endColor": [ 0.3, 0.25, 0.2, 0.0 ],
 
-                "usePhysics": false,
-                "maxParticles": 200
-            },
-            "Audio": {
-                "sounds": [
-                    {
-                        "id": "footstep",
-                        "path": "audio/footstep.mp3",
-                        "volume": 0.2,
-                        "fadeSpeed": 1.0,
-                        "loop": true,
-                        "playOnLoad": false,
-                        "type": "SFX3D"
-                    }
-                ]
-            },
-            "Animation": {
-                "type": "Skeletal",
-                "file": [ "models/player/MainChar2_Running.fbx",
-                          "models/player/MainChar2_Idle.fbx",
-                          "models/player/Kicking.fbx",
-                          "models/player/Death.fbx"
-                        ]
-            },
-            "Script": {
-                "path": "scripts/catch_player.lua"
-            }
+            "usePhysics": false,
+            "maxParticles": 200
+        },
+        "Audio": {
+            "sounds": [
+                {
+                    "id": "footstep",
+                    "path": "audio/footstep.mp3",
+                    "volume": 0.2,
+                    "fadeSpeed": 1.0,
+                    "loop": true,
+                    "playOnLoad": false,
+                    "type": "SFX3D"
+                }
+            ]
+        },
+        "Animation": {
+            "type": "Skeletal",
+            "file": [ "models/player/MainChar2_Running.fbx",
+                        "models/player/MainChar2_Idle.fbx",
+                        "models/player/Kicking.fbx",
+                        "models/player/Death.fbx"
+                    ]
+        },
+        "Script": {
+            "path": "scripts/catch_player.lua"
         }
+    },
+    "Children": [
+        {
+            "name": "kickbackRing",
+            "prefab": "prefabs/kickback-ring.prefab.json"
+        }
+    ]
 }
