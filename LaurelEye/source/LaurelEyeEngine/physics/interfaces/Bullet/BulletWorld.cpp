@@ -292,6 +292,9 @@ namespace LaurelEye::Physics {
         case CollisionShapePhys::ShapeType::Capsule:
             btShape = new btCapsuleShape(csp.radius, csp.height);
             break;
+        case CollisionShapePhys::ShapeType::Cylinder:
+            btShape = new btCylinderShape(btVector3(csp.radius, csp.height, csp.radius));
+            break;
         default:
             btShape = new btBoxShape(btVector3(0.5f, 0.5f, 0.5f));
             break;

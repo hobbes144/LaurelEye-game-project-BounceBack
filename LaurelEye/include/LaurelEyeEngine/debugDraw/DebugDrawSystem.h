@@ -37,7 +37,8 @@ namespace LaurelEye::Debug {
         Normal,
         Sphere,
         Circle,
-        Capsule
+        Capsule,
+        Cylinder
         // ... more in the future
     };
 
@@ -109,6 +110,10 @@ namespace LaurelEye::Debug {
                       const Vector3& color);
 
         void addCapsule(Graphics::GeometryBuffer::ModifiableAttributes& attr,
+                        const Vector3& center, const Vector3& size, float radius,
+                        const Quaternion& rotation, const Vector3& color);
+
+        void addCylinder(Graphics::GeometryBuffer::ModifiableAttributes& attr,
                         const Vector3& center, const Vector3& size, float radius,
                         const Quaternion& rotation, const Vector3& color);
 

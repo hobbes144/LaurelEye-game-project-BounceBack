@@ -40,7 +40,7 @@ namespace LaurelEye::Physics {
 
     /// @brief Definition of a Physics Shape, Used to build shapes and bodies
     struct CollisionShapePhys {
-        enum class ShapeType {Box, Sphere, Capsule, Mesh } type = ShapeType::Box;
+        enum class ShapeType { Box, Sphere, Capsule, Mesh, Cylinder } type = ShapeType::Box;
         Vector3 size = Vector3(1, 1, 1);
         float radius = 0.5f;
         float height = 1.0f;
@@ -111,6 +111,16 @@ namespace LaurelEye::Physics {
         }
 
         static PhysicsBodyData Capsule(float radius, float height, float mass = 1.0f, BodyType type = BodyType::Dynamic) {
+            PhysicsBodyData d;
+            d.type = type;
+            d.shapeDefinition.type = CollisionShapePhys::ShapeType::Capsule;
+            d.shapeDefinition.radius = radius;
+            d.shapeDefinition.height = height;
+            d.mass = (type == BodyType::Static ? 0.0f : mass);
+            return d;
+        }
+
+        static PhysicsBodyData Cylinder(float radius, float height, float mass = 1.0f, BodyType type = BodyType::Dynamic) {
             PhysicsBodyData d;
             d.type = type;
             d.shapeDefinition.type = CollisionShapePhys::ShapeType::Capsule;

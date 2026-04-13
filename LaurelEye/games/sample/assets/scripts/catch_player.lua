@@ -143,6 +143,13 @@ local rightMousePressTime = 0.0
 ---@type number
 local timeEps = 0.001
 
+--- Vector3 to string
+---@param vec Vector3
+---@return string
+local function vector3ToString(vec)
+    return vec.x .. ", " .. vec.y .. ", " .. vec.z
+end
+
 ---@class Projectile
 ---@field entity Entity
 ---@field position Vector3
@@ -354,6 +361,10 @@ function onUpdate(dt)
     Audio.setListenerForward(forward.x, forward.y, forward.z)
     playerAudio = self:findAudio()
     Audio.setMusicVolume(0.0)
+
+    if Input:isKeyPressed(Key.T) then
+        debugLog("Player position" .. vector3ToString(playerPos))
+    end
 
     local emitterPos = Vector3.new(
             playerPos.x,playerPos.y,playerPos.z

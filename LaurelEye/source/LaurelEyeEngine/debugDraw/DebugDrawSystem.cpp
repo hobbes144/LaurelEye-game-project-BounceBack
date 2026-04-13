@@ -144,6 +144,15 @@ namespace LaurelEye::Debug {
                     cmd.size = {0.0f, shapeDef.height * scale.y, 0.0f};
                     break;
                 }
+
+                case Physics::CollisionShapePhys::ShapeType::Cylinder: {
+                    cmd.type = Debug::DebugDrawType::Cylinder;
+                    float radialScale = (scale.x + scale.z) * 0.5f;
+                    cmd.radius = shapeDef.radius * radialScale;
+                    cmd.size = {0.0f, shapeDef.height * scale.y, 0.0f};
+                    break;
+                }
+
                 case Physics::CollisionShapePhys::ShapeType::Mesh:
                 default:
                     LE_ASSERT("Physics", false , "ERROR::LAURELEYE::PHYSICS_SYSTEM::POPULATE_WIRE_FRAME_COMMANDS::INVALID_SHAPE");
@@ -275,6 +284,9 @@ namespace LaurelEye::Debug {
             case DebugDrawType::Capsule:
                 // Call a function to add capsule wireframe lines
                 addCapsule(attributes, cmd.position, cmd.size, cmd.radius, cmd.rotation, cmd.color);
+                break;
+            case DebugDrawType::Cylinder:
+                addCylinder(attributes, cmd.position, cmd.size, cmd.radius, cmd.rotation, cmd.color);
                 break;
             case DebugDrawType::Sphere:
                 //Ensure there is enough room
@@ -520,6 +532,64 @@ namespace LaurelEye::Debug {
                 if ( currentDebugLines >= MaxDebugLines ) return;
                 addLine(attr, ringA[i], ringB[i], color);
             }
+        }
+    }
+
+    void DebugDrawSystem::addCylinder(
+        Graphics::GeometryBuffer::ModifiableAttributes& attr,
+        const Vector3& position,
+        const Vector3& size,
+        float radius,
+        const Quaternion& rotation,
+        const Vector3& color) {
+        constexpr int segments = 16;
+        constexpr float twoPi = 6.28318530718f;
+
+        const float halfHeight = std::max(0.0f, size.y);
+
+        auto rotatePoint = [&](const Vector3& p) -> Vector3 {
+            return rotation * p; // assumes your Quaternion supports q * v
+        };
+
+        for ( int i = 0; i < segments; ++i ) {
+            int next = (i + 1) % segments;
+
+            float a0 = (static_cast<float>(i) / segments) * twoPi;
+            float a1 = (static_cast<float>(next) / segments) * twoPi;
+
+            Vector3 top0Local(
+                std::cos(a0) * radius,
+                halfHeight,
+                std::sin(a0) * radius);
+
+            Vector3 top1Local(
+                std::cos(a1) * radius,
+                halfHeight,
+                std::sin(a1) * radius);
+
+            Vector3 bot0Local(
+                std::cos(a0) * radius,
+                -halfHeight,
+                std::sin(a0) * radius);
+
+            Vector3 bot1Local(
+                std::cos(a1) * radius,
+                -halfHeight,
+                std::sin(a1) * radius);
+
+            Vector3 top0 = position + rotatePoint(top0Local);
+            Vector3 top1 = position + rotatePoint(top1Local);
+            Vector3 bot0 = position + rotatePoint(bot0Local);
+            Vector3 bot1 = position + rotatePoint(bot1Local);
+
+            // Top ring
+            addLine(attr, top0, top1, color);
+
+            // Bottom ring
+            addLine(attr, bot0, bot1, color);
+
+            // Side lines
+            addLine(attr, top0, bot0, color);
         }
     }
 

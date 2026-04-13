@@ -809,9 +809,14 @@
                 "Physics": {
                     "type": "Static",
                     "shapeDefinition": {
-                        "type": "Capsule",
-                        "radius": 50.93788,
-                        "height": 520.811
+                        "type": "Cylinder",
+                        "radius": 25,
+                        "height": 50
+                    },
+                    "centerOfMass": {
+                        "x": 0,
+                        "y": 22.15,
+                        "z": 0
                     },
                     "mass": 1.0,
                     "linearDamping": 0.0,
@@ -848,9 +853,14 @@
                 "Physics": {
                     "type": "Static",
                     "shapeDefinition": {
-                        "type": "Capsule",
-                        "radius": 50.93788,
-                        "height": 520.811
+                        "type": "Cylinder",
+                        "radius": 25,
+                        "height": 50
+                    },
+                    "centerOfMass": {
+                        "x": 0,
+                        "y": 22.15,
+                        "z": 0
                     },
                     "mass": 1.0,
                     "linearDamping": 0.0,

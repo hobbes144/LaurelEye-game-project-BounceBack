@@ -660,9 +660,14 @@
                 "Physics": {
                     "type": "Static",
                     "shapeDefinition": {
-                        "type": "Capsule",
-                        "radius": 40.93788,
-                        "height": 520.811
+                        "type": "Cylinder",
+                        "radius": 25,
+                        "height": 50
+                    },
+                    "centerOfMass": {
+                        "x": 0,
+                        "y": 22.174,
+                        "z": 0
                     },
                     "mass": 1.0,
                     "linearDamping": 0.0,

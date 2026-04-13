@@ -445,6 +445,7 @@ namespace LaurelEye {
                 if ( shapeStr == "Box" ) data.shapeDefinition.type = CollisionShapePhys::ShapeType::Box;
                 else if ( shapeStr == "Sphere" ) data.shapeDefinition.type = CollisionShapePhys::ShapeType::Sphere;
                 else if ( shapeStr == "Capsule" ) data.shapeDefinition.type = CollisionShapePhys::ShapeType::Capsule;
+                else if ( shapeStr == "Cylinder" ) data.shapeDefinition.type = CollisionShapePhys::ShapeType::Cylinder;
                 else if ( shapeStr == "Mesh" ) data.shapeDefinition.type = CollisionShapePhys::ShapeType::Mesh;
             }
 

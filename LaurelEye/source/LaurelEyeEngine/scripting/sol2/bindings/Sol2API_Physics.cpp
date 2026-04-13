@@ -135,6 +135,12 @@ namespace LaurelEye::Scripting {
                     return Physics::PhysicsBodyData::Capsule(radius, height, mass); },
                     [](float radius, float height) {
                         return Physics::PhysicsBodyData::Capsule(radius, height); }),
+            "Cylinder", sol::overload([](float radius, float height, float mass, Physics::BodyType type) {
+                return Physics::PhysicsBodyData::Cylinder(radius, height, mass, type); },
+                [](float radius, float height, float mass) {
+                    return Physics::PhysicsBodyData::Cylinder(radius, height, mass); },
+                    [](float radius, float height) {
+                        return Physics::PhysicsBodyData::Cylinder(radius, height); }),
             // --- Trigger / Sensor Helpers ---
             "TriggerBox", sol::overload([](const Vector3& halfExtents) {
                 return Physics::PhysicsBodyData::TriggerBox(halfExtents); },
