@@ -478,11 +478,17 @@ function onUpdate(dt)
             if animName ~= "MainChar2_Running"  and kickbackCountdown <= 0.0 and not dead then
                 animator:changeAnimation("MainChar2_Running")
                 playerAudio:play("footstep")
+                if moveSpeed == sprintSpeed then
+                    tellCameraMyAnimation("Running")
+                else
+                    tellCameraMyAnimation("Walking")
+                end
             end
         else
             local animName = animator.currentAnimationName
             if animName ~= "MainChar2_Idle" and kickbackCountdown <= 0.0 and not dead then
                 animator:changeAnimation("MainChar2_Idle")
+                tellCameraMyAnimation("Idle")
                 playerAudio:stop("footstep")
             end
         end
