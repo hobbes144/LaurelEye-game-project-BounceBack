@@ -16,11 +16,13 @@ impactPE = nil
 attackPE = nil
 kickbackPE = nil
 
-gravityDisabled = false
-homingTimer = nil        -- tracks time since homing started
-HOMING_TIMEOUT = 2.0     -- seconds before giving up and sending "Catch Me!"
+pickupRange = 1.5      -- distance at which ball is instantly caught
+chaseRange = 10.0
+chaseSpeed = 200.0     -- how fast it moves toward player when homing
 
 chaseRange = 10.0
+pickupDelay = 1.0      -- seconds before pickup range activates
+pickupTimer = 0.0
 
 function onStart()
     transform = self:findTransform()
@@ -57,34 +59,45 @@ function onUpdate(dt)
         returnSpeed = initialSpeed + 25.0
     end
 
+    local pos = transform:getWorldPosition()
+
+    if pos.y < 0.5 then
+        local message = Message.new()
+        message.to = playerEntity
+        message.topic = "Catch Me!"
+        Script.send(message)
+        SceneManager:destroy(self)
+        return
+    end
+
+    pickupTimer = pickupTimer + dt
+
     local target = findPlayer()
     if not target then return end
 
-    local pos = transform:getWorldPosition()
-    local dir = target - pos
-    dir.y = 0.0
 
+        local dir = (target - pos)
     local dist = dir:Magnitude()
-    if dist <= chaseRange then
-        local n = dir:Normalized()
 
-        local newVel = body:getLinearVelocity()
-        local desiredVel = n * initialSpeed
-        local ax = (desiredVel.x - newVel.x) * dt
-        local az = (desiredVel.z - newVel.z) * dt
+    if pickupTimer <= pickupDelay then return end
 
-        newVel.x = newVel.x + ax
-        newVel.z = newVel.z + az
-        local horizSq = newVel.x*newVel.x + newVel.z*newVel.z
-        if horizSq > initialSpeed * initialSpeed then
-            local m = math.sqrt(horizSq)
-            newVel.x = (newVel.x / m) * initialSpeed
-            newVel.z = (newVel.z / m) * initialSpeed
-        end
-
-        body:setLinearVelocity(newVel)
+    if dist <= pickupRange then
+        local message = Message.new()
+        message.to = playerEntity
+        message.topic = "Catch Me!"
+        Script.send(message)
+        SceneManager:destroy(self)
+        return
     end
 
+    if dist > chaseRange then return end
+
+    local n = dir:Normalized()
+    local vel = body:getLinearVelocity()
+    vel.x = n.x * chaseSpeed
+    vel.y = n.y * chaseSpeed
+    vel.z = n.z * chaseSpeed
+    body:setLinearVelocity(vel)
 end
 
 function onTriggerEnter(data)
@@ -170,39 +183,6 @@ function onTriggerEnter(data)
     body:setLinearVelocity(reflected)
     --end
 end
-
-function onTriggerStay(data)
-    local tagsA = data.entityA:getTags()
-    local pos = transform:getWorldPosition()
-    local vel = body:getLinearVelocity()
-    for _, tag in pairs(tagsA) do
-        if tag == "ground" then
-            if vel.y < 1.0 then
-                transform:setWorldPosition(pos.x, 1.0, pos.z)
-            end
-        end
-    end
-    local tagsB = data.entityB:getTags()
-    for _, tag in pairs(tagsB) do
-        if tag == "ground" then
-            if vel.y < 1.0 then
-                transform:setWorldPosition(pos.x, 1.0, pos.z)
-            end
-        end
-    end
-end
-
--- isGround now only checks actual ground
---[[function isGround(entity)
-    if entity == nil then return false end
-    local tags = entity:getTags()
-    for _, tag in pairs(tags) do
-        if tag == "ground" or tag == "door" then
-            return true
-        end
-    end
-    return false
-end]]
 
 function destroySelf()
     if destroyed then return end
