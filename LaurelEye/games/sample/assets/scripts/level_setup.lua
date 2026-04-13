@@ -162,6 +162,10 @@ function setupLevel5()
     local e1 = SceneManager:instantiate("prefabs/security_enemy.prefab.json")
     local e1Transform = e1:findTransform()
     e1Transform:setWorldPosition(35.42, 6.831, -113.045)
+    local message = Message.new()
+    message.to = e1
+    message.topic = "I have the key!"
+    Script.send(message)
 end
 
 function setupLevel6()

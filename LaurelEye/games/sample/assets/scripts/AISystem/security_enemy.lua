@@ -18,6 +18,7 @@ local hit_count     = 0
 local max_hits      = 3
 local animator      = nil
 local shield        = nil
+local hasKey        = false
 
 -----------------------------------
 -- State machine & states
@@ -72,6 +73,10 @@ function onMessage(msg)
     if msg.topic == "Shield Hit!" then      -- ball hit the shield
         if enemy_ai then enemy_ai:forceTransition("GetHit") end
         return true
+    end
+    if msg.topic == "I have the key!" then
+        print("Enemy has been given the key")
+        hasKey = true
     end
 end
 
@@ -254,6 +259,10 @@ function setupDeadState()
     dead_state:setOnEnter(function()
         state_duration = 2.0
         log("Security: destroyed after " .. max_hits .. " hits")
+        local message  = Message.new()
+        message.to     = shield
+        message.topic  = "We Die Together!"
+        Script.send(message)
         if animator then animator:changeAnimation("Death") end
     end)
 
@@ -371,9 +380,11 @@ end
 function destroySelf()
     if destroyed then return end
     destroyed = true
-    local message  = Message.new()
-    message.to     = shield
-    message.topic  = "We Die Together!"
-    Script.send(message)
+    if hasKey then
+        local key = SceneManager:instantiate("prefabs/keycard.prefab.json")
+        local keyTransform = key:findTransform()
+        local pos = transform:getWorldPosition()
+        keyTransform:setWorldPosition(pos.x, 3.0, pos.z)
+    end
     SceneManager:destroy(self)
 end

@@ -280,15 +280,6 @@ function onMessage(msg)
         end
     end
 
-    if msg.topic == "Here's the Key!" then
-        print("Player has the key!")
-        hasKey = true
-        local scene = SceneManager:getCurrentScene()
-        local ballInd = scene:findEntityByName("KeyIndicator")
-        local uiRender = ballInd:findComponent("UIRenderComponent")
-        uiRender:setTransparency(1.0)
-    end
-
     if trajectoryLine ~= nil then
         trajectoryLine:ballCallback(msg)
     end
@@ -634,6 +625,33 @@ function onCollisionEnter(data)
             jumping = false
         elseif tag == "door" then
             if hasKey then changeLevels() end
+        end
+    end
+end
+
+function onTriggerEnter(data)
+    local tagsA = data.entityA:getTags()
+    for _, tag in pairs(tagsA) do
+        if tag == "key" then
+            print("Player has the key!")
+            hasKey = true
+            local scene = SceneManager:getCurrentScene()
+            local ballInd = scene:findEntityByName("KeyIndicator")
+            local uiRender = ballInd:findComponent("UIRenderComponent")
+            uiRender:setTransparency(1.0)
+            SceneManager:destroy(data.entityA)
+        end
+    end
+    local tagsB = data.entityB:getTags()
+    for _, tag in pairs(tagsB) do
+        if tag == "key" then
+            print("Player has the key!")
+            hasKey = true
+            local scene = SceneManager:getCurrentScene()
+            local ballInd = scene:findEntityByName("KeyIndicator")
+            local uiRender = ballInd:findComponent("UIRenderComponent")
+            uiRender:setTransparency(1.0)
+            SceneManager:destroy(data.entityB)
         end
     end
 end

@@ -67,14 +67,6 @@ function onMessage(msg)
     end
     if msg.topic == "Get Hit!" then
         if msg.to ~= self then return end 
-        if hasKey then
-            local scene = SceneManager:getCurrentScene()
-            local player = scene:findEntityByName("PlayerPrefab")
-            local message = Message.new()
-            message.to = player
-            message.topic = "Here's the Key!"
-            Script.send(message)
-        end
         if state_machine.current_state.name == "Dead" then return end
         if state_machine then state_machine:forceTransition("Dead") end
     end
@@ -394,5 +386,11 @@ end
 function destroySelf()
     if destroyed then return end
     destroyed = true
+    if hasKey then
+        local key = SceneManager:instantiate("prefabs/keycard.prefab.json")
+        local keyTransform = key:findTransform()
+        local pos = transform:getWorldPosition()
+        keyTransform:setWorldPosition(pos.x, 3.0, pos.z)
+    end
     SceneManager:destroy(self)
 end
