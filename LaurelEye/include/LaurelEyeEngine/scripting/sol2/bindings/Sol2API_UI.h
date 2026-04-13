@@ -8,7 +8,6 @@
 
 #pragma once
 #include "LaurelEyeEngine/core/EngineContext.h"
-#include "LaurelEyeEngine/events/EventManager.h"
 #include <sol/sol.hpp>
 #include <string>
 #include <unordered_map>

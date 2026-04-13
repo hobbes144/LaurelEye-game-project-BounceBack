@@ -20,6 +20,7 @@
 #pragma once
 
 #include "LaurelEyeEngine/events/EventManager.h"
+#include "LaurelEyeEngine/events/UUIDGenerator.h"
 
 #include <algorithm>
 

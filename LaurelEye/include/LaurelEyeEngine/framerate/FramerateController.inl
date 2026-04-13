@@ -3,7 +3,6 @@
 #include "FramerateController.h"
 
 #include <chrono>
-#include <thread>
 
 template <typename T>
 FramerateController<T>* FramerateController<T>::getController() {

@@ -9,7 +9,6 @@
 /// Copyright © 2025 DIGIPEN Institute of Technology. All rights reserved.
 #pragma once
 
-#include "LaurelEyeEngine/io/Assets.h"
 #include "LaurelEyeEngine/io/IAssetImporter.h"
 
 namespace LaurelEye::Graphics {

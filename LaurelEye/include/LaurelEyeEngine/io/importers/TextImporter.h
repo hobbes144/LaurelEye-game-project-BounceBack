@@ -9,9 +9,6 @@
 /// Copyright © 2025 DIGIPEN Institute of Technology. All rights reserved.
 #pragma once
 
-#include <fstream>
-#include <sstream>
-#include "LaurelEyeEngine/io/Assets.h"
 #include "LaurelEyeEngine/io/IAssetImporter.h"
 
 namespace LaurelEye::IO {

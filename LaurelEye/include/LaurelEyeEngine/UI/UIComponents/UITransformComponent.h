@@ -7,7 +7,6 @@
 
 #pragma once
 #include "LaurelEyeEngine/ecs/IComponent.h"
-#include "LaurelEyeEngine/events/EventManager.h"
 #include "LaurelEyeEngine/math/Rect.h"
 
 namespace LaurelEye::UI {
@@ -33,7 +32,7 @@ namespace LaurelEye::UI {
         void MarkDirty();
         bool IsDirty() const;
 
-        // Resolved 
+        // Resolved
         const Rect& GetResolvedRect() const;
         void SetResolvedRect(const Rect& r);
 

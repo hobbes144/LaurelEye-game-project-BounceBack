@@ -10,7 +10,6 @@
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
-#include <iostream>
 #include <unordered_map>
 #include "IInput.h"
 #include "LaurelEyeEngine/window/IWindow.h"

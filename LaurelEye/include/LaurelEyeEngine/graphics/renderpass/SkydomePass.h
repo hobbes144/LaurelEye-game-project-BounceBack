@@ -5,7 +5,6 @@
 #include "LaurelEyeEngine/graphics/resources/Mesh.h"
 #include "LaurelEyeEngine/graphics/resources/FrameContext.h"
 #include "LaurelEyeEngine/graphics/resources/RenderResources.h"
-#include "LaurelEyeEngine/graphics/resources/GeometryBuffer.h"
 
 namespace LaurelEye::Graphics {
     class SkydomePass : public IRenderPass {

@@ -6,9 +6,7 @@
 /// @brief  A speaker component that can be attached to entities to play audio according to it's postion, velocity and so on. Also cam play 2D audio.
 #pragma once
 
-#include "LaurelEyeEngine/audio/AudioAsset.h"
 #include "LaurelEyeEngine/audio/interfaces/IAudioManager.h"
-#include "LaurelEyeEngine/ecs/Entity.h"
 #include "LaurelEyeEngine/ecs/IComponent.h"
 #include <string>
 #include <unordered_map>

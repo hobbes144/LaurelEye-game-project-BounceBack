@@ -8,7 +8,6 @@
 
 #pragma once
 #include "LaurelEyeEngine/core/EngineContext.h"
-#include "LaurelEyeEngine/input/InputManager.h"
 #include "LaurelEyeEngine/scene/SceneManager.h"
 #include <sol/sol.hpp>
 

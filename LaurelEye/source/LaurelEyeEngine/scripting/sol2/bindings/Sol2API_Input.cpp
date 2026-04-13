@@ -1,5 +1,4 @@
 ﻿#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Input.h"
-#include <tuple>
 
 namespace LaurelEye::Scripting {
 

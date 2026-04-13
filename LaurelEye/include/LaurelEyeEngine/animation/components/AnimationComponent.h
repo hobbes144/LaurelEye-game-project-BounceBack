@@ -2,7 +2,6 @@
 
 #include "LaurelEyeEngine/ecs/IComponent.h"
 #include "LaurelEyeEngine/animation/resources/Animation.h"
-#include "LaurelEyeEngine/graphics/graphics_components/IRenderableComponent.h"
 
 
 namespace LaurelEye::Animations {

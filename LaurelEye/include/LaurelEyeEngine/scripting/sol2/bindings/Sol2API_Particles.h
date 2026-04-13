@@ -11,7 +11,6 @@
 
 #pragma once
 #include "LaurelEyeEngine/core/EngineContext.h"
-#include "LaurelEyeEngine/particles/ParticleEmitterComponent.h"
 #include <sol/sol.hpp>
 
 namespace LaurelEye::Scripting {

@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include "LaurelEyeEngine/math/CatmullRomSpline.h"
 #include <sol/sol.hpp>
 
 namespace LaurelEye::Scripting {

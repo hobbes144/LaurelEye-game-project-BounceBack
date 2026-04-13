@@ -7,12 +7,6 @@
 /// Copyright © 2025 DIGIPEN Institute of Technology. All rights reserved.
 
 #pragma once
-#include "LaurelEyeEngine/math/Vector3.h"
-#include "LaurelEyeEngine/math/VectorTemplated.h"
-#include "LaurelEyeEngine/math/Matrix4.h"
-#include "LaurelEyeEngine/math/Transform.h"
-#include "LaurelEyeEngine/math/Rect.h"
-#include <cmath>
 #include <sol/sol.hpp>
 
 namespace LaurelEye::Scripting {

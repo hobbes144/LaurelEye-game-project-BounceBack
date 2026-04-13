@@ -16,11 +16,11 @@
 #include "LaurelEyeEngine/physics/interfaces/IPhysicsWorld.h"
 #include "LaurelEyeEngine/physics/PhysicsBodyBaseComponent.h"
 #include "LaurelEyeEngine/physics/CollisionManager.h"
-#include "LaurelEyeEngine/debugDraw/DebugDrawSystem.h"
 #include "LaurelEyeEngine/ecs/ISystem.h"
 
 //Forward Declaration
 namespace LaurelEye::Debug {
+    class DebugDrawSystem;
     struct DebugDrawCommand;
 }
 
@@ -73,8 +73,6 @@ namespace LaurelEye::Physics {
         CollisionManager& GetCollisionManager() {
             return collisionManager;
         }
-
-        void populateWireFrameCommands(std::vector<Debug::DebugDrawCommand>& commands) const ;
 
         // Physics Query API
 
@@ -141,6 +139,8 @@ namespace LaurelEye::Physics {
 
         void dispatchCollisionEvents() const;
         //void gatherTriggerEvents();
+
+        friend Debug::DebugDrawSystem;
 
     };
 

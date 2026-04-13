@@ -3,7 +3,6 @@
 #include "LaurelEyeEngine/physics/PhysicsSystem.h"
 #include "LaurelEyeEngine/physics/RigidBodyComponent.h"
 #include "LaurelEyeEngine/physics/GhostBodyComponent.h"
-#include "LaurelEyeEngine/logging/EngineLog.h"
 
 #include <sol/types.hpp>
 

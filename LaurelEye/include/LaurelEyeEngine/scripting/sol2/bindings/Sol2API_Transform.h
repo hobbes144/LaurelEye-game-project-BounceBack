@@ -7,8 +7,6 @@
 /// Copyright © 2025 DIGIPEN Institute of Technology. All rights reserved.
 
 #pragma once
-#include "LaurelEyeEngine/core/EngineContext.h"
-#include "LaurelEyeEngine/transform/TransformComponent.h"
 #include <sol/sol.hpp>
 
 namespace LaurelEye::Scripting {

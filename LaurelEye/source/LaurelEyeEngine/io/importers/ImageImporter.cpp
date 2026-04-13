@@ -2,12 +2,9 @@
 #include "stb_image.h"
 
 #include "LaurelEyeEngine/io/importers/ImageImporter.h"
-#include "LaurelEyeEngine/graphics/resources/RenderResources.h"
 #include "LaurelEyeEngine/graphics/resources/Texture.h"
 #include "LaurelEyeEngine/io/Assets.h"
 #include "LaurelEyeEngine/logging/EngineLog.h"
-
-#include <filesystem>
 
 namespace LaurelEye::IO {
     std::shared_ptr<IAsset> ImageImporter::import(const std::string& path) {

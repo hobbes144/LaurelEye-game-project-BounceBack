@@ -8,7 +8,6 @@
 
 #pragma once
 #include "LaurelEyeEngine/core/EngineContext.h"
-#include "LaurelEyeEngine/ecs/Entity.h"
 #include <sol/sol.hpp>
 
 namespace LaurelEye::Scripting {

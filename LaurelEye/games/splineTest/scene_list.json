@@ -1,9 +1,0 @@
-﻿{
-    "initialScene": "Level1",
-    "scenes": [
-        {
-            "name": "Level1",
-            "path": "scenes/sample_scene_one.scene.json"
-        }
-    ]
-}

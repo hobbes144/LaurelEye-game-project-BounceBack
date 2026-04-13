@@ -9,7 +9,6 @@
 #pragma once
 
 #include "LaurelEyeEngine/events/IEvent.h"
-#include "LaurelEyeEngine/events/UUIDGenerator.h"
 
 #include <cstdint>
 #include <functional>

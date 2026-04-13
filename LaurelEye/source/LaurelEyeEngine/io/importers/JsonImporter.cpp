@@ -1,4 +1,5 @@
 ﻿#include "LaurelEyeEngine/io/importers/JsonImporter.h"
+#include "LaurelEyeEngine/io/Assets.h"
 
 namespace LaurelEye::IO {
     std::shared_ptr<IAsset> JsonImporter::import(const std::string& path) {
@@ -35,4 +36,4 @@ namespace LaurelEye::IO {
 
         return asset;
     }
-} // namespace LaurelEye::IO 
+} // namespace LaurelEye::IO

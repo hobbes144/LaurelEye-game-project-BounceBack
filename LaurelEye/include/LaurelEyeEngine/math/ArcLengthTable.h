@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include <stdexcept>
 #include <vector>
 #include "LaurelEyeEngine/math/VectorTemplated.h"
 

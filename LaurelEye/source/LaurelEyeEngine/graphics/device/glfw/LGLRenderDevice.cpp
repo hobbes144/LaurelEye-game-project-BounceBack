@@ -15,6 +15,7 @@
 #include "LaurelEyeEngine/graphics/resources/DataBuffer.h"
 #include "LaurelEyeEngine/graphics/resources/Framebuffer.h"
 #include "LaurelEyeEngine/graphics/resources/Texture.h"
+#include "LaurelEyeEngine/logging/EngineLog.h"
 
 #include <cstdint>
 #include <glad/glad.h>
@@ -88,21 +89,24 @@ namespace LaurelEye::Graphics {
             break;
         case GL_DEBUG_SEVERITY_MEDIUM:
             severityStr = "Medium";
+            return;
             break;
         case GL_DEBUG_SEVERITY_LOW:
             severityStr = "Low";
+            return;
             break;
         case GL_DEBUG_SEVERITY_NOTIFICATION:
             severityStr = "Notification";
+            return;
             break;
         }
 
-        std::cerr << "OpenGL Debug Message\n"
+        LE_WARN("graphics", "OpenGL Debug Message:\n"
                   << "Source: " << sourceStr << "\n"
                   << "Type: " << typeStr << "\n"
                   << "ID: " << id << "\n"
                   << "Severity: " << severityStr << "\n"
-                  << "Message: " << message << std::endl;
+                  << "Message: " << message);
     }
 
     void openglShaderCheckError(GLint programID) {
@@ -114,7 +118,7 @@ namespace LaurelEye::Graphics {
         if ( isValid == GL_FALSE ) {
             char message[512];
             glGetProgramInfoLog(programID, 512, NULL, message);
-            printf("Program Validation Failed: %s\n", message);
+            LE_ERROR("graphics", "Program Validation Failed: " << message);
         }
     }
 
@@ -123,7 +127,7 @@ namespace LaurelEye::Graphics {
 
     void LGLRenderDevice::initialize() {
         if ( !gladLoadGLLoader((GLADloadproc)glfwGetProcAddress) ) {
-            throw std::runtime_error("ERROR::RENDERSYSTEM::INIT::GLADINIT");
+            LE_ERROR("graphics", "Failed to initialize glad.");
         }
 
         // Enabling debug output

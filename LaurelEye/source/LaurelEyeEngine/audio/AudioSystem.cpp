@@ -6,8 +6,6 @@
 /// @brief  Implementation of AudioSystem that manages audio components and interfaces with audio backends.
 
 #include "LaurelEyeEngine/audio/AudioSystem.h"
-#include "LaurelEyeEngine/transform/TransformComponent.h"
-#include "LaurelEyeEngine/io/importers/AudioAssetImporter.h"
 
 
 namespace LaurelEye::Audio {

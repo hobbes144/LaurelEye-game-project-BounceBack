@@ -14,7 +14,6 @@
 #include "LaurelEyeEngine/math/VectorTemplated.h"
 #include "LaurelEyeEngine/scripting/ScriptComponent.h"
 
-#include <memory>
 #include <rapidjson/document.h>
 #include <string>
 
@@ -41,8 +40,8 @@ namespace LaurelEye{
         void addComponentsFromJson(Entity& entity, const rapidjson::Value& componentsJson);
 
         /// @brief Given a path to a prefab, add it to the given scene
-        /// @param scene 
-        /// @param prefabPath 
+        /// @param scene
+        /// @param prefabPath
         Entity* addPrefabToScene(Scene& scene, const std::string& prefabPath);
     private:
         EngineContext& context;

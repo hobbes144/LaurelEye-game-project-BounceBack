@@ -1,6 +1,4 @@
 ﻿#include "LaurelEyeEngine/scripting/ScriptTypeRegistry.h"
-#include "LaurelEyeEngine/scene/SceneManager.h"
-#include "LaurelEyeEngine/scene/Scene.h"
 #include "LaurelEyeEngine/logging/EngineLog.h"
 
 namespace LaurelEye::Scripting {

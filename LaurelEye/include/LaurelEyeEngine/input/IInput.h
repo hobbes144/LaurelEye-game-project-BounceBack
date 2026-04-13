@@ -9,7 +9,6 @@
 #pragma once
 
 #include "InputCodes.h"
-#include <unordered_map>
 namespace LaurelEye {
 
     struct KeyState {

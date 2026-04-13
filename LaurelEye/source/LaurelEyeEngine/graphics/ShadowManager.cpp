@@ -15,12 +15,13 @@
 #include "LaurelEyeEngine/graphics/resources/FrameContext.h"
 #include "LaurelEyeEngine/graphics/resources/Lights.h"
 #include "LaurelEyeEngine/graphics/resources/RenderResources.h"
-#include "LaurelEyeEngine/graphics/resources/Shader.h"
 #include "LaurelEyeEngine/graphics/resources/Shadow.h"
 #include "LaurelEyeEngine/graphics/resources/Texture.h"
 #include "LaurelEyeEngine/math/Vector3.h"
 #include <cstdint>
 #include <string>
+
+#include <glad/glad.h>
 
 // #include "Renderer.h"
 // #include "RendererStateSaver.h"
@@ -240,7 +241,7 @@ namespace LaurelEye::Graphics {
                 r.shadowMatrix =
                     Matrix4::translation(0.5f) * Matrix4::scale(0.5f) *
                     projectionMatrix * viewMatrix;
-                
+
                 pointShadowPass.execute(ctx);
             }
 

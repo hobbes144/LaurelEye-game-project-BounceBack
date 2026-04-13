@@ -82,27 +82,9 @@ set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_CLEAN_FILES
 # -------------------------------------------------
 # Dependencies from vcpkg
 # -------------------------------------------------
-find_package(glad CONFIG REQUIRED)
-find_package(glfw3 CONFIG REQUIRED)
 find_package(assimp CONFIG REQUIRED)
 find_package(RapidJSON CONFIG REQUIRED)
 find_package(Stb REQUIRED)
-find_package(sol2 CONFIG REQUIRED)
-find_package(lua CONFIG REQUIRED)
-find_package(freetype CONFIG REQUIRED)
-find_package(HarfBuzz CONFIG REQUIRED)
-# find_package(unofficial-lua CONFIG REQUIRED)
-find_package(Bullet CONFIG REQUIRED)
-
-# Normalize Bullet targets across package variants
-set(LAURELEYE_BULLET_LIBS "")
-if(TARGET BulletDynamics AND TARGET BulletCollision AND TARGET LinearMath)
-    list(APPEND LAURELEYE_BULLET_LIBS BulletDynamics BulletCollision LinearMath)
-elseif(TARGET Bullet::BulletDynamics AND TARGET Bullet::BulletCollision AND TARGET Bullet::LinearMath)
-    list(APPEND LAURELEYE_BULLET_LIBS Bullet::BulletDynamics Bullet::BulletCollision Bullet::LinearMath)
-else()
-    message(FATAL_ERROR "Could not determine Bullet targets exposed by vcpkg.")
-endif()
 
 # -------------------------------------------------
 # FMOD from external/
@@ -117,6 +99,9 @@ add_library(LaurelEyeEngine STATIC)
 add_library(LaurelEye::Engine ALIAS LaurelEyeEngine)
 
 add_subdirectory(source/LaurelEyeEngine/math)
+add_subdirectory(source/LaurelEyeEngine/graphics)
+add_subdirectory(source/LaurelEyeEngine/scripting)
+add_subdirectory(source/LaurelEyeEngine/physics)
 
 # Using file GLOB to get all file names in case the file isn't added manually
 # to the add_library call.
@@ -131,116 +116,41 @@ target_sources(LaurelEyeEngine
     "source/LaurelEyeEngine/animation/AnimationManager.cpp"
     "source/LaurelEyeEngine/animation/AnimationSystem.cpp"
     "source/LaurelEyeEngine/animation/Component/SkeletalAnimationComponent.cpp"
-    "source/LaurelEyeEngine/audio/AudioAsset.cpp"
+    "source/LaurelEyeEngine/audio/AudioComponent.cpp"
     "source/LaurelEyeEngine/audio/AudioSystem.cpp"
     "source/LaurelEyeEngine/audio/FModAudioManager.cpp"
-    "source/LaurelEyeEngine/audio/SpeakerComponent.cpp"
     "source/LaurelEyeEngine/core/Engine.cpp"
     "source/LaurelEyeEngine/core/ResourceCoordinator.cpp"
     "source/LaurelEyeEngine/core/SystemCoordinator.cpp"
     "source/LaurelEyeEngine/debugDraw/DebugDrawSystem.cpp"
     "source/LaurelEyeEngine/ecs/EntityFactory.cpp"
-    "source/LaurelEyeEngine/graphics/device/glfw/LGLDataBufferFactory.cpp"
-    "source/LaurelEyeEngine/graphics/device/glfw/LGLFramebufferFactory.cpp"
-    "source/LaurelEyeEngine/graphics/device/glfw/LGLRenderDevice.cpp"
-    "source/LaurelEyeEngine/graphics/device/glfw/LGLRenderState.cpp"
-    "source/LaurelEyeEngine/graphics/device/glfw/LGLTextureFactory.cpp"
-    "source/LaurelEyeEngine/graphics/device/glfw/LGLVertexArrayFactory.cpp"
-    "source/LaurelEyeEngine/graphics/graphics_components/AmbientLightComponent.cpp"
-    "source/LaurelEyeEngine/graphics/graphics_components/CameraComponent.cpp"
-    "source/LaurelEyeEngine/graphics/graphics_components/DirectionalLightComponent.cpp"
-    "source/LaurelEyeEngine/graphics/graphics_components/IRenderComponent.cpp"
-    "source/LaurelEyeEngine/graphics/graphics_components/LightComponent.cpp"
-    "source/LaurelEyeEngine/graphics/graphics_components/PointLightComponent.cpp"
-    "source/LaurelEyeEngine/graphics/graphics_components/Renderable2DComponent.cpp"
-    "source/LaurelEyeEngine/graphics/graphics_components/Renderable3DComponent.cpp"
-    "source/LaurelEyeEngine/graphics/graphics_components/UIButtonComponent.cpp"
-    "source/LaurelEyeEngine/graphics/graphics_components/UIComponent.cpp"
-    "source/LaurelEyeEngine/graphics/graphics_components/UISliderComponent.cpp"
-    "source/LaurelEyeEngine/graphics/MeshManager.cpp"
-    "source/LaurelEyeEngine/graphics/MeshManagerPrimitives.cpp"
-    "source/LaurelEyeEngine/graphics/renderpass/DebugDrawRenderPass.cpp"
-    "source/LaurelEyeEngine/graphics/renderpass/DeferredRenderPass.cpp"
-    "source/LaurelEyeEngine/graphics/renderpass/GBufferPass.cpp"
-    "source/LaurelEyeEngine/graphics/renderpass/GBufferSkinnedPass.cpp"
-    "source/LaurelEyeEngine/graphics/renderpass/IRenderPass.cpp"
-    "source/LaurelEyeEngine/graphics/renderpass/LocalLightsPass.cpp"
-    "source/LaurelEyeEngine/graphics/renderpass/ParticleRenderPass.cpp"
-    "source/LaurelEyeEngine/graphics/renderpass/PointShadowSkinnedPass.cpp"
-    "source/LaurelEyeEngine/graphics/renderpass/ShadowPass.cpp"
-    "source/LaurelEyeEngine/graphics/renderpass/ShadowSkinnedPass.cpp"
-    "source/LaurelEyeEngine/graphics/renderpass/SingleBufferedDataPass.cpp"
-    "source/LaurelEyeEngine/graphics/renderpass/SinglePass.cpp"
-    "source/LaurelEyeEngine/graphics/renderpass/SinglePassShadow.cpp"
-    "source/LaurelEyeEngine/graphics/renderpass/SkydomePass.cpp"
-    "source/LaurelEyeEngine/graphics/renderpass/LocalLightsToonPass.cpp"
-    "source/LaurelEyeEngine/graphics/renderpass/UIPass.cpp"
-    "source/LaurelEyeEngine/graphics/RenderStateSaver.cpp"
-    "source/LaurelEyeEngine/graphics/RenderSystem.cpp"
-    "source/LaurelEyeEngine/graphics/resources/GeometryBuffer.cpp"
-    "source/LaurelEyeEngine/graphics/resources/Material.cpp"
-    "source/LaurelEyeEngine/graphics/resources/Mesh.cpp"
-    "source/LaurelEyeEngine/graphics/resources/RenderResources.cpp"
-    "source/LaurelEyeEngine/graphics/resources/Shader.cpp"
-    "source/LaurelEyeEngine/graphics/ShaderManager.cpp"
-    "source/LaurelEyeEngine/graphics/ShadowManager.cpp"
-    "source/LaurelEyeEngine/graphics/SkeletonManager.cpp"
-    "source/LaurelEyeEngine/graphics/surface/glfw/LGlfwOpenGLWindowSurface.cpp"
     "source/LaurelEyeEngine/input/GLFWInput.cpp"
     "source/LaurelEyeEngine/input/InputManager.cpp"
     "source/LaurelEyeEngine/io/AssetManager.cpp"
     "source/LaurelEyeEngine/io/FileSystem.cpp"
+    "source/LaurelEyeEngine/io/importers/AudioAssetImporter.cpp"
     "source/LaurelEyeEngine/io/importers/ImageImporter.cpp"
     "source/LaurelEyeEngine/io/importers/JsonImporter.cpp"
     "source/LaurelEyeEngine/io/importers/MeshImporter.cpp"
     "source/LaurelEyeEngine/io/importers/ShaderImporter.cpp"
     "source/LaurelEyeEngine/io/importers/TextImporter.cpp"
+    "source/LaurelEyeEngine/io/Paths.cpp"
     "source/LaurelEyeEngine/memory/MemoryManager.cpp"
     "source/LaurelEyeEngine/particles/ParticleEmitterComponent.cpp"
     "source/LaurelEyeEngine/particles/ParticleSystem.cpp"
-    "source/LaurelEyeEngine/physics/CollisionManager.cpp"
-    "source/LaurelEyeEngine/physics/interfaces/Bullet/BulletRigidBody.cpp"
-    "source/LaurelEyeEngine/physics/interfaces/Bullet/BulletGhostBody.cpp"
-    "source/LaurelEyeEngine/physics/interfaces/Bullet/BulletShape.cpp"
-    "source/LaurelEyeEngine/physics/interfaces/Bullet/BulletWorld.cpp"
-    "source/LaurelEyeEngine/physics/RigidBodyComponent.cpp"
-    "source/LaurelEyeEngine/physics/GhostBodyComponent.cpp"
-    "source/LaurelEyeEngine/physics/PhysicsQueryAPI.cpp"
-    "source/LaurelEyeEngine/physics/PhysicsSystem.cpp"
     "source/LaurelEyeEngine/platforms/glfw/GlfwPlatform.cpp"
     "source/LaurelEyeEngine/scene/Scene.cpp"
     "source/LaurelEyeEngine/scene/SceneManager.cpp"
-    "source/LaurelEyeEngine/scripting/ScriptSystem.cpp"
-    "source/LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Animation.cpp"
-    "source/LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Audio.cpp"
-    "source/LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Camera.cpp"
-    "source/LaurelEyeEngine/scripting/sol2/bindings/Sol2API_ECS.cpp"
-    "source/LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Input.cpp"
-    "source/LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Lights.cpp"
-    "source/LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Math2.cpp"
-    "source/LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Math.cpp"
-    "source/LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Particles.cpp"
-    "source/LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Physics.cpp"
-    "source/LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Renderable.cpp"
-    "source/LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Scene.cpp"
-    "source/LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Spline.cpp"
-    "source/LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Transform.cpp"
-    "source/LaurelEyeEngine/scripting/sol2/bindings/Sol2API_UI.cpp"
-    "source/LaurelEyeEngine/scripting/sol2/Sol2API.cpp"
-    "source/LaurelEyeEngine/scripting/sol2/Sol2ScriptBroker.cpp"
-    "source/LaurelEyeEngine/scripting/sol2/Sol2ScriptInstance.cpp"
-    "source/LaurelEyeEngine/scripting/sol2/Sol2State.cpp"
     "source/LaurelEyeEngine/transform/TransformSystem.cpp"
+    "source/LaurelEyeEngine/UI/UIComponents/UIInteractionComponent.cpp"
     "source/LaurelEyeEngine/UI/UIComponents/UIRenderComponent.cpp"
+    "source/LaurelEyeEngine/UI/UIComponents/UITextComponent.cpp"
     "source/LaurelEyeEngine/UI/UIComponents/UITransformComponent.cpp"
+    "source/LaurelEyeEngine/UI/UIInteractionSystem.cpp"
     "source/LaurelEyeEngine/UI/UILayoutSystem.cpp"
     "source/LaurelEyeEngine/window/glfw/LGlfwWindow.cpp"
     "source/LaurelEyeEngine/window/WindowManager.cpp"
-    "source/LaurelEyeEngine/graphics/FontManager.cpp"
-    "source/LaurelEyeEngine/graphics/resources/Font.cpp"
-    "source/LaurelEyeEngine/UI/UIComponents/UITextComponent.cpp"
-    "source/LaurelEyeEngine/scripting/sol2/bindings/Sol2API_UIText.cpp"
-    ${ENGINE_SOURCES}
+    # ${ENGINE_SOURCES}
     )
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -257,13 +167,13 @@ target_precompile_headers(LaurelEyeEngine
         ${LAURELEYE_ENGINE_INCLUDE_DIR}/LaurelEyeEngine/pch.hpp
 )
 
-target_compile_definitions(LaurelEyeEngine PUBLIC PLATFORM_GLFW)
-
 target_compile_definitions(LaurelEyeEngine
     PUBLIC PROJECT_ROOT_DIR="${PROJECT_SOURCE_DIR}"
 )
 
-set_target_properties(LaurelEyeEngine PROPERTIES PUBLIC_HEADER include/LaurelEyeEngine/LaurelEyeEngine.h)
+set_target_properties(LaurelEyeEngine
+    PROPERTIES
+        PUBLIC_HEADER include/LaurelEyeEngine/LaurelEyeEngine.h)
 
 target_include_directories(LaurelEyeEngine
     PUBLIC
@@ -274,18 +184,12 @@ target_include_directories(LaurelEyeEngine
 target_link_libraries(LaurelEyeEngine
     PUBLIC
         LaurelEyeMath
-        glad::glad
-        glfw
+        LaurelEyeGraphics
+        LaurelEyeScripting
+        LaurelEyePhysics
         assimp::assimp
-        lua
-        sol2::sol2
-        ${LAURELEYE_BULLET_LIBS}
         FMOD::FMOD
-        freetype
-        harfbuzz::harfbuzz
 )
-
-add_compile_definitions(HB_HAVE_FREETYPE ON)
 
 target_compile_features(LaurelEyeEngine PUBLIC cxx_std_23)
 

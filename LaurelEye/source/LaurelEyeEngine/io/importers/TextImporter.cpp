@@ -1,4 +1,5 @@
 ﻿#include "LaurelEyeEngine/io/importers/TextImporter.h"
+#include "LaurelEyeEngine/io/Assets.h"
 
 namespace LaurelEye::IO {
     std::shared_ptr<IAsset> TextImporter::import(const std::string& path) {

@@ -1,7 +1,6 @@
 ﻿#pragma once
 #include "LaurelEyeEngine/math/VectorTemplated.h"
 #include "LaurelEyeEngine/math/ArcLengthTable.h"
-#include <iostream>
 
 
 namespace LaurelEye {
@@ -11,13 +10,13 @@ namespace LaurelEye {
     using Vector2 = VectorTemplated<float, 2>;
 
     class Spline {
-        
+
     protected:
         std::vector<Vector2> controlPoints;
         ArcLengthTable arcLengthTable;
 
     private:
-        
+
         // update the arc length table when control points change
         virtual void update() =0;
 
@@ -69,7 +68,5 @@ namespace LaurelEye {
         virtual void toJSON(const std::string& outStr) const =0;
         virtual void fromJSON(const std::string& outStr)=0;
     };
-
-    #include <type_traits>
 
 } // namespace LaurelEye

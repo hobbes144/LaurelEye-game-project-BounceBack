@@ -3,11 +3,10 @@
 #include "LaurelEyeEngine/animation/resources/SkeletalAnimation.h"
 #include "LaurelEyeEngine/animation/AnimationHelpers.h"
 #include "LaurelEyeEngine/graphics/SkeletonManager.h"
+#include "LaurelEyeEngine/graphics/graphics_components/IRenderableComponent.h"
 #include "LaurelEyeEngine/graphics/resources/RenderResources.h"
 #include "LaurelEyeEngine/graphics/RenderSystem.h"
 #include "LaurelEyeEngine/graphics/MeshManager.h"
-#include "LaurelEyeEngine/io/Assets.h"
-#include <memory>
 #include <LaurelEyeEngine/logging/EngineLog.h>
 
 namespace LaurelEye::Animations {

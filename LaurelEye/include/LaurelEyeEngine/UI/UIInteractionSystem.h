@@ -6,14 +6,15 @@
 /// @par    **Course**
 ///    GAM541
 /// @date   01-16-2026
-/// @brief  
-/// 
+/// @brief
+///
 ///
 
 #pragma once
 
 #include "LaurelEyeEngine/ecs/ISystem.h"
 #include "LaurelEyeEngine/UI/UIComponents/UIInteractionComponent.h"
+#include "LaurelEyeEngine/math/Rect.h"
 #include "LaurelEyeEngine/math/VectorTemplated.h"
 
 namespace LaurelEye::UI {

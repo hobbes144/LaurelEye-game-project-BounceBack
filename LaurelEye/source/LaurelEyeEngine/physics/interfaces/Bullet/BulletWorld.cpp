@@ -1,8 +1,8 @@
 ﻿#include "LaurelEyeEngine/physics/interfaces/Bullet/BulletWorld.h"
 #include "LaurelEyeEngine/logging/EngineLog.h"
+#include "LaurelEyeEngine/physics/interfaces/Bullet/BulletGhostBody.h"
 #include "LaurelEyeEngine/physics/interfaces/Bullet/BulletRigidBody.h"
 #include "LaurelEyeEngine/physics/PhysicsBodyBaseComponent.h"
-#include "LaurelEyeEngine/physics/GhostBodyComponent.h"
 
 namespace LaurelEye::Physics {
 

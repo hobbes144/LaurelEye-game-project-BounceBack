@@ -1,17 +1,18 @@
-﻿cmake_minimum_required(VERSION 3.8)
+﻿add_library(LaurelEyeScripting STATIC)
 
-# Engine library
-project (LaurelEyeEngine.Scripting VERSION 0.0.1 DESCRIPTION "Team Laurel GAM55x Engine Graphics lib")
+add_library(LaurelEye::Scripting ALIAS LaurelEyeScripting)
 
 find_package(lua CONFIG REQUIRED)
 find_package(sol2 CONFIG REQUIRED)
 
-add_library(LaurelEyeEngine.Scripting STATIC
+target_sources(LaurelEyeScripting PUBLIC
     "ScriptSystem.cpp"
+    "ScriptTypeRegistry.cpp"
     "sol2/bindings/Sol2API_Animation.cpp"
     "sol2/bindings/Sol2API_Audio.cpp"
     "sol2/bindings/Sol2API_Camera.cpp"
     "sol2/bindings/Sol2API_ECS.cpp"
+    "sol2/bindings/Sol2API_GameManager.cpp"
     "sol2/bindings/Sol2API_Input.cpp"
     "sol2/bindings/Sol2API_Lights.cpp"
     "sol2/bindings/Sol2API_Math2.cpp"
@@ -23,44 +24,42 @@ add_library(LaurelEyeEngine.Scripting STATIC
     "sol2/bindings/Sol2API_Spline.cpp"
     "sol2/bindings/Sol2API_Transform.cpp"
     "sol2/bindings/Sol2API_UI.cpp"
+    "sol2/bindings/Sol2API_UIText.cpp"
+    "sol2/bindings/Sol2API_Window.cpp"
     "sol2/Sol2API.cpp"
     "sol2/Sol2ScriptBroker.cpp"
     "sol2/Sol2ScriptInstance.cpp"
     "sol2/Sol2State.cpp"
 )
 
-le_add_fmod(LaurelEyeEngine.Scripting USE_STUDIO)
-
-target_precompile_headers(LaurelEyeEngine.Scripting
+target_precompile_headers(LaurelEyeScripting
     PRIVATE
-        ${LE_ENGINE_PROJECT_ROOT}/include/LaurelEyeEngine/pch.hpp
+        ${LAURELEYE_ROOT_DIR}/include/LaurelEyeEngine/pch.hpp
 )
 
-# Public headers
-target_include_directories(LaurelEyeEngine.Scripting
+target_include_directories(LaurelEyeScripting
     PUBLIC
-        ${LE_ENGINE_PROJECT_ROOT}/include
-        ${LE_ENGINE_PROJECT_ROOT}/external
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
-set_target_properties(LaurelEyeEngine.Scripting PROPERTIES PUBLIC_HEADER ${LE_ENGINE_PROJECT_ROOT}/include/LaurelEyeEngine/LaurelEyeEngine.h)
+target_include_directories(LaurelEyeScripting
+    PUBLIC
+        ${RAPIDJSON_INCLUDE_DIRS}
+)
 
-target_compile_definitions(LaurelEyeEngine.Scripting PUBLIC PLATFORM_GLFW)
+target_compile_definitions(LaurelEyeScripting
+    PRIVATE
+        LAURELEYE_SCRIPTING_BUILD
+)
 
-if (CMAKE_VERSION VERSION_GREATER 3.20)
-    set_property(TARGET LaurelEyeEngine.Scripting PROPERTY CXX_STANDARD 23)
-endif()
+set_target_properties(LaurelEyeScripting PROPERTIES
+    OUTPUT_NAME "LaurelEyeScripting"
+    FOLDER "Engine"
+)
 
-set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
-
-target_link_libraries(LaurelEyeEngine.Scripting
+target_link_libraries(LaurelEyeScripting
     PUBLIC
         lua
         sol2::sol2
-)
-
-target_compile_definitions(LaurelEyeEngine.Scripting
-    PUBLIC PROJECT_ROOT_DIR="${LE_ENGINE_PROJECT_ROOT}"
 )

@@ -1,5 +1,4 @@
 ﻿#include "LaurelEyeEngine/UI/UILayoutSystem.h"
-#include "LaurelEyeEngine/window/WindowManager.h"
 #include "LaurelEyeEngine/graphics/resources/RenderResources.h"
 #include "LaurelEyeEngine/graphics/RenderSystem.h"
 

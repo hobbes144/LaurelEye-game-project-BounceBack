@@ -13,8 +13,6 @@
 #include <btBulletDynamicsCommon.h>
 
 #include "LaurelEyeEngine/physics/interfaces/IPhysicsWorld.h"
-#include "LaurelEyeEngine/physics/interfaces/Bullet/BulletRigidBody.h"
-#include "LaurelEyeEngine/physics/interfaces/Bullet/BulletGhostBody.h"
 //#include "LaurelEyeEngine/physics/interfaces/Bullet/BulletShape.h"
 
 namespace LaurelEye::Physics {

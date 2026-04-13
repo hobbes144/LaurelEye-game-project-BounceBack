@@ -1,4 +1,4 @@
-﻿/// 
+﻿///
 ///
 /// @file   DebugDrawSystem.h
 /// @author Nicholas Shaw (nick_shaw@me.com)
@@ -8,24 +8,24 @@
 ///    GAM541
 /// @date   11-03-2025
 /// @brief  @file   RenderSystem.h
-/// 
+///
 ///
 
 #pragma once
 
 #include <vector>   // For std::vector
-#include <cstdint>  // For uint32_t
 
 #include "LaurelEyeEngine/ecs/ISystem.h"
 #include "LaurelEyeEngine/graphics/RenderSystem.h"
 #include "LaurelEyeEngine/graphics/resources/GeometryBuffer.h"
 #include "LaurelEyeEngine/debugDraw/IDebugDrawComponent.h"
+#include "LaurelEyeEngine/input/IInput.h"
 #include "LaurelEyeEngine/math/Vector3.h"
-#include "LaurelEyeEngine/math/VectorTemplated.h"
 #include "LaurelEyeEngine/math/Quaternion.h"
-#include "LaurelEyeEngine/graphics/Graphics.h"
-#include "LaurelEyeEngine/physics/PhysicsSystem.h"
-#include "LaurelEyeEngine/input/InputManager.h"
+
+namespace LaurelEye::Physics {
+    class PhysicsSystem;
+}
 
 namespace LaurelEye::Debug {
 
@@ -79,6 +79,8 @@ namespace LaurelEye::Debug {
         void ToggleEnabled() { enabled = !enabled; }
 
         void setMaxDebugLines(unsigned int max) { MaxDebugLines = max; }
+
+        void populateWireFrameCommands(Physics::PhysicsSystem* physicsSystem, std::vector<DebugDrawCommand>& commands);
 
     private:
         bool enabled = false;

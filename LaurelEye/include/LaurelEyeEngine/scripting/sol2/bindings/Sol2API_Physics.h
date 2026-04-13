@@ -8,8 +8,6 @@
 
 #pragma once
 #include "LaurelEyeEngine/core/EngineContext.h"
-#include "LaurelEyeEngine/physics/PhysicsBodyBaseComponent.h"
-#include "LaurelEyeEngine/physics/CollisionManager.h"
 #include <sol/sol.hpp>
 
 namespace LaurelEye::Scripting {
@@ -21,7 +19,7 @@ namespace LaurelEye::Scripting {
         static void setup(sol::state& lua, EngineContext* ctx);
 
     private:
-        
+
     };
 
 } // namespace LaurelEye::Scripting

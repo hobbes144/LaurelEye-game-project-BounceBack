@@ -18,12 +18,7 @@
 #include <hb-ft.h>
 #include <hb.h>
 
-#include "LaurelEyeEngine/graphics/resources/DataBuffer.h"
-#include "LaurelEyeEngine/graphics/resources/Framebuffer.h"
 #include "LaurelEyeEngine/graphics/resources/FrameContext.h"
-#include "LaurelEyeEngine/graphics/resources/Texture.h"
-#include "LaurelEyeEngine/math/Matrix4.h"
-#include "LaurelEyeEngine/math/Vector3.h"
 
 namespace LaurelEye::Graphics {
 

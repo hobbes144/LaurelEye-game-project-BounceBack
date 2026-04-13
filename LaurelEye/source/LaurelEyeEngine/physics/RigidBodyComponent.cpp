@@ -1,6 +1,5 @@
 ﻿#include "LaurelEyeEngine/physics/RigidBodyComponent.h"
 #include "LaurelEyeEngine/ecs/Entity.h"
-#include "LaurelEyeEngine/math/Transform.h"
 #include "LaurelEyeEngine/physics/PhysicsSystem.h"
 
 namespace LaurelEye::Physics {
@@ -41,7 +40,7 @@ namespace LaurelEye::Physics {
         rigidBody.reset();
 
     }
-    
+
     void RigidBodyComponent::SyncToPhysics() {
         if ( rigidBody ) rigidBody->pushTransformToPhysics();
     }
@@ -61,7 +60,7 @@ namespace LaurelEye::Physics {
     */
 
     void RigidBodyComponent::setOwner(Entity* entity) {
-        //Call base 
+        //Call base
         PhysicsBodyBaseComponent::setOwner(entity);
 
         if ( entity ) {

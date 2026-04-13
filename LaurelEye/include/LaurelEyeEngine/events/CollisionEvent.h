@@ -8,7 +8,7 @@
 
 #pragma once
 #include "IEvent.h"
-#include "LaurelEyeEngine/ecs/Entity.h"
+#include "LaurelEyeEngine/physics/CollisionManager.h"
 
 namespace LaurelEye {
     class CollisionEvent : public IEvent {

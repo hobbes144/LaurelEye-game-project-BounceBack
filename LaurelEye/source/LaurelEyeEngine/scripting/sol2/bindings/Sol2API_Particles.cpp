@@ -6,10 +6,11 @@
 /// @par    **Course**
 ///    GAM541
 /// @date   11-17-2025
-/// @brief  
+/// @brief
 ///
 
 #include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Particles.h"
+#include "LaurelEyeEngine/particles/ParticleEmitterComponent.h"
 
 namespace LaurelEye::Scripting {
 

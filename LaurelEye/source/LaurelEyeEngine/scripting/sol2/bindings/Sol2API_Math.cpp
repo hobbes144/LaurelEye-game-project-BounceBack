@@ -1,4 +1,7 @@
 ﻿#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Math.h"
+#include "LaurelEyeEngine/math/Rect.h"
+#include "LaurelEyeEngine/math/Vector3.h"
+#include "LaurelEyeEngine/math/VectorTemplated.h"
 
 namespace LaurelEye::Scripting {
 

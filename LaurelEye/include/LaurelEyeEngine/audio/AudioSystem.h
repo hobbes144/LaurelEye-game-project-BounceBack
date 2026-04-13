@@ -6,18 +6,8 @@
 /// @brief  A audio system that manages audio components and interfaces with audio backends.
 #pragma once
 
-#include <memory>
-
-#include "LaurelEyeEngine/audio/FModAudioManager.h"
-#include "LaurelEyeEngine/audio/SpeakerComponent.h"
 #include "LaurelEyeEngine/ecs/ISystem.h"
-#include "LaurelEyeEngine/audio/MusicSystem.h"
-#include "LaurelEyeEngine/audio/UISoundSystem.h"
-#include "LaurelEyeEngine/audio/SoundEffectSystem3D.h"
-#include "LaurelEyeEngine/audio/SoundEffectSystem2D.h"
-#include "LaurelEyeEngine/audio/AudioLoader.h"
 #include "LaurelEyeEngine/audio/AudioComponent.h"
-#include "LaurelEyeEngine/io/AssetManager.h"
 
 namespace LaurelEye::Audio {
     enum class AudioSystemType {
@@ -42,8 +32,8 @@ namespace LaurelEye::Audio {
         //UISoundSystem& getUISoundSystem() { return uiSoundSystem; }
         //SoundEffectSystem3D& getSoundEffectSystem3D() { return soundEffectSystem3D; }
         //SoundEffectSystem2D& getSoundEffectSystem2D() { return soundEffectSystem2D; }
-        
-        
+
+
         //  Fmod use [0,1] volume range!!!!!!!!!!!!!!!
         //  --- Global Volume Controls ---
         void setMasterVolume(float volume);

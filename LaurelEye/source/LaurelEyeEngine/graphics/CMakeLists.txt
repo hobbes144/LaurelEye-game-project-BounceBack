@@ -1,20 +1,20 @@
-﻿cmake_minimum_required(VERSION 3.8)
+﻿add_library(LaurelEyeGraphics STATIC)
 
-# Engine library
-project (LaurelEyeEngine.Graphics VERSION 0.0.1 DESCRIPTION "Team Laurel GAM55x Engine Graphics lib")
+add_library(LaurelEye::Graphics ALIAS LaurelEyeGraphics)
 
 find_package(glfw3 CONFIG REQUIRED)
 find_package(glad CONFIG REQUIRED)
-find_package(assimp CONFIG REQUIRED)
-find_package(Stb REQUIRED)
+find_package(freetype CONFIG REQUIRED)
+find_package(HarfBuzz CONFIG REQUIRED)
 
-add_library(LaurelEyeEngine.Graphics STATIC
+target_sources(LaurelEyeGraphics PRIVATE
     "device/glfw/LGLDataBufferFactory.cpp"
     "device/glfw/LGLFramebufferFactory.cpp"
     "device/glfw/LGLRenderDevice.cpp"
     "device/glfw/LGLRenderState.cpp"
     "device/glfw/LGLTextureFactory.cpp"
     "device/glfw/LGLVertexArrayFactory.cpp"
+    "FontManager.cpp"
     "graphics_components/AmbientLightComponent.cpp"
     "graphics_components/CameraComponent.cpp"
     "graphics_components/DirectionalLightComponent.cpp"
@@ -34,6 +34,7 @@ add_library(LaurelEyeEngine.Graphics STATIC
     "renderpass/GBufferSkinnedPass.cpp"
     "renderpass/IRenderPass.cpp"
     "renderpass/LocalLightsPass.cpp"
+    "renderpass/LocalLightsToonPass.cpp"
     "renderpass/ParticleRenderPass.cpp"
     "renderpass/PointShadowSkinnedPass.cpp"
     "renderpass/ShadowPass.cpp"
@@ -45,6 +46,7 @@ add_library(LaurelEyeEngine.Graphics STATIC
     "renderpass/UIPass.cpp"
     "RenderStateSaver.cpp"
     "RenderSystem.cpp"
+    "resources/Font.cpp"
     "resources/GeometryBuffer.cpp"
     "resources/Material.cpp"
     "resources/Mesh.cpp"
@@ -56,42 +58,41 @@ add_library(LaurelEyeEngine.Graphics STATIC
     "surface/glfw/LGlfwOpenGLWindowSurface.cpp"
 )
 
-target_precompile_headers(LaurelEyeEngine.Graphics
+target_precompile_headers(LaurelEyeGraphics
     PRIVATE
-        ${LE_ENGINE_PROJECT_ROOT}/include/LaurelEyeEngine/pch.hpp
+        ${LAURELEYE_ROOT_DIR}/include/LaurelEyeEngine/pch.hpp
 )
 
-# Public headers
-target_include_directories(LaurelEyeEngine.Graphics
+target_include_directories(LaurelEyeGraphics
     PUBLIC
-        ${LE_ENGINE_PROJECT_ROOT}/include
-        ${LE_ENGINE_PROJECT_ROOT}/external
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
-set_target_properties(LaurelEyeEngine.Graphics PROPERTIES PUBLIC_HEADER ${LE_ENGINE_PROJECT_ROOT}/include/LaurelEyeEngine/LaurelEyeEngine.h)
+target_compile_definitions(LaurelEyeGraphics
+    PRIVATE
+        LAURELEYE_GRAPHICS_BUILD
+)
 
-target_compile_definitions(LaurelEyeEngine.Graphics PUBLIC PLATFORM_GLFW)
+set_target_properties(LaurelEyeGraphics PROPERTIES
+    OUTPUT_NAME "LaurelEyeGraphics"
+    FOLDER "Engine"
+)
 
-if (CMAKE_VERSION VERSION_GREATER 3.20)
-    set_property(TARGET LaurelEyeEngine.Graphics PROPERTY CXX_STANDARD 23)
-endif()
+target_compile_definitions(LaurelEyeGraphics PUBLIC PLATFORM_GLFW)
 
-set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
-
-target_link_libraries(LaurelEyeEngine.Graphics
+target_link_libraries(LaurelEyeGraphics
     PUBLIC
         glfw
         glad::glad
         assimp::assimp
+        freetype
+        harfbuzz::harfbuzz
 )
 
-target_include_directories(LaurelEyeEngine.Graphics
+add_compile_definitions(HB_HAVE_FREETYPE ON)
+
+target_include_directories(LaurelEyeGraphics
     PUBLIC
         ${Stb_INCLUDE_DIR}            # provided by vcpkg
-)
-
-target_compile_definitions(LaurelEyeEngine.Graphics
-    PUBLIC PROJECT_ROOT_DIR="${LE_ENGINE_PROJECT_ROOT}"
 )

@@ -1,12 +1,15 @@
 ﻿#include "LaurelEyeEngine/physics/PhysicsSystem.h"
 #include "LaurelEyeEngine/logging/EngineLog.h"
-#include "LaurelEyeEngine/physics/GhostBodyComponent.h"
+#include "LaurelEyeEngine/physics/interfaces/ICollider.h"
+#include "LaurelEyeEngine/physics/interfaces/IRigidBody.h"
+#include "LaurelEyeEngine/physics/interfaces/IGhostBody.h"
 #include "LaurelEyeEngine/physics/interfaces/PhysicsTypes.h"
 #include "LaurelEyeEngine/physics/interfaces/Bullet/BulletWorld.h"
 #include "LaurelEyeEngine/events/CollisionEvent.h"
 #include "LaurelEyeEngine/events/TriggerEvent.h"
 #include "LaurelEyeEngine/events/EventManager.h"
 #include "LaurelEyeEngine/scripting/ScriptComponent.h"
+#include "LaurelEyeEngine/physics/interfaces/IPhysicsWorld.h"
 #include <cassert>
 
 namespace LaurelEye::Physics {
@@ -214,16 +217,16 @@ namespace LaurelEye::Physics {
         //TODO: Creation Logic
         switch ( data.type ) {
         case BodyType::Static:
-            return world->CreateRigidBody(data);
+            return std::static_pointer_cast<ICollider>(world->CreateRigidBody(data));
             break;
         case BodyType::Dynamic:
-            return world->CreateRigidBody(data);
+            return std::static_pointer_cast<ICollider>(world->CreateRigidBody(data));
             break;
         case BodyType::Kinematic:
-            return world->CreateRigidBody(data);
+            return std::static_pointer_cast<ICollider>(world->CreateRigidBody(data));
             break;
         case BodyType::Ghost:
-            return world->CreateGhostBody(data);
+            return std::static_pointer_cast<ICollider>(world->CreateGhostBody(data));
             break;
         default:
             return nullptr;
@@ -238,133 +241,6 @@ namespace LaurelEye::Physics {
 
     IPhysicsWorld* PhysicsSystem::GetWorld() {
         return world.get();
-    }
-
-    void PhysicsSystem::populateWireFrameCommands(std::vector<Debug::DebugDrawCommand>& commands) const {
-
-        for ( PhysicsBodyBaseComponent* const pbbc : components ) {
-
-            std::shared_ptr<ICollider> body = pbbc->GetCollider();
-            if ( !body ) continue;
-
-            LaurelEye::TransformComponent* transform = body->GetBoundTransform();
-            if ( !transform ) continue;
-
-            PhysicsBodyData bodyData = pbbc->GetBodyData();
-            CollisionShapePhys shapeDef = bodyData.shapeDefinition;
-
-            const Vector3 objectPos = transform->getWorldPosition();
-            const Quaternion objectRot = transform->getWorldRotation();
-            const Vector3 scale = transform->getWorldScale();
-
-            // --- Apply compound offset transform ---
-            const Vector3 offset = bodyData.centerOfMass;
-            const Vector3 offsetRot = bodyData.rotationOfCenter;
-
-            Vector3 pos = objectPos + (objectRot * offset);
-            Quaternion rot = objectRot * Quaternion::fromEuler(offsetRot);
-
-            // --- Shape wireframe ---
-            Debug::DebugDrawCommand cmd;
-            cmd.position = pos;
-            cmd.rotation = rot;
-            cmd.color = {0.0f, 1.0f, 0.0f}; // Green for collider outlines
-
-            switch ( shapeDef.type ) {
-                case CollisionShapePhys::ShapeType::Box: {
-                    cmd.type = Debug::DebugDrawType::Box;
-                    cmd.size = shapeDef.size * scale; // element-wise scaling
-                    break;
-                }
-
-                case CollisionShapePhys::ShapeType::Sphere: {
-                    cmd.type = Debug::DebugDrawType::Sphere;
-                    float avgScale = (scale.x + scale.y + scale.z) / 3.0f;
-                    cmd.radius = shapeDef.radius * avgScale;
-                    break;
-                }
-
-                case CollisionShapePhys::ShapeType::Capsule: {
-                    cmd.type = Debug::DebugDrawType::Capsule;
-                    float radialScale = (scale.x + scale.z) * 0.5f; // average XZ for radius
-                    cmd.radius = shapeDef.radius * radialScale;
-                    cmd.size = {0.0f, shapeDef.height * scale.y, 0.0f};
-                    break;
-                }
-                case CollisionShapePhys::ShapeType::Mesh:
-                default:
-                    LE_ASSERT("Physics", false , "ERROR::LAURELEYE::PHYSICS_SYSTEM::POPULATE_WIRE_FRAME_COMMANDS::INVALID_SHAPE");
-                    break;
-            }
-
-            switch ( bodyData.type ) {
-            case BodyType::Static:
-                cmd.color = {1.0f, 1.0f, 0.0f};
-                break;
-            case BodyType::Kinematic:
-                cmd.color = {0.25f, 0.75f, 0.0f};
-                break;
-            case BodyType::Dynamic:
-                cmd.color = {0.0f, 1.0f, 0.0f};
-                break;
-            case BodyType::Ghost:
-                cmd.color = {0.0f, 0.5f, 0.5f};
-                break;
-            default:
-                cmd.color = {1.0f, 1.0f, 1.0f};
-                break;
-            }
-
-            commands.push_back(cmd);
-            //Do This Next
-            // --- Velocity Vector ---
-            if ( auto rigid = std::dynamic_pointer_cast<IRigidBody>(body) ) {
-                const Vector3 velocity = rigid->GetLinearVelocity();
-                if ( velocity.magnitudSquared() > 0.0001f ) {
-                    Debug::DebugDrawCommand velCmd;
-                    velCmd.type = Debug::DebugDrawType::VelocityVector;
-                    velCmd.position = pos;
-                    velCmd.direction = velocity.normalized();
-                    velCmd.size = {velocity.magnitude(), 0.0f, 0.0f};
-                    velCmd.color = {1.0f, 0.0f, 0.0f}; // Red for velocity
-                    commands.push_back(velCmd);
-                }
-            }
-
-            /*
-            // --- Force Vector (if available) ---
-            if ( body->HasAppliedForces() ) {
-                Vector3 totalForce = body->GetAccumulatedForce();
-                if ( totalForce.magnitudSquared() > 0.0001f ) {
-                    Debug::DebugDrawCommand forceCmd;
-                    forceCmd.type = Debug::DebugDrawType::VelocityVector; // reuse arrow
-                    forceCmd.position = pos;
-                    forceCmd.direction = totalForce.normalized();
-                    forceCmd.size = {totalForce.magnitude() * 0.01f, 0.0f, 0.0f}; // scale for visibility
-                    forceCmd.color = {1.0f, 1.0f, 0.0f};                 // Yellow for forces
-                    commands.push_back(forceCmd);
-                }
-            }
-            */
-            //Do This Last
-            /*
-            // --- Surface Normals  ---
-            if ( body->HasSurfaceNormals() ) {
-                const auto& normals = body->GetSurfaceNormals();
-                for ( const auto& n : normals ) {
-                    Debug::DebugDrawCommand normalCmd;
-                    normalCmd.type = Debug::DebugDrawType::Normal;
-                    normalCmd.position = n.origin;
-                    normalCmd.direction = n.direction;
-                    normalCmd.size = {0.5f, 0, 0};        // length of normal
-                    normalCmd.color = {0.0f, 0.0f, 1.0f}; // Blue for normals
-                    commands.push_back(normalCmd);
-                }
-            }
-            */
-
-        }
-
     }
 
     void PhysicsSystem::dispatchCollisionEvents() const {

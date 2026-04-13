@@ -1,4 +1,5 @@
 ﻿#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Transform.h"
+#include "LaurelEyeEngine/transform/TransformComponent.h"
 
 namespace LaurelEye::Scripting {
     void Sol2API_Transform::setup(sol::state& lua) {

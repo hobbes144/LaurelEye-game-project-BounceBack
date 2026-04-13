@@ -14,11 +14,9 @@
 #ifndef FMODAUDIOMANAGER_H
 #define FMODAUDIOMANAGER_H
 
-#include "LaurelEyeEngine/audio/AudioAsset.h"
 #include "LaurelEyeEngine/audio/interfaces/IAudioManager.h"
 #include <fmod.hpp>
 #include <unordered_map>
-#include <vector>
 
 namespace LaurelEye::Audio {
 

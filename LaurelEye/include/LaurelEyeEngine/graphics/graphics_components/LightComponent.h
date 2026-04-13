@@ -10,7 +10,6 @@
 #include "LaurelEyeEngine/graphics/graphics_components/IRenderPropertyComponent.h"
 #include "LaurelEyeEngine/graphics/resources/DataBuffer.h"
 #include "LaurelEyeEngine/graphics/resources/Lights.h"
-#include <cstdint>
 
 namespace LaurelEye::Graphics {
 

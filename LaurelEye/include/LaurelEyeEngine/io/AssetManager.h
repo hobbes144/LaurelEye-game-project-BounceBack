@@ -14,7 +14,6 @@
 #pragma once
 
 #include <memory>
-#include <typeindex>
 #include <unordered_map>
 #include "LaurelEyeEngine/io/IAsset.h"
 #include "LaurelEyeEngine/io/IAssetImporter.h"
@@ -39,7 +38,7 @@ namespace LaurelEye::IO {
         std::shared_ptr<IAsset> load(const std::string& path);
         /// @brief Removes the cached IAsset from memory
         /// @param path The path used to load the asset
-        void unload(const std::string& path); 
+        void unload(const std::string& path);
     private:
         // Context for other engine services
         EngineContext* context = nullptr;

@@ -1,9 +1,7 @@
 ﻿#include "LaurelEyeEngine/io/importers/MeshImporter.h"
 #include "LaurelEyeEngine/io/Assets.h"
 #include "LaurelEyeEngine/math/Transform.h"
-#include "LaurelEyeEngine/math/Vector3.h"
 #include "LaurelEyeEngine/platforms/assimp/AssimpUtilities.h"
-#include <filesystem>
 
 #include <assimp/quaternion.h>
 #include <assimp/vector3.h>

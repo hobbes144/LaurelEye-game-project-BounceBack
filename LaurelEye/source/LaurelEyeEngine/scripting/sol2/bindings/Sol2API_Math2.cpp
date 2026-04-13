@@ -1,4 +1,6 @@
-﻿#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Math.h"
+﻿#include "LaurelEyeEngine/math/Matrix4.h"
+#include "LaurelEyeEngine/math/Transform.h"
+#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Math.h"
 
 namespace LaurelEye::Scripting {
     void Sol2API_Math::setupMatrix4(sol::state& lua) {

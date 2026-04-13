@@ -3,29 +3,23 @@
 #include "LaurelEyeEngine/ecs/EntityFactory.h"
 
 // For system initializing
-#include "LaurelEyeEngine/audio/SpeakerComponent.h"
-
 #include "LaurelEyeEngine/graphics/graphics_components/AmbientLightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/CameraComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/DirectionalLightComponent.h"
-#include "LaurelEyeEngine/graphics/graphics_components/LightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/PointLightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/Renderable3DComponent.h"
 #include "LaurelEyeEngine/UI/UIComponents/UIRenderComponent.h"
 #include "LaurelEyeEngine/UI/UIComponents/UITransformComponent.h"
 #include "LaurelEyeEngine/UI/UIComponents/UIInteractionComponent.h"
 #include "LaurelEyeEngine/UI/UIComponents/UITextComponent.h"
+#include "LaurelEyeEngine/graphics/renderpass/GBufferSkinnedPass.h"
+#include "LaurelEyeEngine/graphics/renderpass/SkydomePass.h"
 #include "LaurelEyeEngine/particles/ParticleEmitterComponent.h"
 #include "LaurelEyeEngine/physics/PhysicsBodyBaseComponent.h"
 #include "LaurelEyeEngine/scripting/ScriptComponent.h"
 #include "LaurelEyeEngine/transform/TransformComponent.h"
 
-#include "LaurelEyeEngine/graphics/renderpass/GBufferPass.h"
-#include "LaurelEyeEngine/graphics/renderpass/GBufferSkinnedPass.h"
-#include "LaurelEyeEngine/graphics/renderpass/SkydomePass.h"
-
 #include "LaurelEyeEngine/audio/AudioSystem.h"
-#include "LaurelEyeEngine/audio/FModAudioManager.h"
 #include "LaurelEyeEngine/graphics/RenderSystem.h"
 #include "LaurelEyeEngine/graphics/resources/Texture.h"
 #include "LaurelEyeEngine/io/AssetManager.h"
@@ -34,12 +28,9 @@
 #include "LaurelEyeEngine/physics/PhysicsSystem.h"
 #include "LaurelEyeEngine/scripting/ScriptSystem.h"
 #include "LaurelEyeEngine/transform/TransformSystem.h"
-#include "LaurelEyeEngine/animation/AnimationManager.h"
 #include "LaurelEyeEngine/animation/AnimationSystem.h"
 #include "LaurelEyeEngine/UI/UILayoutSystem.h"
 #include "LaurelEyeEngine/UI/UIInteractionSystem.h"
-
-#include "LaurelEyeEngine/math/VectorTemplated.h"
 
 #include "LaurelEyeEngine/logging/EngineLog.h"
 
@@ -85,7 +76,7 @@ namespace LaurelEye {
             ctx.getService<Graphics::RenderSystem>()->retrieveSkydomePass()->addTexture(handle);
             ctx.getService<Graphics::RenderSystem>()->retrieveGBufferPass()->addSkydome(handle);
         }
-        auto committed = spawnPendingEntities();    
+        auto committed = spawnPendingEntities();
         // Also register any existing entities (for activation we want whole scene)
         auto entitiesCopy = entities;
         for ( auto& e : entitiesCopy ) {
@@ -438,7 +429,7 @@ namespace LaurelEye {
                 //std::cout << "[Scene] Registering Animation Element " << std::endl;
                 animationSystem->registerComponent(AnimationComp);
             }
-            
+
             // add more as needed...
         }
 

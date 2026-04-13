@@ -1,6 +1,5 @@
 ﻿#include "LaurelEyeEngine/graphics/FontManager.h"
 #include "LaurelEyeEngine/graphics/resources/Font.h"
-#include <iostream>
 
 namespace LaurelEye::Graphics {
 

@@ -12,8 +12,6 @@
 #include "LaurelEyeEngine/physics/PhysicsBodyBaseComponent.h"
 #include "LaurelEyeEngine/physics/interfaces/ICollider.h"
 
-#include <atomic>
-
 namespace LaurelEye::Physics {
 
     /// @brief Interface for physics bodies managed by a physics world.

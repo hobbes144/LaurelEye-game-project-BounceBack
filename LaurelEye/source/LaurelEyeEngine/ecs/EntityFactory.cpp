@@ -1,7 +1,5 @@
 ﻿#include "LaurelEyeEngine/ecs/EntityFactory.h"
 #include "LaurelEyeEngine/audio/AudioSystem.h"
-#include "LaurelEyeEngine/audio/FModAudioManager.h"
-#include "LaurelEyeEngine/audio/SpeakerComponent.h"
 #include "LaurelEyeEngine/core/EngineContext.h"
 #include "LaurelEyeEngine/graphics/graphics_components/AmbientLightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/CameraComponent.h"
@@ -16,7 +14,6 @@
 #include "LaurelEyeEngine/physics/interfaces/PhysicsTypes.h"
 #include "LaurelEyeEngine/physics/RigidBodyComponent.h"
 #include "LaurelEyeEngine/physics/GhostBodyComponent.h"
-#include "LaurelEyeEngine/scene/SceneManager.h"
 #include "LaurelEyeEngine/scene/Scene.h"
 #include "LaurelEyeEngine/scripting/ScriptComponent.h"
 #include "LaurelEyeEngine/scripting/ScriptTypeRegistry.h"
@@ -827,7 +824,7 @@ namespace LaurelEye {
         entity.addComponent(std::move(uirenderComponent));
     }
 
-    
+
 
     void EntityFactory::setupUIInteractionComponent(Entity& entity, const rapidjson::Value& uiinteractionData) {
         std::unique_ptr<UI::UIInteractionComponent> uiinteractionComponent = std::make_unique<UI::UIInteractionComponent>();
@@ -903,7 +900,7 @@ namespace LaurelEye {
             std::string fontPath = uitextData["font"].GetString();
 
             textComponent->SetFontName(fontPath);
-            
+
         }
 
         // --- Text Content ---
@@ -988,53 +985,52 @@ namespace LaurelEye {
         else
             animComponent->type = Animations::Animation::Type::Skeletal;
 
-            // --- Load Animation Asset ---
-            // temp for now, mutiply Animation loading
-            if ( animationData.HasMember("file") ) {
-                auto& fileNode = animationData["file"];
+        // --- Load Animation Asset ---
+        // temp for now, mutiply Animation loading
+        if ( animationData.HasMember("file") ) {
+            auto& fileNode = animationData["file"];
 
-                std::vector<std::string> animPaths;
+            std::vector<std::string> animPaths;
 
-                // Case 1: Single string
-                if ( fileNode.IsString() ) {
-                    animPaths.push_back(fileNode.GetString());
-                }
-                // Case 2: Array of strings
-                else if ( fileNode.IsArray() ) {
-                    for ( auto& v : fileNode.GetArray() ) {
-                        if ( v.IsString() ) {
-                            animPaths.push_back(v.GetString());
-                        }
+            // Case 1: Single string
+            if ( fileNode.IsString() ) {
+                animPaths.push_back(fileNode.GetString());
+            }
+            // Case 2: Array of strings
+            else if ( fileNode.IsArray() ) {
+                for ( auto& v : fileNode.GetArray() ) {
+                    if ( v.IsString() ) {
+                        animPaths.push_back(v.GetString());
                     }
-                }
-                else {
-                    throw std::runtime_error("EntityFactory::setupAnimationComponent - 'file' must be string or array of strings.");
-                }
-
-                // Process each animation file
-                for ( const auto& animPath : animPaths ) {
-                    auto asset = context.getService<IO::AssetManager>()->load(assetPath + animPath);
-                    auto skinnedMeshAsset = std::dynamic_pointer_cast<IO::SkinnedMeshAsset>( asset );
-                    auto animAsset = std::dynamic_pointer_cast<IO::AnimationAsset>( skinnedMeshAsset->animation );
-
-                    if ( !animAsset ) {
-                        throw std::runtime_error("EntityFactory::setupAnimationComponent - Asset '" + animPath + "' is not an AnimationAsset.");
-                    }
-
-                    assert(( std::cout << "Loaded asset " + assetPath + animPath + "\n", true ));
-
-                    auto animManager = context.getService<Animations::AnimationManager>();
-                    Animations::AnimationHandle handle = animManager->createAnimation(animAsset.get());
-
-                    // set last animation as default
-                    animComponent->currentAnimation = handle;
-                    animComponent->isPlaying = true;
                 }
             }
+            else {
+                throw std::runtime_error("EntityFactory::setupAnimationComponent - 'file' must be string or array of strings.");
+            }
 
+            // Process each animation file
+            for ( const auto& animPath : animPaths ) {
+                auto asset = context.getService<IO::AssetManager>()->load(assetPath + animPath);
+                auto skinnedMeshAsset = std::dynamic_pointer_cast<IO::SkinnedMeshAsset>(asset);
+                auto animAsset = std::dynamic_pointer_cast<IO::AnimationAsset>(skinnedMeshAsset->animation);
 
-            // Add the component to the entity
-            entity.addComponent<Animations::SkeletalAnimationComponent>(std::move(animComponent));
+                if ( !animAsset ) {
+                    throw std::runtime_error("EntityFactory::setupAnimationComponent - Asset '" + animPath + "' is not an AnimationAsset.");
+                }
+
+                assert((std::cout << "Loaded asset " + assetPath + animPath + "\n", true));
+
+                auto animManager = context.getService<Animations::AnimationManager>();
+                Animations::AnimationHandle handle = animManager->createAnimation(animAsset.get());
+
+                // set last animation as default
+                animComponent->currentAnimation = handle;
+                animComponent->isPlaying = true;
+            }
+        }
+
+        // Add the component to the entity
+        entity.addComponent<Animations::SkeletalAnimationComponent>(std::move(animComponent));
     }
 
 

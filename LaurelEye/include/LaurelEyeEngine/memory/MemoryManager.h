@@ -6,11 +6,10 @@
 /// @brief   File containing the memory manager implementation for the LaurelEyeEngine
 /// Initializes a pool of unique entity pointers and creates raw pointers in the free list
 /// to "give out" to scenes when creating entities
-/// 
+///
 #pragma once
 
 #include "LaurelEyeEngine/ecs/Entity.h"
-#include <deque>
 #include <memory>
 #include <list>
 

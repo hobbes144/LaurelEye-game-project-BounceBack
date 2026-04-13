@@ -1,14 +1,12 @@
 ﻿///
-/// 
-/// 
+///
+///
 
 
 #pragma once
 
 #include "IEvent.h"
-#include "LaurelEyeEngine/ecs/Entity.h"
-
-#include "LaurelEyeEngine/logging/EngineLog.h"
+#include "LaurelEyeEngine/UI/UIComponents/UIInteractionComponent.h"
 
 namespace LaurelEye {
 

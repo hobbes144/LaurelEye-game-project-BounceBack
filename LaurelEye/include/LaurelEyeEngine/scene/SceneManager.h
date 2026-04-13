@@ -16,8 +16,8 @@
 
 #include <memory>
 #include <string>
-#include <future>
 #include <atomic>
+#include <thread>
 #include <unordered_map>
 #include <rapidjson/document.h>
 
@@ -56,7 +56,7 @@ namespace LaurelEye {
         //void preloadSceneAssetsAsync(const std::string& sceneName);
 
         /// @brief Called from script or other systems. Instantiates prefab into the current scene
-        /// @param prefabPath 
+        /// @param prefabPath
         Entity* instantiate(const std::string& prefabPath);
 
         void destroy(Entity* entity);

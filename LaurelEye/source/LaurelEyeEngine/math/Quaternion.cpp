@@ -9,7 +9,6 @@
 /// Copyright © 2025 DIGIPEN Institute of Technology. All rights reserved.
 #include "LaurelEyeEngine/math/Quaternion.h"
 #include "LaurelEyeEngine/math/Vector3.h"
-#include "LaurelEyeEngine/math/Matrix4.h"
 
 namespace LaurelEye {
 

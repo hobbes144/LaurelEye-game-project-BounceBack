@@ -16,8 +16,6 @@
 #pragma once
 
 // TODO: Move GL operations to the Device
-#include "LaurelEyeEngine/math/Quaternion.h"
-#include "LaurelEyeEngine/math/VectorTemplated.h"
 #include <glad/glad.h>
 
 #include <memory>

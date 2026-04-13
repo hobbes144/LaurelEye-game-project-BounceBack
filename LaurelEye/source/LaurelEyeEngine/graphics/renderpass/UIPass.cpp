@@ -15,6 +15,7 @@
 #include "LaurelEyeEngine/math/Transform.h"
 #include "LaurelEyeEngine/graphics/FontManager.h"
 #include "LaurelEyeEngine/logging/EngineLog.h"
+#include "LaurelEyeEngine/graphics/resources/Font.h"
 
 namespace LaurelEye::Graphics {
 
@@ -109,12 +110,12 @@ namespace LaurelEye::Graphics {
                 float originX = rec.center[0] - rec.size[0] * 0.5f;
                 float originY = rec.center[1] - rec.size[1] * 0.5f; // top of rect
 
-                
+
 
                 for ( const ShapedGlyph& g : shaped ) {
                     const GlyphInfo* info = g.info;
                     if ( !info ) continue;
-                    
+
                     float scale = uiText->GetFontSize() / 64.0f;
 
                     float w = (float)info->width * scale;

@@ -34,6 +34,7 @@
 
 // Resource headers
 #include "LaurelEyeEngine/graphics/resources/DataBuffer.h"
+#include "LaurelEyeEngine/graphics/resources/Font.h"
 #include "LaurelEyeEngine/graphics/resources/FrameContext.h"
 #include "LaurelEyeEngine/graphics/resources/Lights.h"
 #include "LaurelEyeEngine/graphics/resources/RenderMesh.h"
@@ -54,7 +55,6 @@
 // Render pass Headers
 #include "LaurelEyeEngine/graphics/renderpass/DebugDrawRenderPass.h"
 #include "LaurelEyeEngine/graphics/renderpass/DeferredRenderPass.h"
-#include "LaurelEyeEngine/graphics/renderpass/GBufferPass.h"
 #include "LaurelEyeEngine/graphics/renderpass/ParticleRenderPass.h"
 #include "LaurelEyeEngine/graphics/renderpass/SinglePass.h"
 #include "LaurelEyeEngine/graphics/renderpass/SinglePassShadow.h"

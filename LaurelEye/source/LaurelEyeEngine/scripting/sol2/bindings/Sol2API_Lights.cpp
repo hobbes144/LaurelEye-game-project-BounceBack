@@ -1,7 +1,5 @@
 ﻿#include "LaurelEyeEngine/scripting/sol2/bindings/Sol2API_Lights.h"
 #include "LaurelEyeEngine/graphics/resources/Lights.h"
-#include "LaurelEyeEngine/graphics/resources/Mesh.h"
-#include "LaurelEyeEngine/graphics/resources/Material.h"
 #include "LaurelEyeEngine/graphics/graphics_components/DirectionalLightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/AmbientLightComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/PointLightComponent.h"

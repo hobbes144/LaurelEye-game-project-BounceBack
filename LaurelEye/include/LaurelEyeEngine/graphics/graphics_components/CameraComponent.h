@@ -15,7 +15,6 @@
 #include "LaurelEyeEngine/graphics/graphics_components/IRenderPropertyComponent.h"
 #include "LaurelEyeEngine/graphics/resources/Camera.h"
 #include "LaurelEyeEngine/graphics/resources/DataBuffer.h"
-#include "LaurelEyeEngine/graphics/resources/SizeRegistry.h"
 #include "LaurelEyeEngine/math/Matrix4.h"
 #include "LaurelEyeEngine/math/Quaternion.h"
 

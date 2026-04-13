@@ -1,10 +1,8 @@
 ﻿#include "LaurelEyeEngine/io/AssetManager.h"
-#include "LaurelEyeEngine/io/Assets.h"
 #include "LaurelEyeEngine/io/FileSystem.h"
 #include "LaurelEyeEngine/io/importers/MeshImporter.h"
 #include "LaurelEyeEngine/io/importers/ImageImporter.h"
 #include "LaurelEyeEngine/io/importers/JsonImporter.h"
-#include "LaurelEyeEngine/graphics/RenderSystem.h"
 
 namespace LaurelEye::IO {
     void AssetManager::initialize() {
@@ -37,7 +35,7 @@ namespace LaurelEye::IO {
         if ( auto cached = assetCache.find(path); cached != assetCache.end() ) {
             return cached->second;
         }
-       
+
         // If it hasn't been used before, look for the importer to import it by its extension
         std::string ext = extractExtension(path);
         auto it = importers.find(ext);

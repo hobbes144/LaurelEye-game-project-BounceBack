@@ -8,7 +8,7 @@
 /// @date   9-30-2025
 /// @brief  One of the "core" functionalities of our engine, and held by Engine.h
 /// Manages dependencies for and loads IResourceManagers to be used by systems.
-/// 
+///
 /// Copyright © 2025 DIGIPEN Institute of Technology. All rights reserved.
 
 #pragma once
@@ -25,7 +25,6 @@
 #include "LaurelEyeEngine/audio/FModAudioManager.h"
 #include "LaurelEyeEngine/gameManager/GameManager.h"
 #include <memory>
-#include <vector>
 
 
 namespace LaurelEye {

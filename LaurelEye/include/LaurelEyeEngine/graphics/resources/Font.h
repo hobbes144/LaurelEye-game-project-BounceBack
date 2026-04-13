@@ -1,6 +1,9 @@
 ﻿#pragma once
 
-#include <memory>
+#include "LaurelEyeEngine/graphics/resources/Texture.h"
+#include "LaurelEyeEngine/graphics/FontManager.h"
+#include "LaurelEyeEngine/io/Paths.h"
+
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -11,8 +14,6 @@
 #include <hb-ft.h>
 #include <hb.h>
 
-#include "LaurelEyeEngine/graphics/FontManager.h"
-#include "LaurelEyeEngine/io/Paths.h"
 
 namespace LaurelEye::Graphics {
 

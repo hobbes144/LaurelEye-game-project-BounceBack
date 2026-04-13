@@ -118,16 +118,11 @@ ComponentType* LaurelEye::Entity::addComponent(std::unique_ptr<ComponentType> co
 /// @param component Component to be removed.
 template <typename ComponentType>
 void LaurelEye::Entity::removeComponent() {
-    auto it = std::remove_if(
-        components.begin(),
-        components.end(),
+    std::erase_if(
+        components,
         [](const std::unique_ptr<IComponent>& c) {
             return dynamic_cast<ComponentType*>(c.get()) != nullptr;
         });
-
-    if ( it != components.end() ) {
-        components.erase(it, components.end());
-    }
 }
 
 /// @brief Find a component and return a pointer to it

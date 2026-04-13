@@ -11,6 +11,11 @@
 
 #include "LaurelEyeEngine/debugDraw/DebugDrawSystem.h"
 #include "LaurelEyeEngine/graphics/renderpass/DebugDrawRenderPass.h"
+#include "LaurelEyeEngine/input/InputManager.h"
+#include "LaurelEyeEngine/physics/PhysicsSystem.h"
+#include "LaurelEyeEngine/physics/interfaces/IRigidBody.h"
+
+#include "LaurelEyeEngine/logging/EngineLog.h"
 
 namespace LaurelEye::Debug {
 
@@ -67,7 +72,7 @@ namespace LaurelEye::Debug {
 
         std::swap(frontBuffer, backBuffer);
         backBuffer.clear();
-        physicsSystem->populateWireFrameCommands(backBuffer);
+        populateWireFrameCommands(physicsSystem, backBuffer);
         updateLineBufferObject();
         assert(dbrp != nullptr);
         dbrp->updateNumLines(currentDebugLines);
@@ -84,6 +89,135 @@ namespace LaurelEye::Debug {
     void DebugDrawSystem::deregisterComponent(const ComponentPtr component) {
         // Remove from Active List
         ISystem<IDebugDrawComponent>::deregisterComponent(component);
+    }
+
+
+
+    void DebugDrawSystem::populateWireFrameCommands(Physics::PhysicsSystem* physicsSystem, std::vector<Debug::DebugDrawCommand>& commands) {
+
+        for ( Physics::PhysicsBodyBaseComponent* const pbbc : physicsSystem->components ) {
+
+            std::shared_ptr<Physics::ICollider> body = pbbc->GetCollider();
+            if ( !body ) continue;
+
+            LaurelEye::TransformComponent* transform = body->GetBoundTransform();
+            if ( !transform ) continue;
+
+            Physics::PhysicsBodyData bodyData = pbbc->GetBodyData();
+            Physics::CollisionShapePhys shapeDef = bodyData.shapeDefinition;
+
+            const Vector3 objectPos = transform->getWorldPosition();
+            const Quaternion objectRot = transform->getWorldRotation();
+            const Vector3 scale = transform->getWorldScale();
+
+            // --- Apply compound offset transform ---
+            const Vector3 offset = bodyData.centerOfMass;
+            const Vector3 offsetRot = bodyData.rotationOfCenter;
+
+            Vector3 pos = objectPos + (objectRot * offset);
+            Quaternion rot = objectRot * Quaternion::fromEuler(offsetRot);
+
+            // --- Shape wireframe ---
+            Debug::DebugDrawCommand cmd;
+            cmd.position = pos;
+            cmd.rotation = rot;
+            cmd.color = {0.0f, 1.0f, 0.0f}; // Green for collider outlines
+
+            switch ( shapeDef.type ) {
+                case Physics::CollisionShapePhys::ShapeType::Box: {
+                    cmd.type = Debug::DebugDrawType::Box;
+                    cmd.size = shapeDef.size * scale; // element-wise scaling
+                    break;
+                }
+
+                case Physics::CollisionShapePhys::ShapeType::Sphere: {
+                    cmd.type = Debug::DebugDrawType::Sphere;
+                    float avgScale = (scale.x + scale.y + scale.z) / 3.0f;
+                    cmd.radius = shapeDef.radius * avgScale;
+                    break;
+                }
+
+                case Physics::CollisionShapePhys::ShapeType::Capsule: {
+                    cmd.type = Debug::DebugDrawType::Capsule;
+                    float radialScale = (scale.x + scale.z) * 0.5f; // average XZ for radius
+                    cmd.radius = shapeDef.radius * radialScale;
+                    cmd.size = {0.0f, shapeDef.height * scale.y, 0.0f};
+                    break;
+                }
+                case Physics::CollisionShapePhys::ShapeType::Mesh:
+                default:
+                    LE_ASSERT("Physics", false , "ERROR::LAURELEYE::PHYSICS_SYSTEM::POPULATE_WIRE_FRAME_COMMANDS::INVALID_SHAPE");
+                    break;
+            }
+
+            switch ( bodyData.type ) {
+            case Physics::BodyType::Static:
+                cmd.color = {1.0f, 1.0f, 0.0f};
+                break;
+            case Physics::BodyType::Kinematic:
+                cmd.color = {0.25f, 0.75f, 0.0f};
+                break;
+            case Physics::BodyType::Dynamic:
+                cmd.color = {0.0f, 1.0f, 0.0f};
+                break;
+            case Physics::BodyType::Ghost:
+                cmd.color = {0.0f, 0.5f, 0.5f};
+                break;
+            default:
+                cmd.color = {1.0f, 1.0f, 1.0f};
+                break;
+            }
+
+            commands.push_back(cmd);
+            //Do This Next
+            // --- Velocity Vector ---
+            if ( auto rigid = std::dynamic_pointer_cast<Physics::IRigidBody>(body) ) {
+                const Vector3 velocity = rigid->GetLinearVelocity();
+                if ( velocity.magnitudSquared() > 0.0001f ) {
+                    Debug::DebugDrawCommand velCmd;
+                    velCmd.type = Debug::DebugDrawType::VelocityVector;
+                    velCmd.position = pos;
+                    velCmd.direction = velocity.normalized();
+                    velCmd.size = {velocity.magnitude(), 0.0f, 0.0f};
+                    velCmd.color = {1.0f, 0.0f, 0.0f}; // Red for velocity
+                    commands.push_back(velCmd);
+                }
+            }
+
+            /*
+            // --- Force Vector (if available) ---
+            if ( body->HasAppliedForces() ) {
+                Vector3 totalForce = body->GetAccumulatedForce();
+                if ( totalForce.magnitudSquared() > 0.0001f ) {
+                    Debug::DebugDrawCommand forceCmd;
+                    forceCmd.type = Debug::DebugDrawType::VelocityVector; // reuse arrow
+                    forceCmd.position = pos;
+                    forceCmd.direction = totalForce.normalized();
+                    forceCmd.size = {totalForce.magnitude() * 0.01f, 0.0f, 0.0f}; // scale for visibility
+                    forceCmd.color = {1.0f, 1.0f, 0.0f};                 // Yellow for forces
+                    commands.push_back(forceCmd);
+                }
+            }
+            */
+            //Do This Last
+            /*
+            // --- Surface Normals  ---
+            if ( body->HasSurfaceNormals() ) {
+                const auto& normals = body->GetSurfaceNormals();
+                for ( const auto& n : normals ) {
+                    Debug::DebugDrawCommand normalCmd;
+                    normalCmd.type = Debug::DebugDrawType::Normal;
+                    normalCmd.position = n.origin;
+                    normalCmd.direction = n.direction;
+                    normalCmd.size = {0.5f, 0, 0};        // length of normal
+                    normalCmd.color = {0.0f, 0.0f, 1.0f}; // Blue for normals
+                    commands.push_back(normalCmd);
+                }
+            }
+            */
+
+        }
+
     }
 
     void DebugDrawSystem::Clear() {

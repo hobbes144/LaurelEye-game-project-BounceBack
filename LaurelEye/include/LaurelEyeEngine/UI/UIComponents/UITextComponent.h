@@ -3,8 +3,6 @@
 #include "LaurelEyeEngine/math/VectorTemplated.h"
 #include "LaurelEyeEngine/UI/UIComponents/UITransformComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/IRenderableComponent.h"
-#include "LaurelEyeEngine/graphics/resources/Font.h"
-#include <memory>
 #include <string>
 
 namespace LaurelEye::UI {

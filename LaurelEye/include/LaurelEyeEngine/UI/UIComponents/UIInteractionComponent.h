@@ -8,9 +8,8 @@
 #pragma once
 
 #include "LaurelEyeEngine/ecs/IComponent.h"
-#include "LaurelEyeEngine/graphics/graphics_components/Renderable2DComponent.h"
-#include "LaurelEyeEngine/input/InputManager.h"
-#include "LaurelEyeEngine/math/Rect.h"
+#include "LaurelEyeEngine/input/IInput.h"
+#include "LaurelEyeEngine/math/VectorTemplated.h"
 
 namespace LaurelEye::UI {
 
@@ -102,7 +101,7 @@ namespace LaurelEye::UI {
         void setIsHovered(bool newIH);
 
         bool getWasHovered() const;
-        void setWasHovered(bool newWH); 
+        void setWasHovered(bool newWH);
 
         bool getIsPressed() const;
         void setIsPressed(bool newIP);

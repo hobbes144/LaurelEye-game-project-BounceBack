@@ -14,7 +14,7 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
-#pragma message("Compiling CatmullRomSpline.cpp")
+// #pragma message("Compiling CatmullRomSpline.cpp")
 
 namespace LaurelEye {
 
@@ -38,7 +38,7 @@ namespace LaurelEye {
     // Evaluate derivative (tangent) at parameter t.
     // this is mostly from https://www.mvps.org/directx/articles/catmull/
     Vector2 CatmullRomSpline::derivative(float t) const {
-#pragma message("CatmullRomSpline::derivative is being compiled")
+// #pragma message("CatmullRomSpline::derivative is being compiled")
         t = std::clamp(t, 0.0f, 1.0f);
         int segCount = controlPoints.size() - 3;
         float scaled = t * segCount;
