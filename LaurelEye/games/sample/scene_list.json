@@ -3,23 +3,27 @@
     "scenes": [
         {
             "name": "DigiPenLogo",
-            "path": "scenes/digipenlogo.scene.json"
+            "path": "scenes/UIScenes/digipenlogo.scene.json"
+        },
+        {
+            "name": "TBDStudiosLogo",
+            "path": "scenes/UIScenes/tbdstudioslogo.scene.json"
         },
         {
             "name": "Cutscene",
-            "path": "scenes/cutscene.scene.json"
+            "path": "scenes/UIScenes/cutscene.scene.json"
         },
         {
             "name": "MainMenu",
-            "path": "scenes/main_menu.scene.json"
+            "path": "scenes/UIScenes/main_menu.scene.json"
         },
         {
             "name": "SettingsMenu",
-            "path": "scenes/settings_menu.scene.json"
+            "path": "scenes/UIScenes/settings_menu.scene.json"
         },
         {
             "name": "Credits",
-            "path": "scenes/credits.scene.json"
+            "path": "scenes/UIScenes/credits.scene.json"
         },
         {
             "name": "Level1",

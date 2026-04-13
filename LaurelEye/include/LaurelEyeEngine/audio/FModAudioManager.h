@@ -86,6 +86,8 @@ namespace LaurelEye::Audio {
         // Raw FMOD access (for systems)
         FMOD::Channel* getRawChannel(ChannelHandle handle);
 
+        float getGroupVolume(ChannelGroupHandle group) override;
+
     private:
         FMOD::System* system = nullptr;
 

@@ -26,6 +26,23 @@ namespace LaurelEye::Scripting {
             audioSystem->setUIVolume(v);
         };
 
+        // --- GETTERS ---
+        lua["Audio"]["getMasterVolume"] = [audioSystem]() {
+            return audioSystem->getMasterVolume();
+        };
+
+        lua["Audio"]["getMusicVolume"] = [audioSystem]() {
+            return audioSystem->getMusicVolume();
+        };
+
+        lua["Audio"]["getSFXVolume"] = [audioSystem]() {
+            return audioSystem->getSFXVolume();
+        };
+
+        lua["Audio"]["getUIVolume"] = [audioSystem]() {
+            return audioSystem->getUIVolume();
+        };
+
         lua["Audio"]["pauseMaster"] = [audioSystem](bool p) {
             audioSystem->pauseMaster(p);
         };

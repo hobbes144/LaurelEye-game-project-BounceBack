@@ -375,4 +375,16 @@ namespace LaurelEye::Audio {
         }
     }
 
+    float FModAudioManager::getGroupVolume(ChannelGroupHandle handle) {
+        if ( auto* g = getGroup(handle) ) {
+            float volume = 0.0f;
+            FMOD_RESULT result = g->getVolume(&volume);
+
+            if ( result == FMOD_OK )
+                return volume;
+        }
+        return 0.0f; // default fallback
+    }
+
+
 } // namespace LaurelEye::Audio

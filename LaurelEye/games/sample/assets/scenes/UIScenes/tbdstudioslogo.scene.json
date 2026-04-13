@@ -1,0 +1,129 @@
+﻿{
+    "settings": {
+        "resetOnLoad": true,
+        "backgroundColor": [ 0.5, 0.25, 0.25 ],
+        "UIActiveOnLoad": true
+    },
+    "entities": [
+        {
+            "name": "Camera",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 15.0, 40.0 ],
+                    "rotation": [ -0.261799, 0.0, 0.0 ],
+                    "scale": [ 50.0, 1.0, 50.0 ]
+                },
+                "Camera": {
+
+                }
+            }
+        },
+        {
+            "name": "DirectionalLight",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, -1.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Light": {
+                    "type": "Directional",
+                    "direction": [ 0.75, -1.0, 0.75 ],
+                    "intensity": 4.0,
+                    "color": [ 1.0, 1.0, 1.0 ]
+                }
+            }
+        },
+        {
+            "name": "AmbientLight",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 0.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Light": {
+                    "type": "Ambient",
+                    "intensity": 0.3,
+                    "color": [ 1.0, 1.0, 1.0 ]
+                }
+            }
+        },
+        {
+            "name": "Background",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0.0, 0.0 ],
+                    "anchorMax": [ 1.0, 1.0 ],
+                    "pivot": [ 0.5, 0.5 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 1, 1 ]
+                },
+                "UIRender": {
+                    "color": [ 1.0, 1.0, 1.0, 1.0 ]
+                },
+                "UIInteraction": {
+                    "isInteractable": true,
+                    "blockRaycast": true,
+                    "receiveHover": true,
+                    "receiveClick": true,
+                    "interactionPriority": 1
+                },
+                "Script": {
+                    "path": "scripts/ButtonScripts/button_menu_navigation.lua",
+                    "data": [
+                        {
+                            "name": "targetScene",
+                            "type": "String",
+                            "value": "Cutscene"
+                        },
+                        {
+                            "name": "timeToTransition",
+                            "type": "Float",
+                            "value": 7.5
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "TeamLogo",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0.375, 0.3 ],
+                    "anchorMax": [ 0.625, 0.7 ],
+                    "pivot": [ 0.5, 0.5 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 0, 0 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "UIElements/TeamLogo/Logo.png",
+                        "layer": 10
+                    },
+                    "color": [ 1.0, 1.0, 1.0, 1.0 ]
+                }
+            }
+        },
+        {
+            "name": "SceneManager",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 10.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 0.08, 0.08, 0.08 ]
+                },
+                "Script": {
+                    "path": "scripts/scene_manager.lua",
+                    "data": [
+                        {
+                            "name": "hideMouse",
+                            "type": "Bool",
+                            "value": false
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

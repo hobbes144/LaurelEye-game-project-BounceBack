@@ -147,6 +147,7 @@ namespace LaurelEye::Audio {
         audioManager->setGroupVolume(audioManager->getMusicGroup(), volume);
         audioManager->setGroupVolume(audioManager->getSFXGroup(), volume);
         audioManager->setGroupVolume(audioManager->getUIGroup(), volume);
+        masterVolume = volume;
     }
 
     void AudioSystem::setMusicVolume(float volume) {
@@ -160,6 +161,23 @@ namespace LaurelEye::Audio {
     void AudioSystem::setUIVolume(float volume) {
         audioManager->setGroupVolume(audioManager->getUIGroup(), volume);
     }
+
+    float AudioSystem::getMasterVolume() const {
+        return masterVolume;
+    }
+
+    float AudioSystem::getMusicVolume() const {
+        return audioManager->getGroupVolume(audioManager->getMusicGroup());
+    }
+
+    float AudioSystem::getSFXVolume() const {
+        return audioManager->getGroupVolume(audioManager->getSFXGroup());
+    }
+
+    float AudioSystem::getUIVolume() const {
+        return audioManager->getGroupVolume(audioManager->getUIGroup());
+    }
+
 
     // --- Global Pause Controls ---
 

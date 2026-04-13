@@ -95,6 +95,9 @@ namespace LaurelEye::Audio {
 
         virtual void setGroupVolume(ChannelGroupHandle group, float volume) = 0;
         virtual void pauseGroup(ChannelGroupHandle group, bool paused) = 0;
+
+        virtual float getGroupVolume(ChannelGroupHandle group) = 0;
+
     };
 
 } // namespace LaurelEye::Audio

@@ -41,6 +41,12 @@ namespace LaurelEye::Audio {
         void setSFXVolume(float volume);
         void setUIVolume(float volume);
 
+        //  --- get Global Volume ---
+        float getMasterVolume() const;
+        float getMusicVolume() const;
+        float getSFXVolume() const;
+        float getUIVolume() const;
+
         // --- Global Pause / Mute Controls ---
         void pauseMaster(bool paused);
         void pauseMusic(bool paused);
@@ -75,6 +81,7 @@ namespace LaurelEye::Audio {
         Vector3 listenerForward{0.0f, 0.0f, 1.0f};
         Vector3 listenerVelocity{0.0f, 0.0f, 0.0f};
         Vector3 listenerPosition{0.0f, 0.0f, 0.0f};
+        float masterVolume = 1.0f;
 
         // only Channel is enough, not need System unless we want to add more features in the future, like crossfading, or music ducking
         //MusicSystem musicSystem;

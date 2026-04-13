@@ -1,9 +1,5 @@
 ﻿--Button Menu Navigatiopn
 
-local renderUI
-local transformUI
-local interactionUI
-
 local targetScene
 local timeToTransition
 
