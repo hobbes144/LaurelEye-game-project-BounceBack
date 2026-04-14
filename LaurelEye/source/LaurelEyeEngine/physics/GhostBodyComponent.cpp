@@ -18,7 +18,7 @@ namespace LaurelEye::Physics {
         ghost = std::dynamic_pointer_cast<IGhostBody>(system.CreateCollider(data));
 
         if ( !ghost ) {
-            std::cerr << "[GhostBodyComponent::CreateInWorld] : INVALID GHOSTBODY CAST\n";
+            LE_DEBUG_ERROR("Physics", "Invalid GhostBody cast.");
             return;
         }
 

@@ -1,0 +1,79 @@
+﻿{
+    "name": "BossEnemy2",
+    "tags": [ "enemy" ],
+    "components": {
+        "Transform": {
+            "position": [ 0.0, 0.0, -2000.0 ],
+            "rotation": [ 0.0, 0.0, -1.0, 0.0 ],
+            "scale": [ 0.012, 0.012, 0.012 ]
+        },
+        "Render3D": {
+            "mesh": {
+                "file": "models/Boss/normal/Boss_Running.fbx"
+            },
+            "material": {
+                "texture": "textures/BossBaseColor.png",
+                "diffuse": [ 10.0, 1.0, 1.0 ],
+                "specular": [ 0.2, 0.2, 0.2 ],
+                "shininess": 32.0
+            }
+        },
+        "Physics": {
+            "type": "Dynamic",
+            "shapeDefinition": {
+                "type": "Capsule",
+                "size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "radius": 110.0,
+                "height": 560.0
+            },
+            "mass": 1.0,
+            "linearVelocity": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "angularVelocity": {
+                "x": 0.0,
+                "y": 5.0,
+                "z": 0.0
+            },
+            "inertia": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "centerOfMass": {
+                "x": 0.0,
+                "y": 4.5,
+                "z": 0.0
+            },
+            "linearDamping": 0.5,
+            "angularDamping": 2.0,
+            "friction": 2.5,
+            "restitution": 0.1,
+            "collisionGroup": 2,
+            "collisionMask": 13,
+            "useCCD": false,
+            "ccdMotionThreshold": 0.01,
+            "ccdSweptSphereRadius": 1.0,
+            "gravityScale": 8.0
+        },
+        "Animation": {
+            "type": "Skeletal",
+            "file": [
+                "models/Boss/normal/Idle_boss.fbx",
+                "models/Boss/normal/Boss_Running.fbx",
+                "models/Boss/normal/BossThrow.fbx",
+                "models/Boss/normal/BossDeath.fbx",
+                "models/Boss/normal/BossGettingHit.fbx"
+            ]
+        },
+        "Script": {
+            "path": "scripts/AISystem/boss_enemy2.lua"
+        }
+    }
+}

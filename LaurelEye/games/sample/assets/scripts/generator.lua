@@ -46,6 +46,16 @@ function onMessage(msg)
         local renderComp = self:findComponent("Renderable3DComponent")
 
         renderComp:setMaterial(brokenMat)
+
+        local scene = SceneManager:getCurrentScene()
+        local sceneName = scene:getName()
+        if sceneName == "BossLevel" then
+            local boss = scene:findEntityByName("BossEnemy")
+            local message = Message.new()
+            message.to = boss
+            message.topic = "I Have Been Destroyed!"
+            Script.send(message)
+        end
     end
 
 end

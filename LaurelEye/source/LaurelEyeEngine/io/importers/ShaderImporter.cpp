@@ -1,4 +1,5 @@
 ﻿#include "LaurelEyeEngine/io/importers/ShaderImporter.h"
+#include "LaurelEyeEngine/logging/EngineLog.h"
 
 namespace LaurelEye::IO {
     std::shared_ptr<IAsset> ShaderImporter::import(const std::string& path) {
@@ -6,12 +7,11 @@ namespace LaurelEye::IO {
 
         ShaderAsset::Stage stage = detectStage(path);
         if ( stage == ShaderAsset::Stage::Unknown ) {
-            std::cerr << "Failed to load Shader at path: " << path << std::endl;
+            LE_ERROR("io", "Failed to load Shader at path: " << path);
             return nullptr;
         }
         std::ifstream file(path);
-        if ( !file.is_open() )
-            throw std::runtime_error("ShaderImporter: Failed to open " + path);
+        LE_ASSERT("io", file.is_open(), "ShaderImporter: Failed to open " + path);
 
         std::stringstream buffer;
         buffer << file.rdbuf();

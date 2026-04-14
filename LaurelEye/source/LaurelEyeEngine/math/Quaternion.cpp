@@ -9,6 +9,7 @@
 /// Copyright © 2025 DIGIPEN Institute of Technology. All rights reserved.
 #include "LaurelEyeEngine/math/Quaternion.h"
 #include "LaurelEyeEngine/math/Vector3.h"
+#include "LaurelEyeEngine/logging/EngineLog.h"
 
 namespace LaurelEye {
 
@@ -122,7 +123,7 @@ namespace LaurelEye {
             return *this * VectorTemplated<T, 3>(0, 0, 1);
             break;
         default:
-            assert(false && "Invalid axis provided");
+            LE_ERROR("Math", "Invalid axis provided");
             return VectorTemplated<T, 3>(0.0f);
         }
     }

@@ -5,8 +5,6 @@
 #include "LaurelEyeEngine/framerate/FramerateController.h"
 #include "LaurelEyeEngine/logging/EngineLog.h"
 
-#include <iostream>
-
 namespace LaurelEye {
     Engine::Engine(const EngineConfig& config) : engineConfig(config) {}
 
@@ -18,7 +16,7 @@ namespace LaurelEye {
     }
 
     void Engine::run() {
-        std::cout << "Engine Started" << std::endl;
+        LE_INFO("Engine",  "Started");
         isRunning = true;
         initialize();
 
@@ -81,7 +79,7 @@ namespace LaurelEye {
     }
 
     void Engine::shutdown() {
-        std::cout << "Engine Shutting down" << std::endl;
+        LE_INFO("Engine", "Shutting down");
         currentWindow = nullptr;
         systemCoordinator->shutdown();
         resourceCoordinator->shutdown();

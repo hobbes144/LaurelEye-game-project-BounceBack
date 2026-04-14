@@ -4,6 +4,8 @@
 #include "LaurelEyeEngine/graphics/RenderSystem.h"
 #include "LaurelEyeEngine/io/AssetManager.h"
 #include "LaurelEyeEngine/io/Assets.h"
+#include "LaurelEyeEngine/logging/EngineLog.h"
+
 #include <filesystem>
 namespace fs = std::filesystem;
 
@@ -31,10 +33,10 @@ namespace LaurelEye {
             try {
                 sceneListDeserialize(); // synchronous loading, same as before
                 assetIsLoaded.store(true, std::memory_order_release);
-                std::cout << "[SceneManager] Scene list deserialization complete\n";
+                LE_DEBUG_INFO("SceneManager", "Scene list deserialization complete.");
             }
             catch ( const std::exception& e ) {
-                std::cerr << "[SceneManager] Error during scene deserialization: " << e.what() << "\n";
+                LE_ERROR("SceneManager", "Error during scene deserialization: " << e.what());
             }
             deserializationRunning.store(false);
         });
@@ -48,7 +50,7 @@ namespace LaurelEye {
 
     void SceneManager::update(float deltaTime) {
         if ( assetIsLoaded.exchange(false) ) {
-            std::cout << "[SceneManager] Asset load flag detected, switching scene...\n";
+            LE_DEBUG_INFO("SceneManager", "Asset load flag detected, switching scene...");
             if ( !initialSceneName.empty() && hasScene(initialSceneName) )
                 changeScene(initialSceneName);
             else if ( !scenes.empty() )
@@ -104,11 +106,8 @@ namespace LaurelEye {
     }
 
     Entity* SceneManager::instantiate(const std::string& prefabPath) {
-        if ( currentScene ) {
-            return currentScene->instantiate(prefabPath);
-        }
-        assert(false && "ERROR::SCENEMANAGER::INSTANTIATE::CURRENTSCENE_UNINITIALIZED");
-        return nullptr;
+        LE_ASSERT("Scene", currentScene, "Current Scene Uninitialized.");
+        return currentScene->instantiate(prefabPath);
     }
 
     void SceneManager::destroy(Entity* entity) {
@@ -125,20 +124,14 @@ namespace LaurelEye {
 
     void SceneManager::loadScene(const std::string& sceneName) {
         auto* assetManager = context->getService<IO::AssetManager>();
-        if ( !assetManager ) {
-            throw std::runtime_error("SceneManager: AssetManager not found");
-        }
+        LE_ASSERT("Scene", assetManager, "AssetManager not found.");
 
         auto it = sceneFilePaths.find(sceneName);
-        if ( it == sceneFilePaths.end() ) {
-            throw std::runtime_error("SceneManager: Unknown scene '" + sceneName + "'");
-        }
+        LE_ASSERT("Scene", it != sceneFilePaths.end(), "Unknown scene '" << sceneName << "'");
         fs::path sceneFilePath = fs::path(assetsRoot) / it->second;
         auto sceneAsset = assetManager->load(sceneFilePath.string());
         auto jsonAsset = std::dynamic_pointer_cast<IO::JsonAsset>(sceneAsset);
-        if ( !jsonAsset ) {
-            throw std::runtime_error("SceneManager: Scene JSON failed to load correctly");
-        }
+        LE_ASSERT("Scene", jsonAsset, "Scene JSON failed to load correctly.");
 
         // Create a Scene instance
         auto scene = std::make_unique<Scene>(sceneName, *context, jsonAsset, assetsRoot);
@@ -186,21 +179,17 @@ namespace LaurelEye {
         }
 
         auto* assetManager = context->getService<IO::AssetManager>();
-        if ( !assetManager ) {
-            throw std::runtime_error("SceneManager: AssetManager not found in EngineContext");
-        }
+        LE_ASSERT("Scene", assetManager, "AssetManager not found.");
+
 
         // --- Load the scene list JSON file ---
         auto asset = assetManager->load(sceneListPath);
         auto jsonAsset = std::dynamic_pointer_cast<IO::JsonAsset>(asset);
-        if ( !jsonAsset ) {
-            throw std::runtime_error("SceneManager: Loaded scene list is not a JsonAsset");
-        }
+        LE_ASSERT("Scene", jsonAsset, "Scene JSON failed to load correctly.");
+
 
         const auto& doc = jsonAsset->jsonDocument;
-        if ( !doc.IsObject() || !doc.HasMember("scenes") || !doc["scenes"].IsArray() ) {
-            throw std::runtime_error("SceneManager: Scene list JSON missing valid 'scenes' array");
-        }
+        LE_ASSERT("Scene", doc.IsObject() && doc.HasMember("scenes") && doc["scenes"].IsArray(), "Scene list JSON missing valid 'scenes' array.");
 
         // --- Register scenes from JSON ---
         for ( const auto& entry : doc["scenes"].GetArray() ) {
@@ -213,9 +202,7 @@ namespace LaurelEye {
             fs::path sceneFilePath = fs::path(assetsRoot) / path;
             auto sceneAsset = assetManager->load(sceneFilePath.string());
             auto jsonAsset = std::dynamic_pointer_cast<IO::JsonAsset>(sceneAsset);
-            if ( !jsonAsset ) {
-                throw std::runtime_error("SceneManager: Scene JSON failed to load correctly for scene '" + name + "'");
-            }
+            LE_ASSERT("Scene", jsonAsset, "Scene JSON failed to load correctly for scene '" << name << "'");
             auto scene = std::make_unique<Scene>(name, *context, jsonAsset, assetsRoot);
             scene->initialize();
             scenes[name] = std::move(scene);

@@ -63,6 +63,8 @@
 // #include "LaurelEyeEngine/graphics/renderpass/SingleBufferedDataPass.h"
 #include "LaurelEyeEngine/graphics/renderpass/LocalLightsToonPass.h"
 
+#include "LaurelEyeEngine/logging/EngineLog.h"
+
 
 #include <memory>
 #include <algorithm>
@@ -116,7 +118,7 @@ namespace LaurelEye::Graphics {
     }
 
     void RenderSystem::initialize() {
-        assert(CHAR_BIT * sizeof(float) == 32 && "How did we get here? FLOAT_NOT_32");
+        LE_ASSERT("Graphics", CHAR_BIT * sizeof(float) == 32, "How did we get here? FLOAT_NOT_32");
 
         graphicsBackendInit();
         createWindowSurfaces();
@@ -416,7 +418,7 @@ namespace LaurelEye::Graphics {
             break;
         case RenderComponentType::UIRenderable: {
             auto* uiRenderComp = static_cast<UI::UIRenderComponent*>(component);
-            assert(uiRenderComp && "ERROR::GRAPHICS::RENDERSYSTEM::INVALID_UI_COMPONENT");
+            LE_ASSERT("Graphics", uiRenderComp, "Invalid UIRenderComponent.");
 
             if ( !uiRenderComp->HasMesh() ) {
                 auto meshHandle = meshManager->createPrimitiveMesh(
@@ -453,7 +455,7 @@ namespace LaurelEye::Graphics {
         }
         case RenderComponentType::UITextRenderable: {
             auto* uiTextComp = static_cast<UI::UITextComponent*>(component);
-            assert(uiTextComp && "ERROR::GRAPHICS::RENDERSYSTEM::INVALID_UI_TEXT_COMPONENT");
+            LE_ASSERT("Graphics", uiTextComp, "Invalid UITextComponent.");
 
             // --- Ensure Quad Mesh (same as UI) ---
             if ( !uiTextComp->HasMesh() ) {
@@ -478,16 +480,14 @@ namespace LaurelEye::Graphics {
             if ( font ) {
                 TextureHandle atlas = font->getAtlasTexture();
 
-                if ( atlas == InvalidTexture ) {
-                    std::cerr << "[UITextRenderable] Font atlas not initialized!\n";
-                }
+                LE_ERROR_IF("Graphics", atlas == InvalidTexture, "[UITextRenderable] Font atlas not initialized!");
 
                 // OPTIONAL: if your material system expects a texture slot
                 // you can bind it here (even if shader uses u_FontAtlas directly)
                 uiTextComp->GetMaterial()->setTexture("u_FontAtlas", atlas);
             }
             else {
-                std::cerr << "[UITextRenderable] Missing font on UITextComponent!\n";
+                LE_ERROR("Graphics", "[UITextRenderable] Missing font on UITextComponent!");
             }
 
             // --- Add to UI list ---
@@ -495,7 +495,7 @@ namespace LaurelEye::Graphics {
             break;
         }
         case RenderComponentType::PropertyCamera: {
-            assert(dynamic_cast<CameraComponent*>(component) && "ERROR::GRAPHICS::RENDERSYSTEM::INVALID_LIGHT");
+            LE_ASSERT("Graphics", dynamic_cast<CameraComponent*>(component), "Invalid CameraComponent.");
             // TODO: This is currently updating camera to the new component
             // each time. This should be changed when we handle multiple
             // cameras.
@@ -503,14 +503,13 @@ namespace LaurelEye::Graphics {
                 defaultCamera = nullptr;
             }
             camera = static_cast<CameraComponent*>(component);
-            assert(camera && "ERROR::GRAPHICS::RENDERSYSTEM::INVALID_CAMERA");
             cameraProperties[camera->GetRenderID()] = camera;
             initCameraBuffer(camera);
             updateCameraBuffer(camera);
             break;
         }
         case RenderComponentType::PropertyLight: {
-            assert(dynamic_cast<LightComponent*>(component) && "ERROR::GRAPHICS::RENDERSYSTEM::INVALID_LIGHT");
+            LE_ASSERT("Graphics", dynamic_cast<LightComponent*>(component), "Invalid LightComponent.");
             auto* light = static_cast<LightComponent*>(component);
             lightProperties[light->GetRenderID()] = light;
             registerLight(light);
@@ -686,7 +685,7 @@ namespace LaurelEye::Graphics {
     }
 
     void RenderSystem::updateCameraBuffer(CameraComponent* camera) {
-        assert(camera && "ERROR::GRAPHICS::RENDERSYSTEM::CAMERA_UNINITIALIZED");
+        LE_ASSERT("Graphics", camera, "Camera uninitialized.");
         device->updateDataBufferSubData(camera->getCameraBufferHandle(), 0, sizeof(Camera), camera->getCameraDataPtr());
     }
 
@@ -719,7 +718,7 @@ namespace LaurelEye::Graphics {
             break;
         case LightType::Default:
         default:
-            throw std::logic_error("ERROR::GRAPHICS::RENDERSYSTEM::INVALID_LIGHT_TYPE");
+            LE_FATAL_ERROR("Graphics", "Invalid light type.");
             break;
         }
 
@@ -747,7 +746,7 @@ namespace LaurelEye::Graphics {
                 break;
             case LightType::Default:
             default:
-                throw std::logic_error("ERROR::GRAPHICS::RENDERSYSTEM::INVALID_LIGHT_TYPE");
+                LE_FATAL_ERROR("Graphics", "Invalid light type.");
                 break;
             }
             lightProperties.erase(it);
@@ -779,15 +778,15 @@ namespace LaurelEye::Graphics {
     }
 
     void RenderSystem::updateGlobalLights() const {
-        assert(isValidDataBuffer(globalLightsBufferHandle) && "ERROR::GRAPHICS::RENDERSYSTEM::GLOBALLIGHTS_UNINITIALIZED");
+        LE_ASSERT("Graphics", isValidDataBuffer(globalLightsBufferHandle), "GlobalLights buffer uninitialized.");
         device->updateDataBufferSubData(
             globalLightsBufferHandle, 0,
             sizeof(GlobalLights), &globalLights);
     }
 
     void RenderSystem::updateLocalLights() {
-        assert(isValidDataBuffer(localLightsBufferHandle) && "ERROR::GRAPHICS::RENDERSYSTEM::LOCALLIGHTS_UNINITIALIZED");
-        assert(localLights.pointLights.size() < 200 && "ERROR::GRAPHICS::RENDERSYSTEM::LOCALLIGHTS_EXCEEDED_MAXIMUM");
+        LE_ASSERT("Graphics", isValidDataBuffer(localLightsBufferHandle), "LocalLights buffer uninitialized.");
+        LE_ASSERT("Graphics", localLights.pointLights.size() < 200, "LocalLights has exceeded the maximum of 200.");
         for (const auto& light : lightProperties) {
             if ( pointLightMapping.contains(light.second->GetRenderID()) ) {
                 auto pointLight = static_cast<PointLightComponent*>(light.second);

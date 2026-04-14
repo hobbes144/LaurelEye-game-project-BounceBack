@@ -5,6 +5,7 @@
 #include "LaurelEyeEngine/graphics/graphics_components/Renderable3DComponent.h"
 #include "LaurelEyeEngine/graphics/graphics_components/Renderable2DComponent.h"
 #include "LaurelEyeEngine/graphics/resources/Mesh.h"
+#include "LaurelEyeEngine/logging/EngineLog.h"
 
 #include "LaurelEyeEngine/io/AssetManager.h"
 
@@ -53,20 +54,20 @@ namespace LaurelEye::Scripting {
                                 return Graphics::Mesh::createMeshFromAsset(meshAsset);
                             }
                             catch ( const std::exception& e ) {
-                                std::cerr << "[Lua Mesh.load] createMeshFromAsset failed: " << e.what() << std::endl;
+                                LE_ERROR("Scripting", "[Lua Mesh.load] createMeshFromAsset failed: " << e.what());
                                 return nullptr;
                             }
                         }
                     }
                 }
             }
-            
+
             // As last resort try direct loader
             try {
                 return Graphics::Mesh::loadMesh(path);
             }
             catch ( const std::exception& e ) {
-                std::cerr << "[Lua Mesh.load] failed to load mesh '" << path << "': " << e.what() << std::endl;
+                LE_ERROR("Scripting", "[Lua Mesh.load] failed to load mesh '" << path << "': " << e.what());
                 return nullptr;
             }
         };
@@ -163,4 +164,4 @@ namespace LaurelEye::Scripting {
             sol::base_classes, sol::bases<Graphics::IRenderableComponent>());
     }
 
-}// namespace LaurelEye::Scripting 
+}// namespace LaurelEye::Scripting

@@ -60,7 +60,7 @@ namespace LaurelEye::UI {
 
             //Set Is Hovered
             interactionComp->setIsHovered(containsMouse);
-            
+
             if ( !interactionComp->getWasHovered() && interactionComp->getIsHovered() ) {
                 //LE_DEBUG_INFO("UIInteraction", "Create OnHoverEnterEvent");
                 generateEvent(MouseButton::Left,
@@ -206,7 +206,7 @@ namespace LaurelEye::UI {
         hoverEnterListener = eventManager->addListener<OnHoverEnterEvent>(
             [&](const OnHoverEnterEvent& event) {
                 const auto& data = event.GetData();
-                assert(data.entityRef);
+                LE_DEBUG_ASSERT("UI", data.entityRef, "Invalid entity.");
 
                 auto scripts = data.entityRef->findAllComponents<Scripting::ScriptComponent>();
 
@@ -214,14 +214,14 @@ namespace LaurelEye::UI {
                     if ( auto* instance = script->getScriptInstance() ) {
                         instance->onHoverEnter(data);
                     }
-                }              
+                }
 
             });
 
         hoverExitListener = eventManager->addListener<OnHoverExitEvent>(
             [&](const OnHoverExitEvent& event) {
                 const auto& data = event.GetData();
-                assert(data.entityRef);
+                LE_DEBUG_ASSERT("UI", data.entityRef, "Invalid entity.");
 
                 auto scripts = data.entityRef->findAllComponents<Scripting::ScriptComponent>();
 
@@ -235,7 +235,7 @@ namespace LaurelEye::UI {
         pressedListener = eventManager->addListener<OnPressedEvent>(
             [&](const OnPressedEvent& event) {
                 const auto& data = event.GetData();
-                assert(data.entityRef);
+                LE_DEBUG_ASSERT("UI", data.entityRef, "Invalid entity.");
 
                 auto scripts = data.entityRef->findAllComponents<Scripting::ScriptComponent>();
 
@@ -249,7 +249,7 @@ namespace LaurelEye::UI {
         heldListener = eventManager->addListener<OnHeldEvent>(
             [&](const OnHeldEvent& event) {
                 const auto& data = event.GetData();
-                assert(data.entityRef);
+                LE_DEBUG_ASSERT("UI", data.entityRef, "Invalid entity.");
 
                 auto scripts = data.entityRef->findAllComponents<Scripting::ScriptComponent>();
 
@@ -263,7 +263,7 @@ namespace LaurelEye::UI {
         releasedListener = eventManager->addListener<OnReleasedEvent>(
             [&](const OnReleasedEvent& event) {
                 const auto& data = event.GetData();
-                assert(data.entityRef);
+                LE_DEBUG_ASSERT("UI", data.entityRef, "Invalid entity.");
 
                 auto scripts = data.entityRef->findAllComponents<Scripting::ScriptComponent>();
 
@@ -277,7 +277,7 @@ namespace LaurelEye::UI {
         clickedListener = eventManager->addListener<OnClickedEvent>(
             [&](const OnClickedEvent& event) {
                 const auto& data = event.GetData();
-                assert(data.entityRef);
+                LE_DEBUG_ASSERT("UI", data.entityRef, "Invalid entity.");
 
                 auto scripts = data.entityRef->findAllComponents<Scripting::ScriptComponent>();
 
@@ -291,7 +291,7 @@ namespace LaurelEye::UI {
         dragStartListener = eventManager->addListener<OnDragStartEvent>(
             [&](const OnDragStartEvent& event) {
                 const auto& data = event.GetData();
-                assert(data.entityRef);
+                LE_DEBUG_ASSERT("UI", data.entityRef, "Invalid entity.");
 
                 auto scripts = data.entityRef->findAllComponents<Scripting::ScriptComponent>();
 
@@ -305,7 +305,7 @@ namespace LaurelEye::UI {
         draggingListener = eventManager->addListener<OnDraggingEvent>(
             [&](const OnDraggingEvent& event) {
                 const auto& data = event.GetData();
-                assert(data.entityRef);
+                LE_DEBUG_ASSERT("UI", data.entityRef, "Invalid entity.");
 
                 auto scripts = data.entityRef->findAllComponents<Scripting::ScriptComponent>();
 
@@ -319,7 +319,7 @@ namespace LaurelEye::UI {
         dragEndListener = eventManager->addListener<OnDragEndEvent>(
             [&](const OnDragEndEvent& event) {
                 const auto& data = event.GetData();
-                assert(data.entityRef);
+                LE_DEBUG_ASSERT("UI", data.entityRef, "Invalid entity.");
 
                 auto scripts = data.entityRef->findAllComponents<Scripting::ScriptComponent>();
 
@@ -333,7 +333,7 @@ namespace LaurelEye::UI {
         focusGainedListener = eventManager->addListener<OnFocusGainedEvent>(
             [&](const OnFocusGainedEvent& event) {
                 const auto& data = event.GetData();
-                assert(data.entityRef);
+                LE_DEBUG_ASSERT("UI", data.entityRef, "Invalid entity.");
 
                 auto scripts = data.entityRef->findAllComponents<Scripting::ScriptComponent>();
 
@@ -347,7 +347,7 @@ namespace LaurelEye::UI {
         focusLostListener = eventManager->addListener<OnFocusLostEvent>(
             [&](const OnFocusLostEvent& event) {
                 const auto& data = event.GetData();
-                assert(data.entityRef);
+                LE_DEBUG_ASSERT("UI", data.entityRef, "Invalid entity.");
 
                 auto scripts = data.entityRef->findAllComponents<Scripting::ScriptComponent>();
 
@@ -363,7 +363,7 @@ namespace LaurelEye::UI {
     void UIInteractionSystem::deregisterInteractionEventListeners() {
 
         auto* eventManager = context->getService<EventManager>();
-        assert(eventManager && "PhysicsSystem: No EventManager in EngineContext");
+        LE_DEBUG_ASSERT("UIInteractionSystem", eventManager , "PhysicsSystem: No EventManager in EngineContext");
         eventManager->removeListener<OnHoverEnterEvent>(hoverEnterListener);
         eventManager->removeListener<OnHoverExitEvent>(hoverExitListener);
         eventManager->removeListener<OnPressedEvent>(pressedListener);
@@ -473,10 +473,10 @@ namespace LaurelEye::UI {
     }
 
     /// @brief Shorthand for creating event (HARDCODED TO LEFT MOUSE)
-    /// @param type 
-    /// @param comp 
-    /// @param screenPos 
-    /// @param dragDelta 
+    /// @param type
+    /// @param comp
+    /// @param screenPos
+    /// @param dragDelta
     void UIInteractionSystem::generateEvent(
         MouseButton button,
         UIInteractionEventData::UIEventType type,
@@ -505,7 +505,7 @@ namespace LaurelEye::UI {
         event.timeStamp = 0.0f; //TODO : Does the engine have a definition of time?
 
         events.push_back(event);
-        
+
     }
 
 } // namespace LaurelEye::UI

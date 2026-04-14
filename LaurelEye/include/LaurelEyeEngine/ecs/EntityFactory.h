@@ -34,7 +34,7 @@ namespace LaurelEye{
             std::unordered_map<std::string, Entity*>& entityMap);
 
         ///@brief Deserialize one entity definition into a live entity
-        Entity* createEntityFromJson(const rapidjson::Value& entityData);
+        Entity* createEntityFromJson(const rapidjson::Value& entityData, std::string parentName = "", Entity* parentEntity = nullptr);
 
         ///@brief Deserializes all components for a given entity, adding them to the entity
         void addComponentsFromJson(Entity& entity, const rapidjson::Value& componentsJson);

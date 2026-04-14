@@ -1,8 +1,8 @@
 ﻿#include "LaurelEyeEngine/graphics/resources/Font.h"
 #include "LaurelEyeEngine/graphics/resources/RenderResources.h"
+#include "LaurelEyeEngine/logging/EngineLog.h"
 #include <algorithm> // std::max
 #include <cstring>   // memset
-#include <iostream>
 #include <glad/glad.h>
 
 namespace LaurelEye::Graphics {
@@ -15,10 +15,15 @@ namespace LaurelEye::Graphics {
         auto fullpath = LaurelEye::IO::Paths().assetsDir / LaurelEye::IO::fs::path(path);
         std::string utf8 = fullpath.lexically_normal().string(); // normalize separators
 
-        assert(ftLibrary != nullptr);
+        if (!ftLibrary) {
+            LE_WARN("Graphics", "Invalid Font library.");
+            valid = false;
+            return;
+        }
+
         // Load FreeType face
         if ( FT_New_Face(ftLibrary, utf8.c_str(), 0, &ftFace) ) {
-            std::cerr << "[Font] Failed to load font face: " << utf8 << "\n";
+            LE_ERROR("Graphics", "[Font] Failed to load font face: " << utf8);
             valid = false;
             return;
         }
@@ -29,7 +34,7 @@ namespace LaurelEye::Graphics {
         // Create HarfBuzz objects
         hbBlob = hb_blob_create_from_file(utf8.c_str()); // ← use full path
         if ( !hbBlob || hb_blob_get_length(hbBlob) == 0 ) {
-            std::cerr << "[Font] Failed to create HarfBuzz blob: " << utf8 << "\n";
+            LE_ERROR("Graphics", "[Font] Failed to create HarfBuzz blob: " << utf8);
             valid = false;
             return;
         }
@@ -82,7 +87,7 @@ namespace LaurelEye::Graphics {
             return;
 
         if ( FT_Load_Glyph(ftFace, glyphIndex, FT_LOAD_RENDER) ) {
-            std::cerr << "[Font] Failed to load glyph index: " << glyphIndex << "\n";
+            LE_ERROR("Graphics", "[Font] Failed to load glyph index: " << glyphIndex);
             return;
         }
 
@@ -118,7 +123,7 @@ namespace LaurelEye::Graphics {
 
         // Check atlas overflow (should not happen for ASCII + 1024x1024)
         if ( penY + gh >= atlasHeight ) {
-            std::cerr << "[Font] Atlas overflow for font: " << fontName << "\n";
+            LE_ERROR("Graphics", "[Font] Atlas overflow for font: " << fontName);
             return;
         }
 

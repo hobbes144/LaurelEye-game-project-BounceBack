@@ -24,6 +24,7 @@
 #include <iomanip>
 #include <iostream>
 #include <mutex>
+#include <set>
 #include <source_location>
 #include <sstream>
 #include <string_view>
@@ -38,6 +39,8 @@ struct Config {
     bool print_time     = true;
     bool print_thread   = true;
     bool print_location = true; // file:line + function
+    std::set<std::string, std::less<>> logEnabledSystems{};
+    std::set<std::string, std::less<>> throwDisabledSystems{};
 };
 
 inline Config& config() { static Config cfg{}; return cfg; }
@@ -150,34 +153,57 @@ inline void debug_break()
     std::abort();
 }
 
+[[noreturn]] inline void fatal_error(std::string_view subsystem,
+                                    std::string_view msg,
+                                    std::source_location loc = std::source_location::current())
+{
+    std::ostringstream oss;
+    oss << "Fatal error occurred";
+    if (!msg.empty()) oss << " — " << msg;
+
+    write(Level::Assert, subsystem, oss.str(), loc);
+    debug_break();
+    std::abort();
+}
+
 } // namespace LaurelEye::Log
 
 // -------------------- Info ---------------------
 #define LE_INFO(subsystem, msg_stream_expr) \
-    do { ::LaurelEye::Log::write(::LaurelEye::Log::Level::Info, (subsystem), LE_LOG_MSG(msg_stream_expr), std::source_location::current()); } while (0)
+    do { if ( Log::config().logEnabledSystems.contains(subsystem) ) ::LaurelEye::Log::write(::LaurelEye::Log::Level::Info, (subsystem), LE_LOG_MSG(msg_stream_expr), std::source_location::current()); } while (0)
+
+#define LE_INFO_IF(subsystem, cond, msg_stream_expr) \
+    do { if ( Log::config().logEnabledSystems.contains(subsystem) && (cond) ) ::LaurelEye::Log::write(::LaurelEye::Log::Level::Info, (subsystem), LE_LOG_MSG("Condition true: (" #cond ") — " << msg_stream_expr), std::source_location::current()); } while (0)
 
 #ifndef NDEBUG
     #define LE_DEBUG_INFO(subsystem, msg_stream_expr) LE_INFO(subsystem, msg_stream_expr)
+    #define LE_DEBUG_INFO_IF(subsystem, cond, msg_stream_expr) LE_INFO_IF(subsystem, cond, msg_stream_expr)
 #else
     #define LE_DEBUG_INFO(subsystem, msg_stream_expr) ((void)0)
+    #define LE_DEBUG_INFO_IF(subsystem, cond, msg_stream_expr) ((void)0)
 #endif
 
 // -------------------- Error --------------------
 #define LE_ERROR(subsystem, msg_stream_expr) \
-    do { ::LaurelEye::Log::write(::LaurelEye::Log::Level::Error, (subsystem), LE_LOG_MSG(msg_stream_expr), std::source_location::current()); } while (0)
+    do { if ( Log::config().logEnabledSystems.contains(subsystem) ) ::LaurelEye::Log::write(::LaurelEye::Log::Level::Error, (subsystem), LE_LOG_MSG(msg_stream_expr), std::source_location::current()); } while (0)
+
+#define LE_ERROR_IF(subsystem, cond, msg_stream_expr) \
+    do { if ( Log::config().logEnabledSystems.contains(subsystem) && (cond) ) ::LaurelEye::Log::write(::LaurelEye::Log::Level::Error, (subsystem), LE_LOG_MSG("Condition true: (" #cond ") — " << msg_stream_expr), std::source_location::current()); } while (0)
 
 #ifndef NDEBUG
     #define LE_DEBUG_ERROR(subsystem, msg_stream_expr) LE_ERROR(subsystem, msg_stream_expr)
+    #define LE_DEBUG_ERROR_IF(subsystem, cond, msg_stream_expr) LE_ERROR_IF(subsystem, cond, msg_stream_expr)
 #else
     #define LE_DEBUG_ERROR(subsystem, msg_stream_expr) ((void)0)
+    #define LE_DEBUG_ERROR_IF(subsystem, cond, msg_stream_expr) ((void)0)
 #endif
 
 // -------------------- Warnings -----------------
 #define LE_WARN(subsystem, msg_stream_expr) \
-    do { ::LaurelEye::Log::write(::LaurelEye::Log::Level::Warn, (subsystem), LE_LOG_MSG(msg_stream_expr), std::source_location::current()); } while (0)
+    do { if ( Log::config().logEnabledSystems.contains(subsystem) ) ::LaurelEye::Log::write(::LaurelEye::Log::Level::Warn, (subsystem), LE_LOG_MSG(msg_stream_expr), std::source_location::current()); } while (0)
 
 #define LE_WARN_IF(subsystem, cond, msg_stream_expr) \
-    do { if ((cond)) ::LaurelEye::Log::write(::LaurelEye::Log::Level::Warn, (subsystem), LE_LOG_MSG("Condition true: (" #cond ") — " << msg_stream_expr), std::source_location::current()); } while (0)
+    do { if ( Log::config().logEnabledSystems.contains(subsystem) && (cond) ) ::LaurelEye::Log::write(::LaurelEye::Log::Level::Warn, (subsystem), LE_LOG_MSG("Condition true: (" #cond ") — " << msg_stream_expr), std::source_location::current()); } while (0)
 
 #ifndef NDEBUG
     #define LE_DEBUG_WARN(subsystem, msg_stream_expr) LE_WARN(subsystem, msg_stream_expr)
@@ -190,7 +216,7 @@ inline void debug_break()
 #define LE_WARN_IF_ONCE(subsystem, cond, msg_stream_expr) \
     do { \
         static std::atomic_bool _once{false}; \
-        if ((cond) && !_once.exchange(true, std::memory_order_relaxed)) \
+        if ( Log::config().logEnabledSystems.contains(subsystem) && (cond) && !_once.exchange(true, std::memory_order_relaxed) ) \
             ::LaurelEye::Log::write(::LaurelEye::Log::Level::Warn, (subsystem), LE_LOG_MSG("Condition true (once): (" #cond ") — " << msg_stream_expr), std::source_location::current()); \
     } while (0)
 
@@ -202,10 +228,10 @@ inline void debug_break()
 
 // -------------------- Asserts -------------------
 #define LE_ASSERT(subsystem, cond, msg_stream_expr) \
-    do { if (!(cond)) ::LaurelEye::Log::fail_assert((subsystem), #cond, std::string_view{LE_LOG_MSG(msg_stream_expr)}, std::source_location::current()); } while (0)
+    do { if ( !Log::config().throwDisabledSystems.contains(subsystem) && !(cond) ) ::LaurelEye::Log::fail_assert((subsystem), #cond, std::string_view{LE_LOG_MSG(msg_stream_expr)}, std::source_location::current()); } while (0)
 
 #define LE_ASSERT0(subsystem, cond) \
-    do { if (!(cond)) ::LaurelEye::Log::fail_assert((subsystem), #cond, std::string_view{}, std::source_location::current()); } while (0)
+    do { if ( !Log::config().throwDisabledSystems.contains(subsystem) && !(cond) ) ::LaurelEye::Log::fail_assert((subsystem), #cond, std::string_view{}, std::source_location::current()); } while (0)
 
 #ifndef NDEBUG
     #define LE_DEBUG_ASSERT(subsystem, cond, msg_stream_expr) LE_ASSERT(subsystem, cond, msg_stream_expr)
@@ -218,7 +244,7 @@ inline void debug_break()
 #define LE_ASSERT_ONCE(subsystem, cond, msg_stream_expr) \
     do { \
         static std::atomic_bool _once{false}; \
-        if (!(cond) && !_once.exchange(true, std::memory_order_relaxed)) \
+        if ( !Log::config().throwDisabledSystems.contains(subsystem) && !(cond) && !_once.exchange(true, std::memory_order_relaxed) ) \
             ::LaurelEye::Log::fail_assert((subsystem), #cond, std::string_view{LE_LOG_MSG(msg_stream_expr)}, std::source_location::current()); \
     } while (0)
 
@@ -226,5 +252,16 @@ inline void debug_break()
     #define LE_DEBUG_ASSERT_ONCE(subsystem, cond, msg_stream_expr) LE_ASSERT_ONCE(subsystem, cond, msg_stream_expr)
 #else
     #define LE_DEBUG_ASSERT_ONCE(subsystem, cond, msg_stream_expr) ((void)0)
+#endif
+
+// -------------------- FATAL ERROR --------------------
+#define LE_FATAL_ERROR(subsystem, msg_stream_expr) \
+    do { if ( !Log::config().throwDisabledSystems.contains(subsystem) ) ::LaurelEye::Log::fatal_error((subsystem), std::string_view{LE_LOG_MSG(msg_stream_expr)}, std::source_location::current()); \
+    } while (0)
+
+#ifndef NDEBUG
+    #define LE_DEBUG_FATAL_ERROR(subsystem, msg_stream_expr) LE_ERROR(subsystem, msg_stream_expr)
+#else
+    #define LE_DEBUG_FATAL_ERROR(subsystem, msg_stream_expr) ((void)0)
 #endif
 

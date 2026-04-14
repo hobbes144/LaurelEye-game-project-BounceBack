@@ -3,6 +3,7 @@
 #include "LaurelEyeEngine/io/importers/MeshImporter.h"
 #include "LaurelEyeEngine/io/importers/ImageImporter.h"
 #include "LaurelEyeEngine/io/importers/JsonImporter.h"
+#include "LaurelEyeEngine/logging/EngineLog.h"
 
 namespace LaurelEye::IO {
     void AssetManager::initialize() {
@@ -14,7 +15,7 @@ namespace LaurelEye::IO {
         registerImporter("obj", meshImporter);
         registerImporter("fbx", meshImporter);
 
-        assert(context && "AssetManager: No EngineContext provided. Cannot locate RenderSystem for texture importing.");
+        LE_ASSERT("io", context, "AssetManager: No EngineContext provided. Cannot locate RenderSystem for texture importing.");
 
         registerImporter("png", imgImporter);
         registerImporter("jpg", imgImporter);

@@ -379,7 +379,6 @@ namespace LaurelEye::Graphics {
         const std::string& name,
         TextureHandle textureID, TextureType type) const {
 
-#if !defined(NDEBUG)
         // Validate texture unit against device limits to avoid GL_INVALID_ENUM.
         GLint maxUnits = 0;
         // LE_ASSERT("Graphics", textureUnit < 10, "Texture " << name << " bound here");
@@ -388,7 +387,6 @@ namespace LaurelEye::Graphics {
             LE_ASSERT("graphics", static_cast<GLint>(textureID) >= maxUnits, "Shader " << name << ": Invalid texture unit being bound!");
             return;
         }
-#endif
 
         glBindTextureUnit(textureUnit, textureID);
         setInt(name, static_cast<int>(textureUnit));
@@ -398,7 +396,6 @@ namespace LaurelEye::Graphics {
         unsigned int textureUnit,
         TextureHandle textureID) const {
 
-#if !defined(NDEBUG)
         // Validate texture unit against device limits to avoid GL_INVALID_ENUM.
         GLint maxUnits = 0;
         // LE_ASSERT("Graphics", textureUnit < 10, "Texture " << name << " bound here");
@@ -407,7 +404,6 @@ namespace LaurelEye::Graphics {
             LE_ASSERT("graphics", static_cast<GLint>(textureID) >= maxUnits, "Shader " << name << ": Invalid texture unit being bound!");
             return;
         }
-#endif
 
         glBindTextureUnit(textureUnit, textureID);
     }

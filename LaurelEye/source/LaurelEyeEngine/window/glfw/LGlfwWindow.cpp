@@ -11,7 +11,6 @@
 #include "LaurelEyeEngine/logging/EngineLog.h"
 #include "LaurelEyeEngine/window/IWindow.h"
 
-#include <cassert>
 #include <GLFW/glfw3.h>
 
 namespace LaurelEye {
@@ -68,7 +67,7 @@ namespace LaurelEye {
             glfwSetInputMode(static_cast<GLFWwindow*>(nativeHandle), GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
         }
 
-        assert(nativeHandle && "Failed to create GLFW window");
+        LE_ASSERT("Window", nativeHandle, "Failed to create GLFW window");
 
         glfwSetWindowUserPointer(nativeHandle, this);
 

@@ -3,9 +3,11 @@
 #include "LaurelEyeEngine/platforms/glfw/GlfwPlatform.h"
 #include "LaurelEyeEngine/window/IWindow.h"
 
+#include "LaurelEyeEngine/logging/EngineLog.h"
+
 namespace LaurelEye {
     ResourceCoordinator::ResourceCoordinator(EngineContext& ctx, const EngineConfig& engineConfig) {
-        std::cout << "Resources Constructing" << std::endl;
+        LE_INFO("ResourceCoordinator", "Resources Constructing");
 
         // TODO - let Anish at this to make it modular, just getting window up for now
         platformManager = std::make_unique<LaurelEye::GlfwPlatform>();
@@ -45,7 +47,7 @@ namespace LaurelEye {
     }
 
     void ResourceCoordinator::initialize() {
-        std::cout << "Resources Initializing" << std::endl;
+        LE_INFO("ResourceCoordinator", "Resources Initializing");
         assetManager->initialize(); // sets extensions to assets
         sceneManager->initialize(); // Sets initial scene
     }
@@ -57,7 +59,7 @@ namespace LaurelEye {
     }
 
     void ResourceCoordinator::shutdown() {
-        std::cout << "Resources Shutting Down" << std::endl;
+        LE_INFO("ResourceCoordinator", "Resources Shutting Down");
         sceneManager.reset();
         inputManager.reset();
         windowManager.reset();

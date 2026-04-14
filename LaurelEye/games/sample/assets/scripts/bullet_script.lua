@@ -85,6 +85,22 @@ function onTriggerEnter(data)
                 Script.send(message)
                 destroySelf()
             end
+        elseif tag == "generator" then
+            if attackEnemy then
+                local message = Message.new()
+                message.to = data.entityA
+                message.topic = "Get Destroyed!"
+                Script.send(message)
+                destroySelf()
+            end
+        elseif tag == "shield" then
+            if attackEnemy then
+                local message = Message.new()
+                message.to = data.entityA
+                message.topic = "Bonk!"
+                Script.send(message)
+                destroySelf()
+            end
         end
     end
     
@@ -127,6 +143,22 @@ function onTriggerEnter(data)
                 local message = Message.new()
                 message.to = data.entityB
                 message.topic = "Get Hit!"
+                Script.send(message)
+                destroySelf()
+            end
+        elseif tag == "generator" then
+            if attackEnemy then
+                local message = Message.new()
+                message.to = data.entityA
+                message.topic = "Get Destroyed!"
+                Script.send(message)
+                destroySelf()
+            end
+        elseif tag == "shield" then
+            if attackEnemy then
+                local message = Message.new()
+                message.to = data.entityA
+                message.topic = "Bonk!"
                 Script.send(message)
                 destroySelf()
             end

@@ -107,7 +107,7 @@
     },
     "Children": [
         {
-            "name": "kickbackRing",
+            "name": "KickbackRing",
             "prefab": "prefabs/kickback-ring.prefab.json"
         }
     ]

@@ -1,4 +1,4 @@
-﻿#include "LaurelEyeEngine/physics/interfaces/Bullet/BulletWorld.h"
+#include "LaurelEyeEngine/physics/interfaces/Bullet/BulletWorld.h"
 #include "LaurelEyeEngine/logging/EngineLog.h"
 #include "LaurelEyeEngine/physics/interfaces/Bullet/BulletGhostBody.h"
 #include "LaurelEyeEngine/physics/interfaces/Bullet/BulletRigidBody.h"
@@ -52,7 +52,7 @@ namespace LaurelEye::Physics {
         auto bulletShape = std::dynamic_pointer_cast<BulletShape>(CreateShape(data.shapeDefinition));
         if ( !bulletShape ) throw std::runtime_error("Failed to create BulletShape");
 
-        LE_DEBUG_ASSERT("physics", data.transformRef != nullptr, "transformRef not valid!");
+        LE_DEBUG_ASSERT("Physics", data.transformRef != nullptr, "transformRef not valid!");
 
         // Apply local scaling from transform
         Vector3 scale = data.transformRef->getWorldScale();
@@ -152,7 +152,7 @@ namespace LaurelEye::Physics {
                 CreateShape(data.shapeDefinition));
         if ( !bulletShape ) throw std::runtime_error("Failed to create BulletShape");
 
-        LE_DEBUG_ASSERT("physics", data.transformRef != nullptr, "transformRef not valid!");
+        LE_DEBUG_ASSERT("Physics", data.transformRef != nullptr, "transformRef not valid!");
 
         // Apply local scaling from transform
         Vector3 scale = data.transformRef->getWorldScale();

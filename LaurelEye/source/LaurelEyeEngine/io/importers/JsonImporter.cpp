@@ -1,12 +1,13 @@
 ﻿#include "LaurelEyeEngine/io/importers/JsonImporter.h"
 #include "LaurelEyeEngine/io/Assets.h"
+#include "LaurelEyeEngine/logging/EngineLog.h"
 
 namespace LaurelEye::IO {
     std::shared_ptr<IAsset> JsonImporter::import(const std::string& path) {
         // --- Open the file in binary mode so we can detect BOM correctly ---
         std::ifstream file(path, std::ios::binary);
         if ( !file.is_open() ) {
-            std::cerr << "[JsonImporter] Failed to open file: " << path << std::endl;
+            LE_ERROR("io", "[JsonImporter] Failed to open file: " << path);
             return nullptr;
         }
 
@@ -18,7 +19,7 @@ namespace LaurelEye::IO {
             file.seekg(0);
         }
         else {
-            std::cout << "[JsonImporter] Stripped UTF-8 BOM from: " << path << std::endl;
+            LE_DEBUG_INFO("io", "[JsonImporter] Stripped UTF-8 BOM from: " << path);
         }
 
         // --- Parse using RapidJSON’s IStreamWrapper ---
@@ -28,9 +29,9 @@ namespace LaurelEye::IO {
 
         // --- Handle parse errors with details ---
         if ( asset->jsonDocument.HasParseError() ) {
-            std::cerr << "[JsonImporter] Parse error in: " << path << "\n"
+            LE_ERROR("io", "[JsonImporter] Parse error in: " << path << "\n"
                       << " -> " << rapidjson::GetParseError_En(asset->jsonDocument.GetParseError())
-                      << " (offset " << asset->jsonDocument.GetErrorOffset() << ")\n";
+                      << " (offset " << asset->jsonDocument.GetErrorOffset() << ")");
             return nullptr;
         }
 

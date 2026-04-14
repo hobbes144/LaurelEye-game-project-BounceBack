@@ -57,7 +57,7 @@ namespace LaurelEye::Particles {
 
             //---Spawn New Particles---
             if (emitter->GetIsPlaying()) {
-                LE_DEBUG_INFO("Particle System", "Particle Emitter Updated: " << emitter->getOwner()->getName());
+                //LE_DEBUG_INFO("Particle System", "Particle Emitter Updated: " << emitter->getOwner()->getName());
                 emitter->IncrementEmittedParticles(dt);
                 // While the Emitter is still poised to emit
                 while ( emitter->GetEmissionAccumulator() >= 1.0f ) {
@@ -67,7 +67,7 @@ namespace LaurelEye::Particles {
                 }
             }
             else {
-                LE_DEBUG_INFO("Particle System", "Paused Particle Updated: " << emitter->getOwner()->getName());
+                //LE_DEBUG_INFO("Particle System", "Paused Particle Updated: " << emitter->getOwner()->getName());
             }
 
             //---Update Particles---
@@ -160,7 +160,10 @@ namespace LaurelEye::Particles {
     void ParticleSystem::spawnParticle(ParticleEmitterComponent& emitter) {
 
         for ( auto& p : emitter.GetParticles() ) {
-            assert(emitter.GetBoundTransform() != nullptr);
+            if (emitter.GetBoundTransform() == nullptr) {
+                LE_DEBUG_WARN("Particle", "Invalid emmitter.");
+                continue;
+            }
 
             if ( !p.active ) {
                 ++activeParticles;

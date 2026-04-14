@@ -1,4 +1,4 @@
-﻿#include "LaurelEyeEngine/scripting/sol2/Sol2State.h"
+#include "LaurelEyeEngine/scripting/sol2/Sol2State.h"
 #include "LaurelEyeEngine/logging/EngineLog.h"
 #include "LaurelEyeEngine/scripting/sol2/Sol2ScriptInstance.h"
 #include "LaurelEyeEngine/scripting/sol2/Sol2API.h"
@@ -16,7 +16,7 @@ namespace LaurelEye::Scripting {
         // Release mode: use assets next to the EXE
         std::filesystem::path scriptDir = IO::Paths().assetsDir / "scripts";
 
-        LE_ASSERT("scripting", std::filesystem::exists(scriptDir), "Unable to find scripts path!");
+        LE_ASSERT("Scripting", std::filesystem::exists(scriptDir), "Unable to find scripts path!");
 
         std::string path = lua["package"]["path"];
         path += ";" + (scriptDir.string() + "/?.lua");

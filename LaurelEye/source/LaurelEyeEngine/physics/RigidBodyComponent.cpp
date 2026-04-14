@@ -2,6 +2,8 @@
 #include "LaurelEyeEngine/ecs/Entity.h"
 #include "LaurelEyeEngine/physics/PhysicsSystem.h"
 
+#include "LaurelEyeEngine/logging/EngineLog.h"
+
 namespace LaurelEye::Physics {
 
     RigidBodyComponent::RigidBodyComponent(){}
@@ -22,7 +24,7 @@ namespace LaurelEye::Physics {
         rigidBody = std::dynamic_pointer_cast<IRigidBody>(system.CreateCollider(data));
 
         if ( !rigidBody ) {
-            std::cerr << "[RigidBodyComponent::CreateInWorld] : INVALID RIGIDBODY CAST\n";
+            LE_ERROR("Physics", "Invalid RigidBody cast.");
             return;
         }
 

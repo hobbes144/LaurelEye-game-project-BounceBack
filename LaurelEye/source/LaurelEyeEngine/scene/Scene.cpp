@@ -47,9 +47,9 @@ namespace LaurelEye {
     }
 
     void Scene::initialize() {
-        std::cout << "Initializing scene: " << name << std::endl;
-        assert(sceneJson && "No valid scene asset for scene.");
-        assert(!assetRootPath.empty() && "No valid asset root path for scene.");
+        LE_DEBUG_INFO("Scene", "Initializing scene: " << name);
+        LE_ASSERT("Scene", sceneJson, "No valid scene asset for scene.");
+        LE_ASSERT("Scene", !assetRootPath.empty(), "No valid asset root path for scene.");
 
         deserialize(sceneJson->jsonDocument);
     }
@@ -127,10 +127,10 @@ namespace LaurelEye {
     }
 
     void Scene::shutdown() {
-        std::cout << "Shutting down scene: " << name << std::endl;
+        LE_DEBUG_INFO("Scene", "Shutting down scene: " << name);
 
         if ( active ) {
-            std::cerr << "Warning: Scene::shutdown called while still active. Force deactivating.\n";
+            LE_WARN("Scene", "Shutdown called while still active. Force deactivating.");
             deregisterScene(); // attempt to make things safe
         }
         for ( auto& e : entities ) {
@@ -169,9 +169,9 @@ namespace LaurelEye {
         }
         else if ( settingsValue.HasMember("backgroundTexture") && settingsValue["backgroundTexture"].IsString() ) {
             std::string backgroundTexturePath = settingsValue["backgroundTexture"].GetString();
-            assert(!backgroundTexturePath.empty() && "Background texture path is empty in scene settings.");
+            LE_ASSERT("Scene", !backgroundTexturePath.empty(), "Background texture path is empty in scene settings.");
             auto texAsset = ctx.getService<IO::AssetManager>()->load(assetRootPath + backgroundTexturePath);
-            assert(texAsset && "Failed to load background texture asset in scene settings.");
+            LE_ASSERT("Scene", texAsset, "Failed to load background texture asset in scene settings.");
             backgroundTexture = std::dynamic_pointer_cast<IO::ImageAsset>(texAsset);
             textureBackground = true;
             colorBackground = false;
@@ -290,21 +290,21 @@ namespace LaurelEye {
         std::vector<Entity*> newPtrs;
         if ( pendingAdditions.empty() ) return newPtrs;
 
-        std::cout << "[Scene] Spawning " << pendingAdditions.size() << " pending entities..." << std::endl;
+        LE_DEBUG_INFO("Scene", "Spawning " << pendingAdditions.size() << " pending entities...");
 
         size_t count = 0;
         for ( auto& e : pendingAdditions ) {
             if ( !e ) {
-                std::cerr << "[Scene] ERROR: Null entity in pending additions!" << std::endl;
+                LE_DEBUG_ERROR("Scene", "Null entity in pending additions!");
                 continue;
             }
-            std::cout << "  + Adding entity: " << e->getName() << " (ID: " << e->getId() << ")" << std::endl;
+            LE_DEBUG_INFO("Scene", "Adding entity: " << e->getName() << " (ID: " << e->getId() << ")");
             newPtrs.push_back(e);
             entities.push_back(std::move(e));
             count++;
         }
 
-        std::cout << "[Scene] Added " << count << " entities. Total now: " << entities.size() << std::endl;
+        LE_DEBUG_INFO("Scene", "Added " << count << " entities. Total now: " << entities.size());
 
         pendingAdditions.clear();
         return newPtrs;

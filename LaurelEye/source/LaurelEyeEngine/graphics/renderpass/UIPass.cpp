@@ -52,10 +52,16 @@ namespace LaurelEye::Graphics {
                 auto temp = rc->getOwner()->getName();
 
                 auto* uiComponent = dynamic_cast<UI::UIRenderComponent*>(rc);
-                assert(uiComponent && "[ERROR - UIPass] UIPass received non-UIRenderComponent!");
+                if (!uiComponent) {
+                    LE_DEBUG_WARN("Graphics", "UIPass received non-UIRenderComponent!");
+                    continue;
+                }
 
                 const UI::UITransformComponent* t = uiComponent->GetBoundTransform();
-                assert(t && "[ERROR - UIPass] UIRenderComponent has no bound UITransformComponent!");
+                if (!t) {
+                    LE_DEBUG_WARN("Graphics", "UIRenderComponent has no bound UITransformComponent!");
+                    continue;
+                }
 
                 const Rect& rec = t->GetResolvedRect();
 
@@ -139,7 +145,7 @@ namespace LaurelEye::Graphics {
 
                 continue;
             }
-            assert("[ERROR - UIPass] UIPass received non-UIRenderComponent or non-UITextComponent!");
+            LE_DEBUG_WARN("Graphics", "UIPass received non-UIRenderComponent or non-UITextComponent!");
         }
 
         glBlendFunc(GL_ONE, GL_ONE);

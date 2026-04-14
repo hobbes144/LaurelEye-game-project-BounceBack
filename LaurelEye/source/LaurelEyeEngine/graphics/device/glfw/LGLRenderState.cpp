@@ -1,6 +1,6 @@
 ﻿#include "LaurelEyeEngine/graphics/device/glfw/LGLRenderState.h"
 #include "LaurelEyeEngine/graphics/resources/RenderState.h"
-#include <iostream>
+#include "LaurelEyeEngine/logging/EngineLog.h"
 
 namespace LaurelEye::Graphics {
 
@@ -9,11 +9,7 @@ namespace LaurelEye::Graphics {
         case BlendEquation::Add:
             return GL_FUNC_ADD;
         default:
-            // TODO: Replace this with proper warning logging.
-#if !defined(NDEBUG)
-            std::cerr << "WARNING::RENDERSYSTEM::RENDER_STATE::INVALID_BLEND_EQUATION"
-                      << "::Defaulting to GL_FUNC_ADD" << std::endl;
-#endif
+            LE_WARN("RenderSystem", "RenderState: Invalid blend equation. Defaulting to GL_FUNC_ADD");
             return GL_FUNC_ADD;
         }
     }
@@ -23,11 +19,7 @@ namespace LaurelEye::Graphics {
         case BlendFactor::One:
             return GL_ONE;
         default:
-            // TODO: Replace this with proper warning logging.
-#if !defined(NDEBUG)
-            std::cerr << "WARNING::RENDERSYSTEM::RENDER_STATE::INVALID_BLEND_FACTOR"
-                      << "::Defaulting to GL_ONE" << std::endl;
-#endif
+            LE_WARN("RenderSystem", "RenderState: Invalid blend factor. Defaulting to GL_ONE");
             return GL_ONE;
         }
     }
@@ -37,11 +29,7 @@ namespace LaurelEye::Graphics {
             case DepthFunction::Less:
             return GL_LESS;
         default:
-            // TODO: Replace this with proper warning logging.
-#if !defined(NDEBUG)
-            std::cerr << "WARNING::RENDERSYSTEM::RENDER_STATE::INVALID_DEPTH_FUNCTION"
-                      << "::Defaulting to GL_LESS" << std::endl;
-#endif
+            LE_WARN("RenderSystem", "RenderState: Invalid depth function. Defaulting to GL_LESS");
             return GL_LESS;
         }
     }

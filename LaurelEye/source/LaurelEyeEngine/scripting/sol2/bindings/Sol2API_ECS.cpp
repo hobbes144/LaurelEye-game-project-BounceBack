@@ -28,7 +28,7 @@ namespace LaurelEye::Scripting {
 
         // Engine setup - TODO move to engine binding file later
         auto* engine = ctx->getService<Engine>();
-        LE_ASSERT("scripting", engine, "Engine service not found in context!");
+        LE_ASSERT("Scripting", engine, "Engine service not found in context!");
 
         auto timeDataType = lua.new_usertype<TimeData>("TimeData");
         timeDataType["scaledTime"] = &TimeData::scaledTime;

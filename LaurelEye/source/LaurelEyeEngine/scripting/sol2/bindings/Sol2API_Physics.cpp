@@ -4,6 +4,8 @@
 #include "LaurelEyeEngine/physics/RigidBodyComponent.h"
 #include "LaurelEyeEngine/physics/GhostBodyComponent.h"
 
+#include "LaurelEyeEngine/logging/EngineLog.h"
+
 #include <sol/types.hpp>
 
 namespace LaurelEye::Scripting {
@@ -196,7 +198,7 @@ namespace LaurelEye::Scripting {
                             const Vector3& dir,
                             float maxDist,
                             sol::optional<sol::table> opt) -> sol::object {
-                    assert(!physics->IsSteppingPhysics() && "ERROR::SCRIPTING::RAYCAST::PHYSICS_IS_STEPPING");
+                    LE_ASSERT("Scripting", !physics->IsSteppingPhysics(), "Raycast failed, Physics is stepping.");
                     sol::state_view L(ts);
                     Physics::RaycastParams params{};
                     if ( opt ) {
@@ -244,7 +246,7 @@ namespace LaurelEye::Scripting {
                             const Vector3& from,
                             const Vector3& to,
                             sol::optional<sol::table> opt) -> sol::object {
-                    assert(!physics->IsSteppingPhysics() && "ERROR::SCRIPTING::RAYCAST::PHYSICS_IS_STEPPING");
+                    LE_ASSERT("Scripting", !physics->IsSteppingPhysics(), "Raycast failed, Physics is stepping.");
                     sol::state_view L(ts);
                     Physics::RaycastParams params{};
                     if ( opt ) {

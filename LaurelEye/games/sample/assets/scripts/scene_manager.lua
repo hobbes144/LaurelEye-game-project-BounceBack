@@ -41,6 +41,10 @@ function onUpdate(dt)
         log("Loading Scene: Level5")
         Window.setCursorMode(0, Window.CursorMode.Disabled)
         SceneManager:changeScene("Level5")
+    elseif Input:isKeyPressed(Key.Eight) then
+        log("Loading Scene: BossLevel")
+        Window.setCursorMode(0, Window.CursorMode.Disabled)
+        SceneManager:changeScene("BossLevel")
     elseif Input:isKeyPressed(Key.Escape) then
         Window.setCursorMode(0, Window.CursorMode.Normal)
         SceneManager:changeScene("MainMenu")

@@ -10,7 +10,6 @@
 #include "LaurelEyeEngine/events/EventManager.h"
 #include "LaurelEyeEngine/scripting/ScriptComponent.h"
 #include "LaurelEyeEngine/physics/interfaces/IPhysicsWorld.h"
-#include <cassert>
 
 namespace LaurelEye::Physics {
     PhysicsSystem::PhysicsSystem(PhysicsSystemType type) {
@@ -74,14 +73,15 @@ namespace LaurelEye::Physics {
 
     void PhysicsSystem::registerCollisionEnterListeners() {
         auto* eventManager = context->getService<EventManager>();
-        assert(eventManager && "PhysicsSystem: No EventManager in EngineContext");
+        LE_ASSERT("Physics", eventManager, "No EventManager in EngineContext.");
         // Add the scripting event bindings
         enterListener = eventManager->addListener<CollisionEnterEvent>(
             [&](const CollisionEnterEvent& event) {
                 const auto& data = event.GetData();
-                assert(data.entityARef && data.entityBRef);
 
-                std::cout << "[EnterCollisioner] Listener is Run" << std::endl;
+                LE_ASSERT("Physics", data.entityARef && data.entityBRef, "[CollisionEnterEvent] Invalid entities.");
+                LE_DEBUG_INFO("Physics", "[CollisionEnterEvent] Listener run.");
+
                 // Forward to Lua if either entity has a script
                 if ( auto* scriptA = data.entityARef->findComponent<Scripting::ScriptComponent>() ) {
                     if ( auto* instance = scriptA->getScriptInstance() ) {
@@ -100,7 +100,9 @@ namespace LaurelEye::Physics {
         stayListener = eventManager->addListener<CollisionStayEvent>(
             [&](const CollisionStayEvent& event) {
                 const auto& data = event.GetData();
-                assert(data.entityARef && data.entityBRef);
+
+                LE_ASSERT("Physics", data.entityARef && data.entityBRef, "[CollisionStayEvent] Invalid entities.");
+                LE_DEBUG_INFO("Physics", "[CollisionStayEvent] Listener run.");
 
                 if ( auto* scriptA = data.entityARef->findComponent<Scripting::ScriptComponent>() ) {
                     if ( auto* instance = scriptA->getScriptInstance() ) {
@@ -118,7 +120,9 @@ namespace LaurelEye::Physics {
         exitListener = eventManager->addListener<CollisionExitEvent>(
             [&](const CollisionExitEvent& event) {
                 const auto& data = event.GetData();
-                assert(data.entityARef && data.entityBRef);
+
+                LE_ASSERT("Physics", data.entityARef && data.entityBRef, "[CollisionExitEvent] Invalid entities.");
+                LE_DEBUG_INFO("Physics", "[CollisionExitEvent] Listener run.");
 
                 if ( auto* scriptA = data.entityARef->findComponent<Scripting::ScriptComponent>() ) {
                     if ( auto* instance = scriptA->getScriptInstance() ) {
@@ -132,15 +136,15 @@ namespace LaurelEye::Physics {
                     }
                 }
 
-                std::cout << "[Exit] " << data << std::endl;
             });
 
         enterTriggerListener = eventManager->addListener<TriggerEnterEvent>(
             [&](const TriggerEnterEvent& event) {
                 const auto& data = event.GetData();
-                assert(data.entityARef && data.entityBRef);
 
-                std::cout << "[EnterTrigger] Listener is Run" << std::endl;
+                LE_ASSERT("Physics", data.entityARef && data.entityBRef, "[TriggerEnterEvent] Invalid entities.");
+                LE_DEBUG_INFO("Physics", "[TriggerEnterEvent] Listener run.");
+
                 if ( auto* scriptA = data.entityARef->findComponent<Scripting::ScriptComponent>() ) {
                     if ( auto* instance = scriptA->getScriptInstance() ) {
                         instance->onTriggerEnter(data);
@@ -159,7 +163,9 @@ namespace LaurelEye::Physics {
         stayTriggerListener = eventManager->addListener<TriggerStayEvent>(
             [&](const TriggerStayEvent& event) {
                 const auto& data = event.GetData();
-                assert(data.entityARef && data.entityBRef);
+
+                LE_ASSERT("Physics", data.entityARef && data.entityBRef, "[TriggerStayEvent] Invalid entities.");
+                LE_DEBUG_INFO("Physics", "[TriggerStayEvent] Listener run.");
 
                 if ( auto* scriptA = data.entityARef->findComponent<Scripting::ScriptComponent>() ) {
                     if ( auto* instance = scriptA->getScriptInstance() ) {
@@ -172,15 +178,15 @@ namespace LaurelEye::Physics {
                         instance->onTriggerStay(data);
                     }
                 }
-
-                //std::cout << "[StayTrigger] " << data << std::endl;
             }
         );
 
         exitTriggerListener = eventManager->addListener<TriggerExitEvent>(
             [&](const TriggerExitEvent& event) {
                 const auto& data = event.GetData();
-                assert(data.entityARef && data.entityBRef);
+
+                LE_ASSERT("Physics", data.entityARef && data.entityBRef, "[TriggerExitEvent] Invalid entities.");
+                LE_DEBUG_INFO("Physics", "[TriggerExitEvent] Listener run.");
 
                 if ( auto* scriptA = data.entityARef->findComponent<Scripting::ScriptComponent>() ) {
                     if ( auto* instance = scriptA->getScriptInstance() ) {
@@ -193,15 +199,13 @@ namespace LaurelEye::Physics {
                         instance->onTriggerExit(data);
                     }
                 }
-
-                //std::cout << "[ExitTrigger] " << data << std::endl;
             }
         );
     }
 
     void PhysicsSystem::deregisterCollisionEnterListeners() {
         auto* eventManager = context->getService<EventManager>();
-        assert(eventManager && "PhysicsSystem: No EventManager in EngineContext");
+        LE_ASSERT("Physics", eventManager, "No EventManager in EngineContext.");
         eventManager->removeListener<CollisionEnterEvent>(enterListener);
         eventManager->removeListener<CollisionStayEvent>(stayListener);
         eventManager->removeListener<CollisionExitEvent>(exitListener);
@@ -250,8 +254,7 @@ namespace LaurelEye::Physics {
         }
         const auto& events = collisionManager.getEvents();
         auto* eventManager = context->getService<EventManager>();
-        if ( !eventManager )
-            throw std::runtime_error("No Event Manager");
+        LE_ASSERT("Physics", eventManager, "No EventManager in EngineContext.");
 
         for ( const auto& evt : events ) {
             //TODO: Use the Event Manager Sigleton or System Coordinator
@@ -280,7 +283,8 @@ namespace LaurelEye::Physics {
                         break;
                     }
                     default:
-                        throw std::runtime_error("Unknown collision event type!");
+                        LE_DEBUG_FATAL_ERROR("Physics", "Unknown Collision Interaction event type!");
+                        return;
                 }
 
                 break;
@@ -303,20 +307,17 @@ namespace LaurelEye::Physics {
                     break;
                 }
                 default:
-                    throw std::runtime_error("Unknown collision event type!");
+                    LE_DEBUG_FATAL_ERROR("Physics", "Unknown Trigger Interaction event type!");
+                    return;
                 }
 
                 break;
 
             case CollisionEventData::Interaction::ERROR:
-                throw std::runtime_error("ERROR Unknown collision Interaction event type!");
-                break;
             default:
-                throw std::runtime_error("Unknown collision Interaction event type!");
+                LE_ERROR("Physics", "Unknown Interaction event type!");
                 break;
             }
-
-            //std::cout << evt << std::endl;
         }
     }
 }

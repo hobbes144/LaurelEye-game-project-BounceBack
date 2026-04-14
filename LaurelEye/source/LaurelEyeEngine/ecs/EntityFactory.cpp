@@ -27,7 +27,6 @@
 
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
-#include <iostream>
 #include <LaurelEyeEngine/animation/resources/Animation.h>
 #include <LaurelEyeEngine/animation/components/SkeletalAnimationComponent.h>
 #include <LaurelEyeEngine/animation/AnimationManager.h>
@@ -75,20 +74,52 @@ namespace LaurelEye {
             }
         }
 
+        if ( entityJson.HasMember("prefab") && entityJson["prefab"].IsString() ) {
+            const std::string& prefabPath = assetPath + entityJson["prefab"].GetString();
+            auto* assetManager = context.getService<IO::AssetManager>();
+            auto asset = assetManager->load(prefabPath);
+            auto jsonAsset = std::dynamic_pointer_cast<IO::JsonAsset>(asset);
+            LE_ASSERT("EntityFactory", jsonAsset, "Could not parse prefab for entity.");
+            if ( jsonAsset->jsonDocument.HasMember("Children") && jsonAsset->jsonDocument["Children"].IsArray() ) {
+                for ( const auto& childJson : jsonAsset->jsonDocument["Children"].GetArray() ) {
+                    createEntityRecursive(scene, childJson, entity, entityMap);
+                }
+            }
+        }
+
         return entity;
 
     }
 
-    Entity* EntityFactory::createEntityFromJson(const rapidjson::Value& entityJson) {
-        if ( !entityJson.HasMember("name") || !entityJson["name"].IsString() )
-            throw std::runtime_error("EntityFactory: Entity missing 'name' field");
+    Entity* EntityFactory::createEntityFromJson(
+            const rapidjson::Value& entityJson, std::string parentName, Entity* parentEntity) {
 
-        std::string name = entityJson["name"].GetString();
-        auto* memManager = context.getService<MemoryManager>();
-        if ( !memManager ) {
-            throw std::runtime_error("EntityFactory: MemoryManager service not found in context");
+        Entity* entity;
+        LE_ASSERT("EntityFactory", entityJson.HasMember("name") || entityJson["name"].IsString(), "Entity missing 'name' field");
+        const std::string localName = entityJson["name"].GetString();
+
+        std::string name;
+        if ( parentName != "" ) {
+            name = parentName;
+            if (parentEntity) {
+                entity = parentEntity;
+            }
+            else {
+                auto* memManager = context.getService<MemoryManager>();
+                if ( !memManager ) {
+                    throw std::runtime_error("EntityFactory: MemoryManager service not found in context");
+                }
+                entity = memManager->allocateMemory(name);
+            }
         }
-        auto entity = memManager->allocateMemory(name);
+        else {
+            name = localName;
+            auto* memManager = context.getService<MemoryManager>();
+            if ( !memManager ) {
+                throw std::runtime_error("EntityFactory: MemoryManager service not found in context");
+            }
+            entity = memManager->allocateMemory(name);
+        }
 
         if ( entityJson.HasMember("tags") && entityJson["tags"].IsArray() ) {
             const auto& tags = entityJson["tags"].GetArray();
@@ -98,20 +129,21 @@ namespace LaurelEye {
                 }
             }
         }
+
         // Add components if present
         if ( entityJson.HasMember("components") && entityJson["components"].IsObject() ) {
             const auto& comps = entityJson["components"];
             addComponentsFromJson(*entity, comps);
         }
-        else if ( entityJson.HasMember("prefab") && entityJson["prefab"].IsString() ) {
+
+        if ( entityJson.HasMember("prefab") && entityJson["prefab"].IsString() ) {
             const std::string& prefabPath = assetPath + entityJson["prefab"].GetString();
             auto* assetManager = context.getService<IO::AssetManager>();
             auto asset = assetManager->load(prefabPath);
             auto jsonAsset = std::dynamic_pointer_cast<IO::JsonAsset>(asset);
-            if ( !jsonAsset ) {
-                std::cerr << "EntityFactory: Could not parse prefab for entity";
-            }
-            entity = createEntityFromJson(jsonAsset->jsonDocument);
+            LE_ASSERT("EntityFactory", jsonAsset, "Could not parse prefab for entity.");
+
+            entity = createEntityFromJson(jsonAsset->jsonDocument, name, entity);
         }
 
         return entity;
@@ -168,7 +200,7 @@ namespace LaurelEye {
                 setupAnimationComponent(entity, compData);
             }
             else {
-                std::cerr << "Entity Factory: Unknown component type trying to be added to entity: " << entity.getName() << std::endl;
+                LE_ERROR("EntityFactory", "Unknown component type trying to be added to entity: " << entity.getName());
             }
         }
     }
@@ -178,9 +210,7 @@ namespace LaurelEye {
         auto* assetManager = context.getService<IO::AssetManager>();
         auto asset = assetManager->load(fullPath);
         auto jsonAsset = std::dynamic_pointer_cast<IO::JsonAsset>(asset);
-        if ( !jsonAsset ) {
-            std::cerr << "EntityFactory: Could not parse prefab for entity";
-        }
+        LE_ERROR_IF("EntityFactory", !jsonAsset, "Could not parse prefab for entity");
         std::unordered_map<std::string, Entity*> entityMap;
         auto entity = createEntityRecursive(scene, jsonAsset->jsonDocument, nullptr, entityMap);
         scene.addEntity(entity);
@@ -230,6 +260,8 @@ namespace LaurelEye {
 #pragma region Setup
 
     void EntityFactory::setupTransformComponent(Entity& entity, const rapidjson::Value& transformData) {
+        if (entity.findComponent<TransformComponent>() != nullptr) return;
+
         auto* transform = entity.addComponent<TransformComponent>();
         if ( transformData.HasMember("position") ) {
             const auto& pos = transformData["position"];
@@ -249,6 +281,8 @@ namespace LaurelEye {
     }
 
     void EntityFactory::setupRender3DComponent(Entity& entity, const rapidjson::Value& render3DData) {
+        if ( entity.findComponent<Graphics::Renderable3DComponent>() != nullptr ) return;
+
         // Register renderer component
 
         // Make the Renderable Component
@@ -328,6 +362,8 @@ namespace LaurelEye {
     }
 
     void EntityFactory::setupCameraComponent(Entity& entity, const rapidjson::Value& cameraData) {
+        if ( entity.findComponent<Graphics::CameraComponent>() != nullptr ) return;
+
         std::unique_ptr<Graphics::CameraComponent> cameraComponent = std::make_unique<Graphics::CameraComponent>();
 
         // cameraComponent->setPositionRotation(
@@ -339,14 +375,16 @@ namespace LaurelEye {
 
     void EntityFactory::setupLightComponent(Entity& entity, const rapidjson::Value& lightData) {
         if ( !lightData.HasMember("type") || !lightData["type"].IsString() ) {
-            std::cerr << "EntityFactory: Light component missing 'type' field on entity: "
-                      << entity.getName() << std::endl;
+            LE_ERROR("EntityFactory",  "Light component missing 'type' field on entity: "
+                      << entity.getName());
             return;
         }
 
         std::string lightType = lightData["type"].GetString();
 
         if ( lightType == "Directional" ) {
+            if ( entity.findComponent<Graphics::DirectionalLightComponent>() != nullptr ) return;
+
             Vector3 direction(0.0f, -1.0f, 0.0f);
             float intensity = 1.0f;
             Vector3 color(1.0f, 1.0f, 1.0f);
@@ -376,6 +414,8 @@ namespace LaurelEye {
         }
 
         else if ( lightType == "Point" ) {
+            if ( entity.findComponent<Graphics::PointLightComponent>() != nullptr ) return;
+
             Vector3 position(0.0f, 0.0f, 0.0f);
             float intensity = 1.0f;
             Vector3 color(1.0f, 1.0f, 1.0f);
@@ -407,6 +447,7 @@ namespace LaurelEye {
         // Ambient Light
         // -------------------------------
         else if ( lightType == "Ambient" ) {
+            if ( entity.findComponent<Graphics::AmbientLightComponent>() != nullptr ) return;
             Vector3 color(1.0f, 1.0f, 1.0f);
             float intensity = 0.5f;
 
@@ -427,6 +468,16 @@ namespace LaurelEye {
     void EntityFactory::setupPhysicsComponent(Entity& entity, const rapidjson::Value& physicsData) {
         using namespace LaurelEye::Physics;
         PhysicsBodyData data;
+
+        // --- Assign to component ---
+        if ( data.type == BodyType::Dynamic ||
+             data.type == BodyType::Static ||
+             data.type == BodyType::Kinematic ) {
+            if ( entity.findComponent<Physics::RigidBodyComponent>() != nullptr ) return;
+        }
+        else if ( data.type == BodyType::Ghost ) {
+            if ( entity.findComponent<Physics::GhostBodyComponent>() != nullptr ) return;
+        }
 
         // --- BodyType ---
         if ( physicsData.HasMember("type") && physicsData["type"].IsString() ) {
@@ -530,11 +581,13 @@ namespace LaurelEye {
             auto* physicsComp = entity.addComponent<Physics::GhostBodyComponent>(data);
         }
         else {
-            std::cerr << "[EntityFactory::setupPhysicsComponent] INVALID BODY TYPE\n";
+            LE_ERROR("EntityFactory", "Invalid body type.");
         }
     }
 
     void EntityFactory::setupScriptComponent(Entity& entity, const rapidjson::Value& scriptData) {
+        if ( entity.findComponent<Scripting::ScriptComponent>() != nullptr ) return;
+
         // Register script component
         if ( !scriptData.HasMember("path") || !scriptData["path"].IsString() ) {
             LE_DEBUG_ASSERT("Entity Factory", false,"EntityFactory: Script component missing 'path' for entity: " << entity.getName());
@@ -579,6 +632,7 @@ namespace LaurelEye {
     }
 
     void EntityFactory::setupParticleEmitterComponent(Entity& entity, const rapidjson::Value& emitterData) {
+        if ( entity.findComponent<Particles::ParticleEmitterComponent>() != nullptr ) return;
 
         Particles::ParticleEmitterData data;
 
@@ -667,9 +721,11 @@ namespace LaurelEye {
     //}
 
     void EntityFactory::setupAudioComponent(Entity& entity, const rapidjson::Value& audioData) {
+        if ( entity.findComponent<Audio::AudioComponent>() != nullptr ) return;
+
         if ( !audioData.HasMember("sounds") || !audioData["sounds"].IsArray() ) {
-            std::cerr << "Audio data missing 'sounds' array for entity: "
-                      << entity.getName() << std::endl;
+            LE_ERROR("EntityFactory", "Audio data missing 'sounds' array for entity: "
+                      << entity.getName());
             return;
         }
 
@@ -682,10 +738,7 @@ namespace LaurelEye {
         const auto& soundsArray = audioData["sounds"].GetArray();
 
         for ( const auto& s : soundsArray ) {
-            if ( !s.HasMember("id") || !s.HasMember("path") || !s["id"].IsString() || !s["path"].IsString() ) {
-                std::cerr << "Invalid sound entry in entity: " << entity.getName() << std::endl;
-                continue;
-            }
+            LE_DEBUG_ERROR_IF("EntityFactory", !s.HasMember("id") || !s.HasMember("path") || !s["id"].IsString() || !s["path"].IsString(), "Invalid sound entry in entity: " << entity.getName());
 
             std::string id = s["id"].GetString();
             std::string path = s["path"].GetString();
@@ -715,6 +768,8 @@ namespace LaurelEye {
     }
 
     void EntityFactory::setupUITransformComponent(Entity& entity, const rapidjson::Value& uitransformData) {
+        if ( entity.findComponent<UI::UITransformComponent>() != nullptr ) return;
+
         UI::UITransformData t;
 
         if ( uitransformData.HasMember("anchorMin") ) {
@@ -742,6 +797,8 @@ namespace LaurelEye {
     }
 
     void EntityFactory::setupUIRenderComponent(Entity& entity, const rapidjson::Value& uirenderData) {
+        if ( entity.findComponent<UI::UIRenderComponent>() != nullptr ) return;
+
         std::unique_ptr<UI::UIRenderComponent> uirenderComponent = std::make_unique<UI::UIRenderComponent>();
 
         // ALWAYS create material
@@ -812,7 +869,7 @@ namespace LaurelEye {
                 uirenderComponent->SetColor(c);
             }
             else {
-                std::cerr << "Color is Not a Vector4\n";
+                LE_ERROR("EntityFactory", "Color is Not a Vector4");
             }
         }
 
@@ -828,6 +885,8 @@ namespace LaurelEye {
 
 
     void EntityFactory::setupUIInteractionComponent(Entity& entity, const rapidjson::Value& uiinteractionData) {
+        if ( entity.findComponent<UI::UIInteractionComponent>() != nullptr ) return;
+
         std::unique_ptr<UI::UIInteractionComponent> uiinteractionComponent = std::make_unique<UI::UIInteractionComponent>();
 
         // ---- Core Flags ----
@@ -880,6 +939,8 @@ namespace LaurelEye {
     }
 
     void EntityFactory::setupUITextComponent(Entity& entity, const rapidjson::Value& uitextData) {
+        if ( entity.findComponent<UI::UITextComponent>() != nullptr ) return;
+
         std::unique_ptr<UI::UITextComponent> textComponent = std::make_unique<UI::UITextComponent>();
 
         // ALWAYS create material (same pattern as UI quad)
@@ -925,7 +986,7 @@ namespace LaurelEye {
                 textComponent->SetColor(Vector4(r, g, b, a));
             }
             else {
-                std::cerr << "[UITextComponent] Color is not a Vector4\n";
+                LE_ERROR("EntityFactory", "[UITextComponent] Color is Not a Vector4");
             }
         }
 
@@ -962,10 +1023,10 @@ namespace LaurelEye {
     }
 
     void EntityFactory::setupAnimationComponent(Entity& entity, const rapidjson::Value& animationData) {
+        if ( entity.findComponent<Animations::SkeletalAnimationComponent>() != nullptr ) return;
+
         if ( !animationData.IsObject() )
             return;
-
-        assert((std::cout << "Setup AnimationComponent\n", true));
 
         // Create the component
         auto animComponent = std::make_unique<Animations::SkeletalAnimationComponent>();
@@ -1015,11 +1076,12 @@ namespace LaurelEye {
                 auto skinnedMeshAsset = std::dynamic_pointer_cast<IO::SkinnedMeshAsset>(asset);
                 auto animAsset = std::dynamic_pointer_cast<IO::AnimationAsset>(skinnedMeshAsset->animation);
 
-                if ( !animAsset ) {
-                    throw std::runtime_error("EntityFactory::setupAnimationComponent - Asset '" + animPath + "' is not an AnimationAsset.");
+                if (!animAsset) {
+                    LE_ERROR("EntityFactory", "setupAnimationComponent - Asset '" << animPath << "' is not an AnimationAsset.");
+                    return;
                 }
 
-                assert((std::cout << "Loaded asset " + assetPath + animPath + "\n", true));
+                LE_INFO("EntityFactory", "Loaded asset " << assetPath << animPath);
 
                 auto animManager = context.getService<Animations::AnimationManager>();
                 Animations::AnimationHandle handle = animManager->createAnimation(animAsset.get());

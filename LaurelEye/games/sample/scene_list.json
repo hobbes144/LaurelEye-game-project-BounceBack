@@ -44,6 +44,10 @@
         {
             "name": "Level5",
             "path": "scenes/level5.scene.json"
+        },
+        {
+            "name": "BossLevel",
+            "path": "scenes/boss_level.scene.json"
         }
     ]
 }

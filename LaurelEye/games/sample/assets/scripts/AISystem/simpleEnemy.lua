@@ -47,7 +47,6 @@ function onStart()
     body = self:findRigidBody()
     --shooting_speed = math.random(minshooting_speed * 100, maxshooting_speed * 100) / 100
     local scene = SceneManager:getCurrentScene()
-    player = scene:findEntityByName("PlayerPrefab")
 
     animator = self:findAnimator()
 
@@ -66,7 +65,7 @@ function onMessage(msg)
         hasKey = true
     end
     if msg.topic == "Get Hit!" then
-        if msg.to ~= self then return end 
+        if msg.to ~= self then return end
         if state_machine.current_state.name == "Dead" then return end
         if state_machine then state_machine:forceTransition("Dead") end
     end
@@ -117,12 +116,15 @@ function setupIdleState()
         animator:changeAnimation("Idle")
         log("Enemy idle")
     end)
-    
+
     idle_state:setUpdate(function(dt)
+        if player == nil then
+            player = getPlayer()
+        end
         --log("Updating idle state")
         ballCheck()
     end)
-    
+
     idle_state:addTransition("toStartle", startle_state, 1, function()
         return active
     end)
@@ -143,19 +145,19 @@ function setupStartleState()
         if player == nil then return end
         state_duration = 1.0
     end)
-    
+
     startle_state:setUpdate(function(dt)
         -- You can add logic for the startle state here (e.g., a brief pause or animation)
         state_duration = state_duration - dt
         rotateTowardsPlayer(dt)
     end)
-    
+
     startle_state:addTransition("toAlert", alert_state, 1, function()
         return state_duration <= 0.0  -- Transition to alert state after startle is done
     end)
 
 end
-    
+
 -----------------------------------
 --Alert state
 -----------------------------------
@@ -171,13 +173,13 @@ function setupAlertState()
         alert_timer = 0.0
         animator:changeAnimation("Alert")
     end)
-    
+
     alert_state:setUpdate(function(dt)
         rotateTowardsPlayer(dt)
         alert_timer = alert_timer + dt
         -- You can add logic for the alert state here (e.g., rotate towards player)
     end)
-    
+
     alert_state:addTransition("toShoot", shoot_state, 1, function()
         --after a delay of a random number of seconds - to add variety
         return alert_timer >= alert_duration
@@ -199,7 +201,7 @@ function setupShootState()
         state_duration = 1.0
         shot = false
     end)
-    
+
     shoot_state:setUpdate(function(dt)
         state_duration = state_duration - dt
         if state_duration < 0.5 then
@@ -210,9 +212,9 @@ function setupShootState()
             end
         end
     end)
-    
+
     shoot_state:addTransition("toAlert", alert_state, 1, function()
-        return state_duration <= 0.0 
+        return state_duration <= 0.0
     end)
 end
 
@@ -393,4 +395,12 @@ function destroySelf()
         keyTransform:setWorldPosition(pos.x, 3.0, pos.z)
     end
     SceneManager:destroy(self)
+end
+
+-----------------------------------
+
+function getPlayer()
+    local scene = SceneManager:getCurrentScene()
+    if scene == nil then return nil end
+    return scene:findEntityByName("PlayerPrefab")
 end

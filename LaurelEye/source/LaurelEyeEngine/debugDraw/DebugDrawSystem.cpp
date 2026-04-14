@@ -24,7 +24,10 @@ namespace LaurelEye::Debug {
     void DebugDrawSystem::initialize() {
 
         dbrp = context->getService<Graphics::RenderSystem>()->retrieveDebugDrawRenderPass();
-        assert(dbrp != nullptr);
+        if (!dbrp) {
+            LE_ERROR("DebugDraw", "Failed to initialize debug draw system");
+            return;
+        }
 
         // --- Create GPU buffer once ---
         if ( !lineGeoBuffer ) {
@@ -48,6 +51,9 @@ namespace LaurelEye::Debug {
     }
 
     void DebugDrawSystem::update(float dt) {
+        if (!dbrp) {
+            return;
+        }
         currentDebugLines = 0;
 
         // Check Hotkey Toggle
@@ -74,7 +80,6 @@ namespace LaurelEye::Debug {
         backBuffer.clear();
         populateWireFrameCommands(physicsSystem, backBuffer);
         updateLineBufferObject();
-        assert(dbrp != nullptr);
         dbrp->updateNumLines(currentDebugLines);
     }
 

@@ -14,6 +14,7 @@
 #include "LaurelEyeEngine/graphics/resources/Texture.h"
 #include "LaurelEyeEngine/graphics/ShaderManager.h"
 #include "LaurelEyeEngine/graphics/ShadowManager.h"
+#include "LaurelEyeEngine/logging/EngineLog.h"
 
 namespace LaurelEye::Graphics {
     void DeferredRenderPass::setup(RenderResources& rs) {
@@ -35,23 +36,23 @@ namespace LaurelEye::Graphics {
 
         if ( !isValidTexture(gbufferPosition) ) {
             gbufferPosition = ctx.resources.texture("gbuffer_position");
-            assert(isValidTexture(gbufferPosition) &&
-                   "LAURELEYE::RENDER_SYSTEM::DEFERRED_RENDER_PASS::GBUFFER_POSITION_MISSING");
+            LE_ASSERT("Graphics", isValidTexture(gbufferPosition),
+                   "GBuffer Position missing.");
         }
         if ( !isValidTexture(gbufferNormal) ) {
             gbufferNormal = ctx.resources.texture("gbuffer_normal");
-            assert(isValidTexture(gbufferNormal) &&
-                   "LAURELEYE::RENDER_SYSTEM::DEFERRED_RENDER_PASS::GBUFFER_NORMAL_MISSING");
+            LE_ASSERT("Graphics", isValidTexture(gbufferNormal),
+                   "GBuffer Normal missing.");
         }
         if ( !isValidTexture(gbufferDiffuse) ) {
             gbufferDiffuse = ctx.resources.texture("gbuffer_diffuse");
-            assert(isValidTexture(gbufferDiffuse) &&
-                   "LAURELEYE::RENDER_SYSTEM::DEFERRED_RENDER_PASS::GBUFFER_DIFFUSE_MISSING");
+            LE_ASSERT("Graphics", isValidTexture(gbufferDiffuse),
+                   "GBuffer Diffuse missing.");
         }
         if ( !isValidTexture(gbufferSpecular) ) {
             gbufferSpecular = ctx.resources.texture("gbuffer_specular");
-            assert(isValidTexture(gbufferSpecular) &&
-                   "LAURELEYE::RENDER_SYSTEM::DEFERRED_RENDER_PASS::GBUFFER_SPECULAR_MISSING");
+            LE_ASSERT("Graphics", isValidTexture(gbufferSpecular),
+                   "GBuffer Specular missing.");
         }
 
         if ( !isValidTexture(sunShadowTex) ) {

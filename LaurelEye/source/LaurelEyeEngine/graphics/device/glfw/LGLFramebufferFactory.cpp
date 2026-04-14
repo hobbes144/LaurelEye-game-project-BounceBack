@@ -12,6 +12,8 @@
 #include "LaurelEyeEngine/graphics/resources/Framebuffer.h"
 #include "LaurelEyeEngine/graphics/resources/SizeRegistry.h"
 #include "LaurelEyeEngine/graphics/resources/Texture.h"
+
+#include "LaurelEyeEngine/logging/EngineLog.h"
 #include <vector>
 
 namespace LaurelEye::Graphics {
@@ -45,7 +47,7 @@ namespace LaurelEye::Graphics {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         GLenum status = glCheckNamedFramebufferStatus(r.id, GL_FRAMEBUFFER);
-        assert((status == GL_FRAMEBUFFER_COMPLETE) && "ERROR::RENDER_SYSTEM::FRAMEBUFFER_FACTORY::CREATE::FAILED");
+        LE_ASSERT("Graphics", status == GL_FRAMEBUFFER_COMPLETE, "Framebuffer Factory creation failed.");
 
         return r.id;
     }
@@ -77,7 +79,7 @@ namespace LaurelEye::Graphics {
     }
 
     uint32_t LGLFramebufferFactory::attachTexture(FramebufferHandle h, const FramebufferAttachmentDesc& d) {
-        assert(createdBuffers.contains(h) && "ERROR::RENDER_SYSTEM::FRAMEBUFFER_FACTORY::ATTACH_TEXTURE::INVALID_FRAMEBUFFER");
+        LE_ASSERT("Graphics", createdBuffers.contains(h), "Invalid Framebuffer.");
 
         FramebufferAttachment a{};
         a.texture = d.texture;
@@ -109,7 +111,7 @@ namespace LaurelEye::Graphics {
 
             if ( !isValidTexture(a.texture) ) {
                 a.texture = createColorAttachmentTexture(h, d);
-                assert(isValidTexture(a.texture) && "ERROR::RENDER_SYSTEM::FRAMEBUFFER_FACTORY::ATTACH_TEXTURE::TEXTURE_CREATION_FAILED");
+                LE_ASSERT("Graphics", isValidTexture(a.texture), "Texture creation failed.");
             }
 
             glNamedFramebufferTexture(h, a.glAttachment, a.texture, 0);
@@ -120,7 +122,7 @@ namespace LaurelEye::Graphics {
         case LaurelEye::Graphics::FramebufferAttachmentType::DepthStencil:
         case LaurelEye::Graphics::FramebufferAttachmentType::Stencil:
         default:
-            assert(false && "ERROR::RENDER_SYSTEM::FRAMEBUFFER_FACTORY::CREATE::INVALID_ATTACHMENT_TYPE");
+            LE_FATAL_ERROR("Graphics", "Invalid attachment type.");
         }
 
         // This should never happen, but is here as fallback

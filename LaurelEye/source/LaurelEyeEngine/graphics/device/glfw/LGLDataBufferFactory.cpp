@@ -8,6 +8,7 @@
 #include "LaurelEyeEngine/graphics/device/glfw/LGLDataBufferFactory.h"
 
 #include "LaurelEyeEngine/graphics/resources/DataBuffer.h"
+#include "LaurelEyeEngine/logging/EngineLog.h"
 
 #include <GL/gl.h>
 #include <GL/glext.h>
@@ -38,10 +39,8 @@ namespace LaurelEye::Graphics {
         glCreateBuffers(1, &r.id);
         glNamedBufferStorage(r.id, (GLsizeiptr)d.sizeBytes, initialData, flags);
 
-#if !defined(NDEBUG)
-        std::cout << "Created buffer: " << debugName << std::endl;
+        LE_DEBUG_INFO("Graphics", "Created buffer: " << debugName);
         glObjectLabel(GL_BUFFER, r.id, -1, debugName.c_str());
-#endif
 
         DataBufferHandle h = r.id;
 

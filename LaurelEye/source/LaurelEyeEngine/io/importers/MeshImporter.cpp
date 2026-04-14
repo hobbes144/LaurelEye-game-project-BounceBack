@@ -2,6 +2,7 @@
 #include "LaurelEyeEngine/io/Assets.h"
 #include "LaurelEyeEngine/math/Transform.h"
 #include "LaurelEyeEngine/platforms/assimp/AssimpUtilities.h"
+#include "LaurelEyeEngine/logging/EngineLog.h"
 
 #include <assimp/quaternion.h>
 #include <assimp/vector3.h>
@@ -82,7 +83,7 @@ namespace LaurelEye::IO {
             const aiBone* b = mesh->mBones[i];
             const std::string boneName = b->mName.C_Str();
             const auto it = skeletonAsset->boneNameIndex.find(boneName);
-            assert("LAURELEYE::IO::MESHIMPORTER::BONEMISSING" && it != skeletonAsset->boneNameIndex.end());
+            LE_ASSERT("io", it != skeletonAsset->boneNameIndex.end(), "Mesh bone missing!");
             const auto boneIndex = it->second;
 
             for ( unsigned int j = 0; j < b->mNumWeights; ++j ) {
@@ -112,7 +113,7 @@ namespace LaurelEye::IO {
         int thisIndex = parentIndex;
 
         if ( usedBoneNames.contains(nodeName) ) {
-            assert(!skel.boneNameIndex.contains(nodeName) && "ERROR::LAURELEYE::MESHIMPORTER::INVALID_SKELETON");
+            LE_ASSERT("io", !skel.boneNameIndex.contains(nodeName), "Invalid skeleton.");
             thisIndex = static_cast<int>(skel.bones.size());
 
             SkeletonAsset::Bone bone;
@@ -196,7 +197,7 @@ namespace LaurelEye::IO {
             // Find matching bone index in skeleton if it exists
             auto it = skeleton.boneNameIndex.find(boneName);
             if ( it == skeleton.boneNameIndex.end() ) {
-                std::cout << "Animation channel bone not found in skeleton: " << boneName << std::endl;
+                LE_DEBUG_WARN("Animation", "Animation channel bone not found in skeleton: " << boneName);
                 continue;
             }
 
@@ -267,8 +268,8 @@ namespace LaurelEye::IO {
             ch.keyframe.push_back(bindT);
             ch.timeStamp.push_back(0.0);
 
-            std::cout << "Added bind-pose channel for missing bone: "
-                      << skeleton.bones[boneIndex].name << std::endl;
+            LE_DEBUG_INFO("Animation", "Added bind-pose channel for missing bone: "
+                      << skeleton.bones[boneIndex].name);
         }
 
         return anim;

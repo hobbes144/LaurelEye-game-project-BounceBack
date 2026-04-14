@@ -6,7 +6,6 @@
 #include "LaurelEyeEngine/physics/CollisionManager.h"
 #include "LaurelEyeEngine/UI/UIComponents/UIInteractionComponent.h"
 #include "LaurelEyeEngine/ecs/Entity.h"
-#include <cassert>
 #include <sol/protected_function_result.hpp>
 
 #include "LaurelEyeEngine/logging/EngineLog.h"
@@ -216,7 +215,7 @@ namespace LaurelEye::Scripting {
             }
         }
     }
-    
+
 #pragma endregion
 
 #pragma region UIInteraction Events

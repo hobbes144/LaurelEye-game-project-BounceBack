@@ -13,7 +13,7 @@
 /// @file   FModAudioManager.cpp
 #include "LaurelEyeEngine/audio/FModAudioManager.h"
 #include "LaurelEyeEngine/io/FileSystem.h"
-#include <cassert>
+#include "LaurelEyeEngine/logging/EngineLog.h"
 
 namespace LaurelEye::Audio {
 
@@ -27,11 +27,11 @@ namespace LaurelEye::Audio {
     void FModAudioManager::initialize() {
         FMOD_RESULT result = FMOD::System_Create(&system);
         // change to LE assert later
-        assert(result == FMOD_OK && "FMOD: System_Create failed");
+        LE_ASSERT("Audio", result == FMOD_OK, "FMOD: System_Create failed.");
 
         // glm style right-handed 3D coordinates, which is what we're using in our math library(I think)
         result = system->init(maxChannels, FMOD_INIT_3D_RIGHTHANDED, nullptr);
-        assert(result == FMOD_OK && "FMOD: system->init failed");
+        LE_ASSERT("Audio", result == FMOD_OK, "FMOD: system->init failed.");
 
         // default is good enough for our needs, but we could tweak these if we want to optimize for latency or memory usage
         //system_->setStreamBufferSize(1024 * 1024, FMOD_TIMEUNIT_RAWBYTES);
@@ -59,7 +59,7 @@ namespace LaurelEye::Audio {
     }
 
     ChannelGroupHandle FModAudioManager::registerGroup(FMOD::ChannelGroup* group) {
-        assert(group != nullptr && "FMOD: Tried to register a null channel group");
+        LE_ASSERT("Audio", group != nullptr, "FMOD: Tried to register a null channel group.");
         ChannelGroupHandle handle = nextGroupHandle++;
         groups[handle] = group;
         return handle;
@@ -116,7 +116,7 @@ namespace LaurelEye::Audio {
         FMOD::Sound* sound = nullptr;
         auto string = "games/sample/assets/" + path;
         auto fullPath = IO::resolve(string).make_preferred().string();
-        std::cout << "Loading sound: " << fullPath << std::endl;
+        LE_DEBUG_INFO("Audio", "Loading sound: " << fullPath);
 
         FMOD_RESULT result = system->createSound(fullPath.c_str(), mode, nullptr, &sound);
         if ( result != FMOD_OK )
@@ -126,7 +126,6 @@ namespace LaurelEye::Audio {
                     path.c_str(), result);
             return NULL_SOUND;
         }
-            
 
         SoundHandle handle = nextSoundHandle++;
         sounds[handle] = sound;

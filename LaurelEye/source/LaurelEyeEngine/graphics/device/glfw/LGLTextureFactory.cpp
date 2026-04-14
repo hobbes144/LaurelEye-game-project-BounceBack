@@ -9,6 +9,7 @@
 
 #include "LaurelEyeEngine/graphics/device/glfw/LGLRenderDevice.h"
 #include "LaurelEyeEngine/graphics/resources/Texture.h"
+#include "LaurelEyeEngine/logging/EngineLog.h"
 
 namespace LaurelEye::Graphics {
 
@@ -36,10 +37,11 @@ namespace LaurelEye::Graphics {
             return GL_DEPTH_COMPONENT32F;
         case TextureFormat::DEPTH24:
             return GL_DEPTH_COMPONENT24;
-        }
 
-        assert(false && "ERROR::RENDERSYSTEM::INVALIDFORMAT");
-        return GL_RGBA8;
+        default:
+            LE_DEBUG_ERROR("Graphics", "Invalid format. Defaulting to RGBA8.");
+            return GL_RGBA8;
+        }
     }
 
     GLint textureFormatToGLBaseFormat(TextureFormat f) {
@@ -62,11 +64,7 @@ namespace LaurelEye::Graphics {
             return GL_DEPTH_COMPONENT;
 
         default:
-            // TODO: Replace this with proper warning logging.
-#if !defined(NDEBUG)
-            std::cerr << "WARNING::RENDERSYSTEM::TEXTUREFACTORY::CREATE::INVALIDFORMAT"
-                      << "::Defaulting to RGBA" << std::endl;
-#endif
+            LE_DEBUG_ERROR("Graphics", "Invalid format. Defaulting to RGBA.");
             return GL_RGBA;
         }
     }
@@ -79,10 +77,11 @@ namespace LaurelEye::Graphics {
             return GL_MIRRORED_REPEAT;
         case TextureWrapMode::ClampToEdge:
             return GL_CLAMP_TO_EDGE;
-        }
 
-        assert(false && "ERROR::RENDERSYSTEM::INVALIDWRAPMODE");
-        return GL_REPEAT;
+        default:
+            LE_DEBUG_ERROR("Graphics", "Invalid wrap mode. Defaulting to GL_REPEAT.");
+            return GL_REPEAT;
+        }
     }
 
     GLint textureFilterToGLFilter(TextureFilterMode f) {
@@ -99,10 +98,11 @@ namespace LaurelEye::Graphics {
             return GL_LINEAR_MIPMAP_NEAREST;
         case TextureFilterMode::LinearMipmapLinear:
             return GL_LINEAR_MIPMAP_LINEAR;
-        }
 
-        assert(false && "ERROR::RENDERSYSTEM::INVALIDFILTERMODE");
-        return GL_LINEAR;
+        default:
+            LE_DEBUG_ERROR("Graphics", "Invalid filter mode. Defaulting to GL_LINEAR.");
+            return GL_LINEAR;
+        }
     }
 
     GLint textureFormatToGLUploadFormat(TextureFormat f) {
@@ -126,11 +126,7 @@ namespace LaurelEye::Graphics {
         case TextureFormat::DEPTH32F:
             return GL_FLOAT;
         default:
-            // TODO: Replace this with proper warning logging.
-#if !defined(NDEBUG)
-            std::cerr << "WARNING::RENDERSYSTEM::TEXTUREFACTORY::CREATE::INVALIDFORMAT"
-                      << "::Defaulting to RGBA" << std::endl;
-#endif
+            LE_DEBUG_ERROR("Graphics", "Invalid texture upload format. Defaulting to GL_FLOAT.");
             return GL_FLOAT;
         }
     }
@@ -172,9 +168,9 @@ namespace LaurelEye::Graphics {
     TextureHandle LGLTextureFactory::createTextureStorage(const TextureDesc& d) {
         TextureHandle h;
 
-        assert(
-            d.type == TextureType::TextureStorage2D &&
-            "ERROR::RENDERSYSTEM::TEXTUREFACTORY::CREATE::INVALIDTYPE::TextureStorage3D not supported");
+        LE_ASSERT("Graphics",
+            d.type == TextureType::TextureStorage2D,
+            "TextureStorage3D not supported");
 
         glCreateTextures(GL_TEXTURE_2D, 1, &h);
 
@@ -196,9 +192,9 @@ namespace LaurelEye::Graphics {
     TextureHandle LGLTextureFactory::createTexture(const TextureDesc& d, const void* init) {
         TextureHandle h;
 
-        assert(
-            d.type == TextureType::Texture2D || d.type == TextureType::TextureCube &&
-            "ERROR::RENDERSYSTEM::TEXTUREFACTORY::CREATE::INVALIDTYPE::Texture3D not supported");
+        LE_ASSERT("Graphics",
+            d.type == TextureType::Texture2D || d.type == TextureType::TextureCube,
+            "Texture3D not supported");
 
         glGenTextures(1, &h);
 
@@ -283,8 +279,8 @@ namespace LaurelEye::Graphics {
     void LGLTextureFactory::resize(TextureHandle h, uint32_t newW, uint32_t newH, uint32_t newD) {
         // NOTE: OpenGL textures are no longer mutable in DSA, so resize will
         // require creating a new texture in the future.
-        assert((textures.find(h) != textures.end()) && "ERROR::RENDERSYSTEM::TEXTUREFACTORY::RESIZE::INVALID_TEXTURE_HANDLE");
-        assert(textures[h].type != TextureType::TextureStorage2D && "ERROR::RENDERSYSTEM::TEXTUREFACTORY::RESIZE::UNSUPPORTED::TextureStorage2D resize not implemented.");
+        LE_ASSERT("Graphics", textures.find(h) != textures.end(), "Invalid texture handle.");
+        LE_ASSERT("Graphics", textures[h].type != TextureType::TextureStorage2D, "TextureStorage2D resize not implemented.");
         TextureDesc& d = textures[h];
         d.width = newW;
         d.height = newH;
@@ -350,7 +346,7 @@ namespace LaurelEye::Graphics {
         GLint maxUnits = 0;
         glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxUnits);
         if ( static_cast<GLint>(textureUnit) >= maxUnits ) {
-            std::cout << "WARNING::RENDERSYSTEM::TEXTUREFACTORY::BIND::INVALID_TEXTURE_UNIT" << std::endl;
+            LE_DEBUG_WARN("Graphics", "Invalid texture unit.");
             return;
         }
         glActiveTexture(GL_TEXTURE0 + textureUnit);

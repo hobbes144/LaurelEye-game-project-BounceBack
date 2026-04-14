@@ -85,7 +85,7 @@ namespace LaurelEye::Log {
     }
 
     inline void luaLog(sol::this_state ts, const std::string& msg) {
-#ifndef NDEBUG
+        if ( !Log::config().logEnabledSystems.contains("Scripting") ) return;
         lua_State* L = ts.lua_state();
         auto cs = LaurelEye::Scripting::get_lua_callsite(L, 1);
 
@@ -95,13 +95,10 @@ namespace LaurelEye::Log {
                                     cs.source,
                                     cs.line,
                                     cs.func);
-#else
-        LE_INFO("Scripting", msg);
-#endif
     }
 
     inline void luaLogWarn(sol::this_state ts, const std::string& msg) {
-#ifndef NDEBUG
+        if ( !Log::config().logEnabledSystems.contains("Scripting") ) return;
         lua_State* L = ts.lua_state();
         auto cs = LaurelEye::Scripting::get_lua_callsite(L, 1);
 
@@ -111,13 +108,10 @@ namespace LaurelEye::Log {
                                     cs.source,
                                     cs.line,
                                     cs.func);
-#else
-        LE_WARN("Scripting", msg);
-#endif
     }
 
     inline void luaLogError(sol::this_state ts, const std::string& msg) {
-#ifndef NDEBUG
+        if ( !Log::config().logEnabledSystems.contains("Scripting") ) return;
         lua_State* L = ts.lua_state();
         auto cs = LaurelEye::Scripting::get_lua_callsite(L, 1);
 
@@ -127,13 +121,11 @@ namespace LaurelEye::Log {
                                     cs.source,
                                     cs.line,
                                     cs.func);
-#else
-        LE_ERROR("Scripting", msg);
-#endif
     }
 
     inline void luaDebugLog(sol::this_state ts, const std::string& msg) {
 #ifndef NDEBUG
+        if ( !Log::config().logEnabledSystems.contains("Scripting") ) return;
         lua_State* L = ts.lua_state();
         auto cs = LaurelEye::Scripting::get_lua_callsite(L, 1);
 
@@ -148,6 +140,7 @@ namespace LaurelEye::Log {
 
     inline void luaDebugLogWarn(sol::this_state ts, const std::string& msg) {
 #ifndef NDEBUG
+        if ( !Log::config().logEnabledSystems.contains("Scripting") ) return;
         lua_State* L = ts.lua_state();
         auto cs = LaurelEye::Scripting::get_lua_callsite(L, 1);
 
@@ -162,6 +155,7 @@ namespace LaurelEye::Log {
 
     inline void luaDebugLogError(sol::this_state ts, const std::string& msg) {
 #ifndef NDEBUG
+        if ( !Log::config().logEnabledSystems.contains("Scripting") ) return;
         lua_State* L = ts.lua_state();
         auto cs = LaurelEye::Scripting::get_lua_callsite(L, 1);
 

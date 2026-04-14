@@ -120,7 +120,7 @@ namespace LaurelEye::Graphics {
             updateOrthographicProjection();
             break;
         default:
-            assert(false && "ERROR::CAMERA_COMPONENT::UPDATE_PROJECTION_MATRIX::INVALID_PROJECTION_TYPE, how did we get here?");
+            updatePerspectiveProjection();
         }
     }
 

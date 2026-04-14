@@ -294,6 +294,16 @@ end
 
 function onUpdate(dt)
 
+
+    if kickbackRing == nil then
+        local scene = SceneManager:getCurrentScene()
+        kickbackRing = scene:findEntityByName("KickbackRing")
+        if kickbackRing ~= nil then
+            kickbackRingTrans = kickbackRing:findTransform()
+            kickbackRingTrans:setWorldScale(Vector3.new(kickBackRange*0.6, 1.0, kickBackRange*0.6))
+        end
+    end
+
     if kickbackCountdown > 0.0 and not dead then
         kickbackCountdown = kickbackCountdown - dt
         if kickbackCountdown < 0.0 then

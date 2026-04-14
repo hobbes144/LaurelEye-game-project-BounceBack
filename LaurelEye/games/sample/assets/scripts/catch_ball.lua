@@ -12,6 +12,12 @@ scene = nil
 playerEntity = nil
 playerTransform = nil
 
+chaseRange = 15.0
+chaseSpeed = 140.0
+
+magnetStrength = 300.0
+maxMagnetForce = 500.0
+heightThreshold = 3.0
 impactPE = nil
 attackPE = nil
 kickbackPE = nil

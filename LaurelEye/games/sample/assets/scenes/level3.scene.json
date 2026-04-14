@@ -226,25 +226,6 @@
             }
         },
         {
-            "name": "BackgroundMusic",
-            "tags": [ "" ],
-            "components": {
-                "Transform": {
-                    "position": [ 0.0, 0.0, 0.0 ],
-                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 1.0, 1.0, 1.0 ]
-                },
-                "Speaker": {
-                    "audioName": "background",
-                    "audioPath": "audio/background_music_loop.mp3",
-                    "volume": 0.05,
-                    "loop": true,
-                    "3D": false,
-                    "playOnLoad": true
-                }
-            }
-        },
-        {
             "name": "southWall",
             "tags": [ "ground" ],
             "components": {
@@ -726,43 +707,55 @@
             "name": "Machine2 (2)",
             "tags": [ "ground" ],
             "components": {
-                    "Transform": {
-                        "position": [ -15.065, -2.208, -26.105 ],
-                        "rotation": [ 0.7071068, 0, -0.7071068, 0 ],
-                        "scale": [ -0.1761074, 0.1818023, -0.285381 ]
+                "Transform": {
+                    "position": [ -15.065, -2.208, -26.105 ],
+                    "rotation": [ 0.7071068, 0, -0.7071068, 0 ],
+                    "scale": [ -0.1761074, 0.1818023, -0.285381 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "Machine2.fbx",
+                        "file": "models/Machine2.fbx"
                     },
-                    "Render3D": {
-                        "mesh": {
-                            "name": "Machine2.fbx",
-                            "file": "models/Machine2.fbx"
-                        },
-                        "material": {
-                            "texture": "textures/arcadeColormap.png",
-                            "diffuse": [ 1.0, 10.0, 1.0 ],
-                            "specular": [ 0.2, 0.2, 0.2 ],
-                            "shininess": 32.0
+                    "material": {
+                        "texture": "textures/arcadeColormap.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 85.3659,
+                            "y": 94.38511,
+                            "z": 230.3842
                         }
                     },
-                    "Physics": {
-                        "type": "Static",
-                        "shapeDefinition": {
-                            "type": "Box",
-                            "size": {
-                                "x": 85.3659,
-                                "y": 94.38511,
-                                "z": 230.3842
-                            }
-                        },
-                        "mass": 0.0,
-                        "linearDamping": 0.0,
-                        "angularDamping": 0.0,
-                        "friction": 0.0,
-                        "restitution": 0.0,
-                        "collisionGroup": 4,
-                        "collisionMask": 11,
-                        "gravityScale": 0.0
-                    }
+                    "mass": 0.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.0,
+                    "restitution": 0.0,
+                    "collisionGroup": 4,
+                    "collisionMask": 11,
+                    "gravityScale": 0.0
                 }
             }
+        },
+        {
+            "name": "PlayerPrefab",
+            "prefab": "prefabs/catch_player.prefab.json"
+        },
+        {
+            "name": "Enemy1",
+            "prefab": "prefabs/shooting_enemy.prefab.json"
+        },
+        {
+            "name": "Enemy2",
+            "prefab": "prefabs/shooting_enemy.prefab.json"
+        }
     ]
 }

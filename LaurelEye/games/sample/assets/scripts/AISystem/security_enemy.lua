@@ -66,11 +66,7 @@ function onMessage(msg)
         end
         return true
     end
-    if msg.topic == "We Bonked!" then
-        if enemy_ai then enemy_ai:forceTransition("GetHit") end
-        return true
-    end
-    if msg.topic == "Shield Hit!" then      -- ball hit the shield
+    if msg.topic == "We Bonked!" then      -- ball hit the shield
         if enemy_ai then enemy_ai:forceTransition("GetHit") end
         return true
     end

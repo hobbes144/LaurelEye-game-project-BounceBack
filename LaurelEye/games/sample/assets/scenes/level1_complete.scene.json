@@ -210,43 +210,6 @@
             }
         },
         {
-            "name": "BackgroundMusic",
-            "tags": [ "" ],
-            "components": {
-                "Transform": {
-                    "position": [ 0.0, 0.0, 0.0 ],
-                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
-                    "scale": [ 1.0, 1.0, 1.0 ]
-                },
-                "Audio": {
-                    "sounds": [
-                        {
-                            "id": "background",
-                            "path": "audio/background_music_loop.mp3",
-                            "volume": 0.2,
-                            "fadeSpeed": 1.0,
-                            "loop": true,
-                            "playOnLoad": true,
-                            "type": "BGM"
-                        },
-                        {
-                            "id": "background2",
-                            "path": "audio/testAudio.mp3",
-                            "volume": 0.2,
-                            "fadeSpeed": 1.0,
-                            "loop": true,
-                            "playOnLoad": true,
-                            "type": "BGM"
-                        }
-                    ]
-                }
-
-            }
-        },
-
-
-
-        {
             "name": "westWall",
             "tags": [ "ground" ],
             "components": {
@@ -650,6 +613,14 @@
                     "path": "scripts/generator.lua"
                 }
             }
+        },
+        {
+            "name": "PlayerPrefab",
+            "prefab": "prefabs/catch_player.prefab.json"
+        },
+        {
+            "name": "Enemy",
+            "prefab": "prefabs/shooting_enemy.prefab.json"
         }
 
     ]

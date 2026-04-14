@@ -21,6 +21,7 @@
  *****************************************************************************/
 
 #include "LaurelEyeEngine/graphics/resources/Mesh.h"
+#include "LaurelEyeEngine/logging/EngineLog.h"
 
 #include "assimp/Importer.hpp"
 #include "assimp/postprocess.h"
@@ -221,8 +222,8 @@ namespace LaurelEye::Graphics {
                                                      aiProcess_CalcTangentSpace);
 
         if ( !scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode ) {
-            std::cerr << "Assimp error loading " << filename << ": "
-                      << importer.GetErrorString() << std::endl;
+            LE_ERROR("io", "Assimp error loading " << filename << ": "
+                      << importer.GetErrorString());
             return nullptr;
         }
 
@@ -482,16 +483,13 @@ namespace LaurelEye::Graphics {
             return createSphereMesh(name);
             break;
         default:
-            assert(("MESH::CREATEMESH::INVALIDTYPE") && false);
+            LE_ERROR("Graphics", "Invalid mesh type.");
         }
         return nullptr;
     }
 
     std::shared_ptr<Mesh> Mesh::createMeshFromAsset(const std::shared_ptr<IO::MeshAsset>& meshAsset) {
-        if ( !meshAsset || meshAsset->vertices.empty() ) {
-            throw("Mesh::FromAsset - Invalid or empty MeshAsset.");
-            return nullptr;
-        }
+        LE_ASSERT("Graphics", meshAsset && !meshAsset->vertices.empty(), "Invalid or empty MeshAsset.");
 
         // Reuse loaded mesh if already present.
         if ( loadedMeshes.contains(meshAsset->getPath()) )
@@ -508,6 +506,7 @@ namespace LaurelEye::Graphics {
         tangents.reserve(vertexCount * 3);
         bitangents.reserve(vertexCount * 3);
 
+        LE_ASSERT("Graphics", false, "Depricated.");
         assert("MESH::CREATE_MESH_FROM_ASSET::DEPRICATED" && false);
         // for ( const auto& v : meshAsset->vertices ) {
         //     positions.insert(positions.end(), v.position, v.position + 3);
@@ -549,7 +548,7 @@ namespace LaurelEye::Graphics {
             name = "SphereShape";
             break;
         default:
-            assert(("MESH::GETSHAPEMESH::INVALIDTYPE") && false);
+            LE_ERROR("Graphics", "Invalid mesh type.");
             name = "InvalidShape";
         }
 

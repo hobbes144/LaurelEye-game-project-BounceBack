@@ -10,6 +10,7 @@
 ///
 
 #include "LaurelEyeEngine/particles/ParticleEmitterComponent.h"
+#include "LaurelEyeEngine/logging/EngineLog.h"
 
 namespace LaurelEye::Particles {
 
@@ -24,7 +25,7 @@ namespace LaurelEye::Particles {
     }
 
     void ParticleEmitterComponent::Toggle() {
-        std::cout << "--- Particles Toggled ---" << std::endl;
+        LE_DEBUG_INFO("Particles", "Particle toggled");
         isPlaying = !isPlaying;
         timer = -1.0;
     }
@@ -102,7 +103,7 @@ namespace LaurelEye::Particles {
             }
         }
     }
-    
+
     void ParticleEmitterComponent::BindTransform(LaurelEye::TransformComponent* t) {
         boundTransform = t;
     }

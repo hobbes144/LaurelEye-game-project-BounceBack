@@ -4,7 +4,7 @@
 
 namespace LaurelEye {
     SystemCoordinator::SystemCoordinator(EngineContext& ctx, const EngineConfig& engineConfig) {
-        LE_DEBUG_INFO("SystemCoordinator", "Systems Constructing");
+        LE_INFO("SystemCoordinator", "Systems Constructing");
 
         this->ctx = &ctx;
 
@@ -69,7 +69,7 @@ namespace LaurelEye {
     }
 
     void SystemCoordinator::initialize() {
-        std::cout << "Systems Initializing" << std::endl;
+        LE_INFO("SystemCoordinator", "Systems Initializing");
         transformSystem->initialize();
         uiLayoutSystem->initialize();
         uiInteractionSystem->initialize();
@@ -111,7 +111,7 @@ namespace LaurelEye {
 #endif
 
     void SystemCoordinator::shutdown() {
-        std::cout << "Systems Shutting Down" << std::endl;
+        LE_INFO("SystemCoordinator", "Systems Shutting Down");
         particleSystem->shutdown();
         scriptSystem->shutdown();
         physicsSystem->shutdown();

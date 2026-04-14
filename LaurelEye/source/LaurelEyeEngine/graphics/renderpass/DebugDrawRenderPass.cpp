@@ -14,7 +14,8 @@
 #include "LaurelEyeEngine/graphics/resources/GeometryBuffer.h"
 #include "LaurelEyeEngine/graphics/resources/Shader.h"
 #include "LaurelEyeEngine/graphics/ShaderManager.h"
-#include <stdexcept>
+
+#include "LaurelEyeEngine/logging/EngineLog.h"
 
 namespace LaurelEye::Graphics {
 
@@ -23,7 +24,7 @@ namespace LaurelEye::Graphics {
 
         // Query once at init
         glGetFloatv(GL_ALIASED_LINE_WIDTH_RANGE, lineWidthRange); // e.g., returns {1.0f, 1.0f}
-        std::cout << "lineWidthRange: " << lineWidthRange[0] << ", " << lineWidthRange[1] << std::endl;
+        LE_DEBUG_INFO("Graphics", "DebugDraw lineWidthRange: " << lineWidthRange[0] << ", " << lineWidthRange[1]);
         // GLfloat smoothRange[2];
         // glGetFloatv(GL_SMOOTH_LINE_WIDTH_RANGE, smoothRange);
     }
