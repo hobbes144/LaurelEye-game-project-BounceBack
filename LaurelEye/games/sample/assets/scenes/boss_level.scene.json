@@ -4,6 +4,31 @@
     },
     "entities": [
         {
+            "name": "BackgroundMusic",
+            "tags": [ "" ],
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 0.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Audio": {
+                    "sounds": [
+                        {
+                            "id": "withDrumBGM",
+                            "path": "audio/Boss fight/ECR01-ShootToKill-Neary.wav",
+                            "volume": 0.4,
+                            "fadeSpeed": 0.2,
+                            "loop": true,
+                            "playOnLoad": true,
+                            "type": "BGM"
+                        }
+                    ]
+                }
+
+            }
+        },
+        {
             "name": "Ground",
             "tags": [ "ground" ],
             "components": {
@@ -70,7 +95,7 @@
                 },
                 "Light": {
                     "type": "Point",
-                    "position": [ 0.0, 30.0, 0.0 ],
+                    "position": [ 26.45, 39.606, -116.265 ],
                     "intensity": 700.0,
                     "color": [ 1.0, 1.0, 1.0 ],
                     "range": 3000.0

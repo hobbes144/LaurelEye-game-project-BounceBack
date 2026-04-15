@@ -46,6 +46,22 @@
             "path": "scenes/level5.scene.json"
         },
         {
+            "name": "Level6",
+            "path": "scenes/level6.scene.json"
+        },
+        {
+            "name": "Level7",
+            "path": "scenes/level7.scene.json"
+        },
+        {
+            "name": "Level8",
+            "path": "scenes/level8.scene.json"
+        },
+        {
+            "name": "Level9",
+            "path": "scenes/level9.scene.json"
+        },
+        {
             "name": "BossLevel",
             "path": "scenes/boss_level.scene.json"
         }

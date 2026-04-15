@@ -6,6 +6,31 @@
     },
     "entities": [
         {
+            "name": "BackgroundMusic",
+            "tags": [ "" ],
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 0.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Audio": {
+                    "sounds": [
+                        {
+                            "id": "whatever",
+                            "path": "audio/Main Menu/ECR07-ACRockVersusDCRock–Cole.wav",
+                            "volume": 1.0,
+                            "fadeSpeed": 1.0,
+                            "loop": true,
+                            "playOnLoad": true,
+                            "type": "BGM"
+                        }
+                    ]
+                }
+
+            }
+        },
+        {
             "name": "Camera",
             "components": {
                 "Transform": {

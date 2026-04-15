@@ -41,15 +41,29 @@ function onUpdate(dt)
         log("Loading Scene: Level5")
         Window.setCursorMode(0, Window.CursorMode.Disabled)
         SceneManager:changeScene("Level5")
+    elseif Input:isKeyPressed(Key.Six) then
+        log("Loading Scene: Level6")
+        Window.setCursorMode(0, Window.CursorMode.Disabled)
+        SceneManager:changeScene("Level6")
+    elseif Input:isKeyPressed(Key.Seven) then
+        log("Loading Scene: Level7")
+        Window.setCursorMode(0, Window.CursorMode.Disabled)
+        SceneManager:changeScene("Level7")
     elseif Input:isKeyPressed(Key.Eight) then
+        log("Loading Scene: Level8")
+        Window.setCursorMode(0, Window.CursorMode.Disabled)
+        SceneManager:changeScene("Level8")
+    elseif Input:isKeyPressed(Key.Nine) then
+        log("Loading Scene: Level9")
+        Window.setCursorMode(0, Window.CursorMode.Disabled)
+        SceneManager:changeScene("Level9")
+    elseif Input:isKeyPressed(Key.B) then
         log("Loading Scene: BossLevel")
         Window.setCursorMode(0, Window.CursorMode.Disabled)
         SceneManager:changeScene("BossLevel")
     elseif Input:isKeyPressed(Key.Escape) then
         Window.setCursorMode(0, Window.CursorMode.Normal)
         SceneManager:changeScene("MainMenu")
-    elseif Input:isKeyPressed(Key.Nine) then
-        Engine:stop()
     elseif Input:isKeyPressed(Key.F11) then
         fullscreen = not fullscreen
         Window.setFullscreen(0, fullscreen)

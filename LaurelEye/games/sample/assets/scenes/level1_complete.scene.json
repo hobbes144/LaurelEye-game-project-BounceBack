@@ -210,6 +210,40 @@
             }
         },
         {
+            "name": "BackgroundMusic",
+            "tags": [ "" ],
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 0.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Audio": {
+                    "sounds": [
+                        {
+                            "id": "noDrumBGM",
+                            "path": "audio/gameplay/noDrum.wav",
+                            "volume": 0.4,
+                            "fadeSpeed": 0.2,
+                            "loop": true,
+                            "playOnLoad": true,
+                            "type": "BGM"
+                        },
+                        {
+                            "id": "withDrumBGM",
+                            "path": "audio/gameplay/withDrum.wav",
+                            "volume": 0.4,
+                            "fadeSpeed": 0.2,
+                            "loop": true,
+                            "playOnLoad": false,
+                            "type": "BGM"
+                        }
+                    ]
+                }
+
+            }
+        },
+        {
             "name": "westWall",
             "tags": [ "ground" ],
             "components": {
@@ -468,9 +502,14 @@
                 "Physics": {
                     "type": "Static",
                     "shapeDefinition": {
-                        "type": "Capsule",
-                        "radius": 40.93788,
-                        "height": 520.811
+                        "type": "Cylinder",
+                        "radius": 25,
+                        "height": 50
+                    },
+                    "centerOfMass": {
+                        "x": 0,
+                        "y": 22.174,
+                        "z": 0
                     },
                     "mass": 1.0,
                     "linearDamping": 0.0,
@@ -478,7 +517,7 @@
                     "friction": 0.0,
                     "restitution": 0.0,
                     "collisionGroup": 4,
-                    "collisionMask": 11,
+                    "collisionMask": 30,
                     "gravityScale": 1.0
                 }
             }
@@ -525,6 +564,28 @@
             }
         },
         {
+            "name": "Exit_sign",
+            "components": {
+                "Transform": {
+                    "position": [ 44.528, 21.6900001, 30.544 ],
+                    "rotation": [ -0.7071068, 0, -0.7071068, 0 ],
+                    "scale": [ -1.09409, 1.09409, -1.09409 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "Exit_sign",
+                        "file": "models/Exit_sign.fbx"
+                    },
+                    "material": {
+                        "texture": "textures/exitSign.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                }
+            }
+        },
+        {
             "name": "exit",
             "tags": [ "door" ],
             "components": {
@@ -539,7 +600,7 @@
                         "file": "models/door.fbx"
                     },
                     "material": {
-                        "texture": "textures/texturePeachDoor.png",
+                        "texture": "textures/texturePurpleDoor.png",
                         "diffuse": [ 1.0, 10.0, 1.0 ],
                         "specular": [ 0.2, 0.2, 0.2 ],
                         "shininess": 32.0
@@ -620,7 +681,7 @@
         },
         {
             "name": "Enemy",
-            "prefab": "prefabs/shooting_enemy.prefab.json"
+            "prefab": "prefabs/shooting_enemy_purple.prefab.json"
         }
 
     ]

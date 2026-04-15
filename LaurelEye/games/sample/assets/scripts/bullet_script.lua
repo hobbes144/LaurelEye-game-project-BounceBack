@@ -10,10 +10,13 @@ speaker = nil
 bounceCount = 0
 attackEnemy = false
 
+soundFactor = 50
+ballaudio = nil
+
 function onStart()
     transform = self:findTransform()
     body = self:findGhostBody()
-
+    ballaudio = self:findAudio()
     --speaker = self:findAudioSpeaker()
     --if speaker ~= nil then
         --speaker:stop()
@@ -43,9 +46,16 @@ function onTriggerEnter(data)
     local tagsA = data.entityA:getTags()
     local tagsB = data.entityB:getTags()
     local scene = SceneManager:getCurrentScene()
-
+    ballaudio = self:findAudio()
     for _, tag in pairs(tagsA) do
         if tag == "ground" then
+            ballaudio:stop("bounce")
+            local BallPos = transform:getWorldPosition()
+            local emitterPos = Vector3.new(
+                BallPos.x/soundFactor,BallPos.y/soundFactor,BallPos.z/soundFactor
+            )
+            ballaudio:setPosition(emitterPos)
+            ballaudio:play("bounce")
             if bounceCount > 2 then
                 destroySelf()
             else
@@ -75,6 +85,7 @@ function onTriggerEnter(data)
             local message = Message.new()
             message.to = player
             message.topic = "Get Hit!"
+
             Script.send(message)
             SceneManager:destroy(self)
         elseif tag == "enemy" then
@@ -106,6 +117,13 @@ function onTriggerEnter(data)
     
     for _, tag in pairs(tagsB) do
         if tag == "ground" then
+            ballaudio:stop("bounce")
+            local BallPos = transform:getWorldPosition()
+            local emitterPos = Vector3.new(
+                BallPos.x/soundFactor,BallPos.y/soundFactor,BallPos.z/soundFactor
+            )
+            ballaudio:setPosition(emitterPos)
+            ballaudio:play("bounce")
             if bounceCount > 2 then
                 destroySelf()
             else
@@ -136,6 +154,13 @@ function onTriggerEnter(data)
             local message = Message.new()
             message.to = player
             message.topic = "Get Hit!"
+            ballaudio:stop("getHit")
+            local BallPos = transform:getWorldPosition()
+            local emitterPos = Vector3.new(
+                BallPos.x/soundFactor,BallPos.y/soundFactor,BallPos.z/soundFactor
+            )
+            ballaudio:setPosition(emitterPos)
+            ballaudio:play("getHit")
             Script.send(message)
             SceneManager:destroy(self)
         elseif tag == "enemy" then
@@ -143,6 +168,13 @@ function onTriggerEnter(data)
                 local message = Message.new()
                 message.to = data.entityB
                 message.topic = "Get Hit!"
+                ballaudio:stop("getHit")
+                local BallPos = transform:getWorldPosition()
+                local emitterPos = Vector3.new(
+                    BallPos.x/soundFactor,BallPos.y/soundFactor,BallPos.z/soundFactor
+                )
+                ballaudio:setPosition(emitterPos)
+                ballaudio:play("getHit")
                 Script.send(message)
                 destroySelf()
             end

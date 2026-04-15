@@ -1,0 +1,1157 @@
+﻿{
+    "settings": {
+        "resetOnLoad": true
+    },
+    "entities": [
+        {
+            "name": "BackgroundMusic",
+            "tags": [ "" ],
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 0.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Audio": {
+                    "sounds": [
+                        {
+                            "id": "withDrumBGM",
+                            "path": "audio/gameplay/withDrum.wav",
+                            "volume": 0.4,
+                            "fadeSpeed": 0.2,
+                            "loop": true,
+                            "playOnLoad": true,
+                            "type": "BGM"
+                        }
+                    ]
+                }
+
+            }
+        },
+        {
+            "name": "AmbientLight",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 0.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Light": {
+                    "type": "Ambient",
+                    "intensity": 0.3,
+                    "color": [ 1.0, 1.0, 1.0 ]
+                }
+            }
+        },
+        {
+            "name": "RoomLight",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 0.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Light": {
+                    "type": "Point",
+                    "position": [ -377.775, 39.606, -22.885 ],
+                    "intensity": 1500.0,
+                    "color": [ 1.0, 1.0, 1.0 ],
+                    "range": 3000.0
+                }
+            }
+        },
+        {
+            "name": "BallIndicator",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0.0, 1.0 ],
+                    "anchorMax": [ 0.0, 1.0 ],
+                    "pivot": [ 0.5, 0.5 ],
+                    "offset": [ 45, -100 ],
+                    "size": [ 30, 30 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "textures/texture_01_red.png",
+                        "layer": 10
+                    },
+                    "transparency": 1.0
+                }
+            }
+        },
+        {
+            "name": "KeyIndicator",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0.0, 1.0 ],
+                    "anchorMax": [ 0.0, 1.0 ],
+                    "pivot": [ 0.5, 0.5 ],
+                    "offset": [ 45, -150 ],
+                    "size": [ 30, 30 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "textures/texture_01_purple.png",
+                        "layer": 10
+                    },
+                    "transparency": 0.0
+                }
+            }
+        },
+        {
+            "name": "HCrosshair",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0.5, 0.5 ],
+                    "anchorMax": [ 0.5, 0.5 ],
+                    "pivot": [ 0.5, 0.5 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 20, 2 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "textures/texture_01_light.png",
+                        "layer": 10
+                    },
+                    "transparency": 0.5
+                }
+            }
+        },
+        {
+            "name": "VCrosshair",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0.5, 0.5 ],
+                    "anchorMax": [ 0.5, 0.5 ],
+                    "pivot": [ 0.5, 0.5 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 2, 20 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "textures/texture_01_light.png",
+                        "layer": 10
+                    },
+                    "transparency": 0.5
+                }
+            }
+        },
+        {
+            "name": "HealthBar",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0.0, 1.0 ],
+                    "anchorMax": [ 0.0, 1.0 ],
+                    "pivot": [ 0.0, 1.0 ],
+                    "offset": [ 30, -30 ],
+                    "size": [ 160, 30 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "textures/texture_01_green.png",
+                        "layer": 10
+                    },
+                    "transparency": 1.0
+                }
+            }
+        },
+        {
+            "name": "SpawnPoint",
+            "components": {
+                "Transform": {
+                    "position": [ -450, 4, 13.375 ],
+                    "rotation": [ 0.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 0.08, 0.08, 0.08 ]
+                }
+            }
+        },
+        {
+            "name": "SceneManager",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 10.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 0.08, 0.08, 0.08 ]
+                },
+                "Script": {
+                    "path": "scripts/scene_manager.lua"
+                }
+            }
+        },
+        {
+            "name": "LevelInstantiator",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 10.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 0.08, 0.08, 0.08 ]
+                },
+                "Script": {
+                    "path": "scripts/level_setup.lua"
+                }
+            }
+        },
+        {
+            "name": "southWall (3)",
+            "tags": [ "ground" ],
+            "components": {
+                "Transform": {
+                    "position": [ -269.79, -15.295, -34.96 ],
+                    "rotation": [ -1, 0, 0, 0 ],
+                    "scale": [ -0.115, 1.805395, -3.203976 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "wall-low",
+                        "file": "models/wall-low.fbx"
+                    },
+                    "material": {
+                        "texture": "textures/arcadeColormap.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 20,
+                            "y": 50,
+                            "z": 100
+                        }
+                    },
+                    "centerOfMass": {
+                        "x": 0,
+                        "y": 45.13487,
+                        "z": 0
+                    },
+                    "mass": 0.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.0,
+                    "restitution": 0.0,
+                    "collisionGroup": 4,
+                    "collisionMask": 11,
+                    "gravityScale": 0.0
+                }
+            }
+        },
+        {
+            "name": "southWall (4)",
+            "tags": [ "ground" ],
+            "components": {
+                "Transform": {
+                    "position": [ -471.27, -198.03, -34.845 ],
+                    "rotation": [ -1, 0, 0, 0 ],
+                    "scale": [ -0.115, 5.395061, -1.97765 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "wall-low",
+                        "file": "models/wall-low.fbx"
+                    },
+                    "material": {
+                        "texture": "textures/arcadeColormap.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 20,
+                            "y": 50,
+                            "z": 100
+                        }
+                    },
+                    "centerOfMass": {
+                        "x": 0,
+                        "y": 134.8765,
+                        "z": 0
+                    },
+                    "mass": 0.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.0,
+                    "restitution": 0.0,
+                    "collisionGroup": 4,
+                    "collisionMask": 11,
+                    "gravityScale": 0.0
+                }
+            }
+        },
+        {
+            "name": "eastWall",
+            "tags": [ "ground" ],
+            "components": {
+                "Transform": {
+                    "position": [ -355.695, -15.295, 52.44 ],
+                    "rotation": [ -0.7071068, 0, 0.7071068, 0 ],
+                    "scale": [ -0.115, 1.805395, -2.445393 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "wall-low",
+                        "file": "models/wall-low.fbx"
+                    },
+                    "material": {
+                        "texture": "textures/arcadeColormap.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 20,
+                            "y": 50,
+                            "z": 100
+                        }
+                    },
+                    "centerOfMass": {
+                        "x": 0,
+                        "y": 45.13487,
+                        "z": 0
+                    },
+                    "mass": 0.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.0,
+                    "restitution": 0.0,
+                    "collisionGroup": 4,
+                    "collisionMask": 11,
+                    "gravityScale": 0.0
+                }
+            }
+        },
+        {
+            "name": "eastWall (2)",
+            "tags": [ "ground" ],
+            "components": {
+                "Transform": {
+                    "position": [ -369.38, -198.03, -109.135 ],
+                    "rotation": [ -0.7071068, 0, 0.7071068, 0 ],
+                    "scale": [ -0.115, 5.565671, -2.445393 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "wall-low",
+                        "file": "models/wall-low.fbx"
+                    },
+                    "material": {
+                        "texture": "textures/arcadeColormap.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 20,
+                            "y": 50,
+                            "z": 100
+                        }
+                    },
+                    "centerOfMass": {
+                        "x": 0,
+                        "y": 139.1418,
+                        "z": 0
+                    },
+                    "mass": 0.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.0,
+                    "restitution": 0.0,
+                    "collisionGroup": 4,
+                    "collisionMask": 11,
+                    "gravityScale": 0.0
+                }
+            }
+        },
+        {
+            "name": "ceiling",
+            "tags": [ "ground" ],
+            "components": {
+                "Transform": {
+                    "position": [ -496.915, 58.765, 3.68 ],
+                    "rotation": [ -0.7071068, 0, 0, 0.7071068 ],
+                    "scale": [ -0.161759, 4.887758, -2.748506 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "wall-low",
+                        "file": "models/wall-low.fbx"
+                    },
+                    "material": {
+                        "texture": "textures/arcadeColormap.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 20,
+                            "y": 50,
+                            "z": 100
+                        }
+                    },
+                    "centerOfMass": {
+                        "x": 0,
+                        "y": 122.194,
+                        "z": 0
+                    },
+                    "mass": 0.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.0,
+                    "restitution": 0.0,
+                    "collisionGroup": 4,
+                    "collisionMask": 11,
+                    "gravityScale": 0.0
+                }
+            }
+        },
+        {
+            "name": "entrance",
+            "components": {
+                "Transform": {
+                    "position": [ -469.66, 1.15, 14.375 ],
+                    "rotation": [ -0.7071068, 0, 0.7071068, 0 ],
+                    "scale": [ -0.1855137, 0.1855136, -0.1855137 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "door",
+                        "file": "models/door.fbx"
+                    },
+                    "material": {
+                        "texture": "textures/textureEntranceDoor.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 161.3163,
+                            "y": 161.3162,
+                            "z": 96.78977
+                        }
+                    },
+                    "mass": 0.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.0,
+                    "restitution": 0.0,
+                    "collisionGroup": 4,
+                    "collisionMask": 11,
+                    "gravityScale": 0.0
+                }
+            }
+        },
+        {
+            "name": "Exit_sign",
+            "components": {
+                "Transform": {
+                    "position": [ -313.26, 23.15, -103.27 ],
+                    "rotation": [ 0, 0, 1, 0 ],
+                    "scale": [ -1.09409, 1.09409, -1.09409 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "Exit_sign",
+                        "file": "models/Exit_sign.fbx"
+                    },
+                    "material": {
+                        "texture": "textures/exitSign.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                }
+            }
+        },
+        {
+            "name": "exit",
+            "tags": [ "door" ],
+            "components": {
+                "Transform": {
+                    "position": [ -313.26, 1.15, -103.27 ],
+                    "rotation": [ 0, 0, 1, 0 ],
+                    "scale": [ -0.1855137, 0.1855136, -0.1855137 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "door",
+                        "file": "models/door.fbx"
+                    },
+                    "material": {
+                        "texture": "textures/texturePurpleDoor.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 161.3162,
+                            "y": 161.3162,
+                            "z": 96.78974
+                        }
+                    },
+                    "mass": 0.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.0,
+                    "restitution": 0.0,
+                    "collisionGroup": 4,
+                    "collisionMask": 11,
+                    "gravityScale": 0.0
+                }
+            }
+        },
+        {
+            "name": "generator",
+            "tags": [ "target" ],
+            "components": {
+                "Transform": {
+                    "position": [ -463.105, 29.9, -102.695 ],
+                    "rotation": [ 0.2865047, -0.2865047, -0.6464636, -0.6464635 ],
+                    "scale": [ -0.2609911, 0.260991, -0.260991 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "computer-wide",
+                        "file": "models/computer-wide.fbx"
+                    },
+                    "material": {
+                        "texture": "textures/textureScreen.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Script": {
+                    "path": "scripts/generator.lua"
+                }
+            }
+        },
+        {
+            "name": "Ground1 (2)",
+            "tags": [ "ground" ],
+            "components": {
+                "Transform": {
+                    "position": [ -320.965, -4.484999, -53.245 ],
+                    "rotation": [ -1, 0, 0, 0 ],
+                    "scale": [ 120.3852, 11.5, 222.3156 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "cubeMesh",
+                        "primitiveType": "Cube"
+                    },
+                    "material": {
+                        "texture": "textures/floorTexture.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 1,
+                            "y": 1,
+                            "z": 1
+                        }
+                    },
+                    "mass": 0.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.0,
+                    "restitution": 0.0,
+                    "collisionGroup": 4,
+                    "collisionMask": 11,
+                    "gravityScale": 0.0
+                }
+            }
+        },
+        {
+            "name": "Ground1 (1)",
+            "tags": [ "ground" ],
+            "components": {
+                "Transform": {
+                    "position": [ -427.8, -4.484999, 15.295 ],
+                    "rotation": [ -1, 0, 0, 0 ],
+                    "scale": [ 93.4062, 11.5, 85.51796 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "cubeMesh",
+                        "primitiveType": "Cube"
+                    },
+                    "material": {
+                        "texture": "textures/floorTexture.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 1,
+                            "y": 1,
+                            "z": 1
+                        }
+                    },
+                    "mass": 0.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.0,
+                    "restitution": 0.0,
+                    "collisionGroup": 4,
+                    "collisionMask": 11,
+                    "gravityScale": 0.0
+                }
+            }
+        },
+        {
+            "name": "Ground1 (3)",
+            "tags": [ "ground" ],
+            "components": {
+                "Transform": {
+                    "position": [ -440.105, -4.484999, -84.755 ],
+                    "rotation": [ -1, 0, 0, 0 ],
+                    "scale": [ 80.25002, 11.5, 60.56895 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "cubeMesh",
+                        "primitiveType": "Cube"
+                    },
+                    "material": {
+                        "texture": "textures/floorTexture.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 1,
+                            "y": 1,
+                            "z": 1
+                        }
+                    },
+                    "mass": 0.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.0,
+                    "restitution": 0.0,
+                    "collisionGroup": 4,
+                    "collisionMask": 11,
+                    "gravityScale": 0.0
+                }
+            }
+        },
+        {
+            "name": "wall (07)",
+            "tags": [ "ground" ],
+            "components": {
+                "Transform": {
+                    "position": [ -400.2, -113.16, -100.51 ],
+                    "rotation": [ -1, 0, 0, 0 ],
+                    "scale": [ -0.115, 1.15, -0.9880529 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "wall",
+                        "file": "models/wall.fbx"
+                    },
+                    "material": {
+                        "texture": "textures/arcadeColormap.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 20,
+                            "y": 100,
+                            "z": 100
+                        }
+                    },
+                    "centerOfMass": {
+                        "x": 0,
+                        "y": 57.5,
+                        "z": 0
+                    },
+                    "mass": 0.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.0,
+                    "restitution": 0.0,
+                    "collisionGroup": 4,
+                    "collisionMask": 11,
+                    "gravityScale": 0.0
+                }
+            }
+        },
+        {
+            "name": "Machine2 (4)",
+            "tags": [ "ground" ],
+            "components": {
+                "Transform": {
+                    "position": [ -305.21, -1.149998, 41.4 ],
+                    "rotation": [ -1, 0, 0, 0 ],
+                    "scale": [ -0.2154538, 0.1910739, -0.3724069 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "pinball",
+                        "file": "models/Machine2.fbx"
+                    },
+                    "material": {
+                        "texture": "textures/arcadeColormap.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 85.3659,
+                            "y": 94.38511,
+                            "z": 230.3842
+                        }
+                    },
+                    "mass": 0.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.0,
+                    "restitution": 0.0,
+                    "collisionGroup": 4,
+                    "collisionMask": 11,
+                    "gravityScale": 0.0
+                }
+            }
+        },
+        {
+            "name": "wall (8)",
+            "tags": [ "ground" ],
+            "components": {
+                "Transform": {
+                    "position": [ -429.065, -113.16, -27.945 ],
+                    "rotation": [ -0.7071068, 0, 0.7071068, 0 ],
+                    "scale": [ -0.2394747, 1.15, -0.9451765 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "wall",
+                        "file": "models/wall.fbx"
+                    },
+                    "material": {
+                        "texture": "textures/arcadeColormap.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 20,
+                            "y": 100,
+                            "z": 100
+                        }
+                    },
+                    "centerOfMass": {
+                        "x": 0,
+                        "y": 57.5,
+                        "z": 0
+                    },
+                    "mass": 0.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.0,
+                    "restitution": 0.0,
+                    "collisionGroup": 4,
+                    "collisionMask": 11,
+                    "gravityScale": 0.0
+                }
+            }
+        },
+        {
+            "name": "column (12)",
+            "tags": [ "ground" ],
+            "components": {
+                "Transform": {
+                    "position": [ -461.15, 42.665, -100.28 ],
+                    "rotation": [ -1, 0, 0, 0 ],
+                    "scale": [ -0.1541399, 0.443479, -0.1614212 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "column",
+                        "file": "models/column.fbx"
+                    },
+                    "material": {
+                        "texture": "textures/arcadeColormap.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Cylinder",
+                        "radius": 25,
+                        "height": 50
+                    },
+                    "centerOfMass": {
+                        "x": 0,
+                        "y": 22.174,
+                        "z": 0
+                    },
+                    "mass": 1.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.0,
+                    "restitution": 0.0,
+                    "collisionGroup": 4,
+                    "collisionMask": 30,
+                    "gravityScale": 1.0
+                }
+            }
+        },
+        {
+            "name": "column (13)",
+            "tags": [ "ground" ],
+            "components": {
+                "Transform": {
+                    "position": [ -276.69, 42.665, -100.28 ],
+                    "rotation": [ -1, 0, 0, 0 ],
+                    "scale": [ -0.1541399, 0.443479, -0.1614212 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "column",
+                        "file": "models/column.fbx"
+                    },
+                    "material": {
+                        "texture": "textures/arcadeColormap.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Cylinder",
+                        "radius": 25,
+                        "height": 50
+                    },
+                    "centerOfMass": {
+                        "x": 0,
+                        "y": 22.174,
+                        "z": 0
+                    },
+                    "mass": 1.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.0,
+                    "restitution": 0.0,
+                    "collisionGroup": 4,
+                    "collisionMask": 30,
+                    "gravityScale": 1.0
+                }
+            }
+        },
+        {
+            "name": "wall (09)",
+            "tags": [ "ground" ],
+            "components": {
+                "Transform": {
+                    "position": [ -439.76, -113.16, -53.475 ],
+                    "rotation": [ -0.7071068, 0, 0.7071068, 0 ],
+                    "scale": [ -0.2394747, 1.15, -0.7921914 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "wall",
+                        "file": "models/wall.fbx"
+                    },
+                    "material": {
+                        "texture": "textures/arcadeColormap.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 20,
+                            "y": 100,
+                            "z": 100
+                        }
+                    },
+                    "centerOfMass": {
+                        "x": 0,
+                        "y": 57.5,
+                        "z": 0
+                    },
+                    "mass": 0.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.0,
+                    "restitution": 0.0,
+                    "collisionGroup": 4,
+                    "collisionMask": 11,
+                    "gravityScale": 0.0
+                }
+            }
+        },
+        {
+            "name": "wall (6)",
+            "tags": [ "ground" ],
+            "components": {
+                "Transform": {
+                    "position": [ -380.88, -113.16, -121.325 ],
+                    "rotation": [ -1, 0, 0, 0 ],
+                    "scale": [ -0.115, 1.15, -1.915797 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "wall",
+                        "file": "models/wall.fbx"
+                    },
+                    "material": {
+                        "texture": "textures/arcadeColormap.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Box",
+                        "size": {
+                            "x": 20,
+                            "y": 100,
+                            "z": 100
+                        }
+                    },
+                    "centerOfMass": {
+                        "x": 0,
+                        "y": 57.5,
+                        "z": 0
+                    },
+                    "mass": 0.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.0,
+                    "restitution": 0.0,
+                    "collisionGroup": 4,
+                    "collisionMask": 11,
+                    "gravityScale": 0.0
+                }
+            }
+        },
+        {
+            "name": "column (11)",
+            "tags": [ "ground" ],
+            "components": {
+                "Transform": {
+                    "position": [ -461.15, 45.195, -100.28 ],
+                    "rotation": [ 0, 0.9999962, -0.002762173, 0 ],
+                    "scale": [ -0.1541399, 0.443479, -0.1614212 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "column",
+                        "file": "models/column.fbx"
+                    },
+                    "material": {
+                        "texture": "textures/arcadeColormap.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Cylinder",
+                        "radius": 25,
+                        "height": 50
+                    },
+                    "centerOfMass": {
+                        "x": 0,
+                        "y": 22.174,
+                        "z": 0
+                    },
+                    "mass": 1.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.0,
+                    "restitution": 0.0,
+                    "collisionGroup": 4,
+                    "collisionMask": 30,
+                    "gravityScale": 1.0
+                }
+            }
+        },
+        {
+            "name": "column (14)",
+            "tags": [ "ground" ],
+            "components": {
+                "Transform": {
+                    "position": [ -276.69, 45.195, -100.28 ],
+                    "rotation": [ 0, 0.9999962, -0.002762173, 0 ],
+                    "scale": [ -0.1541399, 0.443479, -0.1614212 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "column",
+                        "file": "models/column.fbx"
+                    },
+                    "material": {
+                        "texture": "textures/arcadeColormap.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Physics": {
+                    "type": "Static",
+                    "shapeDefinition": {
+                        "type": "Cylinder",
+                        "radius": 25,
+                        "height": 50
+                    },
+                    "centerOfMass": {
+                        "x": 0,
+                        "y": 22.174,
+                        "z": 0
+                    },
+                    "mass": 1.0,
+                    "linearDamping": 0.0,
+                    "angularDamping": 0.0,
+                    "friction": 0.0,
+                    "restitution": 0.0,
+                    "collisionGroup": 4,
+                    "collisionMask": 30,
+                    "gravityScale": 1.0
+                }
+            }
+        },
+        {
+            "name": "generator (9)",
+            "tags": [ "target" ],
+            "components": {
+                "Transform": {
+                    "position": [ -275.54, 31.51, 49.22001 ],
+                    "rotation": [ 0.6680122, -0.6680122, 0.2318613, 0.2318613 ],
+                    "scale": [ -0.2609911, 0.260991, -0.260991 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "computer-wide",
+                        "file": "models/computer-wide.fbx"
+                    },
+                    "material": {
+                        "texture": "textures/textureScreen.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                },
+                "Script": {
+                    "path": "scripts/generator.lua"
+                }
+            }
+        },
+        {
+            "name": "brokenGen",
+            "components": {
+                "Transform": {
+                    "position": [ 2000.0, 50.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "cubeMesh",
+                        "primitiveType": "Cube"
+                    },
+                    "material": {
+                        "texture": "textures/textureBrokenScreen.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                }
+            }
+        },
+        {
+            "name": "PlayerPrefab",
+            "prefab": "prefabs/catch_player.prefab.json"
+        },
+        {
+            "name": "Enemy1",
+            "prefab": "prefabs/shooting_enemy.prefab.json"
+        },
+        {
+            "name": "Enemy2",
+            "prefab": "prefabs/shooting_enemy_purple.prefab.json"
+        },
+        {
+            "name": "Enemy3",
+            "prefab": "prefabs/shooting_enemy_purple.prefab.json"
+        }
+    ]
+}

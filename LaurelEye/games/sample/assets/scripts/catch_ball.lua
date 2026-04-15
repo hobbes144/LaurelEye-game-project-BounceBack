@@ -18,6 +18,7 @@ chaseSpeed = 140.0
 magnetStrength = 300.0
 maxMagnetForce = 500.0
 heightThreshold = 3.0
+local ballaudio = nil
 impactPE = nil
 attackPE = nil
 kickbackPE = nil
@@ -30,12 +31,15 @@ chaseRange = 10.0
 pickupDelay = 1.0      -- seconds before pickup range activates
 pickupTimer = 0.0
 
+soundFactor = 50;
+
 function onStart()
     transform = self:findTransform()
     body = self:findGhostBody()
     scene = SceneManager:getCurrentScene()
     playerEntity = scene:findEntityByName("PlayerPrefab")
     playerTransform = playerEntity and playerEntity:findTransform()
+    ballaudio = self:findAudio()
 
     local impactEntity = scene:findEntityByName("ImpactEmitter")
     impactPE = impactEntity and impactEntity:findParticleEmitter()
@@ -55,6 +59,10 @@ function onMessage(msg)
     if msg.topic == "I am kicking you!" then
         print("Bouncing Away!")
         bounceCount = 0
+
+        local emitterPos = transform:getWorldPosition()
+        ballaudio:setPosition(emitterPos)
+        ballaudio:play("bounce")
     end
 end
 
@@ -117,12 +125,27 @@ function onTriggerEnter(data)
                 local message = Message.new()
                 message.to = entity
                 message.topic = "Get Hit!"
+                --ballaudio:stop("hitting")
+                --local BallPos = transform:getWorldPosition()
+                --local emitterPos = Vector3.new(
+                --    BallPos.x/soundFactor,BallPos.y/soundFactor,BallPos.z/soundFactor
+                --)
+                --ballaudio:setPosition(emitterPos)
+                --ballaudio:play("hitting")
+                
                 impactPE:playFor(0.1)
                 attackPE:playFor(0.2)
                 Script.send(message)
                 return true
             end
             if tag == "ground" then
+                ballaudio:stop("bounce")
+                local BallPos = transform:getWorldPosition()
+                local emitterPos = Vector3.new(
+                    BallPos.x/soundFactor,BallPos.y/soundFactor,BallPos.z/soundFactor
+                )
+                ballaudio:setPosition(emitterPos)
+                ballaudio:play("bounce")
                 impactPE:playFor(0.1)
                 return true
             end
@@ -134,6 +157,15 @@ function onTriggerEnter(data)
                 local message = Message.new()
                 message.to = entity
                 message.topic = "Bonk!"
+
+                ballaudio:stop("shield")
+                local BallPos = transform:getWorldPosition()
+                local emitterPos = Vector3.new(
+                    BallPos.x/soundFactor,BallPos.y/soundFactor,BallPos.z/soundFactor
+                )
+                ballaudio:setPosition(emitterPos)
+                ballaudio:play("shield")
+
                 Script.send(message)
                 return true
             end
@@ -141,6 +173,15 @@ function onTriggerEnter(data)
                 local message = Message.new()
                 message.to = playerEntity
                 message.topic = "Catch Me!"
+
+                --ballaudio:stop("getHit")
+                --local BallPos = transform:getWorldPosition()
+                --local emitterPos = Vector3.new(
+                --    BallPos.x/soundFactor,BallPos.y/soundFactor,BallPos.z/soundFactor
+                --)
+                --ballaudio:setPosition(emitterPos)
+                --ballaudio:play("getHit")
+
                 Script.send(message)
                 SceneManager:destroy(self)
                 return true
@@ -156,6 +197,14 @@ function onTriggerEnter(data)
                 local message = Message.new()
                 message.to = entity
                 message.topic = "Get Destroyed!"
+                ballaudio:stop("hitGenerator")
+                local BallPos = transform:getWorldPosition()
+                local emitterPos = Vector3.new(
+                    BallPos.x/soundFactor,BallPos.y/soundFactor,BallPos.z/soundFactor
+                )
+                ballaudio:setPosition(emitterPos)
+                ballaudio:play("hitGenerator")
+
                 Script.send(message)
                 
                 impactPE:playFor(0.1)

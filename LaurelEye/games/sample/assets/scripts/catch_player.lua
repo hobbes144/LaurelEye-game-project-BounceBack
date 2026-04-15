@@ -43,7 +43,9 @@ local cameraEntity = nil
 local cameraTransform = nil
 smokeEmitter = nil
 speaker = nil
-audio = nil
+playerAudio = nil
+
+firstShoot = true
 
 isGrounded = true
 jumping = false
@@ -89,6 +91,8 @@ dashTimer = 0.0
 isDashing = false
 
 kickbackCountdown = 0.0
+
+local doorName = "whatever"
 
 local TrajectoryLine = require("TrajectoryLine")
 ---@type TrajectoryLine|nil
@@ -284,6 +288,9 @@ function onMessage(msg)
             GameManager:setPlayerHealth(currentHealth)
             invincible = true
             moveHealthBar()
+            playerAudio = self:findAudio()
+            playerAudio:stop("getHit")
+            playerAudio:play("getHit")
         end
     end
 
@@ -336,6 +343,10 @@ function onUpdate(dt)
             and (timeData.unscaledTime - rightMousePressTime < slowTimeLeniency)
             and #projectilesInRange > 0 then
 
+            playerAudio:stop("timeSlow")
+            Audio.setMusicVolume(0.0)
+            playerAudio:play("timeSlow")
+
             targetTimeScale = slowedTimeScale
             slowStartTime = timeData.unscaledTime
         end
@@ -343,6 +354,9 @@ function onUpdate(dt)
         if #projectilesInRange == 0 or
             Input:isMouseButtonReleased(MouseButton.Right) or
             (timeData.unscaledTime - slowStartTime > slowTimeLimit) then
+            
+            playerAudio:stop("timeSlow")
+            Audio.setMusicVolume(1.0)
 
             targetTimeScale = 1.0
             slowEndTime = timeData.unscaledTime
@@ -354,6 +368,7 @@ function onUpdate(dt)
         timeScale = timeScale + (targetTimeScale - timeScale) * timeSlowLerpSpeed * (timeData.unscaledDt)
         Engine.setTimeScale(timeScale)
         dt = timeData.unscaledDt * timeScale
+        Audio.setMusicVolume(1.0)
     end
 
     if cameraTransform == nil or cameraEntity == nil then
@@ -365,22 +380,22 @@ function onUpdate(dt)
 
     -- Audio Part
     playerPos = transform:getWorldPosition()
-    Audio.setListenerPosition(playerPos.x,playerPos.y,playerPos.z)
+    soundFactor = 50;
+    Audio.setListenerPosition(playerPos.x/soundFactor,playerPos.y/soundFactor,playerPos.z/soundFactor)
     local camRot = cameraTransform:getWorldRotation()
     local forward = camRot:forward()
     Audio.setListenerForward(forward.x, forward.y, forward.z)
-    playerAudio = self:findAudio()
-    Audio.setMusicVolume(0.0)
+    --Audio.setMusicVolume(0.0)
 
     if Input:isKeyPressed(Key.T) then
         debugLog("Player position" .. vector3ToString(playerPos))
     end
 
     local emitterPos = Vector3.new(
-            playerPos.x,playerPos.y,playerPos.z
+            playerPos.x/soundFactor,playerPos.y/soundFactor,playerPos.z/soundFactor    
             ) -- keep it close for testing
-            playerAudio = self:findAudio()
-            playerAudio:setPosition(emitterPos)
+    playerAudio = self:findAudio()
+    playerAudio:setPosition(emitterPos)
 
 
     if currentHealth <= 0 then
@@ -485,9 +500,15 @@ function onUpdate(dt)
 
         if inputMag > 0.01 then
             local animName = animator.currentAnimationName
-            if animName ~= "MainChar2_Running"  and kickbackCountdown <= 0.0 and not dead then
+            if animName ~= "MainChar2_Running" and kickbackCountdown <= 0.0 and not dead then
                 animator:changeAnimation("MainChar2_Running")
+            end
+        
+            -- Footstep timer: fires every stepInterval seconds while moving
+            footstepTimer = footstepTimer - dt
+            if footstepTimer <= 0.0 then
                 playerAudio:play("footstep")
+                footstepTimer = stepInterval
                 if moveSpeed == sprintSpeed then
                     tellCameraMyAnimation("Running")
                 else
@@ -501,6 +522,9 @@ function onUpdate(dt)
                 tellCameraMyAnimation("Idle")
                 playerAudio:stop("footstep")
             end
+        
+            -- Reset timer so first step fires immediately when you start moving again
+            footstepTimer = 0.0
         end
 
         if inputMag > 0 then
@@ -559,6 +583,13 @@ function onUpdate(dt)
 
     if Input:isMouseButtonPressed(MouseButton.Left) then
         -- Get the camera aim direction early, so we can reuse it
+        if firstShoot then
+            backgroundobj = scene:findEntityByName("BackgroundMusic")
+            BGMAudio = backgroundobj:findAudio()
+            BGMAudio:stop("noDrumBGM")
+            BGMAudio:play("withDrumBGM")
+            firstShoot = false
+        end
         if hasBall then
             shootProjectile()
             local ballInd = scene:findEntityByName("BallIndicator")
@@ -641,6 +672,7 @@ function onCollisionEnter(data)
             isGrounded = true
             jumping = false
         elseif tag == "door" then
+            doorName = data.entityA:getName()
             if hasKey then changeLevels() end
         end
     end
@@ -651,6 +683,7 @@ function onCollisionEnter(data)
             isGrounded = true
             jumping = false
         elseif tag == "door" then
+            doorName = data.entityB:getName()
             if hasKey then changeLevels() end
         end
     end
@@ -715,12 +748,42 @@ end
 function changeLevels()
     local scene = SceneManager:getCurrentScene()
     if scene == nil then return end
+
     local sceneName = scene:getName()
-    if sceneName == "Level1" then SceneManager:changeScene("Level2")
-    elseif sceneName == "Level2" then SceneManager:changeScene("Level3")
-    elseif sceneName == "Level3" then SceneManager:changeScene("Level4")
-    elseif sceneName == "Level4" then SceneManager:changeScene("Level5")
-    elseif sceneName == "Level5" then log("Beta Completed!") end
+
+    if sceneName == "Level1" then
+        SceneManager:changeScene("Level2")
+
+    elseif sceneName == "Level2" then
+        SceneManager:changeScene("Level3")
+
+    elseif sceneName == "Level3" then
+        SceneManager:changeScene("Level4")
+
+    elseif sceneName == "Level4" then
+        SceneManager:changeScene("Level5")
+
+    elseif sceneName == "Level5" then
+        if doorName == "exit" then
+            SceneManager:changeScene("Level6")
+        else
+            SceneManager:changeScene("Level7")
+        end
+
+    elseif sceneName == "Level6" then
+        SceneManager:changeScene("Level8")
+
+    elseif sceneName == "Level7" then
+        SceneManager:changeScene("Level8")
+
+    elseif sceneName == "Level8" then
+        SceneManager:changeScene("Level9")
+    elseif sceneName == "Level9" then
+        SceneManager:changeScene("BossLevel")
+
+    elseif sceneName == "BossLevel" then
+        log("end")
+    end
 end
 
 function cameraAim(maxDistance)

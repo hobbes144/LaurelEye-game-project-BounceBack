@@ -47,6 +47,11 @@ function onUpdate(dt)
 
         local alpha = startAlpha * (1.0 - t)
 
+        audio = self:findAudio()
+        if audio ~= nil then
+            audio:play("gasp")
+        end
+
         if render ~= nil then
             render:setTransparency(alpha)
         end

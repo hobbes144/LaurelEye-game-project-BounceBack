@@ -6,6 +6,40 @@
     },
     "entities": [
         {
+            "name": "BackgroundMusic",
+            "tags": [ "" ],
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 0.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Audio": {
+                    "sounds": [
+                        {
+                            "id": "whatever",
+                            "path": "audio/Ambiance/freesound_community-office-ambience-24734.wav",
+                            "volume": 1.0,
+                            "fadeSpeed": 1.0,
+                            "loop": true,
+                            "playOnLoad": true,
+                            "type": "BGM"
+                        },
+                        {
+                            "id": "gasp",
+                            "path": "audio/gasp.wav",
+                            "volume": 1.0,
+                            "fadeSpeed": 1.0,
+                            "loop": false,
+                            "playOnLoad": false,
+                            "type": "BGM"
+                        }
+                    ]
+                }
+
+            }
+        },
+        {
             "name": "Camera",
             "components": {
                 "Transform": {
@@ -321,6 +355,19 @@
                             "name": "fadeDuration",
                             "type": "Float",
                             "value": 0.5
+                        }
+                    ]
+                },
+                "Audio": {
+                    "sounds": [
+                        {
+                            "id": "gasp",
+                            "path": "audio/gasp.wav",
+                            "volume": 1.0,
+                            "fadeSpeed": 1.0,
+                            "loop": false,
+                            "playOnLoad": false,
+                            "type": "UI"
                         }
                     ]
                 }

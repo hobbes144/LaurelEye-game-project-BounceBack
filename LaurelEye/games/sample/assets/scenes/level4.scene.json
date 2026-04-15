@@ -4,6 +4,40 @@
     },
     "entities": [
         {
+            "name": "BackgroundMusic",
+            "tags": [ "" ],
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 0.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Audio": {
+                    "sounds": [
+                        {
+                            "id": "noDrumBGM",
+                            "path": "audio/gameplay/noDrum.wav",
+                            "volume": 0.4,
+                            "fadeSpeed": 0.2,
+                            "loop": true,
+                            "playOnLoad": true,
+                            "type": "BGM"
+                        },
+                        {
+                            "id": "withDrumBGM",
+                            "path": "audio/gameplay/withDrum.wav",
+                            "volume": 0.4,
+                            "fadeSpeed": 0.2,
+                            "loop": true,
+                            "playOnLoad": false,
+                            "type": "BGM"
+                        }
+                    ]
+                }
+
+            }
+        },
+        {
             "name": "Ground",
             "tags": [ "ground" ],
             "components": {
@@ -70,8 +104,25 @@
                 },
                 "Light": {
                     "type": "Point",
-                    "position": [ 0.0, 30.0, 0.0 ],
-                    "intensity": 700.0,
+                    "position": [ -18.055, 39.606, 34.615 ],
+                    "intensity": 1500.0,
+                    "color": [ 1.0, 1.0, 1.0 ],
+                    "range": 3000.0
+                }
+            }
+        },
+        {
+            "name": "RoomLight2",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 0.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Light": {
+                    "type": "Point",
+                    "position": [ 63.02, 39.606, -43.47 ],
+                    "intensity": 1500.0,
                     "color": [ 1.0, 1.0, 1.0 ],
                     "range": 3000.0
                 }
@@ -633,6 +684,28 @@
             }
         },
         {
+            "name": "Exit_sign",
+            "components": {
+                "Transform": {
+                    "position": [ -53.13, 21.6900001, 31.97 ],
+                    "rotation": [ -0.7071068, 0, 0.7071068, 0 ],
+                    "scale": [ -1.09409, 1.09409, -1.09409 ]
+                },
+                "Render3D": {
+                    "mesh": {
+                        "name": "Exit_sign",
+                        "file": "models/Exit_sign.fbx"
+                    },
+                    "material": {
+                        "texture": "textures/exitSign.png",
+                        "diffuse": [ 1.0, 10.0, 1.0 ],
+                        "specular": [ 0.2, 0.2, 0.2 ],
+                        "shininess": 32.0
+                    }
+                }
+            }
+        },
+        {
             "name": "exit",
             "tags": [ "door" ],
             "components": {
@@ -647,7 +720,7 @@
                         "file": "models/door.fbx"
                     },
                     "material": {
-                        "texture": "textures/texturePeachDoor.png",
+                        "texture": "textures/texturePurpleDoor.png",
                         "diffuse": [ 1.0, 10.0, 1.0 ],
                         "specular": [ 0.2, 0.2, 0.2 ],
                         "shininess": 32.0
@@ -775,11 +848,11 @@
         },
         {
             "name": "Enemy2",
-            "prefab": "prefabs/shooting_enemy.prefab.json"
+            "prefab": "prefabs/shooting_enemy_purple.prefab.json"
         },
         {
             "name": "Enemy3",
-            "prefab": "prefabs/shooting_enemy.prefab.json"
+            "prefab": "prefabs/shooting_enemy_purple.prefab.json"
         }
 
     ]

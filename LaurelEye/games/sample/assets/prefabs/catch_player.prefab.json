@@ -87,9 +87,27 @@
                     "path": "audio/footstep.mp3",
                     "volume": 0.2,
                     "fadeSpeed": 1.0,
-                    "loop": true,
+                    "loop": false,
                     "playOnLoad": false,
                     "type": "SFX3D"
+                },
+                {
+                    "id": "timeSlow",
+                    "path": "audio/SlowModeLMMS.wav",
+                    "volume": 1.0,
+                    "fadeSpeed": 0.0,
+                    "loop": false,
+                    "playOnLoad": false,
+                    "type": "SFX2D"
+                },
+                {
+                    "id": "getHit",
+                    "path": "audio/getHit.wav",
+                    "volume": 1.0,
+                    "fadeSpeed": 0.0,
+                    "loop": false,
+                    "playOnLoad": false,
+                    "type": "SFX2D"
                 }
             ]
         },

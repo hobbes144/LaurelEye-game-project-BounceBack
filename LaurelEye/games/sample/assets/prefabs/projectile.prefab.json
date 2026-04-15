@@ -53,13 +53,27 @@
             "ccdSweptSphereRadius": 1.0,
             "gravityScale": 1.5
         },
-        "Speaker": {
-            "audioName": "laser",
-            "audioPath": "audio/laserLarge_002.mp3",
-            "volume": 0.3,
-            "loop": false,
-            "3D": false,
-            "playOnLoad": false
+        "Audio": {
+            "sounds": [
+                {
+                    "id": "bounce",
+                    "path": "audio/bounce.wav",
+                    "volume": 1.0,
+                    "fadeSpeed": 0.0,
+                    "loop": false,
+                    "playOnLoad": false,
+                    "type": "SFX3D"
+                },
+                {
+                    "id": "getHit",
+                    "path": "audio/getHit.wav",
+                    "volume": 1.0,
+                    "fadeSpeed": 0.0,
+                    "loop": false,
+                    "playOnLoad": false,
+                    "type": "SFX3D"
+                }
+            ]
         },
         "ParticleEmitter": {
             "emissionRate": 60.0,

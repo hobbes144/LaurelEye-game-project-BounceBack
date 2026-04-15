@@ -50,6 +50,8 @@ local dead_state = nil
 local active = false
 -----------------------------------
 
+soundFactor = 50
+
 function onStart()
     transform = self:findTransform()
     body = self:findRigidBody()
@@ -84,7 +86,14 @@ end
 function onMessage(msg)
 
     if msg.topic == "Get Hit!" then
-
+        local enemyAudio = self:findAudio()
+        enemyAudio:stop("Hitting")
+        local BallPos = transform:getWorldPosition()
+        local emitterPos = Vector3.new(
+            BallPos.x/soundFactor,BallPos.y/soundFactor,BallPos.z/soundFactor
+        )
+        enemyAudio:setPosition(emitterPos)
+        enemyAudio:play("Hitting")
         stunBoss(phase == 1 and 2.0 or 1.0)
         state_machine:forceTransition("Stunned")
         return

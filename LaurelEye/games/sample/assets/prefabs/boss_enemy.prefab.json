@@ -72,6 +72,19 @@
                 "models/Boss/Armored/StomachHit.fbx"
             ]
         },
+        "Audio": {
+            "sounds": [
+                {
+                    "id": "Hitting",
+                    "path": "audio/Hitting.wav",
+                    "volume": 1.0,
+                    "fadeSpeed": 0.0,
+                    "loop": false,
+                    "playOnLoad": false,
+                    "type": "SFX3D"
+                }
+            ]
+        },
         "Script": {
             "path": "scripts/AISystem/boss_enemy.lua"
         }

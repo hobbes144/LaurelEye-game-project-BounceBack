@@ -34,6 +34,7 @@ local get_hit_state   = nil
 local dead_state      = nil
 local take_damage_state = nil
 
+soundFactor = 50
 ---------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------
 
@@ -58,6 +59,14 @@ end
 function onMessage(msg)
     if msg.topic == "Get Hit!" then
         log("Security hit by ball!")
+        local enemyAudio = self:findAudio()
+        enemyAudio:stop("Hitting")
+        local BallPos = transform:getWorldPosition()
+        local emitterPos = Vector3.new(
+            BallPos.x/soundFactor,BallPos.y/soundFactor,BallPos.z/soundFactor
+        )
+        enemyAudio:setPosition(emitterPos)
+        enemyAudio:play("Hitting")
         hit_count = hit_count + 1
         if hit_count >= max_hits then
             if enemy_ai then enemy_ai:forceTransition("Dead") end

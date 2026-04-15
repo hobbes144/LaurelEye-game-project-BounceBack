@@ -19,6 +19,17 @@ local player = nil
 local player_transform = nil
 --local death_triggered = false
 local hasKey = false
+local hasRedKey = false
+local hasBlueKey = false
+local hasYellowKey = false
+
+local keyTypes = {
+    red    = hasRedKey,
+    blue   = hasBlueKey,
+    yellow = hasYellowKey
+}
+
+
 local animator = nil
 local shot = false
 local player_transform = nil
@@ -40,7 +51,7 @@ local dead_state = nil
 ---------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------
 
-
+soundFactor = 50
 
 function onStart()
     transform = self:findTransform()
@@ -64,8 +75,32 @@ function onMessage(msg)
         print("Enemy has been given the key")
         hasKey = true
     end
+    if msg.topic == "I have the red key!" then
+        print("Enemy has been given the RED key")
+        hasRedKey = true
+    end
+    
+    if msg.topic == "I have the blue key!" then
+        print("Enemy has been given the BLUE key")
+        hasBlueKey = true
+    end
+    
+    if msg.topic == "I have the yellow key!" then
+        print("Enemy has been given the YELLOW key")
+        hasYellowKey = true
+    end
+
     if msg.topic == "Get Hit!" then
-        if msg.to ~= self then return end
+        if msg.to ~= self then return end 
+        if hasKey then
+            local scene = SceneManager:getCurrentScene()
+            local player = scene:findEntityByName("PlayerPrefab")
+            local message = Message.new()
+            message.to = player
+            message.topic = "Here's the Key!"
+            Script.send(message)
+        end
+        local enemyAudio = self:findAudio()
         if state_machine.current_state.name == "Dead" then return end
         if state_machine then state_machine:forceTransition("Dead") end
     end
@@ -233,6 +268,14 @@ function setupDeadState()
         death_triggered  = true
         animator:changeAnimation("Death")
         state_duration = 2.0
+        local enemyAudio = self:findAudio()
+        enemyAudio:stop("Hitting")
+        local BallPos = transform:getWorldPosition()
+        local emitterPos = Vector3.new(
+            BallPos.x/soundFactor,BallPos.y/soundFactor,BallPos.z/soundFactor
+        )
+        enemyAudio:setPosition(emitterPos)
+        enemyAudio:play("Hitting")
     end)
 
     dead_state:setUpdate(function(dt)
@@ -392,8 +435,20 @@ function destroySelf()
         local key = SceneManager:instantiate("prefabs/keycard.prefab.json")
         local keyTransform = key:findTransform()
         local pos = transform:getWorldPosition()
-        keyTransform:setWorldPosition(pos.x, 3.0, pos.z)
+        keyTransform:setWorldPosition(pos.x, pos.y + 3.0, pos.z)
     end
+
+    for color, hasKey in pairs(keyTypes) do
+        if hasKey then
+            local prefabPath = "prefabs/keycard_" .. color .. ".prefab.json"
+            local key = SceneManager:instantiate(prefabPath)
+            local keyTransform = key:findTransform()
+    
+            local pos = transform:getWorldPosition()
+            keyTransform:setWorldPosition(pos.x, pos.y + 3.0, pos.z)
+        end
+    end
+
     SceneManager:destroy(self)
 end
 

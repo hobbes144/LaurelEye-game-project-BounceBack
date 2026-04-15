@@ -36,11 +36,14 @@ namespace LaurelEye::Audio {
             return;
 
         SoundEntry& entry = it->second;
-
+        if ( entry.active == true)
+        {
+            return;
+        }
         entry.active = true;
         entry.fadingOut = false;
 
-        if ( entry.fadeSpeed > 0.0f ) {
+        if ( entry.fadeSpeed > 0.0f) {
             entry.fadingIn = true;
             entry.currentVolume = 0.0f;
         }

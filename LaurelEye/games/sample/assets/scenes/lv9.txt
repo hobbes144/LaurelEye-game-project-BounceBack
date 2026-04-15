@@ -1,0 +1,864 @@
+{
+  "name": "lightpos2",
+  "components": {
+    "Transform": {
+      "position": [ 11.73, 39.606, 19.5385 ],
+      "rotation": [ -1, 0, 0, 0 ],
+      "scale": [ 11.5, 11.5, 11.5 ]
+    },
+    "Render3D": {
+      "mesh": { "name": "cubeMesh", "primitiveType": "Cube" },
+      "material": {
+        "texture": "textures/texture_01_dark.png",
+        "diffuse": [ 1.0, 10.0, 1.0 ],
+        "specular": [ 0.2, 0.2, 0.2 ],
+        "shininess": 32.0
+      }
+    }
+    ,
+    "Physics": {
+    "type": "Static",
+    "shapeDefinition": {
+        "type": "Box",
+        "size": {
+            "x": 100,
+            "y": 100,
+            "z": 100
+        }
+    },
+    "mass": 0.0,
+    "linearDamping": 0.0,
+    "angularDamping": 0.0,
+    "friction": 0.0,
+    "restitution": 0.0,
+    "collisionGroup": 4,
+    "collisionMask": 11,
+    "gravityScale": 0.0
+}
+  }
+},
+{
+  "name": "lightpos1",
+  "components": {
+    "Transform": {
+      "position": [ 11.73, 39.606, -98.785 ],
+      "rotation": [ -1, 0, 0, 0 ],
+      "scale": [ 11.5, 11.5, 11.5 ]
+    },
+    "Render3D": {
+      "mesh": { "name": "cubeMesh", "primitiveType": "Cube" },
+      "material": {
+        "texture": "textures/texture_01_dark.png",
+        "diffuse": [ 1.0, 10.0, 1.0 ],
+        "specular": [ 0.2, 0.2, 0.2 ],
+        "shininess": 32.0
+      }
+    }
+    ,
+    "Physics": {
+    "type": "Static",
+    "shapeDefinition": {
+        "type": "Box",
+        "size": {
+            "x": 100,
+            "y": 100,
+            "z": 100
+        }
+    },
+    "mass": 0.0,
+    "linearDamping": 0.0,
+    "angularDamping": 0.0,
+    "friction": 0.0,
+    "restitution": 0.0,
+    "collisionGroup": 4,
+    "collisionMask": 11,
+    "gravityScale": 0.0
+}
+  }
+},
+{
+  "name": "Floor",
+  "components": {
+    "Transform": {
+      "position": [ 12.765, -0.46, -34.615 ],
+      "rotation": [ -1, 0, 0, 0 ],
+      "scale": [ -0.1512039, 0.115, -0.2608665 ]
+    },
+    "Render3D": {
+      "mesh": { "name": "Plane", "file": "models/Plane.fbx" },
+      "material": {
+        "texture": "textures/floorTexture.png",
+        "diffuse": [ 1.0, 10.0, 1.0 ],
+        "specular": [ 0.2, 0.2, 0.2 ],
+        "shininess": 32.0
+      }
+    }
+  }
+},
+{
+  "name": "southWall",
+  "components": {
+    "Transform": {
+      "position": [ -24.725, -15.295, -43.01 ],
+      "rotation": [ -1, 0, 0, 0 ],
+      "scale": [ -0.115, 1.805395, -2.318253 ]
+    },
+    "Render3D": {
+      "mesh": { "name": "wall-low", "file": "models/wall-low.fbx" },
+      "material": {
+        "texture": "textures/arcadeColormap.png",
+        "diffuse": [ 1.0, 10.0, 1.0 ],
+        "specular": [ 0.2, 0.2, 0.2 ],
+        "shininess": 32.0
+      }
+    }
+    ,
+    "Physics": {
+    "type": "Static",
+    "shapeDefinition": {
+        "type": "Box",
+        "size": {
+            "x": 20,
+            "y": 50,
+            "z": 100
+        },
+        "centerOfMass": {
+            "x": 0,
+            "y": 45.13487,
+            "z": 0
+        }
+    },
+    "mass": 0.0,
+    "linearDamping": 0.0,
+    "angularDamping": 0.0,
+    "friction": 0.0,
+    "restitution": 0.0,
+    "collisionGroup": 4,
+    "collisionMask": 11,
+    "gravityScale": 0.0
+}
+  }
+},
+{
+  "name": "southWall (2)",
+  "components": {
+    "Transform": {
+      "position": [ 50.163, -15.295, -44.62 ],
+      "rotation": [ -1, 0, 0, 0 ],
+      "scale": [ -0.115, 1.805395, -2.302039 ]
+    },
+    "Render3D": {
+      "mesh": { "name": "wall-low", "file": "models/wall-low.fbx" },
+      "material": {
+        "texture": "textures/arcadeColormap.png",
+        "diffuse": [ 1.0, 10.0, 1.0 ],
+        "specular": [ 0.2, 0.2, 0.2 ],
+        "shininess": 32.0
+      }
+    }
+    ,
+    "Physics": {
+    "type": "Static",
+    "shapeDefinition": {
+        "type": "Box",
+        "size": {
+            "x": 20,
+            "y": 50,
+            "z": 100
+        },
+        "centerOfMass": {
+            "x": 0,
+            "y": 45.13487,
+            "z": 0
+        }
+    },
+    "mass": 0.0,
+    "linearDamping": 0.0,
+    "angularDamping": 0.0,
+    "friction": 0.0,
+    "restitution": 0.0,
+    "collisionGroup": 4,
+    "collisionMask": 11,
+    "gravityScale": 0.0
+}
+  }
+},
+{
+  "name": "eastWall",
+  "components": {
+    "Transform": {
+      "position": [ 22.195, -15.295, 61.1455 ],
+      "rotation": [ -0.7071068, 0, 0.7071068, 0 ],
+      "scale": [ -0.115, 1.805395, -1.274172 ]
+    },
+    "Render3D": {
+      "mesh": { "name": "wall-low", "file": "models/wall-low.fbx" },
+      "material": {
+        "texture": "textures/arcadeColormap.png",
+        "diffuse": [ 1.0, 10.0, 1.0 ],
+        "specular": [ 0.2, 0.2, 0.2 ],
+        "shininess": 32.0
+      }
+    }
+    ,
+    "Physics": {
+    "type": "Static",
+    "shapeDefinition": {
+        "type": "Box",
+        "size": {
+            "x": 20,
+            "y": 50,
+            "z": 100
+        },
+        "centerOfMass": {
+            "x": 0,
+            "y": 45.13487,
+            "z": 0
+        }
+    },
+    "mass": 0.0,
+    "linearDamping": 0.0,
+    "angularDamping": 0.0,
+    "friction": 0.0,
+    "restitution": 0.0,
+    "collisionGroup": 4,
+    "collisionMask": 11,
+    "gravityScale": 0.0
+}
+  }
+},
+{
+  "name": "eastWall (1)",
+  "components": {
+    "Transform": {
+      "position": [ 10.005, -15.295, -147.2 ],
+      "rotation": [ -0.7071068, 0, 0.7071068, 0 ],
+      "scale": [ -0.115, 1.805395, -0.9806485 ]
+    },
+    "Render3D": {
+      "mesh": { "name": "wall-low", "file": "models/wall-low.fbx" },
+      "material": {
+        "texture": "textures/arcadeColormap.png",
+        "diffuse": [ 1.0, 10.0, 1.0 ],
+        "specular": [ 0.2, 0.2, 0.2 ],
+        "shininess": 32.0
+      }
+    }
+    ,
+    "Physics": {
+    "type": "Static",
+    "shapeDefinition": {
+        "type": "Box",
+        "size": {
+            "x": 20,
+            "y": 50,
+            "z": 100
+        },
+        "centerOfMass": {
+            "x": 0,
+            "y": 45.13487,
+            "z": 0
+        }
+    },
+    "mass": 0.0,
+    "linearDamping": 0.0,
+    "angularDamping": 0.0,
+    "friction": 0.0,
+    "restitution": 0.0,
+    "collisionGroup": 4,
+    "collisionMask": 11,
+    "gravityScale": 0.0
+}
+  }
+},
+{
+  "name": "ceiling",
+  "components": {
+    "Transform": {
+      "position": [ -39.79, 44.505, -47.495 ],
+      "rotation": [ -0.7071068, 0, 0, 0.7071068 ],
+      "scale": [ -0.161759, 1.784266, -2.748506 ]
+    },
+    "Render3D": {
+      "mesh": { "name": "wall-low", "file": "models/wall-low.fbx" },
+      "material": {
+        "texture": "textures/arcadeColormap.png",
+        "diffuse": [ 1.0, 10.0, 1.0 ],
+        "specular": [ 0.2, 0.2, 0.2 ],
+        "shininess": 32.0
+      }
+    }
+    ,
+    "Physics": {
+    "type": "Static",
+    "shapeDefinition": {
+        "type": "Box",
+        "size": {
+            "x": 20,
+            "y": 50,
+            "z": 100
+        },
+        "centerOfMass": {
+            "x": 0,
+            "y": 44.60666,
+            "z": 0
+        }
+    },
+    "mass": 0.0,
+    "linearDamping": 0.0,
+    "angularDamping": 0.0,
+    "friction": 0.0,
+    "restitution": 0.0,
+    "collisionGroup": 4,
+    "collisionMask": 11,
+    "gravityScale": 0.0
+}
+  }
+},
+{
+  "name": "entrance",
+  "components": {
+    "Transform": {
+      "position": [ 0, -0.6900001, 59.455 ],
+      "rotation": [ -1, 0, 0, 0 ],
+      "scale": [ -0.1855137, 0.1855136, -0.1855137 ]
+    },
+    "Render3D": {
+      "mesh": { "name": "door", "file": "models/door.fbx" },
+      "material": {
+        "texture": "textures/textureEntrance.png",
+        "diffuse": [ 1.0, 10.0, 1.0 ],
+        "specular": [ 0.2, 0.2, 0.2 ],
+        "shininess": 32.0
+      }
+    }
+    ,
+    "Physics": {
+    "type": "Static",
+    "shapeDefinition": {
+        "type": "Box",
+        "size": {
+            "x": 161.3162,
+            "y": 161.3162,
+            "z": 96.78974
+        }
+    },
+    "mass": 0.0,
+    "linearDamping": 0.0,
+    "angularDamping": 0.0,
+    "friction": 0.0,
+    "restitution": 0.0,
+    "collisionGroup": 4,
+    "collisionMask": 11,
+    "gravityScale": 0.0
+}
+  }
+},
+{
+  "name": "exit",
+  "components": {
+    "Transform": {
+      "position": [ -4.945, -0.6900001, -145.6475 ],
+      "rotation": [ 0, 0, -1, 0 ],
+      "scale": [ -0.1855137, 0.1855136, -0.1855137 ]
+    },
+    "Render3D": {
+      "mesh": { "name": "door", "file": "models/door.fbx" },
+      "material": {
+        "texture": "textures/textureOrangeDoor.png",
+        "diffuse": [ 1.0, 10.0, 1.0 ],
+        "specular": [ 0.2, 0.2, 0.2 ],
+        "shininess": 32.0
+      }
+    }
+    ,
+    "Physics": {
+    "type": "Static",
+    "shapeDefinition": {
+        "type": "Box",
+        "size": {
+            "x": 161.3162,
+            "y": 161.3162,
+            "z": 96.78974
+        }
+    },
+    "mass": 0.0,
+    "linearDamping": 0.0,
+    "angularDamping": 0.0,
+    "friction": 0.0,
+    "restitution": 0.0,
+    "collisionGroup": 4,
+    "collisionMask": 11,
+    "gravityScale": 0.0
+}
+  }
+},
+{
+  "name": "column",
+  "components": {
+    "Transform": {
+      "position": [ 47.84421, -1.38, 59.34 ],
+      "rotation": [ -1, 0, 0, 0 ],
+      "scale": [ -0.1541399, 0.443479, -0.1614212 ]
+    },
+    "Render3D": {
+      "mesh": { "name": "column", "file": "models/column.fbx" },
+      "material": {
+        "texture": "textures/arcadeColormap.png",
+        "diffuse": [ 1.0, 10.0, 1.0 ],
+        "specular": [ 0.2, 0.2, 0.2 ],
+        "shininess": 32.0
+      }
+    }
+    ,
+    "Physics": {
+    "type": "Static",
+    "shapeDefinition": {
+        "type": "Capsule",
+        "radius": 50.93788,
+        "height": 520.811
+    },
+    "centerOfMass": {
+        "x": 0,
+        "y": 260.4055,
+        "z": 0
+    },
+    "mass": 1.0,
+    "linearDamping": 0.0,
+    "angularDamping": 0.0,
+    "friction": 0.0,
+    "restitution": 0.0,
+    "collisionGroup": 1,
+    "collisionMask": 30,
+    "gravityScale": 1.0
+}
+  }
+},
+{
+  "name": "table-large",
+  "components": {
+    "Transform": {
+      "position": [ 26.06475, 0.03692995, -6.214945 ],
+      "rotation": [ -0.7071068, 0, 0.7071068, 0 ],
+      "scale": [ -0.1310513, 0.1310513, -0.1310513 ]
+    },
+    "Render3D": {
+      "mesh": { "name": "table-large", "file": "models/table-large.fbx" },
+      "material": {
+        "texture": "textures/colormap.png",
+        "diffuse": [ 1.0, 10.0, 1.0 ],
+        "specular": [ 0.2, 0.2, 0.2 ],
+        "shininess": 32.0
+      }
+    }
+    ,
+    "Physics": {
+    "type": "Static",
+    "shapeDefinition": {
+        "type": "Box",
+        "size": {
+            "x": 159.5407,
+            "y": 45.58305,
+            "z": 102.5619
+        }
+    },
+    "mass": 0.0,
+    "linearDamping": 0.0,
+    "angularDamping": 0.0,
+    "friction": 0.0,
+    "restitution": 0.0,
+    "collisionGroup": 4,
+    "collisionMask": 11,
+    "gravityScale": 0.0
+}
+  }
+},
+{
+  "name": "chair-headrest",
+  "components": {
+    "Transform": {
+      "position": [ 15.7757, -0.0537625, -9.96406 ],
+      "rotation": [ -0.7071068, 0, 0.7071068, 0 ],
+      "scale": [ -0.1310513, 0.1310513, -0.1310513 ]
+    },
+    "Render3D": {
+      "mesh": { "name": "chair-headrest", "file": "models/chair-headrest.fbx" },
+      "material": {
+        "texture": "textures/colormap.png",
+        "diffuse": [ 1.0, 10.0, 1.0 ],
+        "specular": [ 0.2, 0.2, 0.2 ],
+        "shininess": 32.0
+      }
+    }
+    ,
+    "Physics": {
+    "type": "Static",
+    "shapeDefinition": {
+        "type": "Box",
+        "size": {
+            "x": 34.18729,
+            "y": 79.77034,
+            "z": 39.88518
+        }
+    },
+    "mass": 0.0,
+    "linearDamping": 0.0,
+    "angularDamping": 0.0,
+    "friction": 0.0,
+    "restitution": 0.0,
+    "collisionGroup": 4,
+    "collisionMask": 11,
+    "gravityScale": 0.0
+}
+  }
+},
+{
+  "name": "chair-headrest (4)",
+  "components": {
+    "Transform": {
+      "position": [ 26.1349, -0.0537625, 6.209885 ],
+      "rotation": [ -1, 0, 0, 0 ],
+      "scale": [ -0.1310513, 0.1310513, -0.1310513 ]
+    },
+    "Render3D": {
+      "mesh": { "name": "chair-headrest", "file": "models/chair-headrest.fbx" },
+      "material": {
+        "texture": "textures/colormap.png",
+        "diffuse": [ 1.0, 10.0, 1.0 ],
+        "specular": [ 0.2, 0.2, 0.2 ],
+        "shininess": 32.0
+      }
+    }
+    ,
+    "Physics": {
+    "type": "Static",
+    "shapeDefinition": {
+        "type": "Box",
+        "size": {
+            "x": 34.18729,
+            "y": 79.77034,
+            "z": 39.88517
+        }
+    },
+    "mass": 0.0,
+    "linearDamping": 0.0,
+    "angularDamping": 0.0,
+    "friction": 0.0,
+    "restitution": 0.0,
+    "collisionGroup": 4,
+    "collisionMask": 11,
+    "gravityScale": 0.0
+}
+  }
+},
+{
+  "name": "chair-headrest (5)",
+  "components": {
+    "Transform": {
+      "position": [ 26.1349, -0.0537625, -18.7105 ],
+      "rotation": [ 0, 0, 1, 0 ],
+      "scale": [ -0.1310513, 0.1310513, -0.1310513 ]
+    },
+    "Render3D": {
+      "mesh": { "name": "chair-headrest", "file": "models/chair-headrest.fbx" },
+      "material": {
+        "texture": "textures/colormap.png",
+        "diffuse": [ 1.0, 10.0, 1.0 ],
+        "specular": [ 0.2, 0.2, 0.2 ],
+        "shininess": 32.0
+      }
+    }
+    ,
+    "Physics": {
+    "type": "Static",
+    "shapeDefinition": {
+        "type": "Box",
+        "size": {
+            "x": 34.18729,
+            "y": 79.77034,
+            "z": 39.88517
+        }
+    },
+    "mass": 0.0,
+    "linearDamping": 0.0,
+    "angularDamping": 0.0,
+    "friction": 0.0,
+    "restitution": 0.0,
+    "collisionGroup": 4,
+    "collisionMask": 11,
+    "gravityScale": 0.0
+}
+  }
+},
+{
+  "name": "chair-headrest (1)",
+  "components": {
+    "Transform": {
+      "position": [ 15.7757, -0.0537625, -1.93223 ],
+      "rotation": [ -0.7071068, 0, 0.7071068, 0 ],
+      "scale": [ -0.1310513, 0.1310513, -0.1310513 ]
+    },
+    "Render3D": {
+      "mesh": { "name": "chair-headrest", "file": "models/chair-headrest.fbx" },
+      "material": {
+        "texture": "textures/colormap.png",
+        "diffuse": [ 1.0, 10.0, 1.0 ],
+        "specular": [ 0.2, 0.2, 0.2 ],
+        "shininess": 32.0
+      }
+    }
+    ,
+    "Physics": {
+    "type": "Static",
+    "shapeDefinition": {
+        "type": "Box",
+        "size": {
+            "x": 34.18729,
+            "y": 79.77034,
+            "z": 39.88518
+        }
+    },
+    "mass": 0.0,
+    "linearDamping": 0.0,
+    "angularDamping": 0.0,
+    "friction": 0.0,
+    "restitution": 0.0,
+    "collisionGroup": 4,
+    "collisionMask": 11,
+    "gravityScale": 0.0
+}
+  }
+},
+{
+  "name": "chair-headrest (2)",
+  "components": {
+    "Transform": {
+      "position": [ 35.2958, -0.0537625, -1.93223 ],
+      "rotation": [ 0.7071068, 0, 0.7071068, 0 ],
+      "scale": [ -0.1310513, 0.1310513, -0.1310513 ]
+    },
+    "Render3D": {
+      "mesh": { "name": "chair-headrest", "file": "models/chair-headrest.fbx" },
+      "material": {
+        "texture": "textures/colormap.png",
+        "diffuse": [ 1.0, 10.0, 1.0 ],
+        "specular": [ 0.2, 0.2, 0.2 ],
+        "shininess": 32.0
+      }
+    }
+    ,
+    "Physics": {
+    "type": "Static",
+    "shapeDefinition": {
+        "type": "Box",
+        "size": {
+            "x": 34.18729,
+            "y": 79.77034,
+            "z": 39.88518
+        }
+    },
+    "mass": 0.0,
+    "linearDamping": 0.0,
+    "angularDamping": 0.0,
+    "friction": 0.0,
+    "restitution": 0.0,
+    "collisionGroup": 4,
+    "collisionMask": 11,
+    "gravityScale": 0.0
+}
+  }
+},
+{
+  "name": "chair-headrest (3)",
+  "components": {
+    "Transform": {
+      "position": [ 35.2958, -0.0537625, -9.943476 ],
+      "rotation": [ 0.7071068, 0, 0.7071068, 0 ],
+      "scale": [ -0.1310513, 0.1310513, -0.1310513 ]
+    },
+    "Render3D": {
+      "mesh": { "name": "chair-headrest", "file": "models/chair-headrest.fbx" },
+      "material": {
+        "texture": "textures/colormap.png",
+        "diffuse": [ 1.0, 10.0, 1.0 ],
+        "specular": [ 0.2, 0.2, 0.2 ],
+        "shininess": 32.0
+      }
+    }
+    ,
+    "Physics": {
+    "type": "Static",
+    "shapeDefinition": {
+        "type": "Box",
+        "size": {
+            "x": 34.18729,
+            "y": 79.77034,
+            "z": 39.88518
+        }
+    },
+    "mass": 0.0,
+    "linearDamping": 0.0,
+    "angularDamping": 0.0,
+    "friction": 0.0,
+    "restitution": 0.0,
+    "collisionGroup": 4,
+    "collisionMask": 11,
+    "gravityScale": 0.0
+}
+  }
+},
+{
+  "name": "chair-armrest-headrest",
+  "components": {
+    "Transform": {
+      "position": [ 25.2195, -0.4599968, -117.0194 ],
+      "rotation": [ 0.06367257, 0, 0.9979709, 0 ],
+      "scale": [ -0.1310512, 0.1310512, -0.1310512 ]
+    },
+    "Render3D": {
+      "mesh": { "name": "chair-armrest-headrest", "file": "models/chair-armrest-headrest.fbx" },
+      "material": {
+        "texture": "textures/colormap.png",
+        "diffuse": [ 1.0, 10.0, 1.0 ],
+        "specular": [ 0.2, 0.2, 0.2 ],
+        "shininess": 32.0
+      }
+    }
+  }
+},
+{
+  "name": "balcony-rail-corner",
+  "components": {
+    "Transform": {
+      "position": [ 22.931, -1.178175, -115.69 ],
+      "rotation": [ 0, 0, 1, 0 ],
+      "scale": [ -0.1937954, 0.1669593, -0.3094757 ]
+    },
+    "Render3D": {
+      "mesh": { "name": "balcony-rail-corner", "file": "models/balcony-rail-corner.fbx" },
+      "material": {
+        "texture": "textures/colormap.png",
+        "diffuse": [ 1.0, 10.0, 1.0 ],
+        "specular": [ 0.2, 0.2, 0.2 ],
+        "shininess": 32.0
+      }
+    }
+    ,
+    "Physics": {
+    "type": "Static",
+    "shapeDefinition": {
+        "type": "Box",
+        "size": {
+            "x": 117.9624,
+            "y": 58.07279,
+            "z": 188.3765
+        }
+    },
+    "mass": 0.0,
+    "linearDamping": 0.0,
+    "angularDamping": 0.0,
+    "friction": 0.0,
+    "restitution": 0.0,
+    "collisionGroup": 4,
+    "collisionMask": 11,
+    "gravityScale": 0.0
+}
+  }
+},
+{
+  "name": "balcony-rail-center",
+  "components": {
+    "Transform": {
+      "position": [ 38.839, -1.178175, -107.8849 ],
+      "rotation": [ -1, 0, 0, 0 ],
+      "scale": [ -0.1937954, 0.1669593, -0.3094758 ]
+    },
+    "Render3D": {
+      "mesh": { "name": "balcony-rail-center", "file": "models/balcony-rail-center.fbx" },
+      "material": {
+        "texture": "textures/colormap.png",
+        "diffuse": [ 1.0, 10.0, 1.0 ],
+        "specular": [ 0.2, 0.2, 0.2 ],
+        "shininess": 32.0
+      }
+    }
+    ,
+    "Physics": {
+    "type": "Static",
+    "shapeDefinition": {
+        "type": "Box",
+        "size": {
+            "x": 168.5177,
+            "y": 58.0728,
+            "z": 53.82187
+        }
+    },
+    "mass": 0.0,
+    "linearDamping": 0.0,
+    "angularDamping": 0.0,
+    "friction": 0.0,
+    "restitution": 0.0,
+    "collisionGroup": 4,
+    "collisionMask": 11,
+    "gravityScale": 0.0
+}
+  }
+},
+{
+  "name": "computer",
+  "components": {
+    "Transform": {
+      "position": [ 36.5125, 4.2205, -108.054 ],
+      "rotation": [ -0.9986132, 0, -0.05264734, 0 ],
+      "scale": [ -0.1310512, 0.1310512, -0.1310512 ]
+    },
+    "Render3D": {
+      "mesh": { "name": "computer", "file": "models/computer.fbx" },
+      "material": {
+        "texture": "textures/colormap.png",
+        "diffuse": [ 1.0, 10.0, 1.0 ],
+        "specular": [ 0.2, 0.2, 0.2 ],
+        "shininess": 32.0
+      }
+    }
+  }
+},
+{
+  "name": "Badge2",
+  "components": {
+    "Transform": {
+      "position": [ 38.4445, 3.07257E-06, -131.7325 ],
+      "rotation": [ 0.135271, 0.1352711, 0.6940473, -0.6940475 ],
+      "scale": [ -4.539939, 4.539939, -4.539939 ]
+    },
+    "Render3D": {
+      "mesh": { "name": "BézierCurve", "file": "models/BézierCurve.fbx" },
+      "material": {
+        "texture": "textures/plainOrange.png",
+        "diffuse": [ 1.0, 10.0, 1.0 ],
+        "specular": [ 0.2, 0.2, 0.2 ],
+        "shininess": 32.0
+      }
+    }
+    ,
+    "Physics": {
+    "type": "Static",
+    "shapeDefinition": {
+        "type": "Box",
+        "size": {
+            "x": 32.83137,
+            "y": 51.45087,
+            "z": 3.158219
+        }
+    },
+    "mass": 0.0,
+    "linearDamping": 0.0,
+    "angularDamping": 0.0,
+    "friction": 0.0,
+    "restitution": 0.0,
+    "collisionGroup": 4,
+    "collisionMask": 11,
+    "gravityScale": 0.0
+}
+  }
+},

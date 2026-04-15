@@ -53,6 +53,72 @@
             "ccdSweptSphereRadius": 1.0,
             "gravityScale": 1.5
         },
+        "ParticleEmitter": {
+            "emissionRate": 60.0,
+            "spreadAngle": 15.0,
+            "particleLifetime": 0.15,
+            "lifetimeVariation": 0.2,
+            "initialSpeed": 2.5,
+            "speedVariation": 0.5,
+            "startSize": 8.55,
+            "endSize": 1.05,
+            "sizeVariation": 0.05,
+            "usePhysics": false,
+
+            "startColor": [ 1.0, 0.1, 0.1, 1.0 ],
+            "endColor": [ 1.0, 0.412, 0.706, 0.0 ],
+
+            "maxParticles": 300
+        },
+        "Audio": {
+            "sounds": [
+                {
+                    "id": "bounce",
+                    "path": "audio/bounce.wav",
+                    "volume": 1.0,
+                    "fadeSpeed": 0.0,
+                    "loop": false,
+                    "playOnLoad": false,
+                    "type": "SFX3D"
+                },
+                {
+                    "id": "hitting",
+                    "path": "audio/Hitting.wav",
+                    "volume": 1.0,
+                    "fadeSpeed": 0.0,
+                    "loop": false,
+                    "playOnLoad": false,
+                    "type": "SFX3D"
+                },
+                {
+                    "id": "hitGenerator",
+                    "path": "audio/Impacts-HeavyObjectsFalls_1.wav",
+                    "volume": 1.0,
+                    "fadeSpeed": 0.0,
+                    "loop": false,
+                    "playOnLoad": false,
+                    "type": "SFX3D"
+                },
+                {
+                    "id": "shield",
+                    "path": "audio/Impacts-NightstickHits-In_3.wav",
+                    "volume": 1.0,
+                    "fadeSpeed": 0.0,
+                    "loop": false,
+                    "playOnLoad": false,
+                    "type": "SFX3D"
+                },
+                {
+                    "id": "getHit",
+                    "path": "audio/getHit.wav",
+                    "volume": 1.0,
+                    "fadeSpeed": 0.0,
+                    "loop": false,
+                    "playOnLoad": false,
+                    "type": "SFX3D"
+                }
+            ]
+        },
         "Script": {
             "path": "scripts/catch_ball.lua"
         }

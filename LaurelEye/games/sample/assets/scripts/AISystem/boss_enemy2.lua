@@ -42,6 +42,8 @@ local dead_state = nil
 local active = false
 -----------------------------------
 
+soundFactor = 50
+
 function onStart()
     transform = self:findTransform()
     body = self:findRigidBody()
@@ -67,6 +69,14 @@ function onMessage(msg)
     if msg.topic == "Get Hit!" then
         log("Security hit by ball!")
         health = health - 1
+        local enemyAudio = self:findAudio()
+        enemyAudio:stop("Hitting")
+        local BallPos = transform:getWorldPosition()
+        local emitterPos = Vector3.new(
+            BallPos.x/soundFactor,BallPos.y/soundFactor,BallPos.z/soundFactor
+        )
+        enemyAudio:setPosition(emitterPos)
+        enemyAudio:play("Hitting")
         if health <= 0 then
             state_machine:forceTransition("Dead")
         else
