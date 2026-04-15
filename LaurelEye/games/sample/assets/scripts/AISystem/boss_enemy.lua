@@ -16,7 +16,7 @@ local shield = nil
 
 -- Phase system
 local phase = 1
-local generators_remaining = 6
+local generators_remaining = 4
 
 -- Movement
 local turn_speed = 6.0

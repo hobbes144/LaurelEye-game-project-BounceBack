@@ -729,31 +729,6 @@
             }
         },
         {
-            "name": "generator (1)",
-            "components": {
-                "Transform": {
-                    "position": [ -25.369, 28.34, 8.97 ],
-                    "rotation": [ -0.5, 0.5, 0.5, 0.5 ],
-                    "scale": [ -0.2609911, 0.260991, -0.260991 ]
-                },
-                "Render3D": {
-                    "mesh": {
-                        "name": "computer-wide",
-                        "file": "models/computer-wide.fbx"
-                    },
-                    "material": {
-                        "texture": "textures/textureScreen.png",
-                        "diffuse": [ 1.0, 10.0, 1.0 ],
-                        "specular": [ 0.2, 0.2, 0.2 ],
-                        "shininess": 32.0
-                    }
-                },
-                "Script": {
-                    "path": "scripts/generator.lua"
-                }
-            }
-        },
-        {
             "name": "generator (10)",
             "components": {
                 "Transform": {
@@ -784,56 +759,6 @@
                 "Transform": {
                     "position": [ 126.454, 28.34, -167.44 ],
                     "rotation": [ 0.4398896, -0.4398896, 0.5536219, 0.5536219 ],
-                    "scale": [ -0.2609911, 0.260991, -0.260991 ]
-                },
-                "Render3D": {
-                    "mesh": {
-                        "name": "computer-wide",
-                        "file": "models/computer-wide.fbx"
-                    },
-                    "material": {
-                        "texture": "textures/textureScreen.png",
-                        "diffuse": [ 1.0, 10.0, 1.0 ],
-                        "specular": [ 0.2, 0.2, 0.2 ],
-                        "shininess": 32.0
-                    }
-                },
-                "Script": {
-                    "path": "scripts/generator.lua"
-                }
-            }
-        },
-        {
-            "name": "generator (12)",
-            "components": {
-                "Transform": {
-                    "position": [ 104.581, 28.34, -73.439 ],
-                    "rotation": [ 0.6488726, -0.6488726, 0.2810061, 0.2810061 ],
-                    "scale": [ -0.2609911, 0.260991, -0.260991 ]
-                },
-                "Render3D": {
-                    "mesh": {
-                        "name": "computer-wide",
-                        "file": "models/computer-wide.fbx"
-                    },
-                    "material": {
-                        "texture": "textures/textureScreen.png",
-                        "diffuse": [ 1.0, 10.0, 1.0 ],
-                        "specular": [ 0.2, 0.2, 0.2 ],
-                        "shininess": 32.0
-                    }
-                },
-                "Script": {
-                    "path": "scripts/generator.lua"
-                }
-            }
-        },
-        {
-            "name": "generator (13)",
-            "components": {
-                "Transform": {
-                    "position": [ 0.345, 28.34, -58.19 ],
-                    "rotation": [ 0.6922104, -0.6922104, -0.144377, -0.144377 ],
                     "scale": [ -0.2609911, 0.260991, -0.260991 ]
                 },
                 "Render3D": {
