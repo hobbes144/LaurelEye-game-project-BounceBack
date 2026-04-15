@@ -252,7 +252,8 @@ function setupDeadState()
                 local explosive = SceneManager:instantiate("prefabs/explosive_ball.prefab.json")
                 local expTransform = explosive:findTransform()
                 local pos = transform:getWorldPosition()
-                expTransform:setWorldPosition(pos.x, 1.0, pos.z - 10.0)
+                expTransform:setWorldPosition(pos.x, 3.0, pos.z)
+                GameManager:addEnemyKilled(1)
                 ballSpawned = true
             end
         end

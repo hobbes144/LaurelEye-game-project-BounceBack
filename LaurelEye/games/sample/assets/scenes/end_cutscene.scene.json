@@ -1,0 +1,286 @@
+﻿{
+    "settings": {
+        "resetOnLoad": true,
+        "backgroundColor": [ 0.5, 0.25, 0.25 ],
+        "UIActiveOnLoad": true
+    },
+    "entities": [
+        {
+            "name": "Camera",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 15.0, 40.0 ],
+                    "rotation": [ -0.261799, 0.0, 0.0 ],
+                    "scale": [ 50.0, 1.0, 50.0 ]
+                },
+                "Camera": {
+
+                }
+            }
+        },
+        {
+            "name": "DirectionalLight",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, -1.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Light": {
+                    "type": "Directional",
+                    "direction": [ 0.75, -1.0, 0.75 ],
+                    "intensity": 4.0,
+                    "color": [ 1.0, 1.0, 1.0 ]
+                }
+            }
+        },
+        {
+            "name": "AmbientLight",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 0.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Light": {
+                    "type": "Ambient",
+                    "intensity": 0.3,
+                    "color": [ 1.0, 0.25, 1.0 ]
+                }
+            }
+        },
+        {
+            "name": "Background",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0.0, 0.0 ],
+                    "anchorMax": [ 1.0, 1.0 ],
+                    "pivot": [ 0.5, 0.5 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 1, 1 ]
+                },
+                "UIRender": {
+                    "color": [ 1.0, 1.0, 1.0, 1.0 ]
+                }
+            }
+        },
+        {
+            "name": "SkipButtonPressed",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0, 0 ],
+                    "anchorMax": [ 0, 0 ],
+                    "pivot": [ 0, 0 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 0, 0 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "UIElements/SkipButton/skipPressed.png",
+                        "layer": 10
+                    },
+                    "color": [ 1.0, 1.0, 1.0, 0.0 ]
+                }
+            }
+        },
+        {
+            "name": "SkipButtonHovered",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0, 0 ],
+                    "anchorMax": [ 0, 0 ],
+                    "pivot": [ 0, 0 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 0, 0 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "UIElements/SkipButton/skipHovered.png",
+                        "layer": 10
+                    },
+                    "color": [ 1.0, 1.0, 1.0, 0.0 ]
+                }
+            }
+        },
+        {
+            "name": "Cutscene03",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0.0, 0.0 ],
+                    "anchorMax": [ 1.0, 1.0 ],
+                    "pivot": [ 0.5, 0.5 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 1.0, 1.0 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "UIElements/Cutscene/end3.png",
+                        "layer": 10
+                    },
+                    "color": [ 1.0, 1.0, 1.0, 1.0 ]
+                },
+                "Script": {
+                    "path": "scripts/UIScripts/delayed_fade_effect.lua",
+                    "data": [
+                        {
+                            "name": "delay",
+                            "type": "Float",
+                            "value": 8.5
+                        },
+                        {
+                            "name": "fadeDuration",
+                            "type": "Float",
+                            "value": 0.5
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Cutscene02",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0.0, 0.0 ],
+                    "anchorMax": [ 1.0, 1.0 ],
+                    "pivot": [ 0.5, 0.5 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 1.0, 1.0 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "UIElements/Cutscene/end2.png",
+                        "layer": 5
+                    },
+                    "color": [ 1.0, 1.0, 1.0, 1.0 ]
+                },
+                "Script": {
+                    "path": "scripts/UIScripts/delayed_fade_effect.lua",
+                    "data": [
+                        {
+                            "name": "delay",
+                            "type": "Float",
+                            "value": 5.5
+                        },
+                        {
+                            "name": "fadeDuration",
+                            "type": "Float",
+                            "value": 0.5
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Cutscene01",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0.0, 0.0 ],
+                    "anchorMax": [ 1.0, 1.0 ],
+                    "pivot": [ 0.5, 0.5 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 1.0, 1.0 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "UIElements/Cutscene/end1.png",
+                        "layer": 10
+                    },
+                    "color": [ 1.0, 1.0, 1.0, 1.0 ]
+                },
+                "Script": {
+                    "path": "scripts/UIScripts/delayed_fade_effect.lua",
+                    "data": [
+                        {
+                            "name": "delay",
+                            "type": "Float",
+                            "value": 2.5
+                        },
+                        {
+                            "name": "fadeDuration",
+                            "type": "Float",
+                            "value": 0.5
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "SkipButton",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0.06, 0.05 ],
+                    "anchorMax": [ 0.12, 0.15 ],
+                    "pivot": [ 0.5, 0.5 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 0, 0 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "UIElements/SkipButton/Skip.png",
+                        "layer": 10
+                    },
+                    "color": [ 1.0, 1.0, 1.0, 1.0 ]
+                },
+                "UIInteraction": {
+                    "isInteractable": true,
+                    "blockRaycast": true,
+                    "receiveHover": true,
+                    "receiveClick": true,
+                    "interactionPriority": 1
+                },
+                "Script": {
+                    "path": "scripts/ButtonScripts/button_menu_navigation.lua",
+                    "data": [
+                        {
+                            "name": "targetScene",
+                            "type": "String",
+                            "value": "ScoreMenu"
+                        },
+                        {
+                            "name": "timeToTransition",
+                            "type": "Float",
+                            "value": 24.0
+                        }
+                    ]
+                },
+                "Script": {
+                    "path": "scripts/ButtonScripts/button_visual_effect.lua",
+                    "data": [
+                        {
+                            "name": "hoverEntName",
+                            "type": "String",
+                            "value": "SkipButtonHovered"
+                        },
+                        {
+                            "name": "pressedEntName",
+                            "type": "String",
+                            "value": "SkipButtonPressed"
+                        }
+                    ]
+                }
+            }
+        },
+
+
+        {
+            "name": "SceneManager",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 10.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 0.08, 0.08, 0.08 ]
+                },
+                "Script": {
+                    "path": "scripts/scene_manager.lua",
+                    "data": [
+                        {
+                            "name": "hideMouse",
+                            "type": "Bool",
+                            "value": false
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

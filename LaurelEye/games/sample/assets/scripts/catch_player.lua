@@ -80,7 +80,7 @@ projectileSpeed = baseProjSpeed
 ---@type Vector3
 local ballGravity = Vector3.new(0.0, -9.8, 0.0)
 
-maxHealth = 3.0
+maxHealth = 5.0
 currentHealth = nil
 invincible = false
 invincibleTimer = 0.0
@@ -266,6 +266,11 @@ function onStart()
     end
 
     trajectoryLine = TrajectoryLine.new()
+
+    local sceneName = scene:getName()
+    if sceneName == "Level9" then
+        GameManager:setPlayerHealth(maxHealth)
+    end
 
     currentHealth = GameManager:getPlayerHealth()
     moveHealthBar()
@@ -700,6 +705,8 @@ function onTriggerEnter(data)
             local uiRender = ballInd:findComponent("UIRenderComponent")
             uiRender:setTransparency(1.0)
             SceneManager:destroy(data.entityA)
+        elseif tag == "explosive" then
+            SceneManager:changeScene("EndCutscene")
         end
     end
     local tagsB = data.entityB:getTags()
@@ -712,6 +719,8 @@ function onTriggerEnter(data)
             local uiRender = ballInd:findComponent("UIRenderComponent")
             uiRender:setTransparency(1.0)
             SceneManager:destroy(data.entityB)
+        elseif tag == "explosive" then
+            SceneManager:changeScene("EndCutscene")
         end
     end
 end

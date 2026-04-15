@@ -391,5 +391,6 @@ function destroySelf()
         local pos = transform:getWorldPosition()
         keyTransform:setWorldPosition(pos.x, 3.0, pos.z)
     end
+    GameManager:addEnemyKilled(1)
     SceneManager:destroy(self)
 end

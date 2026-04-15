@@ -29,7 +29,7 @@ namespace LaurelEye {
         // --- Reset All Stats ---
         void resetStats() {
             gensDestroyed = 0;
-            playerHealth = 3;
+            playerHealth = 5;
             timeCompleted = 0.0f;
             enemiesKilled = 0;
             combos = 0;
@@ -37,7 +37,7 @@ namespace LaurelEye {
 
     private:
         int gensDestroyed = 0;
-        float playerHealth = 3.0f;
+        float playerHealth = 5.0f;
         float timeCompleted = 0.0f;
         int enemiesKilled = 0;
         int combos = 0;

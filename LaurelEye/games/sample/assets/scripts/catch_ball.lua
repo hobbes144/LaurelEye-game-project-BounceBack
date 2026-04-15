@@ -188,7 +188,6 @@ function onTriggerEnter(data)
             end
             if tag == "target" then
                 SceneManager:destroy(entity)
-                GameManager:addGeneratorDestroyed(1)
                 attackPE:playFor(0.1)
                 impactPE:playFor(0.1)
                 return true
@@ -206,7 +205,7 @@ function onTriggerEnter(data)
                 ballaudio:play("hitGenerator")
 
                 Script.send(message)
-                
+                GameManager:addGeneratorDestroyed(1)
                 impactPE:playFor(0.1)
                 attackPE:playFor(0.2)
                 return true

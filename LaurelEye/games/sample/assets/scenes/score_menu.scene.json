@@ -1,0 +1,307 @@
+﻿{
+    "settings": {
+        "resetOnLoad": true,
+        "backgroundColor": [ 0.5, 0.25, 0.25 ],
+        "UIActiveOnLoad": true
+    },
+    "entities": [
+        {
+            "name": "Camera",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 15.0, 40.0 ],
+                    "rotation": [ -0.261799, 0.0, 0.0 ],
+                    "scale": [ 50.0, 1.0, 50.0 ]
+                },
+                "Camera": {
+
+                }
+            }
+        },
+        {
+            "name": "DirectionalLight",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, -1.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Light": {
+                    "type": "Directional",
+                    "direction": [ 0.75, -1.0, 0.75 ],
+                    "intensity": 4.0,
+                    "color": [ 1.0, 1.0, 1.0 ]
+                }
+            }
+        },
+        {
+            "name": "AmbientLight",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 0.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 1.0, 1.0, 1.0 ]
+                },
+                "Light": {
+                    "type": "Ambient",
+                    "intensity": 0.3,
+                    "color": [ 1.0, 1.0, 1.0 ]
+                }
+            }
+        },
+        {
+            "name": "Background",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0.0, 0.0 ],
+                    "anchorMax": [ 1.0, 1.0 ],
+                    "pivot": [ 0.5, 0.5 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 1, 1 ]
+                },
+                "UIRender": {
+                    "color": [ 0.85, 0.85, 0.8, 1.0 ]
+                }
+            }
+        },
+        {
+            "name": "Art",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0.0, 0.0 ],
+                    "anchorMax": [ 1.0, 1.0 ],
+                    "pivot": [ 0.5, 0.5 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 1, 1 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "UIElements/transparent_bounce.png",
+                        "layer": 10
+                    },
+                    "color": [ 1.0, 1.0, 1.0, 1.0 ]
+                }
+            }
+        },
+
+
+
+        {
+            "name": "BackButtonHovered",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0, 0 ],
+                    "anchorMax": [ 0, 0 ],
+                    "pivot": [ 0, 0 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 0, 0 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "UIElements/BackButton/backHovered.png",
+                        "layer": 10
+                    },
+                    "color": [ 1.0, 1.0, 1.0, 0.0 ]
+                }
+            }
+        },
+        {
+            "name": "BackButtonPressed",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0, 0 ],
+                    "anchorMax": [ 0, 0 ],
+                    "pivot": [ 0, 0 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 0, 0 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "UIElements/BackButton/backPressed.png",
+                        "layer": 10
+                    },
+                    "color": [ 1.0, 1.0, 1.0, 0.0 ]
+                }
+            }
+        },
+        {
+            "name": "Back Button",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0.06, 0.05 ],
+                    "anchorMax": [ 0.12, 0.15 ],
+                    "pivot": [ 0.5, 0.5 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 0, 0 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "UIElements/BackButton/back.png",
+                        "layer": 10
+                    },
+                    "color": [ 1.0, 1.0, 1.0, 1.0 ]
+                },
+                "UIInteraction": {
+                    "isInteractable": true,
+                    "blockRaycast": true,
+                    "receiveHover": true,
+                    "receiveClick": true,
+                    "interactionPriority": 1
+                },
+                "Script": {
+                    "path": "scripts/ButtonScripts/button_menu_navigation.lua",
+                    "data": [
+                        {
+                            "name": "targetScene",
+                            "type": "String",
+                            "value": "MainMenu"
+                        }
+
+                    ]
+                },
+                "Script": {
+                    "path": "scripts/ButtonScripts/button_visual_effect.lua",
+                    "data": [
+                        {
+                            "name": "hoverEntName",
+                            "type": "String",
+                            "value": "BackButtonHovered"
+                        },
+                        {
+                            "name": "pressedEntName",
+                            "type": "String",
+                            "value": "BackButtonPressed"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "SlowClap",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0.2, 0.6 ],
+                    "anchorMax": [ 0.8, 0.9 ],
+                    "pivot": [ 0.5, 0.5 ],
+                    "offset": [ 0.0, 0.0 ],
+                    "size": [ 0.0, 0.0 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "UIElements/ScoreScreen/congrats.png",
+                        "layer": 10
+                    },
+                    "transparency": 1.0
+                }
+            }
+        },
+        {
+            "name": "Murderer",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0.2, 0.5 ],
+                    "anchorMax": [ 0.7, 0.6 ],
+                    "pivot": [ 0.5, 0.5 ],
+                    "offset": [ 0.0, 0.0 ],
+                    "size": [ 0.0, 0.0 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "UIElements/ScoreScreen/enemies.png",
+                        "layer": 10
+                    },
+                    "transparency": 1.0
+                }
+            }
+        },
+        {
+            "name": "BodyCount",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0.7, 0.41 ],
+                    "anchorMax": [ 0.75, 0.51 ],
+                    "pivot": [ 0.5, 0.5 ],
+                    "offset": [ 0.0, 0.0 ],
+                    "size": [ 0.0, 0.0 ]
+                },
+                "UIText": {
+                    "text": "Play",
+                    "font": "fonts/KenneyBlocks.ttf",
+                    "fontSize": 36,
+                    "color": [ 0.2, 0.1, 1.0, 0.75 ],
+                    "transparency": 1.0,
+                    "alignment": "center",
+                    "wrap": false,
+                    "maxWidth": 300
+                },
+                "Script": {
+                    "path": "scripts/UIScripts/score_scripts.lua"
+                }
+            }
+        },
+        {
+            "name": "Vandalism",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0.2, 0.4 ],
+                    "anchorMax": [ 0.7, 0.5 ],
+                    "pivot": [ 0.5, 0.5 ],
+                    "offset": [ 0.0, 0.0 ],
+                    "size": [ 0.0, 0.0 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "UIElements/ScoreScreen/generators.png",
+                        "layer": 10
+                    },
+                    "transparency": 1.0
+                }
+            }
+        },
+        {
+            "name": "Destruction",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0.7, 0.51 ],
+                    "anchorMax": [ 0.75, 0.61 ],
+                    "pivot": [ 0.5, 0.5 ],
+                    "offset": [ 0.0, 0.0 ],
+                    "size": [ 0.0, 0.0 ]
+                },
+                "UIText": {
+                    "text": "Play",
+                    "font": "fonts/KenneyBlocks.ttf",
+                    "fontSize": 36,
+                    "color": [ 0.2, 0.1, 1.0, 0.75 ],
+                    "transparency": 1.0,
+                    "alignment": "center",
+                    "wrap": false,
+                    "maxWidth": 300
+                },
+                "Script": {
+                    "path": "scripts/UIScripts/score_scripts.lua"
+                }
+            }
+        },
+        {
+            "name": "SceneManager",
+            "components": {
+                "Transform": {
+                    "position": [ 0.0, 10.0, 0.0 ],
+                    "rotation": [ 1.0, 0.0, 0.0, 0.0 ],
+                    "scale": [ 0.08, 0.08, 0.08 ]
+                },
+                "Script": {
+                    "path": "scripts/scene_manager.lua",
+                    "data": [
+                        {
+                            "name": "hideMouse",
+                            "type": "Bool",
+                            "value": false
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

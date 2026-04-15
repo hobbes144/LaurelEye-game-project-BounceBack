@@ -64,6 +64,14 @@
         {
             "name": "BossLevel",
             "path": "scenes/boss_level.scene.json"
+        },
+        {
+            "name": "EndCutscene",
+            "path": "scenes/end_cutscene.scene.json"
+        },
+        {
+            "name": "ScoreMenu",
+            "path": "scenes/score_menu.scene.json"
         }
     ]
 }

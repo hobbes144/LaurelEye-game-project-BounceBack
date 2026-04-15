@@ -437,6 +437,7 @@ function destroySelf()
         local pos = transform:getWorldPosition()
         keyTransform:setWorldPosition(pos.x, pos.y + 3.0, pos.z)
     end
+    GameManager:addEnemyKilled(1)
 
     for color, hasKey in pairs(keyTypes) do
         if hasKey then
