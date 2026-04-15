@@ -339,7 +339,7 @@
                         {
                             "name": "targetScene",
                             "type": "String",
-                            "value": "Level1"
+                            "value": "TutorialTransition"
                         }
 
                     ]
