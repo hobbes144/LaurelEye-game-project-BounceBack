@@ -60,7 +60,7 @@
                     "size": [ 1, 1 ]
                 },
                 "UIRender": {
-                    "color": [ 1.0, 1.0, 1.0, 1.0 ]
+                    "color": [ 0.0, 0.0, 0.0, 1.0 ]
                 },
                 "UIInteraction": {
                     "isInteractable": true,
@@ -75,7 +75,7 @@
                         {
                             "name": "targetScene",
                             "type": "String",
-                            "value": "FMODLogo"
+                            "value": "TBDStudiosLogo"
                         },
                         {
                             "name": "timeToTransition",
@@ -87,18 +87,18 @@
             }
         },
         {
-            "name": "DigiPenLogo",
+            "name": "FMODLogo",
             "components": {
                 "UITransform": {
-                    "anchorMin": [ 0.15, 0.35 ],
-                    "anchorMax": [ 0.85, 0.65 ],
+                    "anchorMin": [ 0.25, 0.15 ],
+                    "anchorMax": [ 0.75, 0.85 ],
                     "pivot": [ 0.5, 0.5 ],
                     "offset": [ 0, 0 ],
                     "size": [ 0, 0 ]
                 },
                 "UIRender": {
                     "material": {
-                        "texture": "textures/UITextures/DigiPen_RGB_Red.png",
+                        "texture": "textures/UITextures/FMOD_Logo.png",
                         "layer": 10
                     },
                     "color": [ 1.0, 1.0, 1.0, 1.0 ]

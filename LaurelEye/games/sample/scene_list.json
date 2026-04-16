@@ -6,6 +6,10 @@
             "path": "scenes/UIScenes/digipenlogo.scene.json"
         },
         {
+            "name": "FMODLogo",
+            "path": "scenes/UIScenes/fmodlogo.scene.json"
+        },
+        {
             "name": "TBDStudiosLogo",
             "path": "scenes/UIScenes/tbdstudioslogo.scene.json"
         },
