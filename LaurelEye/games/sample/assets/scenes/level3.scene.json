@@ -111,60 +111,126 @@
                 }
             }
         },
+
+
+
         {
-            "name": "BallIndicator",
+            "name": "ResumeButtonPressed",
             "components": {
                 "UITransform": {
-                    "anchorMin": [ 0.0, 1.0 ],
-                    "anchorMax": [ 0.0, 1.0 ],
-                    "pivot": [ 0.5, 0.5 ],
-                    "offset": [ 45, -100 ],
-                    "size": [ 30, 30 ]
+                    "anchorMin": [ 0, 0 ],
+                    "anchorMax": [ 0, 0 ],
+                    "pivot": [ 0, 0 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 0, 0 ]
                 },
                 "UIRender": {
                     "material": {
-                        "texture": "textures/texture_01_red.png",
+                        "texture": "UIElements/SkipButton/skipPressed.png",
                         "layer": 10
                     },
-                    "transparency": 1.0
+                    "color": [ 1.0, 1.0, 1.0, 0.0 ]
                 }
             }
         },
         {
-            "name": "KeyIndicator",
+            "name": "ResumeButtonHovered",
             "components": {
                 "UITransform": {
-                    "anchorMin": [ 0.0, 1.0 ],
-                    "anchorMax": [ 0.0, 1.0 ],
-                    "pivot": [ 0.5, 0.5 ],
-                    "offset": [ 45, -150 ],
-                    "size": [ 30, 30 ]
+                    "anchorMin": [ 0, 0 ],
+                    "anchorMax": [ 0, 0 ],
+                    "pivot": [ 0, 0 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 0, 0 ]
                 },
                 "UIRender": {
                     "material": {
-                        "texture": "textures/texture_01_purple.png",
+                        "texture": "UIElements/SkipButton/skipHovered.png",
                         "layer": 10
                     },
-                    "transparency": 0.0
+                    "color": [ 1.0, 1.0, 1.0, 0.0 ]
                 }
             }
         },
+        {
+            "name": "ExitButtonPressed",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0, 0 ],
+                    "anchorMax": [ 0, 0 ],
+                    "pivot": [ 0, 0 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 0, 0 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "UIElements/ExitButton/exitPressed.png",
+                        "layer": 10
+                    },
+                    "color": [ 1.0, 1.0, 1.0, 0.0 ]
+                }
+            }
+        },
+        {
+            "name": "ExitButtonHovered",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0, 0 ],
+                    "anchorMax": [ 0, 0 ],
+                    "pivot": [ 0, 0 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 0, 0 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "UIElements/ExitButton/exitHovered.png",
+                        "layer": 10
+                    },
+                    "color": [ 1.0, 1.0, 1.0, 0.0 ]
+                }
+            }
+        },
+
+        {
+            "name": "HUDController",
+            "components": {
+                "Script": {
+                    "path": "scripts/UIScripts/hud_controller.lua",
+                    "data": [
+                        {
+                            "name": "PauseElements",
+                            "type": "Array",
+                            "value": [
+                                "ResumeButtonInter",
+                                "QuitButtonInter",
+                                "PauseBlocker",
+                                "PauseBorder",
+                                "ResumeButton",
+                                "ExitButton"
+                            ]
+                        },
+                        {
+                            "name": "PauseTimeScale",
+                            "type": "Float",
+                            "value": 0.0
+                        }
+                    ]
+                }
+            }
+        },
+
         {
             "name": "HCrosshair",
             "components": {
                 "UITransform": {
-                    "anchorMin": [ 0.5, 0.5 ],
-                    "anchorMax": [ 0.5, 0.5 ],
+                    "anchorMin": [ 0.492, 0.499 ],
+                    "anchorMax": [ 0.508, 0.501 ],
                     "pivot": [ 0.5, 0.5 ],
                     "offset": [ 0, 0 ],
-                    "size": [ 20, 2 ]
+                    "size": [ 0, 0 ]
                 },
                 "UIRender": {
-                    "material": {
-                        "texture": "textures/texture_01_light.png",
-                        "layer": 10
-                    },
-                    "transparency": 0.5
+                    "color": [ 0.8, 0.8, 0.8, 0.5 ]
                 }
             }
         },
@@ -172,11 +238,11 @@
             "name": "VCrosshair",
             "components": {
                 "UITransform": {
-                    "anchorMin": [ 0.5, 0.5 ],
-                    "anchorMax": [ 0.5, 0.5 ],
+                    "anchorMin": [ 0.4995, 0.485 ],
+                    "anchorMax": [ 0.5005, 0.515 ],
                     "pivot": [ 0.5, 0.5 ],
                     "offset": [ 0, 0 ],
-                    "size": [ 2, 20 ]
+                    "size": [ 0, 0 ]
                 },
                 "UIRender": {
                     "material": {
@@ -187,25 +253,285 @@
                 }
             }
         },
+
+        {
+            "name": "ResumeButtonInter",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0.4, 0.55 ],
+                    "anchorMax": [ 0.6, 0.65 ],
+                    "pivot": [ 0.5, 0.5 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 0, 0 ]
+                },
+                "UIInteraction": {
+                    "isInteractable": true,
+                    "blockRaycast": false,
+                    "receiveHover": true,
+                    "receiveClick": true,
+                    "interactionPriority": 1
+                },
+                "Script": {
+                    "path": "scripts/UIScripts/resume_button.lua",
+                    "data": [
+                        {
+                            "name": "HUDControllerName",
+                            "type": "String",
+                            "value": "HUDController"
+                        }
+
+                    ]
+                }
+            }
+        },
+        {
+            "name": "QuitButtonInter",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0.4, 0.35 ],
+                    "anchorMax": [ 0.6, 0.45 ],
+                    "pivot": [ 0.5, 0.5 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 0, 0 ]
+                },
+                "UIInteraction": {
+                    "isInteractable": true,
+                    "blockRaycast": false,
+                    "receiveHover": true,
+                    "receiveClick": true,
+                    "interactionPriority": 1
+                },
+                "Script": {
+                    "path": "scripts/ButtonScripts/button_menu_navigation.lua",
+                    "data": [
+                        {
+                            "name": "targetScene",
+                            "type": "String",
+                            "value": "MainMenu"
+                        }
+                    ]
+                }
+            }
+        },
+
+        {
+            "name": "PauseBlocker",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0.0, 0.0 ],
+                    "anchorMax": [ 1.0, 1.0 ],
+                    "pivot": [ 0.5, 0.5 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 0, 0 ]
+                },
+                "UIRender": {
+                    "color": [ 0.2, 0.2, 0.2, 0.5 ]
+                },
+                "UIInteraction": {
+                    "blockRaycast": false
+                }
+            }
+        },
+
+        {
+            "name": "PauseBorder",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0.4, 0.28 ],
+                    "anchorMax": [ 0.6, 0.68 ],
+                    "pivot": [ 0.5, 0.5 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 0, 0 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "textures/UITextures/UIBorder_02.png",
+                        "layer": 10
+                    },
+                    "color": [ 1.0, 1.0, 1.0, 1.0 ]
+                },
+                "UIInteraction": {
+                    "blockRaycast": false
+                }
+            }
+        },
+
+        {
+            "name": "ResumeButton",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0.47, 0.525 ],
+                    "anchorMax": [ 0.53, 0.625 ],
+                    "pivot": [ 0.5, 0.5 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 0, 0 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "UIElements/SkipButton/Skip.png",
+                        "layer": 10
+                    },
+                    "color": [ 1.0, 1.0, 0.0, 1.0 ]
+                },
+                "UIInteraction": {
+                    "isInteractable": true,
+                    "blockRaycast": true,
+                    "receiveHover": true,
+                    "receiveClick": true,
+                    "interactionPriority": 1
+                },
+                "Script": {
+                    "path": "scripts/UIScripts/resume_button.lua",
+                    "data": [
+                        {
+                            "name": "HUDControllerName",
+                            "type": "String",
+                            "value": "HUDController"
+                        }
+
+                    ]
+                },
+                "Script": {
+                    "path": "scripts/ButtonScripts/button_visual_effect.lua",
+                    "data": [
+                        {
+                            "name": "hoverEntName",
+                            "type": "String",
+                            "value": "ResumeButtonHovered"
+                        },
+                        {
+                            "name": "pressedEntName",
+                            "type": "String",
+                            "value": "ResumeButtonPressed"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "ExitButton",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0.47, 0.35 ],
+                    "anchorMax": [ 0.53, 0.45 ],
+                    "pivot": [ 0.5, 0.5 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 0, 0 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "UIElements/ExitButton/exit.png",
+                        "layer": 10
+                    },
+                    "color": [ 1.0, 1.0, 1.0, 1.0 ]
+                },
+                "UIInteraction": {
+                    "isInteractable": true,
+                    "blockRaycast": true,
+                    "receiveHover": true,
+                    "receiveClick": true,
+                    "interactionPriority": 1
+                },
+                "Script": {
+                    "path": "scripts/ButtonScripts/button_menu_navigation.lua",
+                    "data": [
+                        {
+                            "name": "targetScene",
+                            "type": "String",
+                            "value": "MainMenu"
+                        }
+                    ]
+                },
+                "Script": {
+                    "path": "scripts/ButtonScripts/button_visual_effect.lua",
+                    "data": [
+                        {
+                            "name": "hoverEntName",
+                            "type": "String",
+                            "value": "ExitButtonHovered"
+                        },
+                        {
+                            "name": "pressedEntName",
+                            "type": "String",
+                            "value": "ExitButtonPressed"
+                        }
+                    ]
+                }
+            }
+        },
+
+        {
+            "name": "BallIndicator",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0.03, 0.82 ],
+                    "anchorMax": [ 0.08, 0.90 ],
+                    "pivot": [ 0.0, 0.5 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 0, 0 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "textures/UITextures/BallIndicator_02.png",
+                        "layer": 10
+                    },
+                    "color": [ 1.0, 1.0, 1.0, 1.0 ]
+                }
+            }
+        },
+        {
+            "name": "KeyIndicator",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0.03, 0.72 ],
+                    "anchorMax": [ 0.08, 0.80 ],
+                    "pivot": [ 0.0, 0.5 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 0, 0 ]
+                },
+                "UIRender": {
+                    "material": {
+                        "texture": "textures/UITextures/KeyIndicator_02.png",
+                        "layer": 10
+                    },
+                    "transparency": 0.0
+                }
+            }
+        },
+
+        {
+            "name": "HealthBarContainer",
+            "components": {
+                "UITransform": {
+                    "anchorMin": [ 0.025, 0.91 ],
+                    "anchorMax": [ 0.3075, 0.96 ],
+                    "pivot": [ 0.5, 0.5 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 0, 0 ]
+                },
+                "UIRender": {
+                    "color": [ 0.1, 0.1, 0.1, 1.0 ]
+                }
+            }
+        },
         {
             "name": "HealthBar",
             "components": {
                 "UITransform": {
-                    "anchorMin": [ 0.0, 1.0 ],
-                    "anchorMax": [ 0.0, 1.0 ],
-                    "pivot": [ 0.0, 1.0 ],
-                    "offset": [ 30, -30 ],
-                    "size": [ 160, 30 ]
+                    "anchorMin": [ 0.02, 0.925 ],
+                    "anchorMax": [ 0.3, 0.975 ],
+                    "pivot": [ 0.5, 0.5 ],
+                    "offset": [ 0, 0 ],
+                    "size": [ 0, 0 ]
                 },
                 "UIRender": {
-                    "material": {
-                        "texture": "textures/texture_01_green.png",
-                        "layer": 10
-                    },
-                    "transparency": 1.0
+                    "color": [ 0.0, 1.0, 0.0, 1.0 ]
                 }
             }
         },
+
+
+
         {
             "name": "SpawnPoint",
             "components": {

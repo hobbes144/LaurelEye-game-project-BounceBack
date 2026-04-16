@@ -47,6 +47,10 @@ namespace LaurelEye::Graphics {
         Transform trans = Transform();
         //Loop Over UI Elements Drawing them in the shader as minimally as possible
         for ( IRenderComponent* rc : ctx.objects ) {
+            if ( !rc->isActive() ) {
+                continue;
+            }
+
             if ( auto* uiQuad = dynamic_cast<UI::UIRenderComponent*>(rc) ) {
                 // draw quad
                 auto temp = rc->getOwner()->getName();

@@ -586,7 +586,7 @@ namespace LaurelEye {
     }
 
     void EntityFactory::setupScriptComponent(Entity& entity, const rapidjson::Value& scriptData) {
-        if ( entity.findComponent<Scripting::ScriptComponent>() != nullptr ) return;
+        //if ( entity.findComponent<Scripting::ScriptComponent>() != nullptr ) return;
 
         // Register script component
         if ( !scriptData.HasMember("path") || !scriptData["path"].IsString() ) {

@@ -69,13 +69,14 @@ namespace LaurelEye::Scripting {
             "findComponent", &dynamicFindComponent,
             "setActive",
             [](Entity& ent, bool active) {
-                const auto& comps = ent.getComponents();
+            const auto& comps = ent.getComponents();
                 for ( const auto& comp : comps ) {
                     if ( comp ) {
                         comp->setIsActive(active);
                     }
                 }
-            });
+            }
+        );
 
         // --- Type-safe finders (fast path) ---
         entityType.set_function("findTransform", &safeFindComponent<TransformComponent>);

@@ -40,21 +40,15 @@ function onUpdate(dt)
 
 end
 
-function onHoverEnter()
-
-    log("Navigation Hover Enter")
-
-end
-
 function onClicked()
     if timeToTransition ~= nil and not hasTriggered then
-        log("Timer skipped via click")
+        --log("Timer skipped via click")
         triggerSceneChange()
         return
     end
 
     if targetScene == nil then
-        log("ERROR: targetScene is nil")
+        log("ERROR: Button Menu Navigatiopn targetScene is nil")
         return
     end
 

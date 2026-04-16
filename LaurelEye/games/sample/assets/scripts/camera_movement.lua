@@ -15,6 +15,8 @@ currentDistance = defaultDistance
 currentShoulder = defaultShoulder
 currentHeight = defaultHeight
 
+local cameraPaused = false;
+
 --@type TransformComponent
 local transform = nil
 --@type TransformComponent
@@ -50,6 +52,9 @@ function onStart()
 end
 
 function onUpdate(dt)
+
+    if cameraPaused then return end
+
     if target == nil then
         target = findPlayer()
         if target == nil then return end
@@ -168,9 +173,20 @@ function onMessage(message)
             debugLog("Camera offset set to playerIdleOffset.")
         end
     end
+
+    if message.topic == "Pause" then
+        if message.contents then
+            
+            cameraPaused = true
+        else
+            
+            cameraPaused = false
+        end
+    end
 end
 
 function onShutdown()
+    cameraPaused = false
     log("Camera controller stopped")
 end
 

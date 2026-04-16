@@ -61,9 +61,6 @@ function onUpdate(dt)
         log("Loading Scene: BossLevel")
         Window.setCursorMode(0, Window.CursorMode.Disabled)
         SceneManager:changeScene("BossLevel")
-    elseif Input:isKeyPressed(Key.Escape) then
-        Window.setCursorMode(0, Window.CursorMode.Normal)
-        SceneManager:changeScene("MainMenu")
     elseif Input:isKeyPressed(Key.F11) then
         fullscreen = not fullscreen
         Window.setFullscreen(0, fullscreen)

@@ -6,6 +6,14 @@ timeToReachGround = 0.08
 timeToReachAir    = 0.25
 dvDeadzone        = 0.05
 
+--UI Members
+playerPaused = false
+local healthBar = nil
+local barTransform = nil
+local barRender = nil
+local minX = 0.0
+local maxX = 0.0
+
 --Kickback anim cooldown
 kickbackCountdown = 0.0
 
@@ -235,6 +243,21 @@ function onStart()
 
     local scene = SceneManager:getCurrentScene()
 
+    healthBar = scene:findEntityByName("HealthBar")
+    if healthBar ~= nil then
+        barTransform = healthBar:findComponent("UITransformComponent")
+        barRender = healthBar:findComponent("UIRenderComponent")
+
+        if barTransform ~= nil then
+            minX = barTransform:getAnchorMin().x
+            maxX = barTransform:getAnchorMax().x
+        else
+            log("ERROR: Bar Transform Not Found")
+        end
+    else
+            log("ERROR: Health Bar Not Found")
+    end
+
     playerOrgobj = scene:findEntityByName("OrgPrefab")
     damageObj = scene:findEntityByName("damagePrefab")
     damageTex = damageObj:findComponent("Renderable3DComponent"):getMaterial()
@@ -299,12 +322,26 @@ function onMessage(msg)
         end
     end
 
+    if msg.topic == "Pause" then
+        if msg.contents then
+            Window.setCursorMode(0, Window.CursorMode.Normal)
+            playerPaused = true
+        else
+            Window.setCursorMode(0, Window.CursorMode.Disabled)
+            playerPaused = false
+        end
+    end
+
     if trajectoryLine ~= nil then
         trajectoryLine:ballCallback(msg)
     end
 end
 
 function onUpdate(dt)
+
+    if playerPaused then
+        return
+    end
 
 
     if kickbackRing == nil then
@@ -427,8 +464,6 @@ function onUpdate(dt)
     ----
 
     if not dead then
-
-
 
         -- Sprint
         moveSpeed = Input:isKeyHeld(Key.LShift) and sprintSpeed or baseSpeed
@@ -746,12 +781,25 @@ end
 function moveHealthBar()
     local scene = SceneManager:getCurrentScene()
     if scene == nil then return end
-    local healthBar = scene:findEntityByName("HealthBar")
-    local barTransform = healthBar:findComponent("UITransformComponent")
-    local hSize = barTransform:getSize()
-    local maxSize = 160
-    local percent = currentHealth / maxHealth
-    barTransform:setSize(Vector2.new(maxSize * percent, hSize.y))
+
+    if healthBar == nil then return end
+
+    local percent = math.max(0.0, math.min(1.0, currentHealth / maxHealth))
+
+    local newMaxX = minX + (maxX - minX) * percent
+
+    local anchorMin = barTransform:getAnchorMin()
+    local anchorMax = barTransform:getAnchorMax()
+
+    barTransform:setAnchorMin(Vector2.new(minX, anchorMin.y))
+    barTransform:setAnchorMax(Vector2.new(newMaxX, anchorMax.y))
+
+    local r = 1.0 - percent
+    local g = percent
+    local b = 0.0
+
+    barRender:setColor(Vector4.new(r, g, b, 1.0))
+
 end
 
 function changeLevels()
@@ -860,4 +908,8 @@ function flicker()
         end
         flickerTimer = 0.1
     end
+end
+
+function onShutdown()
+    playerPaused = false
 end
