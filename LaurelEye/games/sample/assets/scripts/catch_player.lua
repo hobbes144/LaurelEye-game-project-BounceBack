@@ -343,6 +343,19 @@ function onUpdate(dt)
         return
     end
 
+    local pos = transform:getWorldPosition()
+    if pos.y <= -4.0 then
+        local spawnPoint = scene:findEntityByName("SpawnPoint")
+        local spawnTrans = spawnPoint:findTransform()
+        local spawnPos = spawnTrans:getWorldPosition()
+
+        transform:setWorldPosition(spawnPos)
+        currentHealth = currentHealth - 1
+        GameManager:setPlayerHealth(currentHealth)
+        invincible = true
+        moveHealthBar()
+    end
+
 
     if kickbackRing == nil then
         local scene = SceneManager:getCurrentScene()
