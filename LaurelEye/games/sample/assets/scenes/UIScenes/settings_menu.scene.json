@@ -352,7 +352,7 @@
                     "sounds": [
                         {
                             "id": "demo",
-                            "path": "audio/footstep.mp3",
+                            "path": "audio/select_005.ogg",
                             "volume": 0.5,
                             "fadeSpeed": 1.0,
                             "loop": false,
@@ -421,7 +421,7 @@
                     "sounds": [
                         {
                             "id": "demo",
-                            "path": "audio/footstep.mp3",
+                            "path": "audio/select_005.ogg",
                             "volume": 0.5,
                             "fadeSpeed": 1.0,
                             "loop": false,
@@ -604,7 +604,7 @@
                     "sounds": [
                         {
                             "id": "demo",
-                            "path": "audio/footstep.mp3",
+                            "path": "audio/select_005.ogg",
                             "volume": 0.5,
                             "fadeSpeed": 1.0,
                             "loop": false,
@@ -673,7 +673,7 @@
                     "sounds": [
                         {
                             "id": "demo",
-                            "path": "audio/footstep.mp3",
+                            "path": "audio/select_005.ogg",
                             "volume": 0.5,
                             "fadeSpeed": 1.0,
                             "loop": false,
@@ -743,7 +743,7 @@
                     "sounds": [
                         {
                             "id": "demo",
-                            "path": "audio/footstep.mp3",
+                            "path": "audio/select_005.ogg",
                             "volume": 0.5,
                             "fadeSpeed": 1.0,
                             "loop": false,
@@ -812,7 +812,7 @@
                     "sounds": [
                         {
                             "id": "demo",
-                            "path": "audio/footstep.mp3",
+                            "path": "audio/select_005.ogg",
                             "volume": 0.5,
                             "fadeSpeed": 1.0,
                             "loop": false,
